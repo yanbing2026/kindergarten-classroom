@@ -968,11 +968,24 @@
         go('play', { key, level });
     }
     function buildQuestion(key, items, level) {
-        // Spaced repetition (research B): prefer an item that is currently due
-        // for review; fall back to a random item when none are due.
+        // Adaptive weighting (research C) + spaced repetition (B):
+        // weight each item by how much it needs practice — weak / due items
+        // get a higher chance of being selected; already-mastered-and-not-due
+        // items are still included but down-weighted.
         const catKey = `${key}_${level}`;
-        const dueItems = items.filter(it => isDue(catKey, it.id));
-        const correct = (dueItems.length ? dueItems : items)[Math.floor(Math.random() * (dueItems.length ? dueItems.length : items.length))];
+        const weighted = items.map(it => {
+            const count = getMasteryCount(catKey, it.id);
+            const due = isDue(catKey, it.id);
+            let w = 1;
+            if (count === 0) w = 5;            // never seen — high priority
+            else if (count < MASTERY_THRESHOLD) w = 3; // learning — medium-high
+            else if (due) w = 2;                // mastered but due for review
+            else w = 0.4;                       // mastered & not due — low
+            return { it, w };
+        });
+        const totalW = weighted.reduce((a, x) => a + x.w, 0);
+        let r = Math.random() * totalW, correct = weighted[0].it;
+        for (const x of weighted) { r -= x.w; if (r <= 0) { correct = x.it; break; } }
         if (key === 'letters') {
             if (Math.random() < 0.5) {
                 const choices = pickChoices(items, correct, 4);
