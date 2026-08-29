@@ -16,6 +16,7 @@ Open `index.html` in a browser — no build step required. For the installable/o
   - Colors: 10 basic hues at Kindergarten; 10 more nuanced ones (turquoise, maroon, navy...) at 1st Grade
   - Shapes: basic 2D shapes at Kindergarten; pentagon/hexagon/octagon/trapezoid plus 3D solids at 1st Grade
   - Animals: 12 common animals at Kindergarten; 12 more at 1st Grade
+- **Write mode (✏️)** for Letters, Numbers, Words, Chinese, and Spanish (at both grade levels): trace the current letter/number/word/character with a finger or mouse over a large "ghost" outline on a canvas, with 🔊 replay-audio and 🧹 clear buttons. Earns a diamond per item traced, 8 items per round.
 - **Math**: addition with visual object groups at Kindergarten (difficulty ramps as your child improves); addition to 20 *and* subtraction (take-away model) at 1st Grade.
 - **Progress tracking**: stars, per-category mastery bars (combined across both levels), and unlockable trophies — all saved locally in the browser (`localStorage`), no account needed.
 - **Audio**: 🔊/🔇 toggle in the top bar to mute text-to-speech. Automatically picks the best available browser/system voice per language — no API key, no setup, works fully offline.

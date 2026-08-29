@@ -175,6 +175,7 @@
         .big-btn.play { background: var(--mc-redstone); }
         .big-btn.again { background: var(--mc-emerald); }
         .big-btn.home { background: var(--mc-wood-dark); }
+        .big-btn.write { background: var(--mc-gold); color: var(--mc-ink); }
         .big-btn:active { transform: translateY(3px); box-shadow: inset -4px -4px 0 rgba(255,255,255,0.35), inset 4px 4px 0 rgba(0,0,0,0.3); }
         .center-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         .prompt-box { margin-bottom: 24px; }
@@ -243,6 +244,36 @@
         .trophy { font-family: var(--font-clear); background: var(--mc-wood); border: 3px solid var(--mc-ink); border-radius: 4px; box-shadow: inset 3px 3px 0 rgba(255,255,255,0.35), inset -3px -3px 0 rgba(0,0,0,0.2); padding: 16px; text-align: center; color: var(--mc-ink); font-weight: 700; }
         .trophy.locked { opacity: 0.4; background: var(--mc-stone); }
         .trophy .icon { font-size: 2.4rem; margin-bottom: 4px; }
+        .trace-box {
+            position: relative;
+            width: 100%;
+            max-width: 420px;
+            height: 220px;
+            background: #f3e6c8;
+            border: 3px solid var(--mc-ink);
+            border-radius: 8px;
+            box-shadow: inset 4px 4px 0 rgba(255,255,255,0.4), inset -4px -4px 0 rgba(0,0,0,0.15);
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        .trace-ghost {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-clear);
+            font-weight: 800;
+            color: rgba(43,27,14,0.2);
+            letter-spacing: 2px;
+            pointer-events: none;
+            user-select: none;
+            padding: 10px;
+            text-align: center;
+            word-break: break-word;
+        }
+        .trace-canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
+        .trace-controls { display: flex; gap: 10px; justify-content: center; margin-top: 14px; }
         .confetti-burst { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
         .confetti-piece { position: absolute; font-size: 1.8rem; animation: fall 1.1s ease-in forwards; }
         @keyframes fall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 1; } 100% { transform: translateY(70vh) rotate(360deg); opacity: 0; } }
@@ -425,6 +456,7 @@
     const MASTERY_THRESHOLD = 2;
     const ROUND_LENGTH = 8;
     const TROPHIES = [10, 25, 50, 100, 200];
+    const TRACE_CATEGORIES = ['letters', 'numbers', 'words', 'chinese', 'spanish'];
 
     // ---------- Progress storage ----------
     function loadProgress() {
@@ -717,11 +749,13 @@
             </div>`;
         }
         const cat = CATEGORIES.find(c => c.key === key);
+        const showWrite = TRACE_CATEGORIES.includes(key);
         return `${topbar(true)}
         <div class="center-col">
             <div style="font-size:4rem;">${cat.icon}</div>
             <h2>${cat.name} — ${LEVEL_LABELS[level]}</h2>
             <button class="big-btn learn" onclick="go('learn', {key:'${key}', level:'${level}'})">📖 Learn</button>
+            ${showWrite ? `<button class="big-btn write" onclick="startTrace('${key}', '${level}')">✏️ Write</button>` : ''}
             <button class="big-btn play" onclick="startQuiz('${key}', '${level}')">🎮 Play</button>
         </div>`;
     }
@@ -1086,15 +1120,138 @@
         }
     }
 
+    // ---------- Write / Trace ----------
+    let traceState = null;
+    function getTraceText(key, item) {
+        if (key === 'chinese') return item.hanzi;
+        if (key === 'spanish') return item.es;
+        return item.id;
+    }
+    function traceFontSize(text) {
+        const len = text.length;
+        if (len <= 2) return '6rem';
+        if (len <= 4) return '4rem';
+        if (len <= 6) return '3rem';
+        return '2.2rem';
+    }
+    function speakTraceItem(key, item) {
+        if (key === 'letters') {
+            speakSequence([item.id, `${item.id} is for ${item.word}`]);
+        } else if (key === 'chinese') {
+            speakBilingual(item.hanzi, 'zh-CN', item.en);
+        } else if (key === 'spanish') {
+            speakBilingual(item.es, 'es-ES', item.en);
+        } else {
+            speak(item.id);
+        }
+    }
+    function startTrace(key, level) {
+        const items = getCategoryItems(key, level);
+        const pool = shuffle(items).slice(0, Math.min(ROUND_LENGTH, items.length));
+        traceState = { key, level, items: pool, idx: 0, stars: 0 };
+        go('trace', { key, level });
+    }
+    function renderTrace() {
+        const { key, level } = state.params;
+        const cat = CATEGORIES.find(c => c.key === key);
+        const item = traceState.items[traceState.idx];
+        const text = getTraceText(key, item);
+        return `${topbar(true)}
+        <div class="center-col">
+            <div style="color:#999;margin-bottom:8px;">Item ${traceState.idx + 1} of ${traceState.items.length}</div>
+            <h2>${cat.icon} ${cat.name} — ${LEVEL_LABELS[level]} — Write</h2>
+            <div class="trace-box">
+                <div class="trace-ghost" style="font-size:${traceFontSize(text)};">${esc(text)}</div>
+                <canvas id="traceCanvas" class="trace-canvas"></canvas>
+            </div>
+            <div class="trace-controls">
+                <button class="icon-btn" onclick="replayTrace()">🔊</button>
+                <button class="icon-btn" onclick="clearTraceCanvas()">🧹</button>
+            </div>
+            <button class="big-btn again" onclick="nextTraceItem()">➡️ Next</button>
+        </div>`;
+    }
+    function afterTraceRender() {
+        const canvas = document.getElementById('traceCanvas');
+        if (canvas) {
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = Math.max(1, Math.round(rect.width * dpr));
+            canvas.height = Math.max(1, Math.round(rect.height * dpr));
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+            ctx.strokeStyle = '#3fbf5f';
+            ctx.lineWidth = 10;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            let drawing = false;
+            let lastX = 0, lastY = 0;
+            const getPos = (e) => {
+                const r = canvas.getBoundingClientRect();
+                return { x: e.clientX - r.left, y: e.clientY - r.top };
+            };
+            canvas.addEventListener('pointerdown', (e) => {
+                drawing = true;
+                const p = getPos(e);
+                lastX = p.x; lastY = p.y;
+                e.preventDefault();
+            });
+            canvas.addEventListener('pointermove', (e) => {
+                if (!drawing) return;
+                const p = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(p.x, p.y);
+                ctx.stroke();
+                lastX = p.x; lastY = p.y;
+                e.preventDefault();
+            });
+            const stop = () => { drawing = false; };
+            canvas.addEventListener('pointerup', stop);
+            canvas.addEventListener('pointerleave', stop);
+            canvas.addEventListener('pointercancel', stop);
+        }
+        const item = traceState.items[traceState.idx];
+        speakTraceItem(traceState.key, item);
+    }
+    function replayTrace() {
+        const item = traceState.items[traceState.idx];
+        speakTraceItem(traceState.key, item);
+    }
+    function clearTraceCanvas() {
+        const canvas = document.getElementById('traceCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    function nextTraceItem() {
+        awardStar();
+        traceState.stars += 1;
+        saveProgress();
+        confettiBurst();
+        renderTopbarStarsOnly();
+        traceState.idx += 1;
+        if (traceState.idx >= traceState.items.length) {
+            go('roundEnd', { stars: traceState.stars, key: 'trace', category: traceState.key, level: traceState.level });
+        } else {
+            render();
+        }
+    }
+
     // ---------- Round end / Progress ----------
     function renderRoundEnd() {
-        const { stars, key, level } = state.params;
+        const { stars, key, level, category } = state.params;
+        const isTrace = key === 'trace';
+        let againAction;
+        if (key === 'math') againAction = `startMath('${level}')`;
+        else if (isTrace) againAction = `startTrace('${category}', '${level}')`;
+        else againAction = `startQuiz('${key}', '${level}')`;
         return `${topbar(false)}
         <div class="center-col">
             <div style="font-size:4rem;">🎉</div>
-            <h2>Round Complete!</h2>
+            <h2>${isTrace ? 'Great Writing!' : 'Round Complete!'}</h2>
             <p style="font-size:1.4rem;color:#0e6b7a;font-weight:700;margin-bottom:20px;">You earned ${stars} 💎</p>
-            <button class="big-btn again" onclick="${key === 'math' ? `startMath('${level}')` : `startQuiz('${key}', '${level}')`}">🔁 Play Again</button>
+            <button class="big-btn again" onclick="${againAction}">🔁 ${isTrace ? 'Write More' : 'Play Again'}</button>
             <button class="big-btn home" onclick="goHome()">🏠 Home</button>
         </div>`;
     }
@@ -1134,11 +1291,13 @@
         else if (state.screen === 'learn') html = renderLearn();
         else if (state.screen === 'play') html = renderPlay();
         else if (state.screen === 'mathPlay') html = renderMathPlay();
+        else if (state.screen === 'trace') html = renderTrace();
         else if (state.screen === 'roundEnd') html = renderRoundEnd();
         else if (state.screen === 'progress') html = renderProgress();
         app.innerHTML = html;
         if (state.screen === 'play') afterPlayRender();
         if (state.screen === 'mathPlay') afterMathPlayRender();
+        if (state.screen === 'trace') afterTraceRender();
     }
 
     render();
