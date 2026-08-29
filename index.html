@@ -1471,7 +1471,30 @@
         <div class="star-badge" style="margin:0 auto 20px;width:fit-content;font-size:1.1rem;">💎 ${progress.stars} total diamonds</div>
         ${rows}
         <div style="margin-top:10px;font-weight:700;">Math solved: ${Object.values(progress.mathCorrect).reduce((a, b) => a + (b || 0), 0)} total</div>
-        <div class="trophy-grid">${trophies}</div>`;
+        <div class="trophy-grid">${trophies}</div>
+        <div style="text-align:center;margin-top:18px;">
+            <button class="choice-btn" style="padding:12px 20px;font-size:1rem;" onclick="exportProgress()">📤 Export progress (for parents)</button>
+        </div>`;
+    }
+    // Parent export (research G): dump the progress object as a downloadable JSON file.
+    function exportProgress() {
+        const data = JSON.stringify({
+            exportedAt: new Date().toISOString(),
+            stars: progress.stars,
+            mastery: progress.mastery,
+            due: progress.due,
+            mathCorrect: progress.mathCorrect,
+            version: 'kc_progress_v1'
+        }, null, 2);
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `kindergarten-progress-${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
     }
 
     // ---------- Main render ----------
