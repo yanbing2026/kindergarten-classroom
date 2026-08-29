@@ -277,6 +277,22 @@
         .confetti-burst { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
         .confetti-piece { position: absolute; font-size: 1.8rem; animation: fall 1.1s ease-in forwards; }
         @keyframes fall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 1; } 100% { transform: translateY(70vh) rotate(360deg); opacity: 0; } }
+        .level-toggle { display: flex; gap: 10px; justify-content: center; margin: 0 auto 20px; max-width: 460px; }
+        .lvl-btn {
+            flex: 1;
+            font-family: var(--font-clear);
+            font-weight: 800;
+            font-size: 1.05rem;
+            padding: 14px 10px;
+            border: 3px solid var(--mc-ink);
+            border-radius: 4px;
+            background: var(--mc-stone);
+            color: var(--mc-ink);
+            cursor: pointer;
+            box-shadow: inset 3px 3px 0 rgba(255,255,255,0.4), inset -3px -3px 0 rgba(0,0,0,0.25);
+        }
+        .lvl-btn.active { background: var(--mc-emerald); color: #fff; text-shadow: 2px 2px 0 rgba(0,0,0,0.3); }
+        .lvl-btn:active { transform: translateY(2px); box-shadow: inset -3px -3px 0 rgba(255,255,255,0.4), inset 3px 3px 0 rgba(0,0,0,0.25); }
     </style>
 </head>
 <body>
@@ -509,6 +525,21 @@
     // ---------- Audio ----------
     let muted = localStorage.getItem('kc_muted') === '1';
 
+    // ---------- Selected grade level (persisted) ----------
+    let currentLevel = localStorage.getItem('kc_level') || 'K';
+    function setLevel(lv) {
+        currentLevel = lv;
+        localStorage.setItem('kc_level', lv);
+        if (state.screen === 'category' && state.params) state.params.level = lv;
+        render();
+    }
+    function levelToggle() {
+        return `<div class="level-toggle">
+            <button class="lvl-btn ${currentLevel === 'K' ? 'active' : ''}" onclick="setLevel('K')">🌱 Kindergarten</button>
+            <button class="lvl-btn ${currentLevel === 'G1' ? 'active' : ''}" onclick="setLevel('G1')">🌿 1st Grade</button>
+        </div>`;
+    }
+
     // ---------- Voice selection ----------
     // Browsers expose several voices per language; the default is often a
     // low-quality robotic one. Score the available voices and cache the
@@ -663,7 +694,7 @@
     function renderHome() {
         const cards = CATEGORIES.map(c => {
             const { mastered, total } = categoryMasteredAllLevels(c);
-            return `<div class="card cat-${c.key}" onclick="go('level', {key:'${c.key}'})">
+            return `<div class="card cat-${c.key}" onclick="go('category', {key:'${c.key}', level: currentLevel})">
                 <div class="icon">${c.icon}</div>
                 <div class="label">${c.name}</div>
                 <div class="sublabel">${mastered}/${total} mastered</div>
@@ -673,9 +704,10 @@
         return `
         ${topbar(false)}
         <h1>⛏️ Minecraft Classroom ⛏️</h1>
+        ${levelToggle()}
         <div class="grid">
             ${cards}
-            <div class="card cat-math" onclick="go('level', {key:'math'})">
+            <div class="card cat-math" onclick="go('category', {key:'math', level: currentLevel})">
                 <div class="icon">➕</div>
                 <div class="label">Math</div>
                 <div class="sublabel">${mathSolved} solved</div>
@@ -690,33 +722,6 @@
     }
 
     // ---------- Render: Level picker ----------
-    function renderLevelPicker() {
-        const key = state.params.key;
-        const isMath = key === 'math';
-        const cat = isMath ? null : CATEGORIES.find(c => c.key === key);
-        const name = isMath ? 'Math' : cat.name;
-        const icon = isMath ? '➕' : cat.icon;
-        const cards = ['K', 'G1'].map(lvKey => {
-            let sub;
-            if (isMath) {
-                sub = `${progress.mathCorrect[lvKey] || 0} solved`;
-            } else {
-                const items = cat.levels[lvKey].items;
-                const mastered = categoryMasteredCount(`${key}_${lvKey}`, items);
-                sub = `${mastered}/${items.length} mastered`;
-            }
-            return `<div class="card" onclick="go('category', {key:'${key}', level:'${lvKey}'})">
-                <div class="icon">${LEVEL_ICONS[lvKey]}</div>
-                <div class="label">${LEVEL_LABELS[lvKey]}</div>
-                <div class="sublabel">${sub}</div>
-            </div>`;
-        }).join('');
-        return `${topbar(true)}
-        <h2>${icon} ${name}</h2>
-        <div class="grid">${cards}</div>
-        <div class="footer">Choose a grade level!</div>`;
-    }
-
     function topbar(showBack) {
         return `<div class="topbar">
             <div class="topbar-left">
@@ -754,6 +759,7 @@
         <div class="center-col">
             <div style="font-size:4rem;">${cat.icon}</div>
             <h2>${cat.name} — ${LEVEL_LABELS[level]}</h2>
+            ${levelToggle()}
             <button class="big-btn learn" onclick="go('learn', {key:'${key}', level:'${level}'})">📖 Learn</button>
             ${showWrite ? `<button class="big-btn write" onclick="startTrace('${key}', '${level}')">✏️ Write</button>` : ''}
             <button class="big-btn play" onclick="startQuiz('${key}', '${level}')">🎮 Play</button>
@@ -1286,7 +1292,6 @@
         const app = document.getElementById('app');
         let html = '';
         if (state.screen === 'home') html = renderHome();
-        else if (state.screen === 'level') html = renderLevelPicker();
         else if (state.screen === 'category') html = renderCategory();
         else if (state.screen === 'learn') html = renderLearn();
         else if (state.screen === 'play') html = renderPlay();

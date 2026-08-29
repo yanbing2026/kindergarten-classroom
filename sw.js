@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kc-shell-v1';
+const CACHE_NAME = 'kc-shell-v2';
 const APP_SHELL = [
   './',
   './index.html',
@@ -30,18 +30,38 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return;
   if (event.request.method !== 'GET') return;
 
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const networkFetch = fetch(event.request)
-        .then((response) => {
-          if (response && response.status === 200) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-          }
-          return response;
-        })
-        .catch(() => cached);
-      return cached || networkFetch;
-    })
-  );
+  event.respondWith((async () => {
+    const url = new URL(event.request.url);
+    if (url.origin !== self.location.origin) return fetch(event.request);
+    if (event.request.method !== 'GET') return fetch(event.request);
+
+    // Network-first for page navigations so HTML/level updates are always fresh.
+    if (event.request.mode === 'navigate') {
+      try {
+        const network = await fetch(event.request);
+        if (network && network.status === 200) {
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, network.clone()));
+        }
+        return network;
+      } catch (e) {
+        return (await caches.match(event.request)) || (await caches.match('./')) || Response.error();
+      }
+    }
+
+    // Cache-first for static assets, updating the cache in the background.
+    const cached = await caches.match(event.request);
+    if (cached) {
+      fetch(event.request).then((response) => {
+        if (response && response.status === 200) {
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, response.clone()));
+        }
+      }).catch(() => {});
+      return cached;
+    }
+    const network = await fetch(event.request);
+    if (network && network.status === 200) {
+      caches.open(CACHE_NAME).then((cache) => cache.put(event.request, network.clone()));
+    }
+    return network;
+  })());
 });
