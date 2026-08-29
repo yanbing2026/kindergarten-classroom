@@ -577,6 +577,7 @@
                 } else {
                     p.mastery = {};
                 }
+                if (!p.due || typeof p.due !== 'object') p.due = {};
                 return p;
             }
         } catch (e) {}
@@ -585,15 +586,45 @@
     function saveProgress() { localStorage.setItem('kc_progress_v1', JSON.stringify(progress)); }
     let progress = loadProgress();
 
+    // ---------- Spaced repetition (research B) ----------
+    // mastery[cat][id] stays a count (backward-compatible). A parallel due[]
+    // map tracks when an item should next be reviewed. Intervals expand as the
+    // child masters the item: 1d -> 3d -> 7d -> 14d.
+    const SR_INTERVALS_DAYS = [1, 3, 7, 14, 30];
+    function srIntervalDays(count) {
+        // count = number of times correctly answered (mastery count)
+        const idx = Math.max(0, Math.min(count - 1, SR_INTERVALS_DAYS.length - 1));
+        return SR_INTERVALS_DAYS[idx];
+    }
+    function dueTimestampFor(cat, id) {
+        const m = (progress.due && progress.due[cat] && progress.due[cat][id]) || 0;
+        return m;
+    }
+    function isDue(cat, id) {
+        const t = dueTimestampFor(cat, id);
+        return t === 0 || Date.now() >= t;
+    }
+    function scheduleNextReview(cat, id, count) {
+        if (!progress.due) progress.due = {};
+        if (!progress.due[cat]) progress.due[cat] = {};
+        const days = srIntervalDays(count);
+        progress.due[cat][id] = Date.now() + days * 24 * 60 * 60 * 1000;
+    }
+
     function getMasteryCount(cat, id) {
         return (progress.mastery[cat] && progress.mastery[cat][id]) || 0;
     }
     function bumpMastery(cat, id) {
         if (!progress.mastery[cat]) progress.mastery[cat] = {};
-        progress.mastery[cat][id] = (progress.mastery[cat][id] || 0) + 1;
+        const count = (progress.mastery[cat][id] || 0) + 1;
+        progress.mastery[cat][id] = count;
+        scheduleNextReview(cat, id, count);
     }
     function categoryMasteredCount(cat, items) {
         return items.filter(it => getMasteryCount(cat, it.id) >= MASTERY_THRESHOLD).length;
+    }
+    function categoryDueCount(cat, items) {
+        return items.filter(it => getMasteryCount(cat, it.id) >= MASTERY_THRESHOLD && isDue(cat, it.id)).length;
     }
     function categoryMasteredAllLevels(cat) {
         let mastered = 0, total = 0;
@@ -777,7 +808,13 @@
         const mathSolved = Object.values(progress.mathCorrect).reduce((a, b) => a + (b || 0), 0);
         const cards = CATEGORIES.map(c => {
             const { mastered, total } = categoryMasteredAllLevels(c);
-            const sub = c.key === 'math' ? `${mathSolved} solved` : `${mastered}/${total} mastered`;
+            let sub = c.key === 'math' ? `${mathSolved} solved` : `${mastered}/${total} mastered`;
+            // Show a review nudge when spaced-repetition items are due.
+            if (c.key !== 'math') {
+                let due = 0;
+                for (const lv of c.levels) due += categoryDueCount(`${c.key}_${lv.id}`, lv.items);
+                if (due > 0) sub = `🔄 ${due} to review`;
+            }
             const action = c.leveled ? `go('level', {key:'${c.key}'})` : `go('category', {key:'${c.key}', level:'L1'})`;
             return `<div class="card cat-${c.key}" onclick="${action}">
                 <div class="icon">${c.icon}</div>
@@ -931,7 +968,11 @@
         go('play', { key, level });
     }
     function buildQuestion(key, items, level) {
-        const correct = items[Math.floor(Math.random() * items.length)];
+        // Spaced repetition (research B): prefer an item that is currently due
+        // for review; fall back to a random item when none are due.
+        const catKey = `${key}_${level}`;
+        const dueItems = items.filter(it => isDue(catKey, it.id));
+        const correct = (dueItems.length ? dueItems : items)[Math.floor(Math.random() * (dueItems.length ? dueItems.length : items.length))];
         if (key === 'letters') {
             if (Math.random() < 0.5) {
                 const choices = pickChoices(items, correct, 4);
