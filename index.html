@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Classroom">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="description" content="A supplemental kindergarten learning app: letters, numbers, words, Chinese, Spanish, colors, shapes, animals, and math.">
+    <meta name="description" content="A supplemental kindergarten learning app: letters, numbers, words, Chinese, Spanish, and math.">
     <title>⛏️ Minecraft Classroom ⛏️</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
@@ -131,9 +131,6 @@
         .card.cat-letters { background: var(--mc-wood); }
         .card.cat-numbers { background: var(--mc-stone); }
         .card.cat-words { background: #e8d9b5; }
-        .card.cat-colors { background: #eef0f2; }
-        .card.cat-shapes { background: #cfe0e6; }
-        .card.cat-animals { background: var(--mc-grass); }
         .card.cat-chinese { background: #e2a63c; }
         .card.cat-spanish { background: #e08a4f; }
         .card.cat-math { background: var(--mc-gold); }
@@ -301,16 +298,6 @@
         {id:'Y',word:'Yo-yo',emoji:'🪀'},{id:'Z',word:'Zebra',emoji:'🦓'}
     ];
     const NUMBERS = Array.from({length:20}, (_,i) => ({id:String(i+1), n:i+1}));
-    const COLORS = [
-        {id:'Red',hex:'#ff6b6b'},{id:'Orange',hex:'#ff9f43'},{id:'Yellow',hex:'#feca57'},
-        {id:'Green',hex:'#55efc4'},{id:'Blue',hex:'#48dbfb'},{id:'Purple',hex:'#a29bfe'},
-        {id:'Pink',hex:'#ff9ff3'},{id:'Brown',hex:'#a0522d'},{id:'Black',hex:'#2d3436'},
-        {id:'White',hex:'#ffffff',border:true}
-    ];
-    const SHAPES = [
-        {id:'Circle'},{id:'Square'},{id:'Rectangle'},{id:'Triangle'},
-        {id:'Star',emoji:'⭐'},{id:'Heart',emoji:'❤️'},{id:'Diamond',emoji:'💎'},{id:'Oval'}
-    ];
 
     // ---------- Shared vocabulary (English / Chinese / Spanish) ----------
     // One source of truth per level. Add a word here and it appears in all three
@@ -545,17 +532,6 @@
         id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: []
     }));
 
-    // ---------- Animals (2 levels: Level 1 / Level 2) ----------
-    const ANIMALS_L1 = [
-        {id:'Cat',emoji:'🐱'},{id:'Dog',emoji:'🐶'},{id:'Bird',emoji:'🐦'},{id:'Fish',emoji:'🐟'},
-        {id:'Elephant',emoji:'🐘'},{id:'Lion',emoji:'🦁'},{id:'Cow',emoji:'🐮'},{id:'Duck',emoji:'🦆'},
-        {id:'Sheep',emoji:'🐑'},{id:'Horse',emoji:'🐴'},{id:'Frog',emoji:'🐸'},{id:'Owl',emoji:'🦉'}
-    ];
-    const ANIMALS_L2 = [
-        {id:'Bear',emoji:'🐻'},{id:'Rabbit',emoji:'🐰'},{id:'Monkey',emoji:'🐵'},{id:'Tiger',emoji:'🐯'},
-        {id:'Panda',emoji:'🐼'},{id:'Penguin',emoji:'🐧'},{id:'Turtle',emoji:'🐢'},{id:'Butterfly',emoji:'🦋'},
-        {id:'Bee',emoji:'🐝'},{id:'Snake',emoji:'🐍'},{id:'Squirrel',emoji:'🐿️'},{id:'Kangaroo',emoji:'🦘'}
-    ];
 
     // ---------- Category registry ----------
     const CATEGORIES = [
@@ -564,12 +540,6 @@
         {key:'words', name:'Words', icon:'📖', leveled:true, levels:WORDS_LEVELS},
         {key:'chinese', name:'Chinese', icon:'🇨🇳', leveled:true, levels:CHINESE_LEVELS},
         {key:'spanish', name:'Spanish', icon:'🇪🇸', leveled:true, levels:SPANISH_LEVELS},
-        {key:'colors', name:'Colors', icon:'🌈', leveled:false, levels:[{id:'L1', label:'Level 1', icon:LEVEL_ICONS[0], items:COLORS}]},
-        {key:'shapes', name:'Shapes', icon:'🔷', leveled:false, levels:[{id:'L1', label:'Level 1', icon:LEVEL_ICONS[0], items:SHAPES}]},
-        {key:'animals', name:'Animals', icon:'🐾', leveled:true, levels:[
-            {id:'L1', label:'Level 1', icon:LEVEL_ICONS[0], items:ANIMALS_L1},
-            {id:'L2', label:'Level 2', icon:LEVEL_ICONS[1], items:ANIMALS_L2}
-        ]},
         {key:'math', name:'Math', icon:'➕', leveled:true, levels:MATH_LEVELS}
     ];
     function getCategoryItems(key, level) {
@@ -925,9 +895,6 @@
             let visual, label = it.id;
             if (key === 'letters') visual = `<div class="icon">${it.id}</div>`;
             else if (key === 'numbers') visual = `<div class="icon">${it.n}</div>`;
-            else if (key === 'colors') visual = colorVisualHTML(it, 60);
-            else if (key === 'shapes') visual = shapeVisualHTML(it, 55);
-            else if (key === 'animals') visual = `<div class="icon">${it.emoji}</div>`;
             else if (key === 'words') { visual = `<div class="icon">${wordMediaHTML(it, 56)}</div>`; label = it.id; }
             else if (key === 'chinese') {
                 visual = `<div class="icon">${wordMediaHTML(it, 56)}</div>`;
@@ -1024,36 +991,6 @@
                     choices: choices.map(c => ({ id: c.id, html: c.n, speak: c.n }))
                 };
             }
-        }
-        if (key === 'colors') {
-            const choices = pickChoices(items, correct, 4);
-            return {
-                mode: 'find',
-                promptHTML: `<div class="prompt-word">Find the color: ${correct.id}</div>`,
-                speakText: `Find the color ${correct.id}`,
-                itemId: correct.id,
-                choices: choices.map(c => ({ id: c.id, html: colorVisualHTML(c, 70), speak: c.id }))
-            };
-        }
-        if (key === 'shapes') {
-            const choices = pickChoices(items, correct, 4);
-            return {
-                mode: 'find',
-                promptHTML: `<div class="prompt-word">Find the shape: ${correct.id}</div>`,
-                speakText: `Find the ${correct.id}`,
-                itemId: correct.id,
-                choices: choices.map(c => ({ id: c.id, html: shapeVisualHTML(c, 60), speak: c.id }))
-            };
-        }
-        if (key === 'animals') {
-            const choices = pickChoices(items, correct, 4);
-            return {
-                mode: 'find',
-                promptHTML: `<div class="prompt-word">Find the: ${correct.id}</div>`,
-                speakText: `Find the ${correct.id}`,
-                itemId: correct.id,
-                choices: choices.map(c => ({ id: c.id, html: `<div style="font-size:3rem;">${c.emoji}</div>`, speak: c.id }))
-            };
         }
         if (key === 'words') {
             const choices = pickChoices(items, correct, 4);
