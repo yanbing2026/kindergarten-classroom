@@ -325,114 +325,53 @@
     ];
     const NUMBERS_K = Array.from({length:20}, (_,i) => ({id:String(i+1), n:i+1}));
     const NUMBERS_1 = [21,22,23,24,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100].map(n => ({id:String(n), n}));
-    const WORDS_K = [
-        {id:'pig',emoji:'🐷',img:'images/words/pig.png'},{id:'cow',emoji:'🐮',img:'images/words/cow.png'},
-        {id:'cat',emoji:'🐱',img:'images/words/cat.png'},{id:'dog',emoji:'🐶',img:'images/words/dog.png'},
-        {id:'bat',emoji:'🦇',img:'images/words/bat.png'},{id:'bee',emoji:'🐝',img:'images/words/bee.png'},
-        {id:'fox',emoji:'🦊',img:'images/words/fox.png'},{id:'egg',emoji:'🥚',img:'images/words/egg.png'},
-        {id:'bed',emoji:'🛏️',img:'images/words/bed.png'},{id:'map',emoji:'🗺️',img:'images/words/map.png'},
-        {id:'log',emoji:'🪵',img:'images/words/log.png'},{id:'axe',emoji:'🪓',img:'images/words/axe.png'},
-        {id:'bow',emoji:'🏹',img:'images/words/bow.png'},{id:'gem',emoji:'💎',img:'images/words/gem.png'},
-        {id:'sun',emoji:'☀️'},{id:'web',emoji:'🕸️',img:'images/words/web.png'}
+    // ---------- Shared vocabulary (English / Chinese / Spanish) ----------
+    // Single source of truth per level. Add a word here once and it becomes
+    // available in all three languages automatically (see derived arrays below).
+    const VOCAB_K = [
+        {id:'pig',emoji:'🐷',img:'images/words/pig.png',en:'pig',zh:{hanzi:'猪',pinyin:'zhū'},es:'Cerdo'},
+        {id:'cow',emoji:'🐮',img:'images/words/cow.png',en:'cow',zh:{hanzi:'牛',pinyin:'niú'},es:'Vaca'},
+        {id:'cat',emoji:'🐱',img:'images/words/cat.png',en:'cat',zh:{hanzi:'猫',pinyin:'māo'},es:'Gato'},
+        {id:'dog',emoji:'🐶',img:'images/words/dog.png',en:'dog',zh:{hanzi:'狗',pinyin:'gǒu'},es:'Perro'},
+        {id:'bat',emoji:'🦇',img:'images/words/bat.png',en:'bat',zh:{hanzi:'蝙蝠',pinyin:'biān fú'},es:'Murciélago'},
+        {id:'bee',emoji:'🐝',img:'images/words/bee.png',en:'bee',zh:{hanzi:'蜜蜂',pinyin:'mì fēng'},es:'Abeja'},
+        {id:'fox',emoji:'🦊',img:'images/words/fox.png',en:'fox',zh:{hanzi:'狐狸',pinyin:'hú li'},es:'Zorro'},
+        {id:'egg',emoji:'🥚',img:'images/words/egg.png',en:'egg',zh:{hanzi:'蛋',pinyin:'dàn'},es:'Huevo'},
+        {id:'bed',emoji:'🛏️',img:'images/words/bed.png',en:'bed',zh:{hanzi:'床',pinyin:'chuáng'},es:'Cama'},
+        {id:'map',emoji:'🗺️',img:'images/words/map.png',en:'map',zh:{hanzi:'地图',pinyin:'dì tú'},es:'Mapa'},
+        {id:'log',emoji:'🪵',img:'images/words/log.png',en:'log',zh:{hanzi:'木头',pinyin:'mù tou'},es:'Leño'},
+        {id:'axe',emoji:'🪓',img:'images/words/axe.png',en:'axe',zh:{hanzi:'斧头',pinyin:'fǔ tou'},es:'Hacha'},
+        {id:'bow',emoji:'🏹',img:'images/words/bow.png',en:'bow',zh:{hanzi:'弓',pinyin:'gōng'},es:'Arco'},
+        {id:'gem',emoji:'💎',img:'images/words/gem.png',en:'gem',zh:{hanzi:'宝石',pinyin:'bǎo shí'},es:'Gema'},
+        {id:'sun',emoji:'☀️',en:'sun',zh:{hanzi:'太阳',pinyin:'tài yáng'},es:'Sol'},
+        {id:'web',emoji:'🕸️',img:'images/words/web.png',en:'web',zh:{hanzi:'网',pinyin:'wǎng'},es:'Red'}
     ];
-    const WORDS_1 = [
-        {id:'cake',emoji:'🎂',img:'images/words/cake.png'},{id:'cube',emoji:'🧊',img:'images/words/cube.png'},
-        {id:'home',emoji:'🏠'},{id:'gate',emoji:'🚪',img:'images/words/gate.png'},
-        {id:'chest',emoji:'🧰',img:'images/words/chest.png'},{id:'sword',emoji:'⚔️',img:'images/words/sword.png'},
-        {id:'torch',emoji:'🔦',img:'images/words/torch.png'},{id:'book',emoji:'📚',img:'images/words/book.png'},
-        {id:'boat',emoji:'🚤',img:'images/words/boat.png'},{id:'apple',emoji:'🍎',img:'images/words/apple.png'},
-        {id:'bread',emoji:'🍞',img:'images/words/bread.png'},{id:'slime',emoji:'🟢',img:'images/words/slime.png'},
-        {id:'iron',emoji:'⚙️',img:'images/words/iron.png'},{id:'gold',emoji:'🥇',img:'images/words/gold.png'},
-        {id:'shield',emoji:'🛡️',img:'images/words/shield.png'},{id:'mine',emoji:'⛏️',img:'images/words/mine.png'}
+    const VOCAB_1 = [
+        {id:'cake',emoji:'🎂',img:'images/words/cake.png',en:'cake',zh:{hanzi:'蛋糕',pinyin:'dàn gāo'},es:'Pastel'},
+        {id:'cube',emoji:'🧊',img:'images/words/cube.png',en:'cube',zh:{hanzi:'方块',pinyin:'fāng kuài'},es:'Cubo'},
+        {id:'home',emoji:'🏠',en:'home',zh:{hanzi:'家',pinyin:'jiā'},es:'Casa'},
+        {id:'gate',emoji:'🚪',img:'images/words/gate.png',en:'gate',zh:{hanzi:'门',pinyin:'mén'},es:'Puerta'},
+        {id:'chest',emoji:'🧰',img:'images/words/chest.png',en:'chest',zh:{hanzi:'箱子',pinyin:'xiāng zi'},es:'Cofre'},
+        {id:'sword',emoji:'⚔️',img:'images/words/sword.png',en:'sword',zh:{hanzi:'剑',pinyin:'jiàn'},es:'Espada'},
+        {id:'torch',emoji:'🔦',img:'images/words/torch.png',en:'torch',zh:{hanzi:'火把',pinyin:'huǒ bǎ'},es:'Antorcha'},
+        {id:'book',emoji:'📚',img:'images/words/book.png',en:'book',zh:{hanzi:'书',pinyin:'shū'},es:'Libro'},
+        {id:'boat',emoji:'🚤',img:'images/words/boat.png',en:'boat',zh:{hanzi:'船',pinyin:'chuán'},es:'Bote'},
+        {id:'apple',emoji:'🍎',img:'images/words/apple.png',en:'apple',zh:{hanzi:'苹果',pinyin:'píng guǒ'},es:'Manzana'},
+        {id:'bread',emoji:'🍞',img:'images/words/bread.png',en:'bread',zh:{hanzi:'面包',pinyin:'miàn bāo'},es:'Pan'},
+        {id:'slime',emoji:'🟢',img:'images/words/slime.png',en:'slime',zh:{hanzi:'史莱姆',pinyin:'shǐ lái mǔ'},es:'Slime'},
+        {id:'iron',emoji:'⚙️',img:'images/words/iron.png',en:'iron',zh:{hanzi:'铁',pinyin:'tiě'},es:'Hierro'},
+        {id:'gold',emoji:'🥇',img:'images/words/gold.png',en:'gold',zh:{hanzi:'金',pinyin:'jīn'},es:'Oro'},
+        {id:'shield',emoji:'🛡️',img:'images/words/shield.png',en:'shield',zh:{hanzi:'盾牌',pinyin:'dùn pái'},es:'Escudo'},
+        {id:'mine',emoji:'⛏️',img:'images/words/mine.png',en:'mine',zh:{hanzi:'矿',pinyin:'kuàng'},es:'Mina'}
     ];
-    const CHINESE_K = [
-        {id:'Hello', hanzi:'你好', pinyin:'nǐ hǎo', en:'Hello', emoji:'👋'},
-        {id:'ThankYou', hanzi:'谢谢', pinyin:'xiè xie', en:'Thank you', emoji:'🙏'},
-        {id:'Bye', hanzi:'再见', pinyin:'zài jiàn', en:'Bye', emoji:'👋'},
-        {id:'Love', hanzi:'爱', pinyin:'ài', en:'Love', emoji:'❤️'},
-        {id:'Mom', hanzi:'妈妈', pinyin:'mā ma', en:'Mom', emoji:'👩'},
-        {id:'Dad', hanzi:'爸爸', pinyin:'bà ba', en:'Dad', emoji:'👨'},
-        {id:'Cat', hanzi:'猫', pinyin:'māo', en:'Cat', emoji:'🐱'},
-        {id:'Dog', hanzi:'狗', pinyin:'gǒu', en:'Dog', emoji:'🐶'},
-        {id:'Water', hanzi:'水', pinyin:'shuǐ', en:'Water', emoji:'💧'},
-        {id:'Sun', hanzi:'太阳', pinyin:'tài yáng', en:'Sun', emoji:'☀️'},
-        {id:'Moon', hanzi:'月亮', pinyin:'yuè liang', en:'Moon', emoji:'🌙'},
-        {id:'Star', hanzi:'星星', pinyin:'xīng xing', en:'Star', emoji:'⭐'},
-        {id:'One', hanzi:'一', pinyin:'yī', en:'One', emoji:'1️⃣'},
-        {id:'Two', hanzi:'二', pinyin:'èr', en:'Two', emoji:'2️⃣'},
-        {id:'Three', hanzi:'三', pinyin:'sān', en:'Three', emoji:'3️⃣'},
-        {id:'Red', hanzi:'红色', pinyin:'hóng sè', en:'Red', emoji:'🔴'},
-        {id:'Big', hanzi:'大', pinyin:'dà', en:'Big', emoji:'🐘'},
-        {id:'Small', hanzi:'小', pinyin:'xiǎo', en:'Small', emoji:'🐜'},
-        {id:'Apple', hanzi:'苹果', pinyin:'píng guǒ', en:'Apple', emoji:'🍎'},
-        {id:'Home', hanzi:'家', pinyin:'jiā', en:'Home', emoji:'🏠'}
-    ];
-    const CHINESE_1 = [
-        {id:'Four', hanzi:'四', pinyin:'sì', en:'Four', emoji:'4️⃣'},
-        {id:'Five', hanzi:'五', pinyin:'wǔ', en:'Five', emoji:'5️⃣'},
-        {id:'Six', hanzi:'六', pinyin:'liù', en:'Six', emoji:'6️⃣'},
-        {id:'Seven', hanzi:'七', pinyin:'qī', en:'Seven', emoji:'7️⃣'},
-        {id:'Eight', hanzi:'八', pinyin:'bā', en:'Eight', emoji:'8️⃣'},
-        {id:'Nine', hanzi:'九', pinyin:'jiǔ', en:'Nine', emoji:'9️⃣'},
-        {id:'Ten', hanzi:'十', pinyin:'shí', en:'Ten', emoji:'🔟'},
-        {id:'Blue', hanzi:'蓝色', pinyin:'lán sè', en:'Blue', emoji:'🔵'},
-        {id:'Yellow', hanzi:'黄色', pinyin:'huáng sè', en:'Yellow', emoji:'🟡'},
-        {id:'Green', hanzi:'绿色', pinyin:'lǜ sè', en:'Green', emoji:'🟢'},
-        {id:'Teacher', hanzi:'老师', pinyin:'lǎo shī', en:'Teacher', emoji:'🧑‍🏫'},
-        {id:'School', hanzi:'学校', pinyin:'xué xiào', en:'School', emoji:'🏫'},
-        {id:'Friend', hanzi:'朋友', pinyin:'péng you', en:'Friend', emoji:'🤝'},
-        {id:'Book', hanzi:'书', pinyin:'shū', en:'Book', emoji:'📚'},
-        {id:'Eat', hanzi:'吃', pinyin:'chī', en:'Eat', emoji:'🍽️'},
-        {id:'Drink', hanzi:'喝', pinyin:'hē', en:'Drink', emoji:'🥤'},
-        {id:'Fish', hanzi:'鱼', pinyin:'yú', en:'Fish', emoji:'🐟'},
-        {id:'Bird', hanzi:'鸟', pinyin:'niǎo', en:'Bird', emoji:'🐦'},
-        {id:'Happy', hanzi:'开心', pinyin:'kāi xīn', en:'Happy', emoji:'😊'},
-        {id:'Good', hanzi:'好', pinyin:'hǎo', en:'Good', emoji:'👍'}
-    ];
-    const SPANISH_K = [
-        {id:'Hello', es:'Hola', en:'Hello', emoji:'👋'},
-        {id:'ThankYou', es:'Gracias', en:'Thank you', emoji:'🙏'},
-        {id:'Bye', es:'Adiós', en:'Bye', emoji:'👋'},
-        {id:'Love', es:'Amor', en:'Love', emoji:'❤️'},
-        {id:'Mom', es:'Mamá', en:'Mom', emoji:'👩'},
-        {id:'Dad', es:'Papá', en:'Dad', emoji:'👨'},
-        {id:'Cat', es:'Gato', en:'Cat', emoji:'🐱'},
-        {id:'Dog', es:'Perro', en:'Dog', emoji:'🐶'},
-        {id:'Water', es:'Agua', en:'Water', emoji:'💧'},
-        {id:'Sun', es:'Sol', en:'Sun', emoji:'☀️'},
-        {id:'Moon', es:'Luna', en:'Moon', emoji:'🌙'},
-        {id:'Star', es:'Estrella', en:'Star', emoji:'⭐'},
-        {id:'One', es:'Uno', en:'One', emoji:'1️⃣'},
-        {id:'Two', es:'Dos', en:'Two', emoji:'2️⃣'},
-        {id:'Three', es:'Tres', en:'Three', emoji:'3️⃣'},
-        {id:'Red', es:'Rojo', en:'Red', emoji:'🔴'},
-        {id:'Big', es:'Grande', en:'Big', emoji:'🐘'},
-        {id:'Small', es:'Pequeño', en:'Small', emoji:'🐜'},
-        {id:'Apple', es:'Manzana', en:'Apple', emoji:'🍎'},
-        {id:'Home', es:'Casa', en:'Home', emoji:'🏠'}
-    ];
-    const SPANISH_1 = [
-        {id:'Four', es:'Cuatro', en:'Four', emoji:'4️⃣'},
-        {id:'Five', es:'Cinco', en:'Five', emoji:'5️⃣'},
-        {id:'Six', es:'Seis', en:'Six', emoji:'6️⃣'},
-        {id:'Seven', es:'Siete', en:'Seven', emoji:'7️⃣'},
-        {id:'Eight', es:'Ocho', en:'Eight', emoji:'8️⃣'},
-        {id:'Nine', es:'Nueve', en:'Nine', emoji:'9️⃣'},
-        {id:'Ten', es:'Diez', en:'Ten', emoji:'🔟'},
-        {id:'Blue', es:'Azul', en:'Blue', emoji:'🔵'},
-        {id:'Yellow', es:'Amarillo', en:'Yellow', emoji:'🟡'},
-        {id:'Green', es:'Verde', en:'Green', emoji:'🟢'},
-        {id:'Teacher', es:'Maestra', en:'Teacher', emoji:'🧑‍🏫'},
-        {id:'School', es:'Escuela', en:'School', emoji:'🏫'},
-        {id:'Friend', es:'Amigo', en:'Friend', emoji:'🤝'},
-        {id:'Book', es:'Libro', en:'Book', emoji:'📚'},
-        {id:'Eat', es:'Comer', en:'Eat', emoji:'🍽️'},
-        {id:'Drink', es:'Beber', en:'Drink', emoji:'🥤'},
-        {id:'Fish', es:'Pez', en:'Fish', emoji:'🐟'},
-        {id:'Bird', es:'Pájaro', en:'Bird', emoji:'🐦'},
-        {id:'Happy', es:'Feliz', en:'Happy', emoji:'😊'},
-        {id:'Good', es:'Bueno', en:'Good', emoji:'👍'}
-    ];
+
+    // Derived per-language lists: same word set, different display fields.
+    const WORDS_K   = VOCAB_K.map(v => ({ id:v.id, emoji:v.emoji, img:v.img }));
+    const WORDS_1   = VOCAB_1.map(v => ({ id:v.id, emoji:v.emoji, img:v.img }));
+    const CHINESE_K = VOCAB_K.map(v => ({ id:v.id, emoji:v.emoji, hanzi:v.zh.hanzi, pinyin:v.zh.pinyin, en:v.en }));
+    const CHINESE_1 = VOCAB_1.map(v => ({ id:v.id, emoji:v.emoji, hanzi:v.zh.hanzi, pinyin:v.zh.pinyin, en:v.en }));
+    const SPANISH_K = VOCAB_K.map(v => ({ id:v.id, emoji:v.emoji, es:v.es, en:v.en }));
+    const SPANISH_1 = VOCAB_1.map(v => ({ id:v.id, emoji:v.emoji, es:v.es, en:v.en }));
     const COLORS_K = [
         {id:'Red',hex:'#ff6b6b'},{id:'Orange',hex:'#ff9f43'},{id:'Yellow',hex:'#feca57'},
         {id:'Green',hex:'#55efc4'},{id:'Blue',hex:'#48dbfb'},{id:'Purple',hex:'#a29bfe'},
