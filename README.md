@@ -6,7 +6,7 @@ Open `index.html` in a browser — no build step required. For the installable/o
 
 ## Features
 
-- **Grade levels**: every category offers Kindergarten and 1st Grade content — tap a category, then pick a level. Progress and mastery are tracked separately per level.
+- **Levels**: Letters, Numbers, Colors, and Shapes open directly. Words, Chinese, Spanish, Animals, and Math use a level picker — Words/Chinese/Spanish/Math have 10 levels (Level 1–10) and Animals has 2. Progress and mastery are tracked separately per level.
 - **Learn mode** for Letters, Numbers, Words, Chinese, Spanish, Colors, Shapes, and Animals — tap a card to hear it read aloud (uses the browser's built-in text-to-speech).
 - **Play mode** — quiz games with big tap-friendly multiple-choice buttons, spoken prompts, and encouraging feedback:
   - Letters: single-letter recognition + phonics at Kindergarten; consonant blends/digraphs (sh, ch, th, bl, gr...) at 1st Grade
