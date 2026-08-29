@@ -77,16 +77,33 @@
 
 ---
 
-## Suggested build order
+## Build status — ALL COMPLETE ✅
 
-1. **A + E + F** — polish, ~1 short session, no schema risk.
-2. **B** — spaced repetition (the biggest learning win); needs `loadProgress`
-   migration guard.
-3. **C** — adaptive weighting (build on B's mastery object).
-4. **D + G** — new screens, independent of B/C.
+Implemented step-by-step on `main`, each committed and pushed to GitHub:
 
-## Open questions for the parent (Gary)
-- Should spaced review *replace* the current 8-question round, or run *alongside*
-  it as a "Review due" button?
-- Free-play: allow shape/color tapping too, or keep to current `TRACE_CATEGORIES`?
-- Parent export: email/upload, or just local file download?
+| Step | Improvements | Commit | Status |
+|---|---|---|---|
+| 1 | **A** descriptive praise, **E** audio-on-trace, **F** retry celebration | `d1b4f0b` | ✅ |
+| 2 | **B** spaced-repetition scheduler (due map + home nudge) | `902fa87` | ✅ |
+| 3 | **C** adaptive vocab weighting (builds on B) | `d65f1eb` | ✅ |
+| 4 | **D** free-play sandbox mode | `0b415a6` | ✅ |
+| 5 | **G** parent progress export (JSON download) | `65db79d` | ✅ |
+
+> Note: B kept `mastery[cat][id]` as a backward-compatible counter and added a
+> parallel `due[cat][id]` timestamp map (rather than the `{count,nextDue}`
+> object proposed in the plan) — same behavior, simpler migration, and the
+> native app's offline `classroom.html` picks it up unchanged after a sync.
+
+## Suggested build order (as executed)
+1. **A + E + F** — polish, no schema risk. ✅
+2. **B** — spaced repetition (biggest learning win); migration guard added. ✅
+3. **C** — adaptive weighting (build on B's mastery object). ✅
+4. **D + G** — new screens, independent of B/C. ✅
+
+## Open questions for the parent (Gary) — still your call
+- Spaced review *runs alongside* the normal 8-question round (it prioritizes
+  due items automatically); a dedicated "Review due" button was not added. Want one?
+- Free-play uses the full vocab set (letters/numbers/words/chinese/spanish). ✅
+- Parent export = local file download (no upload). ✅
+- **Next:** sync the native Android app (ClassroomApp) so the offline TTS build
+  reflects these changes — `sync_claude_branch.sh` repointed to `main` + run.
