@@ -1146,6 +1146,7 @@
     function renderSettings() {
         const puterOn = localStorage.getItem('kc_puter_enabled') === '1';
         const hasGeminiKey = !!localStorage.getItem('kc_gemini_key');
+        const isFileProtocol = location.protocol === 'file:';
         const statusLine = puterOn ? '✅ Free AI voice is active'
             : hasGeminiKey ? '✅ Gemini AI voice is active'
             : '🔈 Using free browser voice';
@@ -1159,9 +1160,14 @@
                 <p style="color:rgba(43,27,14,0.75);font-size:0.85rem;margin-bottom:10px;">
                     A much more natural voice — completely free, no API key needed. The first time, your browser may ask you to sign in with a free Puter.com account.
                 </p>
+                ${isFileProtocol ? `
+                <p style="color:var(--mc-redstone);font-size:0.8rem;font-weight:700;margin-bottom:10px;">
+                    ⚠️ This page looks like it was opened as a local file. Signing in usually can't complete that way and the screen can get stuck. Try hosting this page online (e.g. GitHub Pages) first, or use your own Gemini key below instead — that works fine from a local file.
+                </p>` : ''}
                 ${puterOn
                     ? `<button class="big-btn home" onclick="disablePuterVoice()">Disable Free AI Voice</button>`
                     : `<button class="big-btn play" onclick="enablePuterVoice()">🔊 Enable Free AI Voice</button>`}
+                ${!puterOn ? `<p style="color:rgba(43,27,14,0.5);font-size:0.75rem;margin-top:8px;">If the screen ever looks stuck or blank after tapping this, just reload the page — nothing is saved until you see "Free AI voice enabled!".</p>` : ''}
             </div>
 
             <div style="background:rgba(255,255,255,0.2);border:3px solid var(--mc-ink);border-radius:6px;padding:14px;margin-bottom:12px;">
@@ -1183,10 +1189,20 @@
             </p>
         </div>`;
     }
+    function withTimeout(promise, ms, message) {
+        return Promise.race([
+            promise,
+            new Promise((_, reject) => setTimeout(() => reject(new Error(message)), ms))
+        ]);
+    }
     async function enablePuterVoice() {
-        setSettingsMsg('Connecting to free AI voice...', 'var(--mc-ink)');
+        setSettingsMsg('Connecting to free AI voice... (if a sign-in window opens, finish it there)', 'var(--mc-ink)');
         try {
-            const blob = await fetchPuterAudio('Hello! This is a test.', 'en-US');
+            const blob = await withTimeout(
+                fetchPuterAudio('Hello! This is a test.', 'en-US'),
+                20000,
+                'Timed out waiting for sign-in. If this page was opened as a local file, try hosting it online instead (e.g. GitHub Pages) — sign-in usually can\'t complete from a file:// page. Reload the page if the screen looks stuck.'
+            );
             localStorage.setItem('kc_puter_enabled', '1');
             setSettingsMsg('✅ It works! Playing a test clip...', 'var(--mc-emerald)');
             await playBlob(blob);
