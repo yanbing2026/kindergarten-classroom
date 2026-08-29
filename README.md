@@ -16,4 +16,5 @@ Open `index.html` in a browser — no build step required.
   - Colors, Shapes, Animals: "find the ___" recognition games
 - **Math**: simple addition practice with visual object groups, difficulty ramps up as your child improves.
 - **Progress tracking**: stars, per-category mastery bars, and unlockable trophies — all saved locally in the browser (`localStorage`), no account needed.
-- **Audio**: 🔊/🔇 toggle in the top bar to mute text-to-speech.
+- **Audio**: 🔊/🔇 toggle in the top bar to mute text-to-speech. By default it auto-picks the best available browser voice per language.
+- **Optional AI voice (⚙️ Voice Settings)**: add a free [Google AI Studio](https://aistudio.google.com/apikey) API key to use Gemini's TTS for noticeably more natural speech. The key is saved only in your browser (`localStorage`, never committed to this repo) and generated clips are cached in IndexedDB so repeat taps don't re-call the API. Without a key — or if the request ever fails — the app silently falls back to the free browser voice, so it always works.
