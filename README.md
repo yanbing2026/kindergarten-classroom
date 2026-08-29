@@ -2,7 +2,7 @@
 
 A single-page supplemental learning app for kindergarten-age kids (built for a 5-year-old), optimized for touchscreens (tablet/phone).
 
-Open `index.html` in a browser — no build step required.
+Open `index.html` in a browser — no build step required. For the installable/offline features below, the site needs to be hosted (e.g. GitHub Pages) rather than opened as a local file — browsers require a real `http(s)` origin for service workers and "Add to Home Screen."
 
 ## Features
 
@@ -22,3 +22,4 @@ Open `index.html` in a browser — no build step required.
   2. **Browser voice** (always available, zero setup): the best built-in voice the browser offers per language, auto-selected.
 
   A saved key lives only in `localStorage` (never committed to this repo), and generated clips are cached in IndexedDB per phrase so repeat taps don't re-generate (or re-pay for) the same audio. Without a key, or if a request ever fails, the app silently falls back to the browser voice.
+- **Installable app (PWA)**: has a web app manifest and a service worker, so once hosted it can be added to a phone/tablet home screen (Android Chrome: menu → "Add to Home screen"; iOS Safari: share → "Add to Home Screen") and opens full-screen like a native app. After the first visit, the app shell is cached and the whole game works fully offline — only the optional Gemini voice tier needs a live connection, and it falls back to the offline browser voice automatically when there isn't one.
