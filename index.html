@@ -206,6 +206,7 @@
         .choice-btn:active { transform: translateY(3px); box-shadow: inset -4px -4px 0 rgba(255,255,255,0.4), inset 4px 4px 0 rgba(0,0,0,0.2); }
         .choice-btn.correct { background: #bdf2cf; border-color: var(--mc-emerald); animation: pop 0.4s; }
         .choice-btn.incorrect { background: #f7c9c2; border-color: var(--mc-redstone); animation: shake 0.4s; }
+        .choice-btn.persist { box-shadow: 0 0 0 4px var(--mc-gold); }
         @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.12); } 100% { transform: scale(1); } }
         @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
         .replay-btn {
@@ -698,7 +699,39 @@
     }
     function goHome() { state.stack = []; state.screen = 'home'; state.params = null; render(); }
 
-    // ---------- Helpers ----------
+    // ---------- Descriptive praise (research: specific feedback > generic) ----------
+    // Builds an item-aware confirmation instead of a random "Good job!".
+    function descriptivePraise(key, q) {
+        if (key === 'math') {
+            const word = MATH_WORD[q.op];
+            return `Correct! ${q.a} ${word} ${q.b} is ${q.answer}!`;
+        }
+        if (key === 'letters') {
+            const it = LETTERS.find(l => l.id === q.itemId);
+            return it ? `Yes! ${it.id} is for ${it.word}!` : `Correct!`;
+        }
+        if (key === 'numbers') {
+            return `Yes! That is ${q.itemId}!`;
+        }
+        if (key === 'words') {
+            return `Great! That is ${q.itemId}!`;
+        }
+        if (key === 'chinese') {
+            const it = CHINESE.find(w => w.id === q.itemId);
+            return it ? `对! ${it.hanzi} is ${it.en}!` : `Correct!`;
+        }
+        if (key === 'spanish') {
+            const it = SPANISH.find(w => w.id === q.itemId);
+            return it ? `¡Sí! ${it.es} is ${it.en}!` : `Correct!`;
+        }
+        return PRAISE[Math.floor(Math.random() * PRAISE.length)];
+    }
+    function descriptiveRetry(key, q) {
+        if (key === 'math') {
+            return `Not quite — try again! ${q.a} ${MATH_WORD[q.op]} ${q.b}?`;
+        }
+        return RETRY[Math.floor(Math.random() * RETRY.length)];
+    }
     function shuffle(arr) {
         const a = arr.slice();
         for (let i = a.length - 1; i > 0; i--) {
@@ -1045,16 +1078,19 @@
             if (quiz.firstAttempt) {
                 bumpMastery(`${quiz.key}_${quiz.level}`, q.itemId);
                 quiz.correctFirstTry += 1;
+            } else {
+                // Research F: reward persistence — celebrate the eventual success too.
+                btnEl.classList.add('persist');
             }
             saveProgress();
             confettiBurst();
-            speak(PRAISE[Math.floor(Math.random() * PRAISE.length)]);
+            speak(descriptivePraise(quiz.key, q));
             setTimeout(nextQuestion, 900);
         } else {
             btnEl.classList.add('incorrect');
             btnEl.disabled = true;
             quiz.firstAttempt = false;
-            speak(RETRY[Math.floor(Math.random() * RETRY.length)]);
+            speak(descriptiveRetry(quiz.key, q));
         }
         renderTopbarStarsOnly();
     }
@@ -1168,15 +1204,16 @@
             awardStar();
             mathState.stars += 1;
             if (q.firstAttempt) { progress.mathCorrect[mathState.level] = (progress.mathCorrect[mathState.level] || 0) + 1; }
+            else { btnEl.classList.add('persist'); }
             saveProgress();
             confettiBurst();
-            speak(PRAISE[Math.floor(Math.random() * PRAISE.length)]);
+            speak(descriptivePraise('math', q));
             setTimeout(nextMathQuestion, 900);
         } else {
             btnEl.classList.add('incorrect');
             btnEl.disabled = true;
             q.firstAttempt = false;
-            speak(RETRY[Math.floor(Math.random() * RETRY.length)]);
+            speak(descriptiveRetry('math', q));
         }
         renderTopbarStarsOnly();
     }
@@ -1324,6 +1361,8 @@
         traceState.stars += 1;
         saveProgress();
         confettiBurst();
+        // Research E: speak the written word when moving on, reinforcing it.
+        speakTraceItem(traceState.key, traceState.items[traceState.idx]);
         renderTopbarStarsOnly();
         traceState.idx += 1;
         if (traceState.idx >= traceState.items.length) {
