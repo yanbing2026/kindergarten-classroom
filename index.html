@@ -703,6 +703,31 @@
         return `<span style="font-size:${size * 0.55}px;">${item.emoji}</span>`;
     }
 
+    // ---------- Chinese tone helpers ----------
+    // Colors and marks for the four tones + neutral tone. Coloring tones is a
+    // well-established scaffold for young learners who can't yet read pinyin.
+    const TONE_COLORS = { 1:'#e53935', 2:'#fb8c00', 3:'#43a047', 4:'#1e88e5', 0:'#757575' };
+    const TONE_MARKS = { 1:'ˉ', 2:'ˊ', 3:'ˇ', 4:'ˋ' };
+    const TONE_DIACRITIC = {
+        'ā':1,'á':2,'ǎ':3,'à':4, 'ē':1,'é':2,'ě':3,'è':4, 'ī':1,'í':2,'ǐ':3,'ì':4,
+        'ō':1,'ó':2,'ǒ':3,'ò':4, 'ū':1,'ú':2,'ǔ':3,'ù':4, 'ǖ':1,'ǘ':2,'ǚ':3,'ǜ':4, 'ü':0
+    };
+    function toneOf(pinyin) {
+        for (const ch of (pinyin || '')) {
+            if (TONE_DIACRITIC[ch] !== undefined) return TONE_DIACRITIC[ch];
+        }
+        const m = (pinyin || '').match(/([0-4])/);
+        if (m) return parseInt(m[1], 10);
+        return 0;
+    }
+    function pinyinHTML(pinyin, size) {
+        size = size || '0.8rem';
+        const t = toneOf(pinyin);
+        const color = TONE_COLORS[t];
+        const mark = TONE_MARKS[t] || '';
+        return `<span style="font-size:${size};color:${color};font-weight:700;">${esc(pinyin)} <span style="opacity:0.85;">${mark}</span></span>`;
+    }
+
     // ---------- Render: Home ----------
     function renderHome() {
         const cards = CATEGORIES.map(c => {
@@ -796,7 +821,7 @@
             else if (key === 'words') { visual = `<div class="icon">${wordMediaHTML(it, 56)}</div>`; label = it.id; }
             else if (key === 'chinese') {
                 visual = `<div class="icon">${it.emoji}</div>`;
-                label = `<div style="font-size:1.4rem;">${it.hanzi}</div><div style="font-size:0.8rem;color:rgba(43,27,14,0.7);font-weight:400;">${it.pinyin}</div><div style="font-size:0.75rem;color:rgba(43,27,14,0.55);font-weight:400;">${it.en}</div>`;
+                label = `<div style="font-size:1.4rem;">${it.hanzi}</div>${pinyinHTML(it.pinyin, '0.9rem')}<div style="font-size:0.75rem;color:rgba(43,27,14,0.55);font-weight:400;">${it.en}</div>`;
             }
             else if (key === 'spanish') {
                 visual = `<div class="icon">${it.emoji}</div>`;
@@ -948,12 +973,12 @@
                     promptHTML: `<div class="prompt-visual">${correct.emoji}</div><div class="prompt-word">${correct.en}</div>`,
                     speakText: `Find the Chinese word for ${correct.en}`,
                     itemId: correct.id,
-                    choices: choices.map(c => ({ id: c.id, html: `<div>${c.hanzi}</div><div class="pinyin">${c.pinyin}</div>`, cls: 'chinese-choice', speak: c.hanzi }))
+                    choices: choices.map(c => ({ id: c.id, html: `<div>${c.hanzi}</div>${pinyinHTML(c.pinyin, '0.8rem')}`, cls: 'chinese-choice', speak: c.hanzi }))
                 };
             } else {
                 return {
                     mode: 'chinese-listen',
-                    promptHTML: `<div class="prompt-word">${correct.hanzi}</div><div style="font-size:1.1rem;color:#777;margin-top:6px;">${correct.pinyin}</div><button class="replay-btn" onclick="replayForeign()">🔊 Listen Again</button>`,
+                    promptHTML: `<div class="prompt-word">${correct.hanzi}</div>${pinyinHTML(correct.pinyin, '1.2rem')}<button class="replay-btn" onclick="replayForeign()">🔊 Listen Again</button>`,
                     speakText: correct.hanzi,
                     lang: 'zh-CN',
                     itemId: correct.id,
@@ -1183,6 +1208,7 @@
                 <div class="trace-ghost" style="font-size:${traceFontSize(text)};">${esc(text)}</div>
                 <canvas id="traceCanvas" class="trace-canvas"></canvas>
             </div>
+            ${key === 'chinese' ? `<div style="margin-top:10px;">${pinyinHTML(item.pinyin, '1.1rem')}</div>` : ''}
             <div class="trace-controls">
                 <button class="icon-btn" onclick="replayTrace()">🔊</button>
                 <button class="icon-btn" onclick="clearTraceCanvas()">🧹</button>
