@@ -249,6 +249,7 @@
             width: 100%;
             max-width: 420px;
             height: 220px;
+            container-type: size;
             background: #f3e6c8;
             border: 3px solid var(--mc-ink);
             border-radius: 8px;
@@ -1147,11 +1148,11 @@
         return item.id;
     }
     function traceFontSize(text) {
-        const len = text.length;
-        if (len <= 2) return '6rem';
-        if (len <= 4) return '4rem';
-        if (len <= 6) return '3rem';
-        return '2.2rem';
+        const len = Math.max(1, text.length);
+        const isWide = /[㐀-鿿豈-﫿]/.test(text);
+        const factor = isWide ? 95 : 145;
+        const w = Math.round(factor / len);
+        return `min(82cqh, ${w}cqw)`;
     }
     function speakTraceItem(key, item) {
         if (key === 'letters') {
