@@ -316,29 +316,29 @@
     // One source of truth per level. Add a word here and it appears in all three
     // languages automatically. To add a level, append another array to VOCAB_LEVELS.
     const VOCAB_LEVELS = [
-        [ // Level 1 — Farm & Pets
+        [ // Level 1 — Minecraft Farm & Pets
             {id:'pig',emoji:'🐷',img:'images/words/pig.png',en:'pig',zh:{hanzi:'猪',pinyin:'zhū'},es:'Cerdo'},
             {id:'cow',emoji:'🐮',img:'images/words/cow.png',en:'cow',zh:{hanzi:'牛',pinyin:'niú'},es:'Vaca'},
+            {id:'chicken',emoji:'🐔',en:'chicken',zh:{hanzi:'鸡',pinyin:'jī'},es:'Pollo'},
+            {id:'sheep',emoji:'🐑',en:'sheep',zh:{hanzi:'羊',pinyin:'yáng'},es:'Oveja'},
             {id:'cat',emoji:'🐱',img:'images/words/cat.png',en:'cat',zh:{hanzi:'猫',pinyin:'māo'},es:'Gato'},
             {id:'dog',emoji:'🐶',img:'images/words/dog.png',en:'dog',zh:{hanzi:'狗',pinyin:'gǒu'},es:'Perro'},
-            {id:'duck',emoji:'🦆',en:'duck',zh:{hanzi:'鸭',pinyin:'yā'},es:'Pato'},
-            {id:'sheep',emoji:'🐑',en:'sheep',zh:{hanzi:'羊',pinyin:'yáng'},es:'Oveja'},
             {id:'horse',emoji:'🐴',en:'horse',zh:{hanzi:'马',pinyin:'mǎ'},es:'Caballo'},
-            {id:'hen',emoji:'🐔',en:'hen',zh:{hanzi:'鸡',pinyin:'jī'},es:'Gallina'},
-            {id:'goat',emoji:'🐐',en:'goat',zh:{hanzi:'山羊',pinyin:'shān yáng'},es:'Cabra'},
-            {id:'mouse',emoji:'🐭',en:'mouse',zh:{hanzi:'老鼠',pinyin:'lǎo shǔ'},es:'Ratón'}
-        ],
-        [ // Level 2 — Wild Animals
-            {id:'lion',emoji:'🦁',en:'lion',zh:{hanzi:'狮子',pinyin:'shī zi'},es:'León'},
-            {id:'tiger',emoji:'🐯',en:'tiger',zh:{hanzi:'老虎',pinyin:'lǎo hǔ'},es:'Tigre'},
-            {id:'bear',emoji:'🐻',en:'bear',zh:{hanzi:'熊',pinyin:'xióng'},es:'Oso'},
-            {id:'monkey',emoji:'🐵',en:'monkey',zh:{hanzi:'猴子',pinyin:'hóu zi'},es:'Mono'},
-            {id:'elephant',emoji:'🐘',en:'elephant',zh:{hanzi:'大象',pinyin:'dà xiàng'},es:'Elefante'},
-            {id:'fox',emoji:'🦊',img:'images/words/fox.png',en:'fox',zh:{hanzi:'狐狸',pinyin:'hú li'},es:'Zorro'},
-            {id:'wolf',emoji:'🐺',en:'wolf',zh:{hanzi:'狼',pinyin:'láng'},es:'Lobo'},
             {id:'rabbit',emoji:'🐰',en:'rabbit',zh:{hanzi:'兔子',pinyin:'tù zi'},es:'Conejo'},
-            {id:'snake',emoji:'🐍',en:'snake',zh:{hanzi:'蛇',pinyin:'shé'},es:'Serpiente'},
-            {id:'deer',emoji:'🦌',en:'deer',zh:{hanzi:'鹿',pinyin:'lù'},es:'Ciervo'}
+            {id:'fox',emoji:'🦊',img:'images/words/fox.png',en:'fox',zh:{hanzi:'狐狸',pinyin:'hú li'},es:'Zorro'},
+            {id:'bee',emoji:'🐝',img:'images/words/bee.png',en:'bee',zh:{hanzi:'蜜蜂',pinyin:'mì fēng'},es:'Abeja'}
+        ],
+        [ // Level 2 — Minecraft Mobs
+            {id:'zombie',emoji:'🧟',en:'zombie',zh:{hanzi:'僵尸',pinyin:'jiāng shī'},es:'Zombi'},
+            {id:'skeleton',emoji:'💀',en:'skeleton',zh:{hanzi:'骷髅',pinyin:'kū lóu'},es:'Esqueleto'},
+            {id:'spider',emoji:'🕷️',en:'spider',zh:{hanzi:'蜘蛛',pinyin:'zhī zhū'},es:'Araña'},
+            {id:'creeper',emoji:'💥',en:'creeper',zh:{hanzi:'苦力怕',pinyin:'kǔ lì pà'},es:'Creeper'},
+            {id:'slime',emoji:'🟢',img:'images/words/slime.png',en:'slime',zh:{hanzi:'史莱姆',pinyin:'shǐ lái mǔ'},es:'Slime'},
+            {id:'wolf',emoji:'🐺',en:'wolf',zh:{hanzi:'狼',pinyin:'láng'},es:'Lobo'},
+            {id:'bat',emoji:'🦇',img:'images/words/bat.png',en:'bat',zh:{hanzi:'蝙蝠',pinyin:'biān fú'},es:'Murciélago'},
+            {id:'fish',emoji:'🐟',en:'fish',zh:{hanzi:'鱼',pinyin:'yú'},es:'Pez'},
+            {id:'parrot',emoji:'🦜',en:'parrot',zh:{hanzi:'鹦鹉',pinyin:'yīng wǔ'},es:'Loro'},
+            {id:'enderdragon',emoji:'🐉',en:'ender dragon',zh:{hanzi:'末影龙',pinyin:'mò yǐng lóng'},es:'Dragón Ender'}
         ],
         [ // Level 3 — Foods
             {id:'apple',emoji:'🍎',img:'images/words/apple.png',en:'apple',zh:{hanzi:'苹果',pinyin:'píng guǒ'},es:'Manzana'},
@@ -373,8 +373,10 @@
             {id:'sword',emoji:'⚔️',img:'images/words/sword.png',en:'sword',zh:{hanzi:'剑',pinyin:'jiàn'},es:'Espada'},
             {id:'pickaxe',emoji:'⛏️',en:'pickaxe',zh:{hanzi:'镐',pinyin:'gǎo'},es:'Pico'},
             {id:'axe',emoji:'🪓',img:'images/words/axe.png',en:'axe',zh:{hanzi:'斧头',pinyin:'fǔ tou'},es:'Hacha'},
-            {id:'shovel',emoji:'🥄',en:'shovel',zh:{hanzi:'铲',pinyin:'chǎn'},es:'Pala'},
-            {id:'chest',emoji:'🧰',img:'images/words/chest.png',en:'chest',zh:{hanzi:'箱子',pinyin:'xiāng zi'},es:'Cofre'}
+            {id:'chest',emoji:'🧰',img:'images/words/chest.png',en:'chest',zh:{hanzi:'箱子',pinyin:'xiāng zi'},es:'Cofre'},
+            {id:'torch',emoji:'🔦',img:'images/words/torch.png',en:'torch',zh:{hanzi:'火把',pinyin:'huǒ bǎ'},es:'Antorcha'},
+            {id:'tnt',emoji:'🧨',en:'TNT',zh:{hanzi:'炸药',pinyin:'zhà yào'},es:'TNT'},
+            {id:'redstone',emoji:'🔴',en:'redstone',zh:{hanzi:'红石',pinyin:'hóng shí'},es:'Redstone'}
         ],
         [ // Level 6 — Sky & Nature
             {id:'sun',emoji:'☀️',img:'images/words/sun.png',en:'sun',zh:{hanzi:'太阳',pinyin:'tài yáng'},es:'Sol'},
