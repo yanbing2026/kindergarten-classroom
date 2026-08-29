@@ -233,9 +233,10 @@
         .progress-bar-fill { background: var(--mc-emerald); height: 100%; }
         .footer { text-align: center; color: rgba(43,27,14,0.55); margin-top: 20px; font-size: 0.8rem; }
         .dots-wrap { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 320px; font-size: 2.2rem; margin-bottom: 10px; }
-        .math-row { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; margin-bottom: 10px; }
-        .math-group { display: flex; flex-wrap: wrap; gap: 4px; max-width: 160px; font-size: 2rem; }
-        .math-op { font-family: var(--font-pixel); font-size: 1.8rem; color: var(--mc-ink); }
+        .math-row { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+        .math-eq { font-family: var(--font-pixel); font-size: 2.2rem; color: var(--mc-ink); line-height: 1.5; display: flex; align-items: center; gap: 10px; }
+        .math-eq .op { color: var(--mc-redstone); }
+        .math-eq .qm { color: var(--mc-emerald); }
         .trophy-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 14px; margin-top: 16px; }
         .trophy { font-family: var(--font-clear); background: var(--mc-wood); border: 3px solid var(--mc-ink); border-radius: 4px; box-shadow: inset 3px 3px 0 rgba(255,255,255,0.35), inset -3px -3px 0 rgba(0,0,0,0.2); padding: 16px; text-align: center; color: var(--mc-ink); font-weight: 700; }
         .trophy.locked { opacity: 0.4; background: var(--mc-stone); }
@@ -816,7 +817,7 @@
         const lvLabel = (cat.levels.find(l => l.id === level) || {}).label || '';
         if (key === 'math') {
             const lvNum = parseInt(String(level).replace(/\D/g, ''), 10) || 1;
-            const desc = lvNum >= 5 ? 'Practice addition and subtraction!' : 'Practice adding numbers together!';
+            const desc = lvNum >= 8 ? 'Add, subtract, multiply, and divide!' : (lvNum >= 5 ? 'Practice addition and subtraction!' : 'Practice adding numbers together!');
             return `${topbar(true)}
             <div class="center-col">
                 <div style="font-size:4rem;">➕</div>
@@ -1079,49 +1080,84 @@
         for (let i = 0; i < ROUND_LENGTH; i++) mathState.questions.push(buildMathQuestion(level));
         go('mathPlay', { level });
     }
+    // ---------- Math operation plan by level ----------
+    // Progressive difficulty: addition first, then subtraction, then
+    // multiplication, then division — all four mixed by Level 10.
+    function opsForLevel(lvNum) {
+        if (lvNum <= 4) return ['add'];
+        if (lvNum <= 7) return ['add', 'sub'];
+        if (lvNum <= 9) return ['add', 'sub', 'mul'];
+        return ['add', 'sub', 'mul', 'div'];
+    }
+    const MATH_SYMBOL = { add: '+', sub: '−', mul: '×', div: '÷' };
+    const MATH_WORD = { add: 'plus', sub: 'minus', mul: 'times', div: 'divided by' };
     function buildMathQuestion(level) {
         const lvNum = parseInt(String(level).replace(/\D/g, ''), 10) || 1;
         const solved = progress.mathCorrect[level] || 0;
+        const ops = opsForLevel(lvNum);
+        const op = ops[Math.floor(Math.random() * ops.length)];
+        // Number range grows as the child solves more problems at this level.
         const range = solved >= 25 ? lvNum + 5 : (solved >= 10 ? lvNum + 3 : lvNum + 1);
-        if (lvNum >= 5 && Math.random() < 0.4) {
-            const a = 2 + Math.floor(Math.random() * range);
-            const b = 1 + Math.floor(Math.random() * (a - 1));
-            const answer = a - b;
-            const wrongPool = shuffle([answer - 2, answer - 1, answer + 1, answer + 2].filter(n => n >= 0 && n !== answer));
-            const choices = shuffle([answer, ...wrongPool.slice(0, 3)]);
-            return { op: 'sub', a, b, answer, choices, awaitingNext: false, firstAttempt: true };
+        let a, b, answer;
+        if (op === 'add') {
+            a = 1 + Math.floor(Math.random() * range);
+            b = 1 + Math.floor(Math.random() * range);
+            answer = a + b;
+        } else if (op === 'sub') {
+            a = 2 + Math.floor(Math.random() * range);
+            b = 1 + Math.floor(Math.random() * a);
+            answer = a - b;
+        } else if (op === 'mul') {
+            // Keep factors small and friendly for early learners.
+            const maxFactor = Math.min(5, 2 + Math.floor(range / 2));
+            a = 1 + Math.floor(Math.random() * maxFactor);
+            b = 1 + Math.floor(Math.random() * maxFactor);
+            answer = a * b;
+        } else { // div — always clean (no remainders)
+            b = 1 + Math.floor(Math.random() * Math.min(5, 2 + Math.floor(range / 2)));
+            answer = 1 + Math.floor(Math.random() * Math.min(6, range));
+            a = b * answer;
         }
-        const a = 1 + Math.floor(Math.random() * range);
-        const b = 1 + Math.floor(Math.random() * range);
-        const answer = a + b;
-        const wrongPool = shuffle([answer - 2, answer - 1, answer + 1, answer + 2].filter(n => n > 0 && n !== answer));
-        const choices = shuffle([answer, ...wrongPool.slice(0, 3)]);
-        return { op: 'add', a, b, answer, choices, awaitingNext: false, firstAttempt: true };
+        // Build 4 distinct answer choices around the correct value.
+        const wrongSet = new Set([answer]);
+        let delta = 1;
+        while (wrongSet.size < 4) {
+            const cand = answer + delta;
+            if (cand >= 0 && cand !== answer) wrongSet.add(cand);
+            if (wrongSet.size < 4) {
+                const cand2 = answer - delta;
+                if (cand2 >= 0 && cand2 !== answer) wrongSet.add(cand2);
+            }
+            delta++;
+        }
+        const choices = shuffle([...wrongSet]);
+        return { op, a, b, answer, choices, awaitingNext: false, firstAttempt: true };
     }
     function renderMathPlay() {
         const q = mathState.questions[mathState.idx];
         const choicesHTML = q.choices.map(n => `
             <button class="choice-btn" data-id="${n}" onclick="handleMathChoice(${n}, this)">${n}</button>
         `).join('');
-        const opSymbol = q.op === 'sub' ? '−' : '+';
+        const sym = MATH_SYMBOL[q.op];
         return `${topbar(true)}
         <div class="center-col">
             <div style="color:#999;margin-bottom:8px;">Question ${mathState.idx + 1} of ${mathState.questions.length}</div>
             <div class="math-row">
-                <div class="math-group">${'🍎'.repeat(q.a)}</div>
-                <div class="math-op">${opSymbol}</div>
-                <div class="math-group">${'🍎'.repeat(q.b)}</div>
-                <div class="math-op">=</div>
-                <div class="math-op">?</div>
+                <div class="math-eq">
+                    <span>${q.a}</span>
+                    <span class="op">${sym}</span>
+                    <span>${q.b}</span>
+                    <span>=</span>
+                    <span class="qm">?</span>
+                </div>
             </div>
             <div class="choices">${choicesHTML}</div>
         </div>`;
     }
     function afterMathPlayRender() {
         const q = mathState.questions[mathState.idx];
-        const verb = q.op === 'sub' ? 'minus' : 'plus';
-        const question = q.op === 'sub' ? 'How many apples are left?' : 'How many apples in total?';
-        speak(`${q.a} ${verb} ${q.b}. ${question}`);
+        const word = MATH_WORD[q.op];
+        speak(`${q.a} ${word} ${q.b}. What is the answer?`);
     }
     function handleMathChoice(n, btnEl) {
         const q = mathState.questions[mathState.idx];
