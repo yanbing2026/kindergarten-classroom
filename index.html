@@ -421,173 +421,19 @@
         });
     }
 
-    // ---------- Higher-quality voice tier (optional) ----------
-    // If the user has saved their own Google AI Studio API key, we call
-    // Gemini's TTS model for more natural speech. Generated audio is
-    // cached in IndexedDB per (lang, text) so repeat taps don't re-pay for
-    // the same clip. Any failure -- no key, offline, bad response --
-    // silently falls through to the free browser voice.
-    const LANG_NAMES = { 'en-US': 'English', 'zh-CN': 'Mandarin Chinese', 'es-ES': 'Spanish' };
-    const GEMINI_MODEL = 'gemini-2.5-flash-preview-tts';
-    const GEMINI_VOICE = 'Leda';
-    let currentAudioEl = null;
-
     function stopAllAudio() {
-        if (currentAudioEl) { try { currentAudioEl.pause(); } catch (e) {} currentAudioEl = null; }
         if ('speechSynthesis' in window) { try { window.speechSynthesis.cancel(); } catch (e) {} }
-    }
-    function playBlob(blob) {
-        return new Promise((resolve) => {
-            const url = URL.createObjectURL(blob);
-            const el = new Audio(url);
-            currentAudioEl = el;
-            const done = () => { URL.revokeObjectURL(url); if (currentAudioEl === el) currentAudioEl = null; resolve(); };
-            el.onended = done; el.onerror = done;
-            el.play().catch(done);
-        });
-    }
-    function base64ToBytes(b64) {
-        const bin = atob(b64);
-        const bytes = new Uint8Array(bin.length);
-        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-        return bytes;
-    }
-    function writeAsciiString(view, offset, str) {
-        for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
-    }
-    function pcmToWavBlob(pcmBytes, sampleRate) {
-        const numChannels = 1, bitsPerSample = 16;
-        const byteRate = sampleRate * numChannels * bitsPerSample / 8;
-        const blockAlign = numChannels * bitsPerSample / 8;
-        const dataSize = pcmBytes.length;
-        const buffer = new ArrayBuffer(44 + dataSize);
-        const view = new DataView(buffer);
-        writeAsciiString(view, 0, 'RIFF');
-        view.setUint32(4, 36 + dataSize, true);
-        writeAsciiString(view, 8, 'WAVE');
-        writeAsciiString(view, 12, 'fmt ');
-        view.setUint32(16, 16, true);
-        view.setUint16(20, 1, true);
-        view.setUint16(22, numChannels, true);
-        view.setUint32(24, sampleRate, true);
-        view.setUint32(28, byteRate, true);
-        view.setUint16(32, blockAlign, true);
-        view.setUint16(34, bitsPerSample, true);
-        writeAsciiString(view, 36, 'data');
-        view.setUint32(40, dataSize, true);
-        new Uint8Array(buffer, 44).set(pcmBytes);
-        return new Blob([buffer], { type: 'audio/wav' });
-    }
-    async function fetchGeminiAudio(text, lang, apiKey) {
-        const langName = LANG_NAMES[lang] || 'English';
-        const prompt = `Say warmly and clearly in ${langName}, at a slow, friendly pace for a young child: ${text}`;
-        const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: {
-                    responseModalities: ['AUDIO'],
-                    speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: GEMINI_VOICE } } }
-                }
-            })
-        });
-        if (!resp.ok) throw new Error('Gemini TTS request failed: ' + resp.status);
-        const data = await resp.json();
-        const part = data.candidates && data.candidates[0] && data.candidates[0].content &&
-            data.candidates[0].content.parts && data.candidates[0].content.parts[0];
-        const inline = part && part.inlineData;
-        if (!inline || !inline.data) throw new Error('No audio data in Gemini response');
-        const rateMatch = /rate=(\d+)/.exec(inline.mimeType || '');
-        const sampleRate = rateMatch ? parseInt(rateMatch[1], 10) : 24000;
-        return pcmToWavBlob(base64ToBytes(inline.data), sampleRate);
-    }
-
-    // ---------- Audio cache (IndexedDB) ----------
-    const CACHE_DB_NAME = 'kc_audio_cache_v1';
-    const CACHE_STORE = 'clips';
-    let cacheDbPromise = null;
-    function openCacheDB() {
-        if (cacheDbPromise) return cacheDbPromise;
-        cacheDbPromise = new Promise((resolve, reject) => {
-            if (!('indexedDB' in window)) { reject(new Error('no indexedDB')); return; }
-            const req = indexedDB.open(CACHE_DB_NAME, 1);
-            req.onupgradeneeded = () => { req.result.createObjectStore(CACHE_STORE); };
-            req.onsuccess = () => resolve(req.result);
-            req.onerror = () => reject(req.error);
-        });
-        return cacheDbPromise;
-    }
-    async function audioCacheGet(key) {
-        try {
-            const db = await openCacheDB();
-            return await new Promise((resolve, reject) => {
-                const tx = db.transaction(CACHE_STORE, 'readonly');
-                const req = tx.objectStore(CACHE_STORE).get(key);
-                req.onsuccess = () => resolve(req.result || null);
-                req.onerror = () => reject(req.error);
-            });
-        } catch (e) { return null; }
-    }
-    async function audioCacheSet(key, blob) {
-        try {
-            const db = await openCacheDB();
-            await new Promise((resolve, reject) => {
-                const tx = db.transaction(CACHE_STORE, 'readwrite');
-                tx.objectStore(CACHE_STORE).put(blob, key);
-                tx.oncomplete = resolve;
-                tx.onerror = () => reject(tx.error);
-            });
-        } catch (e) {}
-    }
-    async function clearAudioCache() {
-        try {
-            const db = await openCacheDB();
-            await new Promise((resolve, reject) => {
-                const tx = db.transaction(CACHE_STORE, 'readwrite');
-                tx.objectStore(CACHE_STORE).clear();
-                tx.oncomplete = resolve;
-                tx.onerror = () => reject(tx.error);
-            });
-        } catch (e) {}
-    }
-
-    // ---------- Unified speech entry points ----------
-    // Tries the cache, then Gemini (if a key is set), returning the audio
-    // Blob for the first one that works, or null if unavailable (caller
-    // then uses the browser voice).
-    async function getBestAudioBlob(text, lang) {
-        const apiKey = localStorage.getItem('kc_gemini_key');
-        if (apiKey) {
-            const key = 'gemini|' + lang + '|' + text;
-            const cached = await audioCacheGet(key);
-            if (cached) return cached;
-            try {
-                const blob = await fetchGeminiAudio(text, lang, apiKey);
-                audioCacheSet(key, blob);
-                return blob;
-            } catch (e) { /* fall through */ }
-        }
-        return null;
-    }
-    async function playClip(text, lang) {
-        const blob = await getBestAudioBlob(text, lang);
-        if (blob) { await playBlob(blob); return; }
-        await playBrowserUtterance(text, lang);
     }
     function speak(text, opts) {
         if (muted) return;
         stopAllAudio();
         const lang = (opts && opts.lang) || 'en-US';
-        playClip(text, lang).catch(() => {});
+        playBrowserUtterance(text, lang).catch(() => {});
     }
     function speakSequence(parts, rate) {
         if (muted) return;
         stopAllAudio();
         (async () => {
-            const combinedText = parts.join('. ');
-            const blob = await getBestAudioBlob(combinedText, 'en-US');
-            if (blob) { await playBlob(blob); return; }
             for (const p of parts) {
                 await playBrowserUtterance(p, 'en-US', rate || 0.7);
             }
@@ -597,8 +443,8 @@
         if (muted) return;
         stopAllAudio();
         (async () => {
-            await playClip(foreignText, foreignLang);
-            await playClip(enText, 'en-US');
+            await playBrowserUtterance(foreignText, foreignLang);
+            await playBrowserUtterance(enText, 'en-US');
         })().catch(() => {});
     }
 
@@ -709,7 +555,6 @@
             <div class="topbar-right">
                 <div class="star-badge">💎 ${progress.stars}</div>
                 <button class="icon-btn" onclick="toggleMute()">${muted ? '🔇' : '🔊'}</button>
-                <button class="icon-btn" onclick="settingsMsg={text:'',color:''}; go('settings')">⚙️</button>
             </div>
         </div>`;
     }
@@ -1114,73 +959,6 @@
     }
 
     // ---------- Main render ----------
-    // ---------- Render: Settings ----------
-    let settingsMsg = { text: '', color: '' };
-    function setSettingsMsg(text, color) {
-        settingsMsg = { text, color: color || 'var(--mc-ink)' };
-        render();
-    }
-    function renderSettings() {
-        const hasGeminiKey = !!localStorage.getItem('kc_gemini_key');
-        const statusLine = hasGeminiKey ? '✅ Gemini AI voice is active' : '🔈 Using free browser voice';
-        return `${topbar(true)}
-        <h2>⚙️ Voice Settings</h2>
-        <div style="max-width:420px;margin:0 auto;">
-            <div style="text-align:center;font-weight:700;margin-bottom:16px;">${statusLine}</div>
-
-            <div style="background:rgba(255,255,255,0.2);border:3px solid var(--mc-ink);border-radius:6px;padding:14px;margin-bottom:12px;">
-                <div style="font-weight:700;margin-bottom:6px;">🔑 Optional: Your Own Gemini Key</div>
-                <p style="color:rgba(43,27,14,0.75);font-size:0.85rem;margin-bottom:10px;">
-                    Add a free Google AI Studio API key for a more natural voice. Get one at <strong>aistudio.google.com</strong>. Without a key, the app automatically uses your browser's built-in voice — everything still works.
-                </p>
-                <input id="geminiKeyInput" type="password" placeholder="Paste your API key here"
-                    style="display:block;width:100%;padding:12px;border:3px solid var(--mc-ink);border-radius:4px;font-size:0.95rem;margin-bottom:10px;font-family:var(--font-clear);">
-                <button class="big-btn play" onclick="testGeminiVoice()">🔊 Test Voice</button>
-                <button class="big-btn again" onclick="saveGeminiKey()">💾 Save Key (without testing)</button>
-                ${hasGeminiKey ? `<button class="big-btn home" onclick="clearGeminiKey()">🗑️ Remove Key</button>` : ''}
-            </div>
-
-            <button class="big-btn learn" onclick="clearAudioCacheAndNotify()">🧹 Clear Cached Audio</button>
-            <div id="settingsMsg" style="text-align:center;font-weight:700;margin-top:8px;min-height:1.2em;color:${settingsMsg.color || 'var(--mc-ink)'};">${settingsMsg.text}</div>
-            <p style="color:rgba(43,27,14,0.5);font-size:0.75rem;margin-top:16px;text-align:center;">
-                Your key is saved only in this browser (never uploaded anywhere else) and used solely to request audio from Google's API.
-            </p>
-        </div>`;
-    }
-    async function testGeminiVoice() {
-        const input = document.getElementById('geminiKeyInput');
-        const typed = input ? input.value.trim() : '';
-        const key = typed || localStorage.getItem('kc_gemini_key') || '';
-        if (!key) { setSettingsMsg('Please paste a key first.', 'var(--mc-redstone)'); return; }
-        setSettingsMsg('Testing your key...', 'var(--mc-ink)');
-        try {
-            const blob = await fetchGeminiAudio('Hello! This is a test.', 'en-US', key);
-            localStorage.setItem('kc_gemini_key', key);
-            setSettingsMsg('✅ It works! Playing a test clip...', 'var(--mc-emerald)');
-            await playBlob(blob);
-            setSettingsMsg('✅ It works! Key saved.', 'var(--mc-emerald)');
-        } catch (e) {
-            setSettingsMsg('❌ Didn\'t work: ' + (e && e.message ? e.message : 'unknown error'), 'var(--mc-redstone)');
-        }
-    }
-    function saveGeminiKey() {
-        const input = document.getElementById('geminiKeyInput');
-        const val = input ? input.value.trim() : '';
-        if (!val) { setSettingsMsg('Please paste a key first.', 'var(--mc-redstone)'); return; }
-        localStorage.setItem('kc_gemini_key', val);
-        setSettingsMsg('Key saved (untested).', 'var(--mc-ink)');
-    }
-    function clearGeminiKey() {
-        localStorage.removeItem('kc_gemini_key');
-        setSettingsMsg('Key removed.', 'var(--mc-ink)');
-    }
-    function clearAudioCacheAndNotify() {
-        clearAudioCache().then(() => {
-            setSettingsMsg('Cached audio cleared!', 'var(--mc-emerald)');
-            setTimeout(() => { if (settingsMsg.text === 'Cached audio cleared!') setSettingsMsg('', ''); }, 2000);
-        });
-    }
-
     function render() {
         const app = document.getElementById('app');
         let html = '';
@@ -1191,7 +969,6 @@
         else if (state.screen === 'mathPlay') html = renderMathPlay();
         else if (state.screen === 'roundEnd') html = renderRoundEnd();
         else if (state.screen === 'progress') html = renderProgress();
-        else if (state.screen === 'settings') html = renderSettings();
         app.innerHTML = html;
         if (state.screen === 'play') afterPlayRender();
         if (state.screen === 'mathPlay') afterMathPlayRender();

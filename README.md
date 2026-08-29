@@ -16,10 +16,7 @@ Open `index.html` in a browser — no build step required. For the installable/o
   - Colors, Shapes, Animals: "find the ___" recognition games
 - **Math**: simple addition practice with visual object groups, difficulty ramps up as your child improves.
 - **Progress tracking**: stars, per-category mastery bars, and unlockable trophies — all saved locally in the browser (`localStorage`), no account needed.
-- **Audio**: 🔊/🔇 toggle in the top bar to mute text-to-speech. By default it auto-picks the best available browser voice per language.
-- **Voice quality tiers (⚙️ Voice Settings)**:
-  1. **Your own Gemini key** (optional): paste a free [Google AI Studio](https://aistudio.google.com/apikey) API key for a more natural voice, with a "Test Voice" button that confirms it works before saving. Works fine from a local file — it's a plain API call, no sign-in flow.
-  2. **Browser voice** (always available, zero setup): the best built-in voice the browser offers per language, auto-selected.
+- **Audio**: 🔊/🔇 toggle in the top bar to mute text-to-speech. Automatically picks the best available browser/system voice per language — no API key, no setup, works fully offline.
+- **Installable app (PWA)**: has a web app manifest and a service worker, so once hosted it can be added to a phone/tablet home screen (Android Chrome: menu → "Add to Home screen"; iOS Safari: share → "Add to Home Screen") and opens full-screen like a native app. After the first visit, the app shell is cached and the whole game works fully offline.
 
-  A saved key lives only in `localStorage` (never committed to this repo), and generated clips are cached in IndexedDB per phrase so repeat taps don't re-generate (or re-pay for) the same audio. Without a key, or if a request ever fails, the app silently falls back to the browser voice.
-- **Installable app (PWA)**: has a web app manifest and a service worker, so once hosted it can be added to a phone/tablet home screen (Android Chrome: menu → "Add to Home screen"; iOS Safari: share → "Add to Home Screen") and opens full-screen like a native app. After the first visit, the app shell is cached and the whole game works fully offline — only the optional Gemini voice tier needs a live connection, and it falls back to the offline browser voice automatically when there isn't one.
+A native Android build (using the device's own TextToSpeech engine directly, for the best possible voice quality) is being explored separately.
