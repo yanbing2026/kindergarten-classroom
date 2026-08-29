@@ -253,7 +253,10 @@
 
     <script>
     // ---------- Data ----------
-    const LETTERS = [
+    const LEVEL_LABELS = { K: 'Kindergarten', G1: '1st Grade' };
+    const LEVEL_ICONS = { K: '🌱', G1: '🌿' };
+
+    const LETTERS_K = [
         {id:'A',word:'Apple',emoji:'🍎'},{id:'B',word:'Ball',emoji:'⚽'},{id:'C',word:'Cat',emoji:'🐱'},
         {id:'D',word:'Dog',emoji:'🐶'},{id:'E',word:'Elephant',emoji:'🐘'},{id:'F',word:'Fish',emoji:'🐟'},
         {id:'G',word:'Grapes',emoji:'🍇'},{id:'H',word:'Hat',emoji:'👒'},{id:'I',word:'Ice Cream',emoji:'🍦'},
@@ -264,29 +267,30 @@
         {id:'V',word:'Van',emoji:'🚐'},{id:'W',word:'Watermelon',emoji:'🍉'},{id:'X',word:'X-ray',emoji:'🩻'},
         {id:'Y',word:'Yo-yo',emoji:'🪀'},{id:'Z',word:'Zebra',emoji:'🦓'}
     ];
-    const NUMBERS = Array.from({length:20}, (_,i) => ({id:String(i+1), n:i+1}));
-    const COLORS = [
-        {id:'Red',hex:'#ff6b6b'},{id:'Orange',hex:'#ff9f43'},{id:'Yellow',hex:'#feca57'},
-        {id:'Green',hex:'#55efc4'},{id:'Blue',hex:'#48dbfb'},{id:'Purple',hex:'#a29bfe'},
-        {id:'Pink',hex:'#ff9ff3'},{id:'Brown',hex:'#a0522d'},{id:'Black',hex:'#2d3436'},
-        {id:'White',hex:'#ffffff',border:true}
+    const LETTERS_1 = [
+        {id:'sh',word:'Ship',emoji:'🚢'},{id:'ch',word:'Chair',emoji:'🪑'},{id:'th',word:'Thumb',emoji:'👍'},
+        {id:'wh',word:'Whale',emoji:'🐳'},{id:'bl',word:'Block',emoji:'🧱'},{id:'cl',word:'Clock',emoji:'🕐'},
+        {id:'fr',word:'Frog',emoji:'🐸'},{id:'st',word:'Star',emoji:'⭐'},{id:'gr',word:'Grapes',emoji:'🍇'},
+        {id:'pl',word:'Plane',emoji:'✈️'},{id:'sp',word:'Spoon',emoji:'🥄'},{id:'tr',word:'Truck',emoji:'🚚'},
+        {id:'cr',word:'Crab',emoji:'🦀'},{id:'dr',word:'Drum',emoji:'🥁'},{id:'sl',word:'Sled',emoji:'🛷'},
+        {id:'sm',word:'Smile',emoji:'😊'},{id:'sn',word:'Snail',emoji:'🐌'},{id:'sw',word:'Swan',emoji:'🦢'},
+        {id:'br',word:'Bread',emoji:'🍞'},{id:'gl',word:'Glasses',emoji:'👓'}
     ];
-    const SHAPES = [
-        {id:'Circle'},{id:'Square'},{id:'Rectangle'},{id:'Triangle'},
-        {id:'Star',emoji:'⭐'},{id:'Heart',emoji:'❤️'},{id:'Diamond',emoji:'💎'},{id:'Oval'}
-    ];
-    const ANIMALS = [
-        {id:'Cat',emoji:'🐱'},{id:'Dog',emoji:'🐶'},{id:'Bird',emoji:'🐦'},{id:'Fish',emoji:'🐟'},
-        {id:'Elephant',emoji:'🐘'},{id:'Lion',emoji:'🦁'},{id:'Cow',emoji:'🐮'},{id:'Duck',emoji:'🦆'},
-        {id:'Sheep',emoji:'🐑'},{id:'Horse',emoji:'🐴'},{id:'Frog',emoji:'🐸'},{id:'Owl',emoji:'🦉'}
-    ];
-    const WORDS = [
+    const NUMBERS_K = Array.from({length:20}, (_,i) => ({id:String(i+1), n:i+1}));
+    const NUMBERS_1 = [21,22,23,24,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100].map(n => ({id:String(n), n}));
+    const WORDS_K = [
         {id:'cat',emoji:'🐱'},{id:'dog',emoji:'🐶'},{id:'sun',emoji:'☀️'},{id:'hat',emoji:'👒'},
         {id:'pig',emoji:'🐷'},{id:'hen',emoji:'🐔'},{id:'bus',emoji:'🚌'},{id:'cup',emoji:'☕'},
         {id:'map',emoji:'🗺️'},{id:'fan',emoji:'💨'},{id:'bed',emoji:'🛏️'},{id:'bag',emoji:'👜'},
         {id:'box',emoji:'📦'},{id:'bee',emoji:'🐝'},{id:'egg',emoji:'🥚'},{id:'fox',emoji:'🦊'}
     ];
-    const CHINESE = [
+    const WORDS_1 = [
+        {id:'cake',emoji:'🎂'},{id:'bike',emoji:'🚲'},{id:'home',emoji:'🏠'},{id:'rope',emoji:'🪢'},
+        {id:'cube',emoji:'🧊'},{id:'kite',emoji:'🪁'},{id:'note',emoji:'🎵'},{id:'cape',emoji:'🦸'},
+        {id:'wave',emoji:'🌊'},{id:'cone',emoji:'🍦'},{id:'rose',emoji:'🌹'},{id:'gate',emoji:'🚪'},
+        {id:'snake',emoji:'🐍'},{id:'plane',emoji:'✈️'},{id:'grape',emoji:'🍇'},{id:'smile',emoji:'😊'}
+    ];
+    const CHINESE_K = [
         {id:'Hello', hanzi:'你好', pinyin:'nǐ hǎo', en:'Hello', emoji:'👋'},
         {id:'ThankYou', hanzi:'谢谢', pinyin:'xiè xie', en:'Thank you', emoji:'🙏'},
         {id:'Bye', hanzi:'再见', pinyin:'zài jiàn', en:'Bye', emoji:'👋'},
@@ -308,7 +312,29 @@
         {id:'Apple', hanzi:'苹果', pinyin:'píng guǒ', en:'Apple', emoji:'🍎'},
         {id:'Home', hanzi:'家', pinyin:'jiā', en:'Home', emoji:'🏠'}
     ];
-    const SPANISH = [
+    const CHINESE_1 = [
+        {id:'Four', hanzi:'四', pinyin:'sì', en:'Four', emoji:'4️⃣'},
+        {id:'Five', hanzi:'五', pinyin:'wǔ', en:'Five', emoji:'5️⃣'},
+        {id:'Six', hanzi:'六', pinyin:'liù', en:'Six', emoji:'6️⃣'},
+        {id:'Seven', hanzi:'七', pinyin:'qī', en:'Seven', emoji:'7️⃣'},
+        {id:'Eight', hanzi:'八', pinyin:'bā', en:'Eight', emoji:'8️⃣'},
+        {id:'Nine', hanzi:'九', pinyin:'jiǔ', en:'Nine', emoji:'9️⃣'},
+        {id:'Ten', hanzi:'十', pinyin:'shí', en:'Ten', emoji:'🔟'},
+        {id:'Blue', hanzi:'蓝色', pinyin:'lán sè', en:'Blue', emoji:'🔵'},
+        {id:'Yellow', hanzi:'黄色', pinyin:'huáng sè', en:'Yellow', emoji:'🟡'},
+        {id:'Green', hanzi:'绿色', pinyin:'lǜ sè', en:'Green', emoji:'🟢'},
+        {id:'Teacher', hanzi:'老师', pinyin:'lǎo shī', en:'Teacher', emoji:'🧑‍🏫'},
+        {id:'School', hanzi:'学校', pinyin:'xué xiào', en:'School', emoji:'🏫'},
+        {id:'Friend', hanzi:'朋友', pinyin:'péng you', en:'Friend', emoji:'🤝'},
+        {id:'Book', hanzi:'书', pinyin:'shū', en:'Book', emoji:'📚'},
+        {id:'Eat', hanzi:'吃', pinyin:'chī', en:'Eat', emoji:'🍽️'},
+        {id:'Drink', hanzi:'喝', pinyin:'hē', en:'Drink', emoji:'🥤'},
+        {id:'Fish', hanzi:'鱼', pinyin:'yú', en:'Fish', emoji:'🐟'},
+        {id:'Bird', hanzi:'鸟', pinyin:'niǎo', en:'Bird', emoji:'🐦'},
+        {id:'Happy', hanzi:'开心', pinyin:'kāi xīn', en:'Happy', emoji:'😊'},
+        {id:'Good', hanzi:'好', pinyin:'hǎo', en:'Good', emoji:'👍'}
+    ];
+    const SPANISH_K = [
         {id:'Hello', es:'Hola', en:'Hello', emoji:'👋'},
         {id:'ThankYou', es:'Gracias', en:'Thank you', emoji:'🙏'},
         {id:'Bye', es:'Adiós', en:'Bye', emoji:'👋'},
@@ -330,16 +356,70 @@
         {id:'Apple', es:'Manzana', en:'Apple', emoji:'🍎'},
         {id:'Home', es:'Casa', en:'Home', emoji:'🏠'}
     ];
-    const CATEGORIES = [
-        {key:'letters', name:'Letters', icon:'🔤', items:LETTERS},
-        {key:'numbers', name:'Numbers', icon:'🔢', items:NUMBERS},
-        {key:'words', name:'Words', icon:'📖', items:WORDS},
-        {key:'chinese', name:'Chinese', icon:'🇨🇳', items:CHINESE},
-        {key:'spanish', name:'Spanish', icon:'🇪🇸', items:SPANISH},
-        {key:'colors', name:'Colors', icon:'🌈', items:COLORS},
-        {key:'shapes', name:'Shapes', icon:'🔷', items:SHAPES},
-        {key:'animals', name:'Animals', icon:'🐾', items:ANIMALS}
+    const SPANISH_1 = [
+        {id:'Four', es:'Cuatro', en:'Four', emoji:'4️⃣'},
+        {id:'Five', es:'Cinco', en:'Five', emoji:'5️⃣'},
+        {id:'Six', es:'Seis', en:'Six', emoji:'6️⃣'},
+        {id:'Seven', es:'Siete', en:'Seven', emoji:'7️⃣'},
+        {id:'Eight', es:'Ocho', en:'Eight', emoji:'8️⃣'},
+        {id:'Nine', es:'Nueve', en:'Nine', emoji:'9️⃣'},
+        {id:'Ten', es:'Diez', en:'Ten', emoji:'🔟'},
+        {id:'Blue', es:'Azul', en:'Blue', emoji:'🔵'},
+        {id:'Yellow', es:'Amarillo', en:'Yellow', emoji:'🟡'},
+        {id:'Green', es:'Verde', en:'Green', emoji:'🟢'},
+        {id:'Teacher', es:'Maestra', en:'Teacher', emoji:'🧑‍🏫'},
+        {id:'School', es:'Escuela', en:'School', emoji:'🏫'},
+        {id:'Friend', es:'Amigo', en:'Friend', emoji:'🤝'},
+        {id:'Book', es:'Libro', en:'Book', emoji:'📚'},
+        {id:'Eat', es:'Comer', en:'Eat', emoji:'🍽️'},
+        {id:'Drink', es:'Beber', en:'Drink', emoji:'🥤'},
+        {id:'Fish', es:'Pez', en:'Fish', emoji:'🐟'},
+        {id:'Bird', es:'Pájaro', en:'Bird', emoji:'🐦'},
+        {id:'Happy', es:'Feliz', en:'Happy', emoji:'😊'},
+        {id:'Good', es:'Bueno', en:'Good', emoji:'👍'}
     ];
+    const COLORS_K = [
+        {id:'Red',hex:'#ff6b6b'},{id:'Orange',hex:'#ff9f43'},{id:'Yellow',hex:'#feca57'},
+        {id:'Green',hex:'#55efc4'},{id:'Blue',hex:'#48dbfb'},{id:'Purple',hex:'#a29bfe'},
+        {id:'Pink',hex:'#ff9ff3'},{id:'Brown',hex:'#a0522d'},{id:'Black',hex:'#2d3436'},
+        {id:'White',hex:'#ffffff',border:true}
+    ];
+    const COLORS_1 = [
+        {id:'Gray',hex:'#9e9e9e'},{id:'Turquoise',hex:'#30d5c8'},{id:'Maroon',hex:'#800000'},
+        {id:'Navy',hex:'#1a2b4c'},{id:'Gold',hex:'#ffd700'},{id:'Silver',hex:'#c0c0c0'},
+        {id:'Lime',hex:'#b6e354'},{id:'Teal',hex:'#128277'},{id:'Coral',hex:'#ff6f61'},{id:'Indigo',hex:'#4b0082'}
+    ];
+    const SHAPES_K = [
+        {id:'Circle'},{id:'Square'},{id:'Rectangle'},{id:'Triangle'},
+        {id:'Star',emoji:'⭐'},{id:'Heart',emoji:'❤️'},{id:'Diamond',emoji:'💎'},{id:'Oval'}
+    ];
+    const SHAPES_1 = [
+        {id:'Pentagon'},{id:'Hexagon'},{id:'Octagon'},{id:'Trapezoid'},
+        {id:'Cube',emoji:'🎲'},{id:'Sphere',emoji:'⚽'},{id:'Cone',emoji:'🚧'},{id:'Cylinder',emoji:'🥫'}
+    ];
+    const ANIMALS_K = [
+        {id:'Cat',emoji:'🐱'},{id:'Dog',emoji:'🐶'},{id:'Bird',emoji:'🐦'},{id:'Fish',emoji:'🐟'},
+        {id:'Elephant',emoji:'🐘'},{id:'Lion',emoji:'🦁'},{id:'Cow',emoji:'🐮'},{id:'Duck',emoji:'🦆'},
+        {id:'Sheep',emoji:'🐑'},{id:'Horse',emoji:'🐴'},{id:'Frog',emoji:'🐸'},{id:'Owl',emoji:'🦉'}
+    ];
+    const ANIMALS_1 = [
+        {id:'Bear',emoji:'🐻'},{id:'Rabbit',emoji:'🐰'},{id:'Monkey',emoji:'🐵'},{id:'Tiger',emoji:'🐯'},
+        {id:'Panda',emoji:'🐼'},{id:'Penguin',emoji:'🐧'},{id:'Turtle',emoji:'🐢'},{id:'Butterfly',emoji:'🦋'},
+        {id:'Bee',emoji:'🐝'},{id:'Snake',emoji:'🐍'},{id:'Squirrel',emoji:'🐿️'},{id:'Kangaroo',emoji:'🦘'}
+    ];
+    const CATEGORIES = [
+        {key:'letters', name:'Letters', icon:'🔤', levels:{K:{items:LETTERS_K}, G1:{items:LETTERS_1}}},
+        {key:'numbers', name:'Numbers', icon:'🔢', levels:{K:{items:NUMBERS_K}, G1:{items:NUMBERS_1}}},
+        {key:'words', name:'Words', icon:'📖', levels:{K:{items:WORDS_K}, G1:{items:WORDS_1}}},
+        {key:'chinese', name:'Chinese', icon:'🇨🇳', levels:{K:{items:CHINESE_K}, G1:{items:CHINESE_1}}},
+        {key:'spanish', name:'Spanish', icon:'🇪🇸', levels:{K:{items:SPANISH_K}, G1:{items:SPANISH_1}}},
+        {key:'colors', name:'Colors', icon:'🌈', levels:{K:{items:COLORS_K}, G1:{items:COLORS_1}}},
+        {key:'shapes', name:'Shapes', icon:'🔷', levels:{K:{items:SHAPES_K}, G1:{items:SHAPES_1}}},
+        {key:'animals', name:'Animals', icon:'🐾', levels:{K:{items:ANIMALS_K}, G1:{items:ANIMALS_1}}}
+    ];
+    function getCategoryItems(key, level) {
+        return CATEGORIES.find(c => c.key === key).levels[level].items;
+    }
     const PRAISE = ['Great job!','Awesome!','You got it!','Super!','Nice work!','Way to go!','Excellent!'];
     const RETRY = ['Try again!','Almost! Try again.','Not quite, try again!','Keep trying!'];
     const MASTERY_THRESHOLD = 2;
@@ -350,9 +430,26 @@
     function loadProgress() {
         try {
             const raw = localStorage.getItem('kc_progress_v1');
-            if (raw) return JSON.parse(raw);
+            if (raw) {
+                const p = JSON.parse(raw);
+                // Migrate pre-levels saves: mathCorrect used to be a single
+                // number, and mastery was keyed by category only (always
+                // Kindergarten content back then).
+                if (typeof p.mathCorrect === 'number') p.mathCorrect = { K: p.mathCorrect, G1: 0 };
+                if (!p.mathCorrect) p.mathCorrect = { K: 0, G1: 0 };
+                if (p.mastery) {
+                    const migrated = {};
+                    for (const k in p.mastery) {
+                        migrated[/_K$|_G1$/.test(k) ? k : k + '_K'] = p.mastery[k];
+                    }
+                    p.mastery = migrated;
+                } else {
+                    p.mastery = {};
+                }
+                return p;
+            }
         } catch (e) {}
-        return { stars: 0, mastery: {}, mathCorrect: 0 };
+        return { stars: 0, mastery: {}, mathCorrect: { K: 0, G1: 0 } };
     }
     function saveProgress() { localStorage.setItem('kc_progress_v1', JSON.stringify(progress)); }
     let progress = loadProgress();
@@ -366,6 +463,15 @@
     }
     function categoryMasteredCount(cat, items) {
         return items.filter(it => getMasteryCount(cat, it.id) >= MASTERY_THRESHOLD).length;
+    }
+    function categoryMasteredAllLevels(cat) {
+        let mastered = 0, total = 0;
+        for (const lvKey in cat.levels) {
+            const items = cat.levels[lvKey].items;
+            mastered += categoryMasteredCount(`${cat.key}_${lvKey}`, items);
+            total += items.length;
+        }
+        return { mastered, total };
     }
 
     // ---------- Audio ----------
@@ -508,6 +614,10 @@
             case 'Rectangle': return `<div style="width:${size*1.4}px;height:${size*0.7}px;background:#667eea;"></div>`;
             case 'Oval': return `<div style="width:${size*1.4}px;height:${size*0.8}px;background:#667eea;border-radius:50%;"></div>`;
             case 'Triangle': return `<div style="width:0;height:0;border-left:${size/2}px solid transparent;border-right:${size/2}px solid transparent;border-bottom:${size}px solid #667eea;"></div>`;
+            case 'Pentagon': return `<div style="${s}clip-path:polygon(50% 0%,100% 38%,82% 100%,18% 100%,0% 38%);"></div>`;
+            case 'Hexagon': return `<div style="${s}clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%);"></div>`;
+            case 'Octagon': return `<div style="${s}clip-path:polygon(30% 0%,70% 0%,100% 30%,100% 70%,70% 100%,30% 100%,0% 70%,0% 30%);"></div>`;
+            case 'Trapezoid': return `<div style="width:${size*1.3}px;height:${size*0.8}px;background:#667eea;clip-path:polygon(20% 0%,80% 0%,100% 100%,0% 100%);"></div>`;
             default: return '';
         }
     }
@@ -520,22 +630,23 @@
     // ---------- Render: Home ----------
     function renderHome() {
         const cards = CATEGORIES.map(c => {
-            const mastered = categoryMasteredCount(c.key, c.items);
-            return `<div class="card cat-${c.key}" onclick="go('category', {key:'${c.key}'})">
+            const { mastered, total } = categoryMasteredAllLevels(c);
+            return `<div class="card cat-${c.key}" onclick="go('level', {key:'${c.key}'})">
                 <div class="icon">${c.icon}</div>
                 <div class="label">${c.name}</div>
-                <div class="sublabel">${mastered}/${c.items.length} mastered</div>
+                <div class="sublabel">${mastered}/${total} mastered</div>
             </div>`;
         }).join('');
+        const mathSolved = (progress.mathCorrect.K || 0) + (progress.mathCorrect.G1 || 0);
         return `
         ${topbar(false)}
         <h1>⛏️ Minecraft Classroom ⛏️</h1>
         <div class="grid">
             ${cards}
-            <div class="card cat-math" onclick="go('category', {key:'math'})">
+            <div class="card cat-math" onclick="go('level', {key:'math'})">
                 <div class="icon">➕</div>
                 <div class="label">Math</div>
-                <div class="sublabel">${progress.mathCorrect} solved</div>
+                <div class="sublabel">${mathSolved} solved</div>
             </div>
             <div class="card cat-progress" onclick="go('progress')">
                 <div class="icon">🏆</div>
@@ -544,6 +655,34 @@
             </div>
         </div>
         <div class="footer">Tap a card to start learning!</div>`;
+    }
+
+    // ---------- Render: Level picker ----------
+    function renderLevelPicker() {
+        const key = state.params.key;
+        const isMath = key === 'math';
+        const cat = isMath ? null : CATEGORIES.find(c => c.key === key);
+        const name = isMath ? 'Math' : cat.name;
+        const icon = isMath ? '➕' : cat.icon;
+        const cards = ['K', 'G1'].map(lvKey => {
+            let sub;
+            if (isMath) {
+                sub = `${progress.mathCorrect[lvKey] || 0} solved`;
+            } else {
+                const items = cat.levels[lvKey].items;
+                const mastered = categoryMasteredCount(`${key}_${lvKey}`, items);
+                sub = `${mastered}/${items.length} mastered`;
+            }
+            return `<div class="card" onclick="go('category', {key:'${key}', level:'${lvKey}'})">
+                <div class="icon">${LEVEL_ICONS[lvKey]}</div>
+                <div class="label">${LEVEL_LABELS[lvKey]}</div>
+                <div class="sublabel">${sub}</div>
+            </div>`;
+        }).join('');
+        return `${topbar(true)}
+        <h2>${icon} ${name}</h2>
+        <div class="grid">${cards}</div>
+        <div class="footer">Choose a grade level!</div>`;
     }
 
     function topbar(showBack) {
@@ -566,32 +705,35 @@
 
     // ---------- Render: Category ----------
     function renderCategory() {
-        const key = state.params.key;
+        const { key, level } = state.params;
         if (key === 'math') {
+            const desc = level === 'G1' ? 'Practice addition and subtraction!' : 'Practice adding numbers together!';
             return `${topbar(true)}
             <div class="center-col">
                 <div style="font-size:4rem;">➕</div>
-                <h2>Math</h2>
-                <p style="color:#888;margin-bottom:20px;">Practice adding numbers together!</p>
-                <button class="big-btn play" onclick="startMath()">🎮 Play</button>
+                <h2>Math — ${LEVEL_LABELS[level]}</h2>
+                <p style="color:#888;margin-bottom:20px;">${desc}</p>
+                <button class="big-btn play" onclick="startMath('${level}')">🎮 Play</button>
             </div>`;
         }
         const cat = CATEGORIES.find(c => c.key === key);
         return `${topbar(true)}
         <div class="center-col">
             <div style="font-size:4rem;">${cat.icon}</div>
-            <h2>${cat.name}</h2>
-            <button class="big-btn learn" onclick="go('learn', {key:'${key}'})">📖 Learn</button>
-            <button class="big-btn play" onclick="startQuiz('${key}')">🎮 Play</button>
+            <h2>${cat.name} — ${LEVEL_LABELS[level]}</h2>
+            <button class="big-btn learn" onclick="go('learn', {key:'${key}', level:'${level}'})">📖 Learn</button>
+            <button class="big-btn play" onclick="startQuiz('${key}', '${level}')">🎮 Play</button>
         </div>`;
     }
 
     // ---------- Render: Learn ----------
     function renderLearn() {
-        const key = state.params.key;
+        const { key, level } = state.params;
         const cat = CATEGORIES.find(c => c.key === key);
-        const cards = cat.items.map(it => {
-            const mastered = getMasteryCount(key, it.id) >= MASTERY_THRESHOLD;
+        const items = cat.levels[level].items;
+        const scopedKey = `${key}_${level}`;
+        const cards = items.map(it => {
+            const mastered = getMasteryCount(scopedKey, it.id) >= MASTERY_THRESHOLD;
             let visual, label = it.id;
             if (key === 'letters') visual = `<div class="icon">${it.id}</div>`;
             else if (key === 'numbers') visual = `<div class="icon">${it.n}</div>`;
@@ -607,30 +749,31 @@
                 visual = `<div class="icon">${it.emoji}</div>`;
                 label = `<div style="font-size:1.4rem;">${it.es}</div><div style="font-size:0.75rem;color:rgba(43,27,14,0.55);font-weight:400;">${it.en}</div>`;
             }
-            return `<div class="card" onclick="learnTap('${key}','${it.id}')">
+            return `<div class="card" onclick="learnTap('${key}','${it.id}','${level}')">
                 ${mastered ? '<div class="mastered-check">✓</div>' : ''}
                 ${visual}
                 <div class="label">${label}</div>
             </div>`;
         }).join('');
         return `${topbar(true)}
-        <h2>${cat.icon} ${cat.name} — Learn</h2>
+        <h2>${cat.icon} ${cat.name} — ${LEVEL_LABELS[level]} — Learn</h2>
         <div class="grid">${cards}</div>
         <div class="footer">Tap a card to hear it!</div>`;
     }
-    function learnTap(key, id) {
+    function learnTap(key, id, level) {
+        const items = getCategoryItems(key, level);
         if (key === 'letters') {
-            const it = LETTERS.find(l => l.id === id);
+            const it = items.find(l => l.id === id);
             speakSequence([id, `${id} is for ${it.word}`]);
         } else if (key === 'numbers') {
             speak(id);
         } else if (key === 'words') {
             speakSequence(id.split('').concat([id]));
         } else if (key === 'chinese') {
-            const it = CHINESE.find(w => w.id === id);
+            const it = items.find(w => w.id === id);
             speakBilingual(it.hanzi, 'zh-CN', it.en);
         } else if (key === 'spanish') {
-            const it = SPANISH.find(w => w.id === id);
+            const it = items.find(w => w.id === id);
             speakBilingual(it.es, 'es-ES', it.en);
         } else {
             speak(id);
@@ -639,14 +782,14 @@
 
     // ---------- Quiz engine ----------
     let quiz = null;
-    function startQuiz(key) {
-        const cat = CATEGORIES.find(c => c.key === key);
+    function startQuiz(key, level) {
+        const items = getCategoryItems(key, level);
         const questions = [];
-        for (let i = 0; i < ROUND_LENGTH; i++) questions.push(buildQuestion(key, cat.items));
-        quiz = { key, questions, idx: 0, correctFirstTry: 0, firstAttempt: true, awaitingNext: false, stars: 0 };
-        go('play', { key });
+        for (let i = 0; i < ROUND_LENGTH; i++) questions.push(buildQuestion(key, items, level));
+        quiz = { key, level, questions, idx: 0, correctFirstTry: 0, firstAttempt: true, awaitingNext: false, stars: 0 };
+        go('play', { key, level });
     }
-    function buildQuestion(key, items) {
+    function buildQuestion(key, items, level) {
         const correct = items[Math.floor(Math.random() * items.length)];
         if (key === 'letters') {
             if (Math.random() < 0.5) {
@@ -670,7 +813,7 @@
             }
         }
         if (key === 'numbers') {
-            if (Math.random() < 0.5) {
+            if (level === 'G1' || Math.random() < 0.5) {
                 const choices = pickChoices(items, correct, 4);
                 return {
                     mode: 'number-find',
@@ -822,7 +965,7 @@
             awardStar();
             quiz.stars += 1;
             if (quiz.firstAttempt) {
-                bumpMastery(quiz.key === 'math' ? 'math' : quiz.key, q.itemId);
+                bumpMastery(`${quiz.key}_${quiz.level}`, q.itemId);
                 quiz.correctFirstTry += 1;
             }
             saveProgress();
@@ -846,7 +989,7 @@
         quiz.firstAttempt = true;
         quiz.awaitingNext = false;
         if (quiz.idx >= quiz.questions.length) {
-            go('roundEnd', { stars: quiz.stars, key: quiz.key });
+            go('roundEnd', { stars: quiz.stars, key: quiz.key, level: quiz.level });
         } else {
             render();
         }
@@ -854,31 +997,52 @@
 
     // ---------- Math game ----------
     let mathState = null;
-    function startMath() {
-        mathState = { idx: 0, stars: 0, questions: [] };
-        for (let i = 0; i < ROUND_LENGTH; i++) mathState.questions.push(buildMathQuestion());
-        go('mathPlay');
+    function startMath(level) {
+        mathState = { idx: 0, stars: 0, level, questions: [] };
+        for (let i = 0; i < ROUND_LENGTH; i++) mathState.questions.push(buildMathQuestion(level));
+        go('mathPlay', { level });
     }
-    function buildMathQuestion() {
-        const level = progress.mathCorrect >= 25 ? 6 : (progress.mathCorrect >= 10 ? 5 : 3);
-        const a = 1 + Math.floor(Math.random() * level);
-        const b = 1 + Math.floor(Math.random() * level);
-        const sum = a + b;
-        const wrongPool = shuffle([sum - 2, sum - 1, sum + 1, sum + 2].filter(n => n > 0 && n !== sum));
-        const choices = shuffle([sum, ...wrongPool.slice(0, 3)]);
-        return { a, b, sum, choices, awaitingNext: false, firstAttempt: true };
+    function buildMathQuestion(level) {
+        const solved = progress.mathCorrect[level] || 0;
+        if (level === 'G1') {
+            const range = solved >= 25 ? 12 : (solved >= 10 ? 9 : 6);
+            const op = Math.random() < 0.5 ? 'add' : 'sub';
+            if (op === 'add') {
+                const a = 1 + Math.floor(Math.random() * range);
+                const b = 1 + Math.floor(Math.random() * range);
+                const answer = a + b;
+                const wrongPool = shuffle([answer - 2, answer - 1, answer + 1, answer + 2].filter(n => n > 0 && n !== answer));
+                const choices = shuffle([answer, ...wrongPool.slice(0, 3)]);
+                return { op, a, b, answer, choices, awaitingNext: false, firstAttempt: true };
+            } else {
+                const a = 2 + Math.floor(Math.random() * range);
+                const b = 1 + Math.floor(Math.random() * (a - 1));
+                const answer = a - b;
+                const wrongPool = shuffle([answer - 2, answer - 1, answer + 1, answer + 2].filter(n => n >= 0 && n !== answer));
+                const choices = shuffle([answer, ...wrongPool.slice(0, 3)]);
+                return { op, a, b, answer, choices, awaitingNext: false, firstAttempt: true };
+            }
+        }
+        const range = solved >= 25 ? 6 : (solved >= 10 ? 5 : 3);
+        const a = 1 + Math.floor(Math.random() * range);
+        const b = 1 + Math.floor(Math.random() * range);
+        const answer = a + b;
+        const wrongPool = shuffle([answer - 2, answer - 1, answer + 1, answer + 2].filter(n => n > 0 && n !== answer));
+        const choices = shuffle([answer, ...wrongPool.slice(0, 3)]);
+        return { op: 'add', a, b, answer, choices, awaitingNext: false, firstAttempt: true };
     }
     function renderMathPlay() {
         const q = mathState.questions[mathState.idx];
         const choicesHTML = q.choices.map(n => `
             <button class="choice-btn" data-id="${n}" onclick="handleMathChoice(${n}, this)">${n}</button>
         `).join('');
+        const opSymbol = q.op === 'sub' ? '−' : '+';
         return `${topbar(true)}
         <div class="center-col">
             <div style="color:#999;margin-bottom:8px;">Question ${mathState.idx + 1} of ${mathState.questions.length}</div>
             <div class="math-row">
                 <div class="math-group">${'🍎'.repeat(q.a)}</div>
-                <div class="math-op">+</div>
+                <div class="math-op">${opSymbol}</div>
                 <div class="math-group">${'🍎'.repeat(q.b)}</div>
                 <div class="math-op">=</div>
                 <div class="math-op">?</div>
@@ -888,17 +1052,19 @@
     }
     function afterMathPlayRender() {
         const q = mathState.questions[mathState.idx];
-        speak(`${q.a} plus ${q.b}. How many apples in total?`);
+        const verb = q.op === 'sub' ? 'minus' : 'plus';
+        const question = q.op === 'sub' ? 'How many apples are left?' : 'How many apples in total?';
+        speak(`${q.a} ${verb} ${q.b}. ${question}`);
     }
     function handleMathChoice(n, btnEl) {
         const q = mathState.questions[mathState.idx];
         if (q.awaitingNext) return;
-        if (n === q.sum) {
+        if (n === q.answer) {
             btnEl.classList.add('correct');
             q.awaitingNext = true;
             awardStar();
             mathState.stars += 1;
-            if (q.firstAttempt) { progress.mathCorrect += 1; }
+            if (q.firstAttempt) { progress.mathCorrect[mathState.level] = (progress.mathCorrect[mathState.level] || 0) + 1; }
             saveProgress();
             confettiBurst();
             speak(PRAISE[Math.floor(Math.random() * PRAISE.length)]);
@@ -914,7 +1080,7 @@
     function nextMathQuestion() {
         mathState.idx += 1;
         if (mathState.idx >= mathState.questions.length) {
-            go('roundEnd', { stars: mathState.stars, key: 'math' });
+            go('roundEnd', { stars: mathState.stars, key: 'math', level: mathState.level });
         } else {
             render();
         }
@@ -922,23 +1088,23 @@
 
     // ---------- Round end / Progress ----------
     function renderRoundEnd() {
-        const { stars, key } = state.params;
+        const { stars, key, level } = state.params;
         return `${topbar(false)}
         <div class="center-col">
             <div style="font-size:4rem;">🎉</div>
             <h2>Round Complete!</h2>
             <p style="font-size:1.4rem;color:#0e6b7a;font-weight:700;margin-bottom:20px;">You earned ${stars} 💎</p>
-            <button class="big-btn again" onclick="${key === 'math' ? 'startMath()' : `startQuiz('${key}')`}">🔁 Play Again</button>
+            <button class="big-btn again" onclick="${key === 'math' ? `startMath('${level}')` : `startQuiz('${key}', '${level}')`}">🔁 Play Again</button>
             <button class="big-btn home" onclick="goHome()">🏠 Home</button>
         </div>`;
     }
     function renderProgress() {
         const rows = CATEGORIES.map(c => {
-            const mastered = categoryMasteredCount(c.key, c.items);
-            const pct = Math.round((mastered / c.items.length) * 100);
+            const { mastered, total } = categoryMasteredAllLevels(c);
+            const pct = Math.round((mastered / total) * 100);
             return `<div style="margin-bottom:16px;">
                 <div style="display:flex;justify-content:space-between;font-weight:700;">
-                    <span>${c.icon} ${c.name}</span><span>${mastered}/${c.items.length}</span>
+                    <span>${c.icon} ${c.name}</span><span>${mastered}/${total}</span>
                 </div>
                 <div class="progress-bar-track"><div class="progress-bar-fill" style="width:${pct}%;"></div></div>
             </div>`;
@@ -954,7 +1120,7 @@
         <h2>🏆 My Progress</h2>
         <div class="star-badge" style="margin:0 auto 20px;width:fit-content;font-size:1.1rem;">💎 ${progress.stars} total diamonds</div>
         ${rows}
-        <div style="margin-top:10px;font-weight:700;">Math problems solved: ${progress.mathCorrect}</div>
+        <div style="margin-top:10px;font-weight:700;">Math solved: Kindergarten ${progress.mathCorrect.K || 0} · 1st Grade ${progress.mathCorrect.G1 || 0}</div>
         <div class="trophy-grid">${trophies}</div>`;
     }
 
@@ -963,6 +1129,7 @@
         const app = document.getElementById('app');
         let html = '';
         if (state.screen === 'home') html = renderHome();
+        else if (state.screen === 'level') html = renderLevelPicker();
         else if (state.screen === 'category') html = renderCategory();
         else if (state.screen === 'learn') html = renderLearn();
         else if (state.screen === 'play') html = renderPlay();
