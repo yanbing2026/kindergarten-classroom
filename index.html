@@ -706,7 +706,7 @@
             <div class="topbar-right">
                 <div class="star-badge">💎 ${progress.stars}</div>
                 <button class="icon-btn" onclick="toggleMute()">${muted ? '🔇' : '🔊'}</button>
-                <button class="icon-btn" onclick="go('settings')">⚙️</button>
+                <button class="icon-btn" onclick="settingsMsg={text:'',color:''}; go('settings')">⚙️</button>
             </div>
         </div>`;
     }
@@ -1112,6 +1112,11 @@
 
     // ---------- Main render ----------
     // ---------- Render: Settings ----------
+    let settingsMsg = { text: '', color: '' };
+    function setSettingsMsg(text, color) {
+        settingsMsg = { text, color: color || 'var(--mc-ink)' };
+        render();
+    }
     function renderSettings() {
         const hasKey = !!localStorage.getItem('kc_gemini_key');
         return `${topbar(true)}
@@ -1122,33 +1127,49 @@
                 <strong>aistudio.google.com</strong>. Without a key, the app automatically uses your browser's built-in voice — everything still works.
             </p>
             <div style="text-align:center;font-weight:700;margin-bottom:10px;">${hasKey ? '✅ AI voice is active' : '🔈 Using free browser voice'}</div>
-            <input id="geminiKeyInput" type="password" placeholder="Paste your API key here (starts with AIzaSy)"
+            <input id="geminiKeyInput" type="password" placeholder="Paste your API key here"
                 style="display:block;width:100%;padding:14px;border:3px solid var(--mc-ink);border-radius:4px;font-size:1rem;margin-bottom:12px;font-family:var(--font-clear);">
-            <button class="big-btn again" onclick="saveGeminiKey()">💾 Save Key</button>
+            <button class="big-btn play" onclick="testGeminiVoice()">🔊 Test Voice</button>
+            <button class="big-btn again" onclick="saveGeminiKey()">💾 Save Key (without testing)</button>
             ${hasKey ? `<button class="big-btn home" onclick="clearGeminiKey()">🗑️ Remove Key</button>` : ''}
             <button class="big-btn learn" onclick="clearAudioCacheAndNotify()">🧹 Clear Cached Audio</button>
-            <div id="settingsMsg" style="text-align:center;color:var(--mc-emerald);font-weight:700;margin-top:8px;min-height:1.2em;"></div>
+            <div id="settingsMsg" style="text-align:center;font-weight:700;margin-top:8px;min-height:1.2em;color:${settingsMsg.color || 'var(--mc-ink)'};">${settingsMsg.text}</div>
             <p style="color:rgba(43,27,14,0.5);font-size:0.75rem;margin-top:16px;text-align:center;">
                 Your key is saved only in this browser (never uploaded anywhere else) and used solely to request audio from Google's API.
             </p>
         </div>`;
     }
+    async function testGeminiVoice() {
+        const input = document.getElementById('geminiKeyInput');
+        const typed = input ? input.value.trim() : '';
+        const key = typed || localStorage.getItem('kc_gemini_key') || '';
+        if (!key) { setSettingsMsg('Please paste a key first.', 'var(--mc-redstone)'); return; }
+        setSettingsMsg('Testing your key...', 'var(--mc-ink)');
+        try {
+            const blob = await fetchGeminiAudio('Hello! This is a test.', 'en-US', key);
+            localStorage.setItem('kc_gemini_key', key);
+            setSettingsMsg('✅ It works! Playing a test clip...', 'var(--mc-emerald)');
+            await playBlob(blob);
+            setSettingsMsg('✅ It works! Key saved.', 'var(--mc-emerald)');
+        } catch (e) {
+            setSettingsMsg('❌ Didn\'t work: ' + (e && e.message ? e.message : 'unknown error'), 'var(--mc-redstone)');
+        }
+    }
     function saveGeminiKey() {
         const input = document.getElementById('geminiKeyInput');
         const val = input ? input.value.trim() : '';
-        const msg = document.getElementById('settingsMsg');
-        if (!val) { if (msg) msg.textContent = 'Please paste a key first.'; return; }
+        if (!val) { setSettingsMsg('Please paste a key first.', 'var(--mc-redstone)'); return; }
         localStorage.setItem('kc_gemini_key', val);
-        render();
+        setSettingsMsg('Key saved (untested).', 'var(--mc-ink)');
     }
     function clearGeminiKey() {
         localStorage.removeItem('kc_gemini_key');
-        render();
+        setSettingsMsg('Key removed.', 'var(--mc-ink)');
     }
     function clearAudioCacheAndNotify() {
         clearAudioCache().then(() => {
-            const msg = document.getElementById('settingsMsg');
-            if (msg) { msg.textContent = 'Cached audio cleared!'; setTimeout(() => { if (msg) msg.textContent = ''; }, 2000); }
+            setSettingsMsg('Cached audio cleared!', 'var(--mc-emerald)');
+            setTimeout(() => { if (settingsMsg.text === 'Cached audio cleared!') setSettingsMsg('', ''); }, 2000);
         });
     }
 
