@@ -368,10 +368,10 @@
     // Derived per-language lists: same word set, different display fields.
     const WORDS_K   = VOCAB_K.map(v => ({ id:v.id, emoji:v.emoji, img:v.img }));
     const WORDS_1   = VOCAB_1.map(v => ({ id:v.id, emoji:v.emoji, img:v.img }));
-    const CHINESE_K = VOCAB_K.map(v => ({ id:v.id, emoji:v.emoji, hanzi:v.zh.hanzi, pinyin:v.zh.pinyin, en:v.en }));
-    const CHINESE_1 = VOCAB_1.map(v => ({ id:v.id, emoji:v.emoji, hanzi:v.zh.hanzi, pinyin:v.zh.pinyin, en:v.en }));
-    const SPANISH_K = VOCAB_K.map(v => ({ id:v.id, emoji:v.emoji, es:v.es, en:v.en }));
-    const SPANISH_1 = VOCAB_1.map(v => ({ id:v.id, emoji:v.emoji, es:v.es, en:v.en }));
+    const CHINESE_K = VOCAB_K.map(v => ({ id:v.id, emoji:v.emoji, img:v.img, hanzi:v.zh.hanzi, pinyin:v.zh.pinyin, en:v.en }));
+    const CHINESE_1 = VOCAB_1.map(v => ({ id:v.id, emoji:v.emoji, img:v.img, hanzi:v.zh.hanzi, pinyin:v.zh.pinyin, en:v.en }));
+    const SPANISH_K = VOCAB_K.map(v => ({ id:v.id, emoji:v.emoji, img:v.img, es:v.es, en:v.en }));
+    const SPANISH_1 = VOCAB_1.map(v => ({ id:v.id, emoji:v.emoji, img:v.img, es:v.es, en:v.en }));
     const COLORS_K = [
         {id:'Red',hex:'#ff6b6b'},{id:'Orange',hex:'#ff9f43'},{id:'Yellow',hex:'#feca57'},
         {id:'Green',hex:'#55efc4'},{id:'Blue',hex:'#48dbfb'},{id:'Purple',hex:'#a29bfe'},
@@ -759,11 +759,11 @@
             else if (key === 'animals') visual = `<div class="icon">${it.emoji}</div>`;
             else if (key === 'words') { visual = `<div class="icon">${wordMediaHTML(it, 56)}</div>`; label = it.id; }
             else if (key === 'chinese') {
-                visual = `<div class="icon">${it.emoji}</div>`;
+                visual = `<div class="icon">${wordMediaHTML(it, 56)}</div>`;
                 label = `<div style="font-size:1.4rem;">${it.hanzi}</div>${pinyinHTML(it.pinyin, '0.9rem')}<div style="font-size:0.75rem;color:rgba(43,27,14,0.55);font-weight:400;">${it.en}</div>`;
             }
             else if (key === 'spanish') {
-                visual = `<div class="icon">${it.emoji}</div>`;
+                visual = `<div class="icon">${wordMediaHTML(it, 56)}</div>`;
                 label = `<div style="font-size:1.4rem;">${it.es}</div><div style="font-size:0.75rem;color:rgba(43,27,14,0.55);font-weight:400;">${it.en}</div>`;
             }
             return `<div class="card" onclick="learnTap('${key}','${it.id}','${level}')">
@@ -909,7 +909,7 @@
             if (Math.random() < 0.5) {
                 return {
                     mode: 'chinese-find',
-                    promptHTML: `<div class="prompt-visual">${correct.emoji}</div><div class="prompt-word">${correct.en}</div>`,
+                    promptHTML: `<div class="prompt-visual">${wordMediaHTML(correct, 100)}</div><div class="prompt-word">${correct.en}</div>`,
                     speakText: `Find the Chinese word for ${correct.en}`,
                     itemId: correct.id,
                     choices: choices.map(c => ({ id: c.id, html: `<div>${c.hanzi}</div>${pinyinHTML(c.pinyin, '0.8rem')}`, cls: 'chinese-choice', speak: c.hanzi }))
@@ -921,7 +921,7 @@
                     speakText: correct.hanzi,
                     lang: 'zh-CN',
                     itemId: correct.id,
-                    choices: choices.map(c => ({ id: c.id, html: `<div style="font-size:3rem;">${c.emoji}</div>`, speak: c.en }))
+                    choices: choices.map(c => ({ id: c.id, html: wordMediaHTML(c, 90), speak: c.en }))
                 };
             }
         }
@@ -930,7 +930,7 @@
             if (Math.random() < 0.5) {
                 return {
                     mode: 'spanish-find',
-                    promptHTML: `<div class="prompt-visual">${correct.emoji}</div><div class="prompt-word">${correct.en}</div>`,
+                    promptHTML: `<div class="prompt-visual">${wordMediaHTML(correct, 100)}</div><div class="prompt-word">${correct.en}</div>`,
                     speakText: `Find the Spanish word for ${correct.en}`,
                     itemId: correct.id,
                     choices: choices.map(c => ({ id: c.id, html: c.es, cls: 'word-choice', speak: c.es }))
@@ -942,7 +942,7 @@
                     speakText: correct.es,
                     lang: 'es-ES',
                     itemId: correct.id,
-                    choices: choices.map(c => ({ id: c.id, html: `<div style="font-size:3rem;">${c.emoji}</div>`, speak: c.en }))
+                    choices: choices.map(c => ({ id: c.id, html: wordMediaHTML(c, 90), speak: c.en }))
                 };
             }
         }
