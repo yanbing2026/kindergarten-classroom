@@ -249,7 +249,6 @@
             width: 100%;
             max-width: 420px;
             height: 220px;
-            container-type: size;
             background: #f3e6c8;
             border: 3px solid var(--mc-ink);
             border-radius: 8px;
@@ -1149,10 +1148,10 @@
     }
     function traceFontSize(text) {
         const len = Math.max(1, text.length);
-        const isWide = /[㐀-鿿豈-﫿]/.test(text);
-        const factor = isWide ? 95 : 145;
-        const w = Math.round(factor / len);
-        return `min(82cqh, ${w}cqw)`;
+        if (len <= 2) return '8rem';
+        if (len <= 4) return '6rem';
+        if (len <= 6) return '4.5rem';
+        return '3.5rem';
     }
     function speakTraceItem(key, item) {
         if (key === 'letters') {
@@ -1190,6 +1189,32 @@
             </div>
             <button class="big-btn again" onclick="nextTraceItem()">➡️ Next</button>
         </div>`;
+    }
+    function fitTraceGhost(text) {
+        const ghost = document.querySelector('.trace-ghost');
+        const box = document.querySelector('.trace-box');
+        if (!ghost || !box) return;
+        const cs = getComputedStyle(ghost);
+        const isWide = /[㐀-鿿豈-﫿]/.test(text);
+        const span = document.createElement('span');
+        span.style.fontFamily = cs.fontFamily;
+        span.style.fontWeight = cs.fontWeight;
+        span.style.letterSpacing = cs.letterSpacing;
+        span.style.whiteSpace = 'nowrap';
+        span.style.position = 'absolute';
+        span.style.visibility = 'hidden';
+        span.style.fontSize = '100px';
+        span.textContent = text;
+        document.body.appendChild(span);
+        const r = span.getBoundingClientRect();
+        span.remove();
+        const w100 = r.width || 1;
+        const h100 = r.height || 100;
+        const maxW = box.clientWidth - 12;
+        const maxH = box.clientHeight - 12;
+        let fs = Math.floor(Math.min(maxW / (w100 / 100), maxH / (h100 / 100)));
+        fs = Math.max(24, fs);
+        ghost.style.fontSize = fs + 'px';
     }
     function afterTraceRender() {
         const canvas = document.getElementById('traceCanvas');
@@ -1232,6 +1257,7 @@
             canvas.addEventListener('pointercancel', stop);
         }
         const item = traceState.items[traceState.idx];
+        fitTraceGhost(getTraceText(traceState.key, item));
         speakTraceItem(traceState.key, item);
     }
     function replayTrace() {
