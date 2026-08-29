@@ -827,6 +827,11 @@
         <h1>⛏️ Minecraft Classroom ⛏️</h1>
         <div class="grid">
             ${cards}
+            <div class="card cat-freeplay" onclick="go('freeplay')">
+                <div class="icon">🎨</div>
+                <div class="label">Free Play</div>
+                <div class="sublabel">explore & listen</div>
+            </div>
             <div class="card cat-progress" onclick="go('progress')">
                 <div class="icon">🏆</div>
                 <div class="label">My Progress</div>
@@ -1481,11 +1486,57 @@
         else if (state.screen === 'mathPlay') html = renderMathPlay();
         else if (state.screen === 'trace') html = renderTrace();
         else if (state.screen === 'roundEnd') html = renderRoundEnd();
+        else if (state.screen === 'freeplay') html = renderFreeplay();
         else if (state.screen === 'progress') html = renderProgress();
         app.innerHTML = html;
         if (state.screen === 'play') afterPlayRender();
         if (state.screen === 'mathPlay') afterMathPlayRender();
         if (state.screen === 'trace') afterTraceRender();
+    }
+
+    // ---------- Render: Free Play (research D — autonomy, no-pressure explore) ----------
+    function renderFreeplay() {
+        // Flatten a sample of browseable items across categories/levels.
+        const groups = [];
+        for (const c of CATEGORIES) {
+            if (c.key === 'math') continue;
+            for (const lv of c.levels) {
+                for (const it of lv.items) {
+                    let text = it.id, emoji = it.emoji || '🔤', sub = '';
+                    if (c.key === 'letters') { text = it.id; sub = it.word; }
+                    else if (c.key === 'numbers') { text = it.n; }
+                    else if (c.key === 'chinese') { text = it.hanzi; sub = it.en; }
+                    else if (c.key === 'spanish') { text = it.es; sub = it.en; }
+                    else if (c.key === 'words') { text = it.id; emoji = it.emoji || '📖'; }
+                    groups.push({ key: c.key, item: it, text, emoji, sub });
+                }
+            }
+        }
+        // Cap to a friendly grid (shuffle for variety)
+        const sample = shuffle(groups).slice(0, 24);
+        const cards = sample.map(g => `
+            <div class="card" onclick="freeplayTap('${g.key}', '${esc(g.item.id)}')">
+                <div class="icon">${g.emoji}</div>
+                <div class="label">${esc(g.text)}</div>
+                ${g.sub ? `<div class="sublabel">${esc(g.sub)}</div>` : ''}
+            </div>`).join('');
+        return `${topbar(true)}
+        <h2>🎨 Free Play</h2>
+        <p style="color:#888;text-align:center;margin-bottom:14px;">Tap anything to hear it. No quizzes here!</p>
+        <div class="grid">${cards}</div>
+        <div class="footer">Just explore!</div>`;
+    }
+    function freeplayTap(key, id) {
+        const cat = CATEGORIES.find(c => c.key === key);
+        // locate the item across levels
+        let item = null;
+        for (const lv of cat.levels) { const f = lv.items.find(i => i.id === id); if (f) { item = f; break; } }
+        if (!item) return;
+        if (key === 'letters') speakSequence([item.id, `${item.id} is for ${item.word}`]);
+        else if (key === 'chinese') speakBilingual(item.hanzi, 'zh-CN', item.en);
+        else if (key === 'spanish') speakBilingual(item.es, 'es-ES', item.en);
+        else if (key === 'numbers') speak(String(item.n));
+        else speak(item.id);
     }
 
     render();
