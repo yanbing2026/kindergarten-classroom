@@ -128,6 +128,7 @@
         .card.cat-colors { background: #eef0f2; }
         .card.cat-shapes { background: #cfe0e6; }
         .card.cat-animals { background: var(--mc-grass); }
+        .card.cat-chinese { background: #e2a63c; }
         .card.cat-math { background: var(--mc-gold); }
         .card.cat-progress { background: var(--mc-diamond); }
         .icon { font-size: 3.2rem; margin-bottom: 8px; }
@@ -196,6 +197,8 @@
             cursor: pointer;
         }
         .choice-btn.word-choice { font-size: 1.6rem; }
+        .choice-btn.chinese-choice { flex-direction: column; font-size: 1.8rem; gap: 4px; }
+        .choice-btn.chinese-choice .pinyin { font-size: 0.8rem; font-weight: 400; color: #666; }
         .choice-btn:active { transform: translateY(3px); box-shadow: inset -4px -4px 0 rgba(255,255,255,0.4), inset 4px 4px 0 rgba(0,0,0,0.2); }
         .choice-btn.correct { background: #bdf2cf; border-color: var(--mc-emerald); animation: pop 0.4s; }
         .choice-btn.incorrect { background: #f7c9c2; border-color: var(--mc-redstone); animation: shake 0.4s; }
@@ -276,10 +279,33 @@
         {id:'map',emoji:'🗺️'},{id:'fan',emoji:'💨'},{id:'bed',emoji:'🛏️'},{id:'bag',emoji:'👜'},
         {id:'box',emoji:'📦'},{id:'bee',emoji:'🐝'},{id:'egg',emoji:'🥚'},{id:'fox',emoji:'🦊'}
     ];
+    const CHINESE = [
+        {id:'Hello', hanzi:'你好', pinyin:'nǐ hǎo', en:'Hello', emoji:'👋'},
+        {id:'ThankYou', hanzi:'谢谢', pinyin:'xiè xie', en:'Thank you', emoji:'🙏'},
+        {id:'Bye', hanzi:'再见', pinyin:'zài jiàn', en:'Bye', emoji:'👋'},
+        {id:'Love', hanzi:'爱', pinyin:'ài', en:'Love', emoji:'❤️'},
+        {id:'Mom', hanzi:'妈妈', pinyin:'mā ma', en:'Mom', emoji:'👩'},
+        {id:'Dad', hanzi:'爸爸', pinyin:'bà ba', en:'Dad', emoji:'👨'},
+        {id:'Cat', hanzi:'猫', pinyin:'māo', en:'Cat', emoji:'🐱'},
+        {id:'Dog', hanzi:'狗', pinyin:'gǒu', en:'Dog', emoji:'🐶'},
+        {id:'Water', hanzi:'水', pinyin:'shuǐ', en:'Water', emoji:'💧'},
+        {id:'Sun', hanzi:'太阳', pinyin:'tài yáng', en:'Sun', emoji:'☀️'},
+        {id:'Moon', hanzi:'月亮', pinyin:'yuè liang', en:'Moon', emoji:'🌙'},
+        {id:'Star', hanzi:'星星', pinyin:'xīng xing', en:'Star', emoji:'⭐'},
+        {id:'One', hanzi:'一', pinyin:'yī', en:'One', emoji:'1️⃣'},
+        {id:'Two', hanzi:'二', pinyin:'èr', en:'Two', emoji:'2️⃣'},
+        {id:'Three', hanzi:'三', pinyin:'sān', en:'Three', emoji:'3️⃣'},
+        {id:'Red', hanzi:'红色', pinyin:'hóng sè', en:'Red', emoji:'🔴'},
+        {id:'Big', hanzi:'大', pinyin:'dà', en:'Big', emoji:'🐘'},
+        {id:'Small', hanzi:'小', pinyin:'xiǎo', en:'Small', emoji:'🐜'},
+        {id:'Apple', hanzi:'苹果', pinyin:'píng guǒ', en:'Apple', emoji:'🍎'},
+        {id:'Home', hanzi:'家', pinyin:'jiā', en:'Home', emoji:'🏠'}
+    ];
     const CATEGORIES = [
         {key:'letters', name:'Letters', icon:'🔤', items:LETTERS},
         {key:'numbers', name:'Numbers', icon:'🔢', items:NUMBERS},
         {key:'words', name:'Words', icon:'📖', items:WORDS},
+        {key:'chinese', name:'Chinese', icon:'🇨🇳', items:CHINESE},
         {key:'colors', name:'Colors', icon:'🌈', items:COLORS},
         {key:'shapes', name:'Shapes', icon:'🔷', items:SHAPES},
         {key:'animals', name:'Animals', icon:'🐾', items:ANIMALS}
@@ -321,6 +347,7 @@
             const u = new SpeechSynthesisUtterance(text);
             u.rate = (opts && opts.rate) || 0.85;
             u.pitch = (opts && opts.pitch) || 1.1;
+            u.lang = (opts && opts.lang) || 'en-US';
             window.speechSynthesis.speak(u);
         } catch (e) {}
     }
@@ -333,6 +360,18 @@
             u.pitch = 1.1;
             window.speechSynthesis.speak(u);
         });
+    }
+    function speakBilingual(zhText, enText) {
+        if (muted || !('speechSynthesis' in window)) return;
+        try {
+            window.speechSynthesis.cancel();
+            const u1 = new SpeechSynthesisUtterance(zhText);
+            u1.lang = 'zh-CN'; u1.rate = 0.8; u1.pitch = 1.1;
+            const u2 = new SpeechSynthesisUtterance(enText);
+            u2.lang = 'en-US'; u2.rate = 0.85; u2.pitch = 1.1;
+            window.speechSynthesis.speak(u1);
+            window.speechSynthesis.speak(u2);
+        } catch (e) {}
     }
 
     // ---------- Nav ----------
@@ -486,6 +525,10 @@
             else if (key === 'shapes') visual = shapeVisualHTML(it, 55);
             else if (key === 'animals') visual = `<div class="icon">${it.emoji}</div>`;
             else if (key === 'words') { visual = `<div class="icon">${it.emoji}</div>`; label = it.id; }
+            else if (key === 'chinese') {
+                visual = `<div class="icon">${it.emoji}</div>`;
+                label = `<div style="font-size:1.4rem;">${it.hanzi}</div><div style="font-size:0.8rem;color:rgba(43,27,14,0.7);font-weight:400;">${it.pinyin}</div><div style="font-size:0.75rem;color:rgba(43,27,14,0.55);font-weight:400;">${it.en}</div>`;
+            }
             return `<div class="card" onclick="learnTap('${key}','${it.id}')">
                 ${mastered ? '<div class="mastered-check">✓</div>' : ''}
                 ${visual}
@@ -505,6 +548,9 @@
             speak(id);
         } else if (key === 'words') {
             speakSequence(id.split('').concat([id]));
+        } else if (key === 'chinese') {
+            const it = CHINESE.find(w => w.id === id);
+            speakBilingual(it.hanzi, it.en);
         } else {
             speak(id);
         }
@@ -617,10 +663,35 @@
                 };
             }
         }
+        if (key === 'chinese') {
+            const choices = pickChoices(items, correct, 4);
+            if (Math.random() < 0.5) {
+                return {
+                    mode: 'chinese-find',
+                    promptHTML: `<div class="prompt-visual">${correct.emoji}</div><div class="prompt-word">${correct.en}</div>`,
+                    speakText: `Find the Chinese word for ${correct.en}`,
+                    itemId: correct.id,
+                    choices: choices.map(c => ({ id: c.id, html: `<div>${c.hanzi}</div><div class="pinyin">${c.pinyin}</div>`, cls: 'chinese-choice', speak: c.hanzi }))
+                };
+            } else {
+                return {
+                    mode: 'chinese-listen',
+                    promptHTML: `<div class="prompt-word">${correct.hanzi}</div><div style="font-size:1.1rem;color:#777;margin-top:6px;">${correct.pinyin}</div><button class="replay-btn" onclick="replayChinese()">🔊 Listen Again</button>`,
+                    speakText: correct.hanzi,
+                    lang: 'zh-CN',
+                    itemId: correct.id,
+                    choices: choices.map(c => ({ id: c.id, html: `<div style="font-size:3rem;">${c.emoji}</div>`, speak: c.en }))
+                };
+            }
+        }
     }
     function soundOutCurrentWord() {
         const q = quiz.questions[quiz.idx];
         speakSequence(q.itemId.split('').concat([q.itemId]));
+    }
+    function replayChinese() {
+        const q = quiz.questions[quiz.idx];
+        speak(q.speakText, { lang: q.lang });
     }
 
     function renderPlay() {
@@ -637,7 +708,7 @@
     }
     function afterPlayRender() {
         const q = quiz.questions[quiz.idx];
-        if (q.speakText) speak(q.speakText);
+        if (q.speakText) speak(q.speakText, { lang: q.lang });
     }
     function handleChoice(id, btnEl) {
         if (quiz.awaitingNext) return;
