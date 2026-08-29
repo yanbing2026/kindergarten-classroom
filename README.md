@@ -12,6 +12,7 @@ Open `index.html` in a browser — no build step required.
   - Numbers: number recognition + counting practice
   - Words: sight-word matching + "sound it out" phonics blending
   - Chinese: 20 beginner Mandarin words (greetings, family, numbers, colors) with hanzi, pinyin, and spoken audio — match the character to a picture, or listen and pick the picture
+  - Spanish: 20 beginner Spanish words covering the same everyday concepts, with spoken audio — match the word to a picture, or listen and pick the picture
   - Colors, Shapes, Animals: "find the ___" recognition games
 - **Math**: simple addition practice with visual object groups, difficulty ramps up as your child improves.
 - **Progress tracking**: stars, per-category mastery bars, and unlockable trophies — all saved locally in the browser (`localStorage`), no account needed.

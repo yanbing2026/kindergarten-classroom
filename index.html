@@ -129,6 +129,7 @@
         .card.cat-shapes { background: #cfe0e6; }
         .card.cat-animals { background: var(--mc-grass); }
         .card.cat-chinese { background: #e2a63c; }
+        .card.cat-spanish { background: #e08a4f; }
         .card.cat-math { background: var(--mc-gold); }
         .card.cat-progress { background: var(--mc-diamond); }
         .icon { font-size: 3.2rem; margin-bottom: 8px; }
@@ -301,11 +302,34 @@
         {id:'Apple', hanzi:'苹果', pinyin:'píng guǒ', en:'Apple', emoji:'🍎'},
         {id:'Home', hanzi:'家', pinyin:'jiā', en:'Home', emoji:'🏠'}
     ];
+    const SPANISH = [
+        {id:'Hello', es:'Hola', en:'Hello', emoji:'👋'},
+        {id:'ThankYou', es:'Gracias', en:'Thank you', emoji:'🙏'},
+        {id:'Bye', es:'Adiós', en:'Bye', emoji:'👋'},
+        {id:'Love', es:'Amor', en:'Love', emoji:'❤️'},
+        {id:'Mom', es:'Mamá', en:'Mom', emoji:'👩'},
+        {id:'Dad', es:'Papá', en:'Dad', emoji:'👨'},
+        {id:'Cat', es:'Gato', en:'Cat', emoji:'🐱'},
+        {id:'Dog', es:'Perro', en:'Dog', emoji:'🐶'},
+        {id:'Water', es:'Agua', en:'Water', emoji:'💧'},
+        {id:'Sun', es:'Sol', en:'Sun', emoji:'☀️'},
+        {id:'Moon', es:'Luna', en:'Moon', emoji:'🌙'},
+        {id:'Star', es:'Estrella', en:'Star', emoji:'⭐'},
+        {id:'One', es:'Uno', en:'One', emoji:'1️⃣'},
+        {id:'Two', es:'Dos', en:'Two', emoji:'2️⃣'},
+        {id:'Three', es:'Tres', en:'Three', emoji:'3️⃣'},
+        {id:'Red', es:'Rojo', en:'Red', emoji:'🔴'},
+        {id:'Big', es:'Grande', en:'Big', emoji:'🐘'},
+        {id:'Small', es:'Pequeño', en:'Small', emoji:'🐜'},
+        {id:'Apple', es:'Manzana', en:'Apple', emoji:'🍎'},
+        {id:'Home', es:'Casa', en:'Home', emoji:'🏠'}
+    ];
     const CATEGORIES = [
         {key:'letters', name:'Letters', icon:'🔤', items:LETTERS},
         {key:'numbers', name:'Numbers', icon:'🔢', items:NUMBERS},
         {key:'words', name:'Words', icon:'📖', items:WORDS},
         {key:'chinese', name:'Chinese', icon:'🇨🇳', items:CHINESE},
+        {key:'spanish', name:'Spanish', icon:'🇪🇸', items:SPANISH},
         {key:'colors', name:'Colors', icon:'🌈', items:COLORS},
         {key:'shapes', name:'Shapes', icon:'🔷', items:SHAPES},
         {key:'animals', name:'Animals', icon:'🐾', items:ANIMALS}
@@ -361,12 +385,12 @@
             window.speechSynthesis.speak(u);
         });
     }
-    function speakBilingual(zhText, enText) {
+    function speakBilingual(foreignText, foreignLang, enText) {
         if (muted || !('speechSynthesis' in window)) return;
         try {
             window.speechSynthesis.cancel();
-            const u1 = new SpeechSynthesisUtterance(zhText);
-            u1.lang = 'zh-CN'; u1.rate = 0.8; u1.pitch = 1.1;
+            const u1 = new SpeechSynthesisUtterance(foreignText);
+            u1.lang = foreignLang; u1.rate = 0.8; u1.pitch = 1.1;
             const u2 = new SpeechSynthesisUtterance(enText);
             u2.lang = 'en-US'; u2.rate = 0.85; u2.pitch = 1.1;
             window.speechSynthesis.speak(u1);
@@ -529,6 +553,10 @@
                 visual = `<div class="icon">${it.emoji}</div>`;
                 label = `<div style="font-size:1.4rem;">${it.hanzi}</div><div style="font-size:0.8rem;color:rgba(43,27,14,0.7);font-weight:400;">${it.pinyin}</div><div style="font-size:0.75rem;color:rgba(43,27,14,0.55);font-weight:400;">${it.en}</div>`;
             }
+            else if (key === 'spanish') {
+                visual = `<div class="icon">${it.emoji}</div>`;
+                label = `<div style="font-size:1.4rem;">${it.es}</div><div style="font-size:0.75rem;color:rgba(43,27,14,0.55);font-weight:400;">${it.en}</div>`;
+            }
             return `<div class="card" onclick="learnTap('${key}','${it.id}')">
                 ${mastered ? '<div class="mastered-check">✓</div>' : ''}
                 ${visual}
@@ -550,7 +578,10 @@
             speakSequence(id.split('').concat([id]));
         } else if (key === 'chinese') {
             const it = CHINESE.find(w => w.id === id);
-            speakBilingual(it.hanzi, it.en);
+            speakBilingual(it.hanzi, 'zh-CN', it.en);
+        } else if (key === 'spanish') {
+            const it = SPANISH.find(w => w.id === id);
+            speakBilingual(it.es, 'es-ES', it.en);
         } else {
             speak(id);
         }
@@ -676,9 +707,30 @@
             } else {
                 return {
                     mode: 'chinese-listen',
-                    promptHTML: `<div class="prompt-word">${correct.hanzi}</div><div style="font-size:1.1rem;color:#777;margin-top:6px;">${correct.pinyin}</div><button class="replay-btn" onclick="replayChinese()">🔊 Listen Again</button>`,
+                    promptHTML: `<div class="prompt-word">${correct.hanzi}</div><div style="font-size:1.1rem;color:#777;margin-top:6px;">${correct.pinyin}</div><button class="replay-btn" onclick="replayForeign()">🔊 Listen Again</button>`,
                     speakText: correct.hanzi,
                     lang: 'zh-CN',
+                    itemId: correct.id,
+                    choices: choices.map(c => ({ id: c.id, html: `<div style="font-size:3rem;">${c.emoji}</div>`, speak: c.en }))
+                };
+            }
+        }
+        if (key === 'spanish') {
+            const choices = pickChoices(items, correct, 4);
+            if (Math.random() < 0.5) {
+                return {
+                    mode: 'spanish-find',
+                    promptHTML: `<div class="prompt-visual">${correct.emoji}</div><div class="prompt-word">${correct.en}</div>`,
+                    speakText: `Find the Spanish word for ${correct.en}`,
+                    itemId: correct.id,
+                    choices: choices.map(c => ({ id: c.id, html: c.es, cls: 'word-choice', speak: c.es }))
+                };
+            } else {
+                return {
+                    mode: 'spanish-listen',
+                    promptHTML: `<div class="prompt-word">${correct.es}</div><button class="replay-btn" onclick="replayForeign()">🔊 Listen Again</button>`,
+                    speakText: correct.es,
+                    lang: 'es-ES',
                     itemId: correct.id,
                     choices: choices.map(c => ({ id: c.id, html: `<div style="font-size:3rem;">${c.emoji}</div>`, speak: c.en }))
                 };
@@ -689,7 +741,7 @@
         const q = quiz.questions[quiz.idx];
         speakSequence(q.itemId.split('').concat([q.itemId]));
     }
-    function replayChinese() {
+    function replayForeign() {
         const q = quiz.questions[quiz.idx];
         speak(q.speakText, { lang: q.lang });
     }
