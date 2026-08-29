@@ -9,6 +9,7 @@
     <title>⛏️ Minecraft Classroom ⛏️</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://js.puter.com/v2/"></script>
     <style>
         :root {
             --mc-sky-top: #7ec8e3;
@@ -415,15 +416,18 @@
         });
     }
 
-    // ---------- Gemini TTS (optional, higher-quality voice) ----------
-    // If the user has saved a Google AI Studio API key, we call Gemini's
-    // TTS model for natural speech and cache the resulting audio in
-    // IndexedDB (keyed by text+lang) so repeat taps don't re-pay for the
-    // same clip. Any failure (no key, offline, bad response) silently
-    // falls back to the free browser voice above.
+    // ---------- Higher-quality voice tiers (optional) ----------
+    // Two opt-in tiers layer on top of the free browser voice above:
+    //  1. Puter/OpenAI: no API key needed at all (Puter's "User-Pays"
+    //     model), enabled with one tap in Settings.
+    //  2. Gemini: the user's own Google AI Studio API key.
+    // Generated audio is cached in IndexedDB per (provider, lang, text) so
+    // repeat taps don't re-pay for the same clip. Any failure at any tier
+    // silently falls through to the next, ending at the free browser voice.
+    const LANG_NAMES = { 'en-US': 'English', 'zh-CN': 'Mandarin Chinese', 'es-ES': 'Spanish' };
     const GEMINI_MODEL = 'gemini-2.5-flash-preview-tts';
     const GEMINI_VOICE = 'Leda';
-    const GEMINI_LANG_NAMES = { 'en-US': 'English', 'zh-CN': 'Mandarin Chinese', 'es-ES': 'Spanish' };
+    const PUTER_VOICE = 'fable';
     let currentAudioEl = null;
 
     function stopAllAudio() {
@@ -472,8 +476,23 @@
         new Uint8Array(buffer, 44).set(pcmBytes);
         return new Blob([buffer], { type: 'audio/wav' });
     }
+    async function fetchPuterAudio(text, lang) {
+        if (typeof puter === 'undefined' || !puter.ai || !puter.ai.txt2speech) {
+            throw new Error('Puter.js not available');
+        }
+        const langName = LANG_NAMES[lang] || 'English';
+        const audioEl = await puter.ai.txt2speech(text, {
+            provider: 'openai',
+            voice: PUTER_VOICE,
+            model: 'gpt-4o-mini-tts',
+            instructions: `Speak warmly and clearly in ${langName}, at a gentle, friendly pace suitable for a young child.`
+        });
+        const resp = await fetch(audioEl.src);
+        if (!resp.ok) throw new Error('Failed to read Puter audio: ' + resp.status);
+        return await resp.blob();
+    }
     async function fetchGeminiAudio(text, lang, apiKey) {
-        const langName = GEMINI_LANG_NAMES[lang] || 'English';
+        const langName = LANG_NAMES[lang] || 'English';
         const prompt = `Say warmly and clearly in ${langName}, at a slow, friendly pace for a young child: ${text}`;
         const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`, {
             method: 'POST',
@@ -547,19 +566,36 @@
     }
 
     // ---------- Unified speech entry points ----------
-    async function playClip(text, lang) {
-        const cacheKey = lang + '|' + GEMINI_VOICE + '|' + text;
-        const cached = await audioCacheGet(cacheKey);
-        if (cached) { await playBlob(cached); return; }
+    // Tries each enabled tier in priority order (cache -> Puter -> Gemini),
+    // returning the audio Blob for the first one that works, or null if
+    // none are enabled/available (caller then uses the browser voice).
+    async function getBestAudioBlob(text, lang) {
+        if (localStorage.getItem('kc_puter_enabled') === '1') {
+            const key = 'puter|' + lang + '|' + text;
+            const cached = await audioCacheGet(key);
+            if (cached) return cached;
+            try {
+                const blob = await fetchPuterAudio(text, lang);
+                audioCacheSet(key, blob);
+                return blob;
+            } catch (e) { /* fall through */ }
+        }
         const apiKey = localStorage.getItem('kc_gemini_key');
         if (apiKey) {
+            const key = 'gemini|' + lang + '|' + text;
+            const cached = await audioCacheGet(key);
+            if (cached) return cached;
             try {
                 const blob = await fetchGeminiAudio(text, lang, apiKey);
-                audioCacheSet(cacheKey, blob);
-                await playBlob(blob);
-                return;
-            } catch (e) { /* fall through to browser voice */ }
+                audioCacheSet(key, blob);
+                return blob;
+            } catch (e) { /* fall through */ }
         }
+        return null;
+    }
+    async function playClip(text, lang) {
+        const blob = await getBestAudioBlob(text, lang);
+        if (blob) { await playBlob(blob); return; }
         await playBrowserUtterance(text, lang);
     }
     function speak(text, opts) {
@@ -573,18 +609,8 @@
         stopAllAudio();
         (async () => {
             const combinedText = parts.join('. ');
-            const cacheKey = 'en-US|' + GEMINI_VOICE + '|' + combinedText;
-            const cached = await audioCacheGet(cacheKey);
-            if (cached) { await playBlob(cached); return; }
-            const apiKey = localStorage.getItem('kc_gemini_key');
-            if (apiKey) {
-                try {
-                    const blob = await fetchGeminiAudio(combinedText, 'en-US', apiKey);
-                    audioCacheSet(cacheKey, blob);
-                    await playBlob(blob);
-                    return;
-                } catch (e) { /* fall through to browser voice */ }
-            }
+            const blob = await getBestAudioBlob(combinedText, 'en-US');
+            if (blob) { await playBlob(blob); return; }
             for (const p of parts) {
                 await playBrowserUtterance(p, 'en-US', rate || 0.7);
             }
@@ -1118,26 +1144,60 @@
         render();
     }
     function renderSettings() {
-        const hasKey = !!localStorage.getItem('kc_gemini_key');
+        const puterOn = localStorage.getItem('kc_puter_enabled') === '1';
+        const hasGeminiKey = !!localStorage.getItem('kc_gemini_key');
+        const statusLine = puterOn ? '✅ Free AI voice is active'
+            : hasGeminiKey ? '✅ Gemini AI voice is active'
+            : '🔈 Using free browser voice';
         return `${topbar(true)}
         <h2>⚙️ Voice Settings</h2>
         <div style="max-width:420px;margin:0 auto;">
-            <p style="color:rgba(43,27,14,0.75);font-size:0.9rem;margin-bottom:14px;text-align:center;">
-                Add a free Google AI Studio API key for a more natural voice. Get one at
-                <strong>aistudio.google.com</strong>. Without a key, the app automatically uses your browser's built-in voice — everything still works.
-            </p>
-            <div style="text-align:center;font-weight:700;margin-bottom:10px;">${hasKey ? '✅ AI voice is active' : '🔈 Using free browser voice'}</div>
-            <input id="geminiKeyInput" type="password" placeholder="Paste your API key here"
-                style="display:block;width:100%;padding:14px;border:3px solid var(--mc-ink);border-radius:4px;font-size:1rem;margin-bottom:12px;font-family:var(--font-clear);">
-            <button class="big-btn play" onclick="testGeminiVoice()">🔊 Test Voice</button>
-            <button class="big-btn again" onclick="saveGeminiKey()">💾 Save Key (without testing)</button>
-            ${hasKey ? `<button class="big-btn home" onclick="clearGeminiKey()">🗑️ Remove Key</button>` : ''}
+            <div style="text-align:center;font-weight:700;margin-bottom:16px;">${statusLine}</div>
+
+            <div style="background:rgba(255,255,255,0.35);border:3px solid var(--mc-ink);border-radius:6px;padding:14px;margin-bottom:18px;">
+                <div style="font-weight:700;margin-bottom:6px;">🌟 Free AI Voice</div>
+                <p style="color:rgba(43,27,14,0.75);font-size:0.85rem;margin-bottom:10px;">
+                    A much more natural voice — completely free, no API key needed. The first time, your browser may ask you to sign in with a free Puter.com account.
+                </p>
+                ${puterOn
+                    ? `<button class="big-btn home" onclick="disablePuterVoice()">Disable Free AI Voice</button>`
+                    : `<button class="big-btn play" onclick="enablePuterVoice()">🔊 Enable Free AI Voice</button>`}
+            </div>
+
+            <div style="background:rgba(255,255,255,0.2);border:3px solid var(--mc-ink);border-radius:6px;padding:14px;margin-bottom:12px;">
+                <div style="font-weight:700;margin-bottom:6px;">🔑 Advanced: Your Own Gemini Key</div>
+                <p style="color:rgba(43,27,14,0.75);font-size:0.85rem;margin-bottom:10px;">
+                    Optional alternative voice using your own Google AI Studio key. Get one at <strong>aistudio.google.com</strong>.
+                </p>
+                <input id="geminiKeyInput" type="password" placeholder="Paste your API key here"
+                    style="display:block;width:100%;padding:12px;border:3px solid var(--mc-ink);border-radius:4px;font-size:0.95rem;margin-bottom:10px;font-family:var(--font-clear);">
+                <button class="big-btn play" onclick="testGeminiVoice()">🔊 Test Voice</button>
+                <button class="big-btn again" onclick="saveGeminiKey()">💾 Save Key (without testing)</button>
+                ${hasGeminiKey ? `<button class="big-btn home" onclick="clearGeminiKey()">🗑️ Remove Key</button>` : ''}
+            </div>
+
             <button class="big-btn learn" onclick="clearAudioCacheAndNotify()">🧹 Clear Cached Audio</button>
             <div id="settingsMsg" style="text-align:center;font-weight:700;margin-top:8px;min-height:1.2em;color:${settingsMsg.color || 'var(--mc-ink)'};">${settingsMsg.text}</div>
             <p style="color:rgba(43,27,14,0.5);font-size:0.75rem;margin-top:16px;text-align:center;">
-                Your key is saved only in this browser (never uploaded anywhere else) and used solely to request audio from Google's API.
+                Nothing here is uploaded anywhere except directly to whichever voice provider you choose, to generate that one audio clip. Without any of this, the app automatically uses your browser's built-in voice — everything still works.
             </p>
         </div>`;
+    }
+    async function enablePuterVoice() {
+        setSettingsMsg('Connecting to free AI voice...', 'var(--mc-ink)');
+        try {
+            const blob = await fetchPuterAudio('Hello! This is a test.', 'en-US');
+            localStorage.setItem('kc_puter_enabled', '1');
+            setSettingsMsg('✅ It works! Playing a test clip...', 'var(--mc-emerald)');
+            await playBlob(blob);
+            setSettingsMsg('✅ Free AI voice enabled!', 'var(--mc-emerald)');
+        } catch (e) {
+            setSettingsMsg('❌ Could not enable: ' + (e && e.message ? e.message : 'unknown error'), 'var(--mc-redstone)');
+        }
+    }
+    function disablePuterVoice() {
+        localStorage.removeItem('kc_puter_enabled');
+        setSettingsMsg('Free AI voice disabled.', 'var(--mc-ink)');
     }
     async function testGeminiVoice() {
         const input = document.getElementById('geminiKeyInput');
