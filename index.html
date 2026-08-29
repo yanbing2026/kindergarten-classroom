@@ -961,7 +961,7 @@
                     promptHTML: `<div class="prompt-word">${correct.id}</div><button class="replay-btn" onclick="soundOutCurrentWord()">🔊 Sound it out</button>`,
                     speakText: null,
                     itemId: correct.id,
-                    choices: choices.map(c => ({ id: c.id, html: c.id, speak: c.id }))
+                    choices: choices.map(c => ({ id: c.id, html: wordMediaHTML(c, 90), speak: c.id }))
                 };
             }
         }
