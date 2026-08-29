@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Classroom! 📚</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 1000px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: #f0f4ff;
+            border-radius: 15px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 3px solid transparent;
+        }
+        .card:hover { transform: scale(1.05); border-color: #667eea; }
+        .card:active { transform: scale(0.95); }
+        .icon { font-size: 4rem; margin-bottom: 10px; }
+        .label { font-size: 1.5rem; color: #444; font-weight: 600; }
+        .footer {
+            text-align: center;
+            color: #888;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧒 Our Classroom</h1>
+        <div class="grid" id="menu">
+            <div class="card" onclick="showSection('letters')">
+                <div class="icon">🔤</div>
+                <div class="label">Letters</div>
+            </div>
+            <div class="card" onclick="showSection('numbers')">
+                <div class="icon">🔢</div>
+                <div class="label">Numbers</div>
+            </div>
+            <div class="card" onclick="showSection('colors')">
+                <div class="icon">🌈</div>
+                <div class="label">Colors</div>
+            </div>
+            <div class="card" onclick="showSection('shapes')">
+                <div class="icon">🔷</div>
+                <div class="label">Shapes</div>
+            </div>
+            <div class="card" onclick="showSection('animals')">
+                <div class="icon">🐾</div>
+                <div class="label">Animals</div>
+            </div>
+            <div class="card" onclick="showSection('words')">
+                <div class="icon">📖</div>
+                <div class="label">Words</div>
+            </div>
+        </div>
+        <div id="content"></div>
+        <div class="footer">Press ← → keys or use remote to navigate</div>
+    </div>
+
+    <script>
+        let currentSection = 'menu';
+
+        function showSection(section) {
+            document.getElementById('menu').style.display = 'none';
+            const content = document.getElementById('content');
+            content.innerHTML = '';
+            currentSection = section;
+
+            if (section === 'letters') {
+                content.innerHTML = `<div style="text-align:center; margin-bottom:20px;"><h2 style="font-size:2rem;">Letters A-Z</h2></div><div class="grid">`;
+                for (let i = 65; i <= 90; i++) {
+                    content.innerHTML += `<div class="card" style="background:#fff5f5;"><div class="icon" style="font-size:3rem;">${String.fromCharCode(i)}</div><div class="label">${String.fromCharCode(i)}</div></div>`;
+                }
+                content.innerHTML += `</div>`;
+            }
+            else if (section === 'numbers') {
+                content.innerHTML = `<div style="text-align:center; margin-bottom:20px;"><h2 style="font-size:2rem;">Numbers 1-20</h2></div><div class="grid">`;
+                for (let i = 1; i <= 20; i++) {
+                    content.innerHTML += `<div class="card" style="background:#f0fff4;"><div class="icon" style="font-size:3rem;">${i}</div><div class="label">${i}</div></div>`;
+                }
+                content.innerHTML += `</div>`;
+            }
+            else if (section === 'colors') {
+                const colors = [
+                    {name:'Red', hex:'#ff6b6b'}, {name:'Orange', hex:'#ff9f43'},
+                    {name:'Yellow', hex:'#feca57'}, {name:'Green', hex:'#55efc4'},
+                    {name:'Blue', hex:'#48dbfb'}, {name:'Purple', hex:'#a29bfe'}
+                ];
+                content.innerHTML = `<div style="text-align:center; margin-bottom:20px;"><h2 style="font-size:2rem;">Colors</h2></div><div class="grid">`;
+                colors.forEach(c => {
+                    content.innerHTML += `<div class="card" style="background:${c.hex}; color:white;"><div class="icon">🎨</div><div class="label">${c.name}</div></div>`;
+                });
+                content.innerHTML += `</div>`;
+            }
+            else if (section === 'shapes') {
+                const shapes = [
+                    {name:'Circle', emoji:'🔵'}, {name:'Square', emoji:'🟦'},
+                    {name:'Triangle', emoji:'🔺'}, {name:'Star', emoji:'⭐'},
+                    {name:'Heart', emoji:'❤️'}, {name:'Diamond', emoji:'💎'}
+                ];
+                content.innerHTML = `<div style="text-align:center; margin-bottom:20px;"><h2 style="font-size:2rem;">Shapes</h2></div><div class="grid">`;
+                shapes.forEach(s => {
+                    content.innerHTML += `<div class="card"><div class="icon">${s.emoji}</div><div class="label">${s.name}</div></div>`;
+                });
+                content.innerHTML += `</div>`;
+            }
+            else if (section === 'animals') {
+                const animals = [
+                    {name:'Cat', emoji:'🐱'}, {name:'Dog', emoji:'🐶'},
+                    {name:'Bird', emoji:'🐦'}, {name:'Fish', emoji:'🐟'},
+                    {name:'Elephant', emoji:'🐘'}, {name:'Lion', emoji:'🦁'}
+                ];
+                content.innerHTML = `<div style="text-align:center; margin-bottom:20px;"><h2 style="font-size:2rem;">Animals</h2></div><div class="grid">`;
+                animals.forEach(a => {
+                    content.innerHTML += `<div class="card"><div class="icon" style="font-size:4rem;">${a.emoji}</div><div class="label">${a.name}</div></div>`;
+                });
+                content.innerHTML += `</div>`;
+            }
+            else if (section === 'words') {
+                const words = ['Mom','Dad','Cat','Dog','Sun','Moon','Star','Book','Hat','Cup','Ball','Bird'];
+                content.innerHTML = `<div style="text-align:center; margin-bottom:20px;"><h2 style="font-size:2rem;">Words to Read</h2></div><div class="grid">`;
+                words.forEach(w => {
+                    content.innerHTML += `<div class="card" style="background:#fff5f5;"><div class="label" style="font-size:2rem;">${w}</div></div>`;
+                });
+                content.innerHTML += `</div>`;
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (currentSection !== 'menu') {
+                if (e.key === 'Escape' || e.key === 'Backspace') {
+                    document.getElementById('menu').style.display = 'grid';
+                    document.getElementById('content').innerHTML = '';
+                    currentSection = 'menu';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
