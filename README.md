@@ -25,10 +25,24 @@ Open `index.html` in a browser — no build step required. For the installable/o
 - **Audio**: 🔊/🔇 toggle in the top bar to mute text-to-speech. Automatically picks the best available browser/system voice per language (preferring neural/premium voices when present) — no API key, no setup, works fully offline.
 - **Installable app (PWA)**: has a web app manifest and a service worker, so once hosted it can be added to a phone/tablet home screen (Android Chrome: menu → "Add to Home screen"; iOS Safari: share → "Add to Home Screen") and opens full-screen like a native app. After the first visit, the app shell is cached and the whole game works fully offline.
 
-## Notes
+## Level Structure
 
-- Vocabulary images live in `images/words/` (Minecraft-style sprites, one per vocab entry).
-- A native Android build (using the device's own TextToSpeech engine directly, for the best possible voice quality) is being explored separately.
+English, Chinese, and Spanish vocabulary is organized into **10 levels** grouped by word length. New vocabulary should be appended to the appropriate existing level based on its English `id` length:
+
+| Level | Word Length | Example Items |
+|-------|-------------|---------------|
+| 1 | 3–4 letters | axe, bat, bee, bow, cat, cod, cow, egg, fox, book |
+| 2 | 4–5 letters | clay, coal, dirt, door, frog, goat, gold, iron, wolf, wool |
+| 3 | 5 letters | arrow, blaze, boots, bread, camel, chest, clock, stick, paper, sugar, apple, wheat |
+| 4 | 5–6 letters | sword, torch, water, witch, bamboo, barrel, beacon, bucket, carrot, cookie |
+| 5 | 6 letters | hoglin, ladder, parrot, piglin, potato, rabbit, saddle, salmon, candle, cactus |
+| 6 | 6–7 letters | zombie, axolotl, bedrock, chicken, compass, creeper, diamond, dolphin, emerald |
+| 7 | 7–8 letters | strider, tadpole, trident, beetroot, campfire, crossbow, enderman, feather, mushroom |
+| 8 | 8–10 letters | villager, armadillo, bookshelf, endermite, glowstone, polarbear, cavespider |
+| 9 | 10–12 letters | netherrack, prismarine, pufferfish, silverfish, vindicator, cobblestone, goldenapple |
+| 10 | 12–15 letters | tropicalfish, amethystshard, craftingtable, totemofundying, zombifiedpiglin |
+
+**When adding new vocabulary:** append the entry to the level matching the English word's letter count. Never create a new level — max is 10.
 
 ## Data Sources
 
