@@ -1271,26 +1271,26 @@
         const solved = progress.mathCorrect[level] || 0;
         const ops = opsForLevel(lvNum);
         const op = ops[Math.floor(Math.random() * ops.length)];
-        // Number range grows as the child solves more problems at this level.
-        const range = solved >= 25 ? lvNum + 5 : (solved >= 10 ? lvNum + 3 : lvNum + 1);
+        // Max answer = level × 10 (Level 1: max 10, Level 2: max 20, etc.)
+        const maxAnswer = lvNum * 10;
         let a, b, answer;
         if (op === 'add') {
-            a = 1 + Math.floor(Math.random() * range);
-            b = 1 + Math.floor(Math.random() * range);
+            a = 1 + Math.floor(Math.random() * Math.min(maxAnswer - 1, 10));
+            b = 1 + Math.floor(Math.random() * Math.min(maxAnswer - a, 10));
             answer = a + b;
         } else if (op === 'sub') {
-            a = 2 + Math.floor(Math.random() * range);
-            b = 1 + Math.floor(Math.random() * a);
+            a = 2 + Math.floor(Math.random() * Math.min(maxAnswer, 10));
+            b = 1 + Math.floor(Math.random() * Math.min(a - 1, 10));
             answer = a - b;
         } else if (op === 'mul') {
             // Keep factors small and friendly for early learners.
-            const maxFactor = Math.min(5, 2 + Math.floor(range / 2));
+            const maxFactor = Math.min(5, 2 + Math.floor(maxAnswer / 10));
             a = 1 + Math.floor(Math.random() * maxFactor);
             b = 1 + Math.floor(Math.random() * maxFactor);
             answer = a * b;
         } else { // div — always clean (no remainders)
-            b = 1 + Math.floor(Math.random() * Math.min(5, 2 + Math.floor(range / 2)));
-            answer = 1 + Math.floor(Math.random() * Math.min(6, range));
+            b = 1 + Math.floor(Math.random() * Math.min(5, 2 + Math.floor(maxAnswer / 10)));
+            answer = 1 + Math.floor(Math.random() * Math.min(6, maxAnswer / 5));
             a = b * answer;
         }
         // Build 4 distinct answer choices around the correct value.
