@@ -355,6 +355,14 @@
         /* Word choice for sight words */
         .choice-btn.sightword-choice { font-size: 2.5rem; font-weight: 800; letter-spacing: 3px; }
         .choice-btn.compare-choice { font-size: 2.8rem; font-weight: 800; }
+        .cat-worksheets { background: #8e44ad; }
+        @media print {
+            body { background: white !important; padding: 0 !important; }
+            body::after { display: none !important; }
+            .container { box-shadow: none !important; border: none !important; background: white !important; min-height: auto !important; }
+            .topbar { display: none !important; }
+            .footer { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -1103,6 +1111,248 @@
         ],
     ];
 
+    // ---------- Make 10 (3 levels) ----------
+    const MAKE10_LEVELS = [
+        [ // Level 1 — Make 5
+            {id:'mk1',given:2,target:5,answer:3,options:[1,2,3,4]},
+            {id:'mk2',given:1,target:5,answer:4,options:[2,3,4,5]},
+            {id:'mk3',given:3,target:5,answer:2,options:[1,2,3,5]},
+            {id:'mk4',given:4,target:5,answer:1,options:[0,1,2,3]},
+            {id:'mk5',given:0,target:5,answer:5,options:[3,4,5,6]},
+            {id:'mk6',given:5,target:5,answer:0,options:[0,1,2,3]},
+        ],
+        [ // Level 2 — Make 10
+            {id:'mk7',given:3,target:10,answer:7,options:[5,6,7,8]},
+            {id:'mk8',given:7,target:10,answer:3,options:[2,3,4,5]},
+            {id:'mk9',given:2,target:10,answer:8,options:[6,7,8,9]},
+            {id:'mk10',given:8,target:10,answer:2,options:[1,2,3,4]},
+            {id:'mk11',given:5,target:10,answer:5,options:[3,4,5,6]},
+            {id:'mk12',given:6,target:10,answer:4,options:[2,3,4,5]},
+            {id:'mk13',given:4,target:10,answer:6,options:[4,5,6,7]},
+            {id:'mk14',given:1,target:10,answer:9,options:[7,8,9,10]},
+        ],
+        [ // Level 3 — Make 20
+            {id:'mk15',given:7,target:20,answer:13,options:[11,12,13,14]},
+            {id:'mk16',given:12,target:20,answer:8,options:[6,7,8,9]},
+            {id:'mk17',given:15,target:20,answer:5,options:[3,4,5,6]},
+            {id:'mk18',given:3,target:20,answer:17,options:[15,16,17,18]},
+            {id:'mk19',given:10,target:20,answer:10,options:[8,9,10,11]},
+            {id:'mk20',given:14,target:20,answer:6,options:[4,5,6,7]},
+        ],
+    ];
+
+    // ---------- Decompose Numbers (3 levels) ----------
+    const DECOMPOSE_LEVELS = [
+        [ // Level 1 — Decompose 1-5
+            {id:'dc1',number:2,answer:[0,2],options:[[0,2],[1,1],[0,3],[1,3]]},
+            {id:'dc2',number:3,answer:[1,2],options:[[1,2],[0,3],[2,2],[1,1]]},
+            {id:'dc3',number:4,answer:[2,2],options:[[2,2],[1,3],[0,4],[3,1]]},
+            {id:'dc4',number:5,answer:[2,3],options:[[2,3],[1,4],[0,5],[3,3]]},
+            {id:'dc5',number:1,answer:[0,1],options:[[0,1],[1,0],[0,2],[2,0]]},
+        ],
+        [ // Level 2 — Decompose 6-10
+            {id:'dc6',number:6,answer:[3,3],options:[[3,3],[2,4],[1,5],[0,6]]},
+            {id:'dc7',number:7,answer:[3,4],options:[[3,4],[2,5],[1,6],[4,4]]},
+            {id:'dc8',number:8,answer:[4,4],options:[[4,4],[3,5],[2,6],[1,7]]},
+            {id:'dc9',number:9,answer:[4,5],options:[[4,5],[3,6],[2,7],[5,5]]},
+            {id:'dc10',number:10,answer:[5,5],options:[[5,5],[4,6],[3,7],[2,8]]},
+        ],
+        [ // Level 3 — Multiple ways
+            {id:'dc11',number:5,answer:[1,4],options:[[1,4],[2,3],[0,5],[3,3]]},
+            {id:'dc12',number:7,answer:[2,5],options:[[2,5],[3,4],[1,6],[0,7]]},
+            {id:'dc13',number:10,answer:[3,7],options:[[3,7],[4,6],[5,5],[2,8]]},
+            {id:'dc14',number:8,answer:[1,7],options:[[1,7],[2,6],[3,5],[4,4]]},
+            {id:'dc15',number:6,answer:[0,6],options:[[0,6],[1,5],[2,4],[3,3]]},
+        ],
+    ];
+
+    // ---------- Teen Numbers (3 levels) ----------
+    const TEEN_NUMBERS_LEVELS = [
+        [ // Level 1 — 11-13
+            {id:'tn1',number:11,ten:10,ones:1,emoji:'🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟩'},
+            {id:'tn2',number:12,ten:10,ones:2,emoji:'🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟩🟩'},
+            {id:'tn3',number:13,ten:10,ones:3,emoji:'🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟩🟩🟩'},
+        ],
+        [ // Level 2 — 14-16
+            {id:'tn4',number:14,ten:10,ones:4,emoji:'🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟩🟩🟩🟩'},
+            {id:'tn5',number:15,ten:10,ones:5,emoji:'🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟩🟩🟩🟩🟩'},
+            {id:'tn6',number:16,ten:10,ones:6,emoji:'🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟩🟩🟩🟩🟩🟩'},
+        ],
+        [ // Level 3 — 17-19
+            {id:'tn7',number:17,ten:10,ones:7,emoji:'🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟩🟩🟩🟩🟩🟩🟩'},
+            {id:'tn8',number:18,ten:10,ones:8,emoji:'🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟩🟩🟩🟩🟩🟩🟩🟩'},
+            {id:'tn9',number:19,ten:10,ones:9,emoji:'🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟩🟩🟩🟩🟩🟩🟩🟩🟩'},
+        ],
+    ];
+
+    // ---------- Sort & Classify (3 levels) ----------
+    const SORT_CLASSIFY_LEVELS = [
+        [ // Level 1 — Sort by color
+            {id:'sc1',objects:[{emoji:'🍎',category:'red'},{emoji:'🔵',category:'blue'},{emoji:'🍀',category:'green'},{emoji:'🍅',category:'red'},{emoji:'🌎',category:'blue'}],question:'How many red ones?',answer:2,options:[1,2,3,4]},
+            {id:'sc2',objects:[{emoji:'🍎',category:'red'},{emoji:'🔵',category:'blue'},{emoji:'🍀',category:'green'},{emoji:'💎',category:'blue'},{emoji:'🟢',category:'green'}],question:'How many blue ones?',answer:2,options:[1,2,3,4]},
+            {id:'sc3',objects:[{emoji:'🍎',category:'red'},{emoji:'🟢',category:'green'},{emoji:'🍀',category:'green'},{emoji:'🍅',category:'red'},{emoji:'🟢',category:'green'}],question:'How many green ones?',answer:3,options:[2,3,4,5]},
+        ],
+        [ // Level 2 — Sort by shape
+            {id:'sc4',objects:[{emoji:'⚽',category:'circle'},{emoji:'🟦',category:'square'},{emoji:'🔺',category:'triangle'},{emoji:'🏀',category:'circle'},{emoji:'🔺',category:'triangle'}],question:'How many circles?',answer:2,options:[1,2,3,4]},
+            {id:'sc5',objects:[{emoji:'🟦',category:'square'},{emoji:'🔴',category:'circle'},{emoji:'🟦',category:'square'},{emoji:'🔺',category:'triangle'},{emoji:'🟦',category:'square'}],question:'How many squares?',answer:3,options:[2,3,4,5]},
+            {id:'sc6',objects:[{emoji:'🔺',category:'triangle'},{emoji:'🟦',category:'square'},{emoji:'🔺',category:'triangle'},{emoji:'🔺',category:'triangle'},{emoji:'🔵',category:'circle'}],question:'How many triangles?',answer:3,options:[1,2,3,4]},
+        ],
+        [ // Level 3 — Sort by size
+            {id:'sc7',objects:[{emoji:'🐘',category:'big'},{emoji:'🐜',category:'small'},{emoji:'🐘',category:'big'},{emoji:'🐁',category:'small'},{emoji:'🐘',category:'big'}],question:'How many big animals?',answer:3,options:[2,3,4,5]},
+            {id:'sc8',objects:[{emoji:'🐜',category:'small'},{emoji:'🐋',category:'big'},{emoji:'🐜',category:'small'},{emoji:'🐁',category:'small'},{emoji:'🐋',category:'big'}],question:'How many small animals?',answer:3,options:[2,3,4,5]},
+            {id:'sc9',objects:[{emoji:'🐦',category:'medium'},{emoji:'🐘',category:'big'},{emoji:'🐜',category:'small'},{emoji:'🐦',category:'medium'},{emoji:'🐘',category:'big'}],question:'How many medium animals?',answer:2,options:[1,2,3,4]},
+        ],
+    ];
+
+    // ---------- 3D Shapes (3 levels) ----------
+    const SHAPES3D_LEVELS = [
+        [ // Level 1 — sphere, cube, cone
+            {id:'s3d1',name:'Sphere',emoji:'🔵',realWorld:['ball','orange'],fact:'A sphere is round all over like a ball.'},
+            {id:'s3d2',name:'Cube',emoji:'🧊',realWorld:['dice','ice cube'],fact:'A cube has 6 square faces.'},
+            {id:'s3d3',name:'Cone',emoji:'🔺',realWorld:['ice cream cone','traffic cone'],fact:'A cone has a circle base and a point on top.'},
+        ],
+        [ // Level 2 — cylinder, pyramid, rectangular prism
+            {id:'s3d4',name:'Cylinder',emoji:'🥫',realWorld:['can','tube'],fact:'A cylinder has 2 circle faces and one curved side.'},
+            {id:'s3d5',name:'Pyramid',emoji:'🔷',realWorld:['pyramid','roof'],fact:'A pyramid has a flat base and triangles on each side.'},
+            {id:'s3d6',name:'Rectangular Prism',emoji:'📦',realWorld:['box','book'],fact:'A rectangular prism has 6 rectangle faces.'},
+        ],
+        [ // Level 3 — mixed review
+            {id:'s3d7',name:'Sphere',emoji:'⚽',realWorld:['soccer ball','globe'],fact:'A sphere is round like a ball.'},
+            {id:'s3d8',name:'Cylinder',emoji:'🥤',realWorld:['cup','pipe'],fact:'A cylinder looks like a can.'},
+            {id:'s3d9',name:'Cone',emoji:'🎪',realWorld:['party hat','funnel'],fact:'A cone is pointy on top.'},
+            {id:'s3d10',name:'Cube',emoji:'🎲',realWorld:['block','box'],fact:'A cube has 6 equal faces.'},
+            {id:'s3d11',name:'Pyramid',emoji:'🏛️',realWorld:['Egyptian pyramid','prism'],fact:'A pyramid has triangle sides.'},
+            {id:'s3d12',name:'Rectangular Prism',emoji:'🧱',realWorld:['brick','shoebox'],fact:'A rectangular prism is like a box.'},
+        ],
+    ];
+
+    // ---------- Print Concepts (2 levels) ----------
+    const PRINT_CONCEPTS_LEVELS = [
+        [ // Level 1 — Parts of a book
+            {id:'pc1',scenario:'📖',question:'Where is the cover of the book?',answer:'Front',options:['Front','Back','Middle','Spine']},
+            {id:'pc2',scenario:'📖',question:'Where do you find the title?',answer:'Front cover',options:['Front cover','Back cover','Last page','Middle page']},
+            {id:'pc3',scenario:'📚',question:'What do you read first?',answer:'Front cover',options:['Front cover','Last page','Back cover','Middle']},
+            {id:'pc4',scenario:'📖',question:'Where are the pages?',answer:'Inside',options:['Inside','Front cover','Back cover','Spine']},
+            {id:'pc5',scenario:'✍️',question:'Who writes a book?',answer:'Author',options:['Author','Reader','Teacher','Student']},
+        ],
+        [ // Level 2 — Reading direction
+            {id:'pc6',scenario:'➡️',question:'Which way do you read words on a page?',answer:'Left to right',options:['Left to right','Right to left','Top to bottom','Bottom to top']},
+            {id:'pc7',scenario:'⬇️',question:'Which way do you read lines on a page?',answer:'Top to bottom',options:['Top to bottom','Bottom to top','Left to right','Right to left']},
+            {id:'pc8',scenario:'📖',question:'Which page comes first in a book?',answer:'Front',options:['Front','Back','Middle','It doesn\'t matter']},
+            {id:'pc9',scenario:'➡️➡️',question:'After the first page, where do you go?',answer:'Next page',options:['Next page','Previous page','Last page','Back cover']},
+            {id:'pc10',scenario:'📖✅',question:'When you finish a book, what comes last?',answer:'Back cover',options:['Back cover','Front cover','First page','Title page']},
+        ],
+    ];
+
+    // ---------- Beginning/Ending Sounds (3 levels) ----------
+    const BEGIN_END_SOUNDS_LEVELS = [
+        [ // Level 1 — Beginning sounds
+            {id:'bes1',word:'Cat',emoji:'🐱',position:'beginning',answer:'c',options:['c','b','d','t']},
+            {id:'bes2',word:'Dog',emoji:'🐶',position:'beginning',answer:'d',options:['d','b','g','t']},
+            {id:'bes3',word:'Ball',emoji:'⚽',position:'beginning',answer:'b',options:['b','d','a','l']},
+            {id:'bes4',word:'Fish',emoji:'🐟',position:'beginning',answer:'f',options:['f','s','p','h']},
+            {id:'bes5',word:'Sun',emoji:'☀️',position:'beginning',answer:'s',options:['s','h','b','m']},
+            {id:'bes6',word:'Tree',emoji:'🌳',position:'beginning',answer:'t',options:['t','r','l','e']},
+        ],
+        [ // Level 2 — Ending sounds
+            {id:'bes7',word:'Cat',emoji:'🐱',position:'ending',answer:'t',options:['t','c','a','s']},
+            {id:'bes8',word:'Dog',emoji:'🐶',position:'ending',answer:'g',options:['g','d','o','s']},
+            {id:'bes9',word:'Fish',emoji:'🐟',position:'ending',answer:'sh',options:['sh','s','h','f']},
+            {id:'bes10',word:'Bus',emoji:'🚌',position:'ending',answer:'s',options:['s','b','u','z']},
+            {id:'bes11',word:'Hand',emoji:'✋',position:'ending',answer:'d',options:['d','h','n','t']},
+            {id:'bes12',word:'Bike',emoji:'🚲',position:'ending',answer:'k',options:['k','b','i','e']},
+        ],
+        [ // Level 3 — Mixed review
+            {id:'bes13',word:'Map',emoji:'🗺️',position:'beginning',answer:'m',options:['m','p','a','d']},
+            {id:'bes14',word:'Ten',emoji:'🔟',position:'ending',answer:'n',options:['n','t','e','s']},
+            {id:'bes15',word:'Lion',emoji:'🦁',position:'beginning',answer:'l',options:['l','i','o','n']},
+            {id:'bes16',word:'Jump',emoji:'🦘',position:'ending',answer:'p',options:['p','j','u','m']},
+            {id:'bes17',word:'Cup',emoji:'☕',position:'beginning',answer:'c',options:['c','u','p','k']},
+            {id:'bes18',word:'Bed',emoji:'🛏️',position:'ending',answer:'d',options:['d','b','e','t']},
+        ],
+    ];
+
+    // ---------- Complete Sentences (3 levels) ----------
+    const SENTENCES_LEVELS = [
+        [ // Level 1 — Capital letter at start
+            {id:'sn1',broken:'the cat is big',correct:'The cat is big.',options:['The cat is big.','the cat is big.','The cat is big','the cat is big']},
+            {id:'sn2',broken:'i like apples',correct:'I like apples.',options:['I like apples.','i like apples.','I like apples','i like apples']},
+            {id:'sn3',broken:'the dog runs fast',correct:'The dog runs fast.',options:['The dog runs fast.','the dog runs fast.','The dog runs fast','the dog runs fast']},
+            {id:'sn4',broken:'we play outside',correct:'We play outside.',options:['We play outside.','we play outside.','We play outside','we play outside']},
+            {id:'sn5',broken:'she is happy',correct:'She is happy.',options:['She is happy.','she is happy.','She is happy','she is happy']},
+        ],
+        [ // Level 2 — Period at end
+            {id:'sn6',broken:'the dog runs.',correct:'The dog runs.',options:['The dog runs.','the dog runs.','The dog runs','the dog runs']},
+            {id:'sn7',broken:'i am tall.',correct:'I am tall.',options:['I am tall.','i am tall.','I am tall','i am tall']},
+            {id:'sn8',broken:'we sing a song.',correct:'We sing a song.',options:['We sing a song.','we sing a song.','We sing a song','we sing a song']},
+            {id:'sn9',broken:'they jump high.',correct:'They jump high.',options:['They jump high.','they jump high.','They jump high','they jump high']},
+            {id:'sn10',broken:'he reads a book.',correct:'He reads a book.',options:['He reads a book.','he reads a book.','He reads a book','he reads a book']},
+        ],
+        [ // Level 3 — Both capital + period
+            {id:'sn11',broken:'the bird sings',correct:'The bird sings.',options:['The bird sings.','the bird sings.','The bird sings','the bird sings']},
+            {id:'sn12',broken:'i go to school',correct:'I go to school.',options:['I go to school.','i go to school.','I go to school','i go to school']},
+            {id:'sn13',broken:'we eat lunch',correct:'We eat lunch.',options:['We eat lunch.','we eat lunch.','We eat lunch','we eat lunch']},
+            {id:'sn14',broken:'the sun is bright',correct:'The sun is bright.',options:['The sun is bright.','the sun is bright.','The sun is bright','the sun is bright']},
+            {id:'sn15',broken:'she walks to school',correct:'She walks to school.',options:['She walks to school.','she walks to school.','She walks to school','she walks to school']},
+        ],
+    ];
+
+    // ---------- Prepositions (3 levels) ----------
+    const PREPOSITIONS_LEVELS = [
+        [ // Level 1 — in, on, under
+            {id:'pr1',scene:'🐱⬇️📦',answer:'under',options:['in','on','under','next to']},
+            {id:'pr2',scene:'🐱⬆️📦',answer:'on',options:['in','on','under','behind']},
+            {id:'pr3',scene:'🐱📦',answer:'in',options:['in','on','under','between']},
+            {id:'pr4',scene:'🐱📦',answer:'on',options:['in','on','under','next to']},
+            {id:'pr5',scene:'📦⬇️🐱',answer:'under',options:['in','on','under','in front of']},
+            {id:'pr6',scene:'📦🐱',answer:'in',options:['in','on','under','behind']},
+        ],
+        [ // Level 2 — behind, in front of, between
+            {id:'pr7',scene:'🪑🐱📦',answer:'between',options:['behind','in front of','between','next to']},
+            {id:'pr8',scene:'📦🐱',answer:'behind',options:['behind','in front of','between','under']},
+            {id:'pr9',scene:'🐱📦',answer:'in front of',options:['behind','in front of','between','under']},
+            {id:'pr10',scene:'📦🐱📦',answer:'between',options:['behind','in front of','between','on']},
+            {id:'pr11',scene:'📦🐱',answer:'behind',options:['behind','in front of','on','under']},
+            {id:'pr12',scene:'🐱📦',answer:'in front of',options:['behind','in front of','on','under']},
+        ],
+        [ // Level 3 — above, below, next to
+            {id:'pr13',scene:'🐱⬆️📦',answer:'above',options:['above','below','next to','in']},
+            {id:'pr14',scene:'🐱⬇️📦',answer:'below',options:['above','below','next to','on']},
+            {id:'pr15',scene:'🐱📦',answer:'next to',options:['above','below','next to','in']},
+            {id:'pr16',scene:'📦⬆️🐱',answer:'above',options:['above','below','next to','under']},
+            {id:'pr17',scene:'📦⬇️🐱',answer:'below',options:['above','below','next to','over']},
+            {id:'pr18',scene:'📦🐱',answer:'next to',options:['above','below','next to','behind']},
+        ],
+    ];
+
+    // ---------- Sort by Category (3 levels) ----------
+    const SORT_CATEGORY_LEVELS = [
+        [ // Level 1 — Foods vs Animals vs Clothes
+            {id:'stc1',item:{emoji:'🍎',name:'apple'},correctCategory:'Food',categories:['Food','Animal','Clothing','Color']},
+            {id:'stc2',item:{emoji:'🐱',name:'cat'},correctCategory:'Animal',categories:['Food','Animal','Clothing','Color']},
+            {id:'stc3',item:{emoji:'👕',name:'shirt'},correctCategory:'Clothing',categories:['Food','Animal','Clothing','Color']},
+            {id:'stc4',item:{emoji:'🍌',name:'banana'},correctCategory:'Food',categories:['Food','Animal','Clothing','Color']},
+            {id:'stc5',item:{emoji:'🐶',name:'dog'},correctCategory:'Animal',categories:['Food','Animal','Clothing','Color']},
+            {id:'stc6',item:{emoji:'🧣',name:'scarf'},correctCategory:'Clothing',categories:['Food','Animal','Clothing','Color']},
+        ],
+        [ // Level 2 — Furniture vs Vehicles vs Tools
+            {id:'stc7',item:{emoji:'🪑',name:'chair'},correctCategory:'Furniture',categories:['Furniture','Vehicle','Tool','Food']},
+            {id:'stc8',item:{emoji:'🚗',name:'car'},correctCategory:'Vehicle',categories:['Furniture','Vehicle','Tool','Food']},
+            {id:'stc9',item:{emoji:'🔨',name:'hammer'},correctCategory:'Tool',categories:['Furniture','Vehicle','Tool','Food']},
+            {id:'stc10',item:{emoji:'🛏️',name:'bed'},correctCategory:'Furniture',categories:['Furniture','Vehicle','Tool','Food']},
+            {id:'stc11',item:{emoji:'🚌',name:'bus'},correctCategory:'Vehicle',categories:['Furniture','Vehicle','Tool','Food']},
+            {id:'stc12',item:{emoji:'🪛',name:'screwdriver'},correctCategory:'Tool',categories:['Furniture','Vehicle','Tool','Food']},
+        ],
+        [ // Level 3 — Mixed categories
+            {id:'stc13',item:{emoji:'📚',name:'book'},correctCategory:'School',categories:['Food','Animal','School','Nature']},
+            {id:'stc14',item:{emoji:'🌳',name:'tree'},correctCategory:'Nature',categories:['Food','Animal','School','Nature']},
+            {id:'stc15',item:{emoji:'🐸',name:'frog'},correctCategory:'Animal',categories:['Food','Animal','School','Nature']},
+            {id:'stc16',item:{emoji:'🥕',name:'carrot'},correctCategory:'Food',categories:['Food','Animal','School','Nature']},
+            {id:'stc17',item:{emoji:'✏️',name:'pencil'},correctCategory:'School',categories:['Food','Animal','School','Nature']},
+            {id:'stc18',item:{emoji:'🌊',name:'water'},correctCategory:'Nature',categories:['Food','Animal','School','Nature']},
+        ],
+    ];
+
     // ---------- Mapped arrays for new categories ----------
     const PATTERNS_MAPPED = PATTERNS_LEVELS.map((entries, i) => ({
         id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: entries
@@ -1131,6 +1381,36 @@
     const SIGHTWORDS_MAPPED = SIGHTWORDS_LEVELS.map((entries, i) => ({
         id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: entries
     }));
+    const MAKE10_MAPPED = MAKE10_LEVELS.map((entries, i) => ({
+        id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: entries
+    }));
+    const DECOMPOSE_MAPPED = DECOMPOSE_LEVELS.map((entries, i) => ({
+        id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: entries
+    }));
+    const TEEN_NUMBERS_MAPPED = TEEN_NUMBERS_LEVELS.map((entries, i) => ({
+        id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: entries
+    }));
+    const SORT_CLASSIFY_MAPPED = SORT_CLASSIFY_LEVELS.map((entries, i) => ({
+        id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: entries
+    }));
+    const SHAPES3D_MAPPED = SHAPES3D_LEVELS.map((entries, i) => ({
+        id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: entries
+    }));
+    const PRINT_CONCEPTS_MAPPED = PRINT_CONCEPTS_LEVELS.map((entries, i) => ({
+        id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: entries
+    }));
+    const BEGIN_END_SOUNDS_MAPPED = BEGIN_END_SOUNDS_LEVELS.map((entries, i) => ({
+        id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: entries
+    }));
+    const SENTENCES_MAPPED = SENTENCES_LEVELS.map((entries, i) => ({
+        id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: entries
+    }));
+    const PREPOSITIONS_MAPPED = PREPOSITIONS_LEVELS.map((entries, i) => ({
+        id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: entries
+    }));
+    const SORT_CATEGORY_MAPPED = SORT_CATEGORY_LEVELS.map((entries, i) => ({
+        id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: entries
+    }));
 
 
     // ---------- Category registry ----------
@@ -1150,7 +1430,17 @@
         {key:'money', name:'Money', icon:'🪙', leveled:true, levels:MONEY_MAPPED},
         {key:'onemoreless', name:'More or Less', icon:'➕➖', leveled:true, levels:ONEMORELESS_MAPPED},
         {key:'rhyming', name:'Rhyming', icon:'🎵', leveled:true, levels:RHYMING_MAPPED},
-        {key:'sightwords', name:'Sight Words', icon:'👁️', leveled:true, levels:SIGHTWORDS_MAPPED}
+        {key:'sightwords', name:'Sight Words', icon:'👁️', leveled:true, levels:SIGHTWORDS_MAPPED},
+        {key:'make10', name:'Make 10', icon:'🔟', leveled:true, levels:MAKE10_MAPPED},
+        {key:'decompose', name:'Decompose', icon:'🔢', leveled:true, levels:DECOMPOSE_MAPPED},
+        {key:'teennumbers', name:'Teen Numbers', icon:'🟦', leveled:true, levels:TEEN_NUMBERS_MAPPED},
+        {key:'sortclassify', name:'Sort & Classify', icon:'🎨', leveled:true, levels:SORT_CLASSIFY_MAPPED},
+        {key:'shapes3d', name:'3D Shapes', icon:'🧊', leveled:true, levels:SHAPES3D_MAPPED},
+        {key:'printconcepts', name:'Print Concepts', icon:'📖', leveled:true, levels:PRINT_CONCEPTS_MAPPED},
+        {key:'begendsounds', name:'Sounds', icon:'🔤', leveled:true, levels:BEGIN_END_SOUNDS_MAPPED},
+        {key:'sentences', name:'Sentences', icon:'✏️', leveled:true, levels:SENTENCES_MAPPED},
+        {key:'prepositions', name:'Prepositions', icon:'📍', leveled:true, levels:PREPOSITIONS_MAPPED},
+        {key:'sortcategory', name:'Categories', icon:'🏷️', leveled:true, levels:SORT_CATEGORY_MAPPED}
     ];
     function getCategoryItems(key, level) {
         const cat = CATEGORIES.find(c => c.key === key);
@@ -1451,6 +1741,11 @@
                 <div class="label">Timed Challenge</div>
                 <div class="sublabel">⏱ 60s rapid-fire!</div>
             </div>
+            <div class="card cat-worksheets" onclick="go('worksheets')">
+                <div class="icon">🖨️</div>
+                <div class="label">Worksheets</div>
+                <div class="sublabel">print & practice</div>
+            </div>
             <div class="card cat-progress" onclick="go('progress')">
                 <div class="icon">🏆</div>
                 <div class="label">My Progress</div>
@@ -1596,6 +1891,47 @@
                 visual = `<div style="font-size:2.5rem;font-weight:800;letter-spacing:3px;">${it.id}</div>`;
                 label = `<div style="font-size:0.9rem;">sight word</div>`;
             }
+            else if (key === 'make10') {
+                visual = `<div style="font-size:2rem;font-weight:800;">${it.given} + ❓ = ${it.target}</div>`;
+                label = `<div style="font-size:1rem;">Make ${it.target}</div>`;
+            }
+            else if (key === 'decompose') {
+                visual = `<div style="font-size:2rem;font-weight:800;">${it.number} = ❓ + ❓</div>`;
+                label = `<div style="font-size:1rem;">${it.answer[0]} + ${it.answer[1]}</div>`;
+            }
+            else if (key === 'teennumbers') {
+                visual = `<div style="font-size:0.7rem;letter-spacing:1px;line-height:1.2;word-break:break-all;">${it.emoji}</div>`;
+                label = `<div style="font-size:1.4rem;font-weight:800;">${it.number}</div><div style="font-size:0.75rem;color:rgba(43,27,14,0.55);">10 + ${it.ones}</div>`;
+            }
+            else if (key === 'sortclassify') {
+                const objs = it.objects.map(o => o.emoji).join('');
+                visual = `<div style="font-size:1.5rem;">${objs}</div>`;
+                label = `<div style="font-size:0.9rem;">${it.question}</div>`;
+            }
+            else if (key === 'shapes3d') {
+                visual = `<div style="font-size:3rem;">${it.emoji}</div>`;
+                label = `<div style="font-size:1.2rem;font-weight:700;">${it.name}</div>`;
+            }
+            else if (key === 'printconcepts') {
+                visual = `<div style="font-size:3rem;">${it.scenario}</div>`;
+                label = `<div style="font-size:0.9rem;">${it.question}</div>`;
+            }
+            else if (key === 'begendsounds') {
+                visual = `<div style="font-size:3rem;">${it.emoji}</div>`;
+                label = `<div style="font-size:1.2rem;font-weight:700;">${it.word}</div><div style="font-size:0.75rem;color:rgba(43,27,14,0.55);">${it.position}: ${it.answer}</div>`;
+            }
+            else if (key === 'sentences') {
+                visual = `<div style="font-size:1rem;font-weight:600;text-align:left;max-width:160px;">${it.broken}</div>`;
+                label = `<div style="font-size:0.9rem;">Fix the sentence</div>`;
+            }
+            else if (key === 'prepositions') {
+                visual = `<div style="font-size:2rem;letter-spacing:3px;">${it.scene}</div>`;
+                label = `<div style="font-size:1.1rem;font-weight:700;">${it.answer}</div>`;
+            }
+            else if (key === 'sortcategory') {
+                visual = `<div style="font-size:3rem;">${it.item.emoji}</div>`;
+                label = `<div style="font-size:1.2rem;font-weight:700;">${it.item.name}</div><div style="font-size:0.75rem;color:rgba(43,27,14,0.55);">${it.correctCategory}</div>`;
+            }
             return `<div class="card" onclick="learnTap('${key}','${it.id}','${level}')">
                 ${mastered ? '<div class="mastered-check">✓</div>' : ''}
                 ${visual}
@@ -1707,6 +2043,48 @@
             const it = items.find(s => s.id === id);
             showLearnDisplay(it.id, 'Sight word');
             await playBrowserUtterance(it.id, 'en-US');
+        } else if (key === 'make10') {
+            const it = items.find(m => m.id === id);
+            showLearnDisplay(`${it.given} + ❓ = ${it.target}`, `The answer is ${it.answer}!`);
+            await playBrowserUtterance(`${it.given} plus what equals ${it.target}? The answer is ${it.answer}.`, 'en-US');
+        } else if (key === 'decompose') {
+            const it = items.find(d => d.id === id);
+            showLearnDisplay(`${it.number} = ${it.answer[0]} + ${it.answer[1]}`, `${it.number} can be ${it.answer[0]} and ${it.answer[1]}`);
+            await playBrowserUtterance(`${it.number} equals ${it.answer[0]} plus ${it.answer[1]}.`, 'en-US');
+        } else if (key === 'teennumbers') {
+            const it = items.find(t => t.id === id);
+            showLearnDisplay(`${it.number}`, `10 plus ${it.ones} equals ${it.number}`);
+            await playBrowserUtterance(`Ten plus ${it.ones} equals ${it.number}. This is ${it.number}.`, 'en-US');
+        } else if (key === 'sortclassify') {
+            const it = items.find(s => s.id === id);
+            const objs = it.objects.map(o => o.emoji).join(' ');
+            showLearnDisplay(objs, `${it.question} The answer is ${it.answer}.`);
+            await playBrowserUtterance(`${it.question} The answer is ${it.answer}.`, 'en-US');
+        } else if (key === 'shapes3d') {
+            const it = items.find(s => s.id === id);
+            showLearnDisplay(`${it.emoji} ${it.name}`, it.fact);
+            await playBrowserUtterance(`This is a ${it.name}. ${it.fact}`, 'en-US');
+        } else if (key === 'printconcepts') {
+            const it = items.find(p => p.id === id);
+            showLearnDisplay(`${it.scenario} ${it.question}`, `The answer is ${it.answer}.`);
+            await playBrowserUtterance(`${it.question} The answer is ${it.answer}.`, 'en-US');
+        } else if (key === 'begendsounds') {
+            const it = items.find(b => b.id === id);
+            const pos = it.position === 'beginning' ? 'starts' : 'ends';
+            showLearnDisplay(`${it.emoji} ${it.word}`, `"${it.word}" ${pos} with the sound "${it.answer}"`);
+            await playBrowserUtterance(`${it.word}. The word ${it.word} ${pos} with the sound ${it.answer}.`, 'en-US');
+        } else if (key === 'sentences') {
+            const it = items.find(s => s.id === id);
+            showLearnDisplay(it.correct, `The correct sentence is: ${it.correct}`);
+            await playBrowserUtterance(it.correct, 'en-US');
+        } else if (key === 'prepositions') {
+            const it = items.find(p => p.id === id);
+            showLearnDisplay(it.scene, `The cat is ${it.answer} the box.`);
+            await playBrowserUtterance(`The cat is ${it.answer} the box.`, 'en-US');
+        } else if (key === 'sortcategory') {
+            const it = items.find(s => s.id === id);
+            showLearnDisplay(`${it.item.emoji} ${it.item.name}`, `This is a ${it.correctCategory}.`);
+            await playBrowserUtterance(`${it.item.name}. This is a ${it.correctCategory}.`, 'en-US');
         } else {
             showLearnDisplay(id);
             await playBrowserUtterance(id, 'en-US');
@@ -2014,6 +2392,131 @@
                 speakText: `Find the word ${correct.id}.`,
                 itemId: correct.id,
                 choices
+            };
+        }
+        if (key === 'make10') {
+            const choices = correct.options.map(o => ({ id: String(o), html: String(o), speak: String(o) }));
+            return {
+                mode: 'make10-find',
+                promptHTML: `<div class="prompt-word">What plus ${correct.given} equals ${correct.target}?</div><div class="prompt-visual" style="font-size:3rem;">${correct.given} + ❓ = ${correct.target}</div>`,
+                speakText: `What plus ${correct.given} equals ${correct.target}?`,
+                itemId: String(correct.answer),
+                choices: shuffle(choices)
+            };
+        }
+        if (key === 'decompose') {
+            const choiceStrs = correct.options.map(o => o[0] + '+' + o[1]);
+            const correctStr = correct.answer[0] + '+' + correct.answer[1];
+            const choices = correct.options.map(o => ({ id: o[0]+'+'+o[1], html: o[0]+' + '+o[1], speak: o[0] + ' plus ' + o[1] }));
+            return {
+                mode: 'decompose-find',
+                promptHTML: `<div class="prompt-word">Which two numbers make ${correct.number}?</div><div class="prompt-visual" style="font-size:3.5rem;">${correct.number} = ❓ + ❓</div>`,
+                speakText: `Which two numbers make ${correct.number}?`,
+                itemId: correctStr,
+                choices: shuffle(choices)
+            };
+        }
+        if (key === 'teennumbers') {
+            const wrongSet = new Set([correct.number]);
+            let d = 1;
+            while (wrongSet.size < 4) {
+                if (correct.number - d >= 11) wrongSet.add(correct.number - d);
+                if (correct.number + d <= 19) wrongSet.add(correct.number + d);
+                d++;
+            }
+            wrongSet.delete(correct.number);
+            const wrongList = [...wrongSet].slice(0, 3);
+            const choices = shuffle([...wrongList.map(w => ({ id: String(w), html: String(w), speak: String(w) })), { id: String(correct.number), html: String(correct.number), speak: String(correct.number) }]);
+            return {
+                mode: 'teen-find',
+                promptHTML: `<div class="prompt-word">What number is this?</div><div class="prompt-visual" style="font-size:0.9rem;letter-spacing:1px;line-height:1.2;word-break:break-all;">${correct.emoji}</div><div class="prompt-word" style="font-size:1.5rem;">10 + ${correct.ones} = ?</div>`,
+                speakText: `Ten plus ${correct.ones} equals what?`,
+                itemId: String(correct.number),
+                choices
+            };
+        }
+        if (key === 'sortclassify') {
+            const objs = correct.objects.map(o => o.emoji).join(' ');
+            const choices = correct.options.map(o => ({ id: String(o), html: String(o), speak: String(o) }));
+            return {
+                mode: 'sortclassify-find',
+                promptHTML: `<div class="prompt-word">${correct.question}</div><div class="prompt-visual" style="font-size:2rem;">${objs}</div>`,
+                speakText: `${correct.question}`,
+                itemId: String(correct.answer),
+                choices: shuffle(choices)
+            };
+        }
+        if (key === 'shapes3d') {
+            // Alternate between name-to-shape and shape-to-name
+            if (Math.random() < 0.5) {
+                const choices = pickChoices(items, correct, 4);
+                return {
+                    mode: 'shapes3d-name',
+                    promptHTML: `<div class="prompt-visual"><span style="font-size:5rem;">${correct.emoji}</span></div><div class="prompt-word">What shape is this?</div>`,
+                    speakText: `What shape is this?`,
+                    itemId: correct.name,
+                    choices: choices.map(c => ({ id: c.name, html: c.name, speak: c.name }))
+                };
+            } else {
+                const choices = pickChoices(items, correct, 4);
+                return {
+                    mode: 'shapes3d-emoji',
+                    promptHTML: `<div class="prompt-word">Find the ${correct.name}</div><div class="prompt-word" style="font-size:1rem;color:#888;">${correct.fact}</div>`,
+                    speakText: `Find the ${correct.name}.`,
+                    itemId: correct.name,
+                    choices: choices.map(c => ({ id: c.name, html: `<span style="font-size:2.5rem;">${c.emoji}</span>`, speak: c.name }))
+                };
+            }
+        }
+        if (key === 'printconcepts') {
+            const choices = correct.options.map(o => ({ id: o, html: o, speak: o }));
+            return {
+                mode: 'printconcepts-find',
+                promptHTML: `<div class="prompt-visual"><span style="font-size:5rem;">${correct.scenario}</span></div><div class="prompt-word">${correct.question}</div>`,
+                speakText: `${correct.question}`,
+                itemId: correct.answer,
+                choices: shuffle(choices)
+            };
+        }
+        if (key === 'begendsounds') {
+            const choices = correct.options.map(o => ({ id: o, html: o, speak: o }));
+            const pos = correct.position === 'beginning' ? 'start' : 'end';
+            return {
+                mode: 'begendsounds-find',
+                promptHTML: `<div class="prompt-visual"><span style="font-size:5rem;">${correct.emoji}</span></div><div class="prompt-word">What sound does "${correct.word}" ${pos} with?</div>`,
+                speakText: `What sound does the word ${correct.word} ${pos} with?`,
+                itemId: correct.answer,
+                choices: shuffle(choices)
+            };
+        }
+        if (key === 'sentences') {
+            const choices = correct.options.map(o => ({ id: o, html: `<span style="font-size:0.9rem;">${o}</span>`, speak: o }));
+            return {
+                mode: 'sentences-find',
+                promptHTML: `<div class="prompt-word">Which sentence is correct?</div><div class="prompt-visual" style="font-size:1.4rem;font-weight:600;">"${correct.broken}"</div>`,
+                speakText: `Which sentence is written correctly?`,
+                itemId: correct.correct,
+                choices: shuffle(choices)
+            };
+        }
+        if (key === 'prepositions') {
+            const choices = correct.options.map(o => ({ id: o, html: o, speak: o }));
+            return {
+                mode: 'prepositions-find',
+                promptHTML: `<div class="prompt-word">The cat is ___ the box</div><div class="position-scene" style="font-size:3rem;letter-spacing:4px;">${correct.scene}</div>`,
+                speakText: `The cat is ___ the box. What word fits?`,
+                itemId: correct.answer,
+                choices: shuffle(choices)
+            };
+        }
+        if (key === 'sortcategory') {
+            const choices = correct.categories.map(c => ({ id: c, html: c, speak: c }));
+            return {
+                mode: 'sortcategory-find',
+                promptHTML: `<div class="prompt-visual"><span style="font-size:5rem;">${correct.item.emoji}</span></div><div class="prompt-word">Which category does "${correct.item.name}" belong to?</div>`,
+                speakText: `Which category does ${correct.item.name} belong to?`,
+                itemId: correct.correctCategory,
+                choices: shuffle(choices)
             };
         }
     }
@@ -2596,6 +3099,122 @@
         </div>`;
     }
 
+    // ---------- Worksheets (printable) ----------
+    function renderWorksheets() {
+        return `${topbar(true)}
+        <div class="center-col">
+            <div style="font-size:4rem;">🖨️</div>
+            <h2>Worksheets</h2>
+            <p style="color:#888;margin-bottom:20px;">Pick a worksheet to print!</p>
+            <button class="big-btn learn" onclick="printWorksheet('letters')">🔤 Letter Tracing</button>
+            <button class="big-btn learn" onclick="printWorksheet('numbers')">🔢 Number Tracing</button>
+            <button class="big-btn play" onclick="printWorksheet('math')">➕ Math Facts</button>
+            <button class="big-btn write" onclick="printWorksheet('shapes')">🔷 Shape Recognition</button>
+            <button class="big-btn again" onclick="printWorksheet('sightwords')">👁️ Sight Words</button>
+            <button class="big-btn home" onclick="goHome()">🏠 Home</button>
+        </div>`;
+    }
+    function printWorksheet(type) {
+        let html = '';
+        if (type === 'letters') {
+            html = generateLetterWorksheet();
+        } else if (type === 'numbers') {
+            html = generateNumberWorksheet();
+        } else if (type === 'math') {
+            html = generateMathWorksheet();
+        } else if (type === 'shapes') {
+            html = generateShapesWorksheet();
+        } else if (type === 'sightwords') {
+            html = generateSightWordsWorksheet();
+        }
+        const win = window.open('', '_blank');
+        win.document.write(`<!DOCTYPE html><html><head><title>Worksheet</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Arial',sans-serif;padding:24px;color:#222;}
+h1{text-align:center;margin-bottom:4px;font-size:1.5rem;}
+h2{text-align:center;margin-bottom:16px;font-size:1.1rem;color:#555;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;margin-bottom:20px;}
+.cell{border:2px dashed #999;border-radius:8px;text-align:center;font-size:2.5rem;padding:12px 8px;min-height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.cell .trace-letter{font-size:2.5rem;color:#ccc;letter-spacing:2px;}
+.cell .name{font-size:0.75rem;color:#888;margin-top:4px;}
+.math-row{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:12px;padding:12px;border:1px dashed #ccc;border-radius:8px;font-size:1.5rem;}
+.math-row .eq{display:flex;align-items:center;gap:8px;}
+.math-row .blank{width:40px;border-bottom:2px solid #333;margin:0 4px;}
+.shape-item{display:flex;flex-direction:column;align-items:center;margin-bottom:16px;}
+.shape-item .shape-icon{font-size:3rem;}
+.shape-item .lines{display:flex;gap:20px;margin-top:8px;}
+.shape-item .line{width:80px;border-bottom:2px solid #333;font-size:0.8rem;text-align:center;color:#888;padding-top:4px;}
+.sightword-row{display:flex;align-items:center;gap:16px;margin-bottom:14px;padding:12px;border:1px dashed #ccc;border-radius:8px;}
+.sightword-row .word{font-size:2rem;font-weight:bold;letter-spacing:3px;min-width:120px;}
+.sightword-row .trace-area{flex:1;border-bottom:2px solid #ccc;min-height:40px;}
+.sightword-row .draw-area{width:80px;height:80px;border:2px dashed #ccc;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:0.8rem;}
+@media print{body{padding:12px;}.no-print{display:none;}}
+</style></head><body>
+<h1>⛏️ Minecraft Classroom Worksheet ⛏️</h1>
+<h2>${getWorksheetTitle(type)}</h2>
+${html}
+<div class="no-print" style="text-align:center;margin-top:20px;"><button onclick="window.print()" style="padding:10px 24px;font-size:1.1rem;border:2px solid #333;border-radius:8px;cursor:pointer;">🖨️ Print</button></div>
+</body></html>`);
+        win.document.close();
+    }
+    function getWorksheetTitle(type) {
+        const titles = { letters:'Letter Tracing Practice', numbers:'Number Tracing Practice', math:'Addition Facts Practice', shapes:'Shape Recognition', sightwords:'Sight Words Practice' };
+        return titles[type] || 'Practice Worksheet';
+    }
+    function generateLetterWorksheet() {
+        const letters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+        const words = {A:'Apple',B:'Ball',C:'Cat',D:'Dog',E:'Elephant',F:'Fish',G:'Grapes',H:'Hat',I:'Ice Cream',J:'Juice',K:'Kite',L:'Lion',M:'Moon',N:'Nest',O:'Orange',P:'Pig',Q:'Queen',R:'Rainbow',S:'Sun',T:'Tree',U:'Umbrella',V:'Van',W:'Watermelon',X:'X-ray',Y:'Yo-yo',Z:'Zebra'};
+        let html = '<div class="grid">';
+        for (const ch of letters) {
+            html += `<div class="cell"><div class="trace-letter">${ch}${ch}${ch}</div><div class="name">${words[ch]||ch}</div></div>`;
+        }
+        html += '</div>';
+        return html;
+    }
+    function generateNumberWorksheet() {
+        let html = '<div class="grid">';
+        for (let n = 0; n <= 20; n++) {
+            html += `<div class="cell"><div class="trace-letter">${n}${n}${n}</div><div class="name">${'🍎'.repeat(Math.min(n, 10))}</div></div>`;
+        }
+        html += '</div>';
+        return html;
+    }
+    function generateMathWorksheet() {
+        let html = '<div style="columns:2;column-gap:30px;">';
+        for (let i = 0; i < 20; i++) {
+            const a = 1 + Math.floor(Math.random() * 9);
+            const b = 1 + Math.floor(Math.random() * 9);
+            html += `<div class="math-row"><div class="eq"><span>${a}</span><span>+</span><span>${b}</span><span>=</span><span class="blank">&nbsp;</span></div></div>`;
+        }
+        html += '</div>';
+        return html;
+    }
+    function generateShapesWorksheet() {
+        const shapes = [
+            {name:'Circle',emoji:'⭕',edges:'0 edges, round'},
+            {name:'Square',emoji:'🟦',edges:'4 equal edges'},
+            {name:'Triangle',emoji:'🔺',edges:'3 edges'},
+            {name:'Rectangle',emoji:'⬜',edges:'4 edges (2 pairs)'},
+            {name:'Sphere',emoji:'🔵',edges:'Round all over'},
+            {name:'Cube',emoji:'🧊',edges:'6 square faces'},
+        ];
+        let html = '';
+        for (const s of shapes) {
+            html += `<div class="shape-item"><div class="shape-icon">${s.emoji}</div><div style="font-size:1.1rem;font-weight:bold;">${s.name}</div><div class="lines"><div class="line">Name</div><div class="line">Sides</div><div class="line">Draw</div></div></div>`;
+        }
+        return html;
+    }
+    function generateSightWordsWorksheet() {
+        const allWords = ['I','the','a','is','it','can','we','see','and','you','he','she','me','my','do','so','to','no','yes','go','at','in','on','up','an','am'];
+        const selected = shuffle(allWords).slice(0, 10);
+        let html = '';
+        for (const w of selected) {
+            html += `<div class="sightword-row"><div class="word">${w}</div><div class="trace-area"></div><div class="draw-area">draw</div></div>`;
+        }
+        return html;
+    }
+
     // ---------- Main render ----------
     function render() {
         const app = document.getElementById('app');
@@ -2612,6 +3231,7 @@
         else if (state.screen === 'draw') html = renderDraw();
         else if (state.screen === 'timed') html = renderTimed();
         else if (state.screen === 'timedEnd') html = renderTimedEnd();
+        else if (state.screen === 'worksheets') html = renderWorksheets();
         else if (state.screen === 'progress') html = renderProgress();
         app.innerHTML = html;
         if (state.screen === 'play') afterPlayRender();
