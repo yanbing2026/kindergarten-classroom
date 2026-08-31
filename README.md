@@ -29,3 +29,40 @@ Open `index.html` in a browser — no build step required. For the installable/o
 
 - Vocabulary images live in `images/words/` (Minecraft-style sprites, one per vocab entry).
 - A native Android build (using the device's own TextToSpeech engine directly, for the best possible voice quality) is being explored separately.
+
+## Data Sources
+
+All vocabulary, images, and translations are sourced from the [Minecraft Wiki](https://minecraft.wiki/).
+
+### Vocabulary & Images
+
+The `VOCAB_LEVELS` array in `index.html` contains every word used across English, Chinese, and Spanish sections. Each entry includes:
+
+- `id` — the English word (lowercase)
+- `img` — path to the Minecraft sprite in `images/words/`
+- `en` — English display name
+- `zh.hanzi` — Chinese (Simplified) translation
+- `es` — Spanish translation
+
+Sprite images are item/mob PNGs from the Minecraft Wiki. When adding a new vocab entry, pull the corresponding sprite from `https://minecraft.wiki/images/` (search the item or mob page for the sprite file).
+
+### Chinese Translations
+
+Chinese translations use Simplified Chinese hanzi (简体中文). Sources for reference:
+
+- [Minecraft Wiki — Chinese-language pages](https://minecraft.wiki/zh-hans/) (Simplified Chinese wiki)
+- In-game item/mob names as they appear in Minecraft's Simplified Chinese localization
+
+### Spanish Translations
+
+Spanish translations use the localization names from Minecraft's Spanish language files. Sources for reference:
+
+- [Minecraft Wiki — Spanish-language pages](https://minecraft.wiki/es/) (Spanish wiki)
+- Minecraft's `es_es.lang` / `es_mx.lang` translation files for item and mob names
+
+### Adding New Words
+
+1. Find the item/mob on [minecraft.wiki](https://minecraft.wiki/) and download its sprite PNG.
+2. Place the sprite in `images/words/` (lowercase filename, e.g. `diamond.png`).
+3. Add one entry to `VOCAB_LEVELS` in `index.html` with `id`, `img`, `en`, `zh.hanzi`, and `es`.
+4. The word automatically appears in English, Chinese, and Spanish sections.
