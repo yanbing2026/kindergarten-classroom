@@ -568,6 +568,95 @@
     }));
 
 
+    // ---------- Science (8 levels; emoji-based with fun facts) ----------
+    const SCIENCE_LEVELS = [
+        [ // Level 1 — Weather
+            {id:'sun',emoji:'☀️',fact:'The sun is a star that gives us light and warmth!'},
+            {id:'rain',emoji:'🌧️',fact:'Rain comes from clouds and helps plants grow!'},
+            {id:'snow',emoji:'❄️',fact:'Snow is frozen water that falls from clouds!'},
+            {id:'wind',emoji:'💨',fact:'Wind is air moving from one place to another!'},
+            {id:'cloud',emoji:'☁️',fact:'Clouds are made of tiny water droplets floating in the sky!'},
+            {id:'rainbow',emoji:'🌈',fact:'Rainbows appear when sunlight shines through rain!'},
+            {id:'thunder',emoji:'⛈️',fact:'Thunder is the loud sound made by lightning!'},
+            {id:'ice',emoji:'🧊',fact:'Ice is water that has frozen solid!'},
+        ],
+        [ // Level 2 — Space
+            {id:'moon',emoji:'🌙',fact:'The moon goes around the Earth and lights up the night!'},
+            {id:'star',emoji:'⭐',fact:'Stars are giant balls of hot gas that make their own light!'},
+            {id:'earth',emoji:'🌍',fact:'Earth is our planet — it has land, water, and air!'},
+            {id:'planet',emoji:'🪐',fact:'Planets are big objects that orbit around a star!'},
+            {id:'comet',emoji:'☄️',fact:'Comets are icy balls that fly through space with a glowing tail!'},
+            {id:'galaxy',emoji:'🌌',fact:'A galaxy is a huge group of stars — we live in the Milky Way!'},
+            {id:'rocket',emoji:'🚀',fact:'Rockets fly into space to explore the stars and planets!'},
+            {id:'satellite',emoji:'🛰️',fact:'Satellites orbit Earth and help us talk and navigate!'},
+        ],
+        [ // Level 3 — Plants
+            {id:'flower',emoji:'🌸',fact:'Flowers are the colorful parts of a plant that make seeds!'},
+            {id:'tree',emoji:'🌳',fact:'Trees are the biggest plants — they give us oxygen!'},
+            {id:'seed',emoji:'🌱',fact:'A seed is a tiny baby plant waiting to grow!'},
+            {id:'leaf',emoji:'🍃',fact:'Leaves use sunlight to make food for the plant!'},
+            {id:'root',emoji:'🪴',fact:'Roots hold the plant in the ground and drink water!'},
+            {id:'grass',emoji:'🌿',fact:'Grass is a plant that covers the ground and is soft to touch!'},
+            {id:'mushroom',emoji:'🍄',fact:'Mushrooms are fungi — they are not plants or animals!'},
+            {id:'cactus',emoji:'🌵',fact:'Cacti store water inside their stems so they can live in the desert!'},
+        ],
+        [ // Level 4 — Body Parts
+            {id:'eye',emoji:'👁️',fact:'Eyes help you see — they can detect millions of colors!'},
+            {id:'ear',emoji:'👂',fact:'Ears help you hear sounds and keep your balance!'},
+            {id:'nose',emoji:'👃',fact:'Your nose helps you smell and also helps you breathe!'},
+            {id:'hand',emoji:'✋',fact:'Hands have 5 fingers and can pick up and hold things!'},
+            {id:'foot',emoji:'🦶',fact:'Feet help you walk, run, and jump!'},
+            {id:'heart',emoji:'❤️',fact:'Your heart pumps blood through your whole body!'},
+            {id:'tooth',emoji:'🦷',fact:'Teeth help you bite and chew your food!'},
+            {id:'bone',emoji:'🦴',fact:'Bones are hard parts inside your body that give you shape!'},
+        ],
+        [ // Level 5 — Animals
+            {id:'frog',emoji:'🐸',fact:'Frogs can jump really far and live both in water and on land!'},
+            {id:'snake',emoji:'🐍',fact:'Snakes slither on the ground and have no legs!'},
+            {id:'whale',emoji:'🐋',fact:'Whales are the biggest animals on Earth — they live in the ocean!'},
+            {id:'eagle',emoji:'🦅',fact:'Eagles are birds that can see very far from high in the sky!'},
+            {id:'fish',emoji:'🐟',fact:'Fish breathe underwater using gills instead of lungs!'},
+            {id:'ant',emoji:'🐜',fact:'Ants are tiny but very strong — they can carry 50 times their weight!'},
+            {id:'bee',emoji:'🐝',fact:'Bees make honey and help flowers grow by spreading pollen!'},
+            {id:'owl',emoji:'🦉',fact:'Owls can see in the dark and turn their heads almost all the way around!'},
+        ],
+        [ // Level 6 — Seasons & Earth
+            {id:'spring',emoji:'🌷',fact:'Spring is when flowers bloom and baby animals are born!'},
+            {id:'summer',emoji:'☀️',fact:'Summer is the hottest season — great for swimming!'},
+            {id:'autumn',emoji:'🍂',fact:'In autumn, leaves change color and fall from trees!'},
+            {id:'winter',emoji:'⛄',fact:'Winter is the coldest season — sometimes it snows!'},
+            {id:'ocean',emoji:'🌊',fact:'Oceans cover most of Earth and are home to amazing sea creatures!'},
+            {id:'river',emoji:'🏞️',fact:'Rivers flow from mountains to the sea and bring fresh water!'},
+            {id:'mountain',emoji:'⛰️',fact:'Mountains are the tallest land on Earth — some touch the clouds!'},
+            {id:'volcano',emoji:'🌋',fact:'Volcanoes are mountains that can erupt with hot lava!'},
+        ],
+        [ // Level 7 — Sounds & States
+            {id:'hot',emoji:'🔥',fact:'Hot things have lots of energy — like fire and the sun!'},
+            {id:'cold',emoji:'🥶',fact:'Cold things have less energy — like ice and snow!'},
+            {id:'wet',emoji:'💧',fact:'Wet means water is on something — like after rain!'},
+            {id:'dry',emoji:'🏜️',fact:'Dry means no water — like a desert or sunny day!'},
+            {id:'loud',emoji:'📢',fact:'Loud sounds have lots of energy — like thunder or a drum!'},
+            {id:'quiet',emoji:'🤫',fact:'Quiet means very soft or no sound at all!'},
+            {id:'soft',emoji:'🧸',fact:'Soft things are easy to squeeze — like a pillow or cotton!'},
+            {id:'hard',emoji:'🪨',fact:'Hard things are strong and tough to break — like a rock!'},
+        ],
+        [ // Level 8 — Shapes & Colors
+            {id:'circle',emoji:'⭕',fact:'A circle is round with no corners — like a ball!'},
+            {id:'square',emoji:'🟧',fact:'A square has 4 equal sides and 4 corners!'},
+            {id:'triangle',emoji:'🔺',fact:'A triangle has 3 sides and 3 corners!'},
+            {id:'rectangle',emoji:'🧱',fact:'A rectangle has 4 sides — 2 long and 2 short!'},
+            {id:'red',emoji:'🔴',fact:'Red is the color of apples, fire trucks, and hearts!'},
+            {id:'blue',emoji:'🔵',fact:'Blue is the color of the sky and the ocean!'},
+            {id:'yellow',emoji:'🟡',fact:'Yellow is the color of the sun and bananas!'},
+            {id:'green',emoji:'🟢',fact:'Green is the color of grass, leaves, and frogs!'},
+        ],
+    ];
+
+    const SCIENCE_LEVELS_MAPPED = SCIENCE_LEVELS.map((entries, i) => ({
+        id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i],
+        items: entries.map(v => ({ id:v.id, emoji:v.emoji, fact:v.fact }))
+    }));
+
     // ---------- Category registry ----------
     const CATEGORIES = [
         {key:'letters', name:'Letters', icon:'🔤', leveled:false, levels:[{id:'L1', label:'Level 1', icon:LEVEL_ICONS[0], items:LETTERS}]},
@@ -575,7 +664,8 @@
         {key:'words', name:'English', icon:'📖', leveled:true, levels:WORDS_LEVELS},
         {key:'chinese', name:'Chinese', icon:'🇨🇳', leveled:true, levels:CHINESE_LEVELS},
         {key:'spanish', name:'Spanish', icon:'🇪🇸', leveled:true, levels:SPANISH_LEVELS},
-        {key:'math', name:'Math', icon:'➕', leveled:true, levels:MATH_LEVELS}
+        {key:'math', name:'Math', icon:'➕', leveled:true, levels:MATH_LEVELS},
+        {key:'science', name:'Science', icon:'🔬', leveled:true, levels:SCIENCE_LEVELS_MAPPED}
     ];
     function getCategoryItems(key, level) {
         const cat = CATEGORIES.find(c => c.key === key);
@@ -971,6 +1061,10 @@
                 visual = `<div class="icon">${wordMediaHTML(it, 56)}</div>`;
                 label = `<div style="font-size:1.4rem;">${it.es}</div><div style="font-size:0.75rem;color:rgba(43,27,14,0.55);font-weight:400;">${it.en}</div>`;
             }
+            else if (key === 'science') {
+                visual = `<div class="icon" style="font-size:2.5rem;">${it.emoji}</div>`;
+                label = `<div style="font-size:1.4rem;">${it.id}</div>`;
+            }
             return `<div class="card" onclick="learnTap('${key}','${it.id}','${level}')">
                 ${mastered ? '<div class="mastered-check">✓</div>' : ''}
                 ${visual}
@@ -1036,6 +1130,10 @@
             await playBrowserUtterance(it.es, 'es-ES');
             showLearnDisplay(it.es, it.en);
             await playBrowserUtterance(it.en, 'en-US');
+        } else if (key === 'science') {
+            const it = items.find(s => s.id === id);
+            showLearnDisplay(`${it.emoji} ${it.id}`, it.fact);
+            await playBrowserUtterance(`${it.id}. ${it.fact}`, 'en-US');
         } else {
             showLearnDisplay(id);
             await playBrowserUtterance(id, 'en-US');
@@ -1178,6 +1276,16 @@
                     choices: choices.map(c => ({ id: c.id, html: wordMediaHTML(c, 90), speak: c.en }))
                 };
             }
+        }
+        if (key === 'science') {
+            const choices = pickChoices(items, correct, 4);
+            return {
+                mode: 'science-find',
+                promptHTML: `<div class="prompt-visual"><span style="font-size:5rem;">${correct.emoji}</span></div><div class="prompt-word">What is this?</div>`,
+                speakText: `What is this?`,
+                itemId: correct.id,
+                choices: choices.map(c => ({ id: c.id, html: c.id, cls: 'word-choice', speak: c.id }))
+            };
         }
     }
     function soundOutCurrentWord() {
