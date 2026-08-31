@@ -135,6 +135,16 @@
         .card.cat-spanish { background: #e08a4f; }
         .card.cat-math { background: var(--mc-gold); }
         .card.cat-progress { background: var(--mc-diamond); }
+        .card.cat-science { background: #a8e6cf; }
+        .card.cat-patterns { background: #dda0dd; }
+        .card.cat-comparing { background: #ffd93d; }
+        .card.cat-positions { background: #87ceeb; }
+        .card.cat-measurement { background: #ffb347; }
+        .card.cat-time { background: #98fb98; }
+        .card.cat-money { background: #ffd700; }
+        .card.cat-onemoreless { background: #ff6b6b; }
+        .card.cat-rhyming { background: #a18cd1; }
+        .card.cat-sightwords { background: #fad390; }
         .icon { font-size: 3.2rem; margin-bottom: 8px; }
         .label { font-family: var(--font-clear); font-size: 1.3rem; color: var(--mc-ink); font-weight: 700; }
         .sublabel { font-family: var(--font-clear); font-size: 0.85rem; color: rgba(43,27,14,0.65); margin-top: 4px; }
@@ -297,6 +307,54 @@
         .learn-display-letter { font-size: 6rem; font-family: var(--font-clear); font-weight: 800; color: var(--mc-ink); min-height: 100px; display: flex; align-items: center; justify-content: center; transition: opacity 0.15s; }
         .learn-display-word { font-size: 2.5rem; font-family: var(--font-clear); font-weight: 700; color: var(--mc-ink); margin-top: 10px; }
         .learn-display-sub { font-size: 1.2rem; color: #888; margin-top: 8px; }
+        /* Timed Challenge */
+        .card.cat-timed { background: #e74c3c; }
+        .timer-ring { position: relative; width: 80px; height: 80px; margin: 0 auto 10px; }
+        .timer-ring svg { transform: rotate(-90deg); }
+        .timer-ring circle { fill: none; stroke-width: 6; }
+        .timer-ring .track { stroke: var(--mc-stone-dark); }
+        .timer-ring .fill { stroke: var(--mc-emerald); stroke-dasharray: 220; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear; }
+        .timer-ring .fill.urgent { stroke: var(--mc-redstone); }
+        .timer-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-pixel); font-size: 1.4rem; color: var(--mc-ink); }
+        /* Streak */
+        .streak-badge {
+            font-family: var(--font-pixel);
+            font-size: 0.85rem;
+            color: var(--mc-ink);
+            background: var(--mc-gold);
+            border: 2px solid var(--mc-ink);
+            border-radius: 4px;
+            padding: 6px 12px;
+            margin-bottom: 12px;
+            display: none;
+            animation: pop 0.3s;
+        }
+        .streak-badge.active { display: inline-block; }
+        .streak-badge.fire { background: #ff6b35; color: #fff; }
+        .streak-badge.unstoppable { background: #9b59b6; color: #fff; }
+        .streak-badge.legendary { background: linear-gradient(135deg, #ffd700, #ff6b35); color: #fff; font-size: 1rem; }
+        /* Pattern sequence display */
+        .pattern-seq { font-size: 2.4rem; display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; }
+        .pattern-q { font-size: 2.4rem; color: var(--mc-redstone); font-weight: 800; }
+        /* Comparison visual */
+        .compare-wrap { display: flex; align-items: center; justify-content: center; gap: 20px; font-size: 2.5rem; margin-bottom: 10px; }
+        .compare-emojis { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .compare-emoji-row { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; max-width: 180px; }
+        .compare-symbol { font-family: var(--font-pixel); font-size: 2rem; color: var(--mc-redstone); }
+        /* Position scene */
+        .position-scene { font-size: 2.8rem; margin-bottom: 10px; letter-spacing: 4px; }
+        /* Measurement items */
+        .measure-wrap { display: flex; align-items: center; justify-content: center; gap: 30px; font-size: 2rem; margin-bottom: 10px; }
+        .measure-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .measure-emoji { font-size: 3rem; }
+        /* Coin display */
+        .coin-wrap { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; }
+        .coin { font-size: 2.2rem; }
+        .coin-label { font-family: var(--font-pixel); font-size: 0.7rem; color: var(--mc-ink); }
+        .coin-stack { display: flex; flex-direction: column; align-items: center; }
+        /* Word choice for sight words */
+        .choice-btn.sightword-choice { font-size: 2.5rem; font-weight: 800; letter-spacing: 3px; }
+        .choice-btn.compare-choice { font-size: 2.8rem; font-weight: 800; }
     </style>
 </head>
 <body>
@@ -650,12 +708,430 @@
             {id:'yellow',emoji:'🟡',fact:'Yellow is the color of the sun and bananas!'},
             {id:'green',emoji:'🟢',fact:'Green is the color of grass, leaves, and frogs!'},
         ],
+        [ // Level 9 — Magnets
+            {id:'magnet_paperclip',emoji:'📎',fact:'Magnets can pull metal objects like paper clips!',answer:'Can pull',options:['Can pull','Cannot pull']},
+            {id:'magnet_rubber',emoji:'🦆',fact:'Magnets cannot pull rubber — rubber is not magnetic!',answer:'Cannot pull',options:['Can pull','Cannot pull']},
+            {id:'magnet_spoon',emoji:'🥄',fact:'Spoons are made of metal, so magnets can pull them!',answer:'Can pull',options:['Can pull','Cannot pull']},
+            {id:'magnet_wood',emoji:'🪵',fact:'Wood is not magnetic — magnets cannot pull it!',answer:'Cannot pull',options:['Can pull','Cannot pull']},
+            {id:'magnet_nail',emoji:'🔩',fact:'Nails are made of metal — magnets love them!',answer:'Can pull',options:['Can pull','Cannot pull']},
+            {id:'magnet_eraser',emoji:'✏️',fact:'Erasers are rubber — magnets cannot pull them!',answer:'Cannot pull',options:['Can pull','Cannot pull']},
+            {id:'magnet_coin',emoji:'🪙',fact:'Coins are made of metal — some magnets can pull them!',answer:'Can pull',options:['Can pull','Cannot pull']},
+            {id:'magnet_fabric',emoji:'🧶',fact:'Fabric is cloth — magnets cannot pull it!',answer:'Cannot pull',options:['Can pull','Cannot pull']},
+        ],
+        [ // Level 10 — Push and Pull
+            {id:'push_door',emoji:'🚪',fact:'Opening a door is a push — you push it forward!',answer:'Push',options:['Push','Pull']},
+            {id:'pull_drawer',emoji:'🗄️',fact:'Opening a drawer is a pull — you pull it toward you!',answer:'Pull',options:['Push','Pull']},
+            {id:'push_ball',emoji:'⚽',fact:'Kicking a ball is a push — you push it with your foot!',answer:'Push',options:['Push','Pull']},
+            {id:'pull_cart',emoji:'🛒',fact:'Pulling a cart is a pull — you drag it behind you!',answer:'Pull',options:['Push','Pull']},
+            {id:'push_swing',emoji:'🪁',fact:'Pushing a swing is a push — you push it away!',answer:'Push',options:['Push','Pull']},
+            {id:'pull_rope',emoji:'🪢',fact:'Tugging a rope is a pull — you pull it toward you!',answer:'Pull',options:['Push','Pull']},
+            {id:'push_button',emoji:'🔘',fact:'Pressing a button is a push — you push it down!',answer:'Push',options:['Push','Pull']},
+            {id:'pull_zipper',emoji:'🧥',fact:'Zipping a jacket is a pull — you pull the zipper up!',answer:'Pull',options:['Push','Pull']},
+        ],
+        [ // Level 11 — Materials (Solid, Liquid, Gas)
+            {id:'rock_solid',emoji:'🪨',fact:'A rock is a solid — it keeps its shape!',answer:'Solid',options:['Solid','Liquid','Gas']},
+            {id:'water_liquid',emoji:'💧',fact:'Water is a liquid — it flows and takes the shape of its container!',answer:'Liquid',options:['Solid','Liquid','Gas']},
+            {id:'air_gas',emoji:'💨',fact:'Air is a gas — it fills up any space around you!',answer:'Gas',options:['Solid','Liquid','Gas']},
+            {id:'ice_solid',emoji:'🧊',fact:'Ice is a solid — it is frozen water that keeps its shape!',answer:'Solid',options:['Solid','Liquid','Gas']},
+            {id:'juice_liquid',emoji:'🧃',fact:'Juice is a liquid — it pours and fills a cup!',answer:'Liquid',options:['Solid','Liquid','Gas']},
+            {id:'steam_gas',emoji:'♨️',fact:'Steam is a gas — it is water that got really hot!',answer:'Gas',options:['Solid','Liquid','Gas']},
+            {id:'sand_solid',emoji:'🏖️',fact:'Sand is solid — tiny solid pieces that flow like a liquid!',answer:'Solid',options:['Solid','Liquid','Gas']},
+            {id:'milk_liquid',emoji:'🥛',fact:'Milk is a liquid — it pours and flows!',answer:'Liquid',options:['Solid','Liquid','Gas']},
+        ],
+        [ // Level 12 — Survival (What does this need?)
+            {id:'fish_water',emoji:'🐟',fact:'Fish need water to live — they breathe underwater!',answer:'Water',options:['Water','Sunlight','Air','Food']},
+            {id:'plant_sun',emoji:'🌱',fact:'Plants need sunlight to make food through photosynthesis!',answer:'Sunlight',options:['Water','Sunlight','Air','Food']},
+            {id:'bird_air',emoji:'🐦',fact:'Birds need air to breathe and fly through the sky!',answer:'Air',options:['Water','Sunlight','Air','Food']},
+            {id:'bear_food',emoji:'🐻',fact:'Bears need food to have energy — they eat fish, berries, and more!',answer:'Food',options:['Water','Sunlight','Air','Food']},
+            {id:'tree_water',emoji:'🌳',fact:'Trees need water from the ground to grow tall!',answer:'Water',options:['Water','Sunlight','Air','Food']},
+            {id:'flower_sun',emoji:'🌸',fact:'Flowers need sunlight to bloom and make colorful petals!',answer:'Sunlight',options:['Water','Sunlight','Air','Food']},
+            {id:'fish_air',emoji:'🐠',fact:'Even fish need dissolved air (oxygen) from the water!',answer:'Air',options:['Water','Sunlight','Air','Food']},
+            {id:'baby_food',emoji:'👶',fact:'Babies need food like milk to grow big and strong!',answer:'Food',options:['Water','Sunlight','Air','Food']},
+        ],
     ];
 
     const SCIENCE_LEVELS_MAPPED = SCIENCE_LEVELS.map((entries, i) => ({
         id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i],
         items: entries.map(v => ({ id:v.id, emoji:v.emoji, fact:v.fact }))
     }));
+
+
+    // ---------- Patterns (5 levels) ----------
+    const PATTERNS_LEVELS = [
+        [ // Level 1 — ABAB patterns
+            {id:'p1',sequence:['🔴','🔵','🔴','🔵'],answer:'🔴',options:['🔴','🔵','🟢','🟡']},
+            {id:'p2',sequence:['⭐','🌙','⭐','🌙'],answer:'⭐',options:['⭐','🌙','☀️','🌈']},
+            {id:'p3',sequence:['🍎','🍊','🍎','🍊'],answer:'🍎',options:['🍎','🍊','🍋','🍇']},
+            {id:'p4',sequence:['🐱','🐶','🐱','🐶'],answer:'🐱',options:['🐱','🐶','🐰','🦊']},
+            {id:'p5',sequence:['⬛','⬜','⬛','⬜'],answer:'⬛',options:['⬛','⬜','🟫','🟩']},
+            {id:'p6',sequence:['🌸','🌿','🌸','🌿'],answer:'🌸',options:['🌸','🌿','🍂','❄️']},
+            {id:'p7',sequence:['🟥','🟦','🟥','🟦'],answer:'🟥',options:['🟥','🟦','🟨','🟩']},
+            {id:'p8',sequence:['🔶','🔷','🔶','🔷'],answer:'🔶',options:['🔶','🔷','🔺','🔻']},
+        ],
+        [ // Level 2 — AABB patterns
+            {id:'p9',sequence:['🔴','🔴','🔵','🔵'],answer:'🔴',options:['🔴','🔵','🟢','🟡']},
+            {id:'p10',sequence:['⭐','⭐','🌙','🌙'],answer:'⭐',options:['⭐','🌙','☀️','🌈']},
+            {id:'p11',sequence:['🍎','🍎','🍊','🍊'],answer:'🍎',options:['🍎','🍊','🍋','🍇']},
+            {id:'p12',sequence:['🐱','🐱','🐶','🐶'],answer:'🐱',options:['🐱','🐶','🐰','🦊']},
+            {id:'p13',sequence:['🟩','🟩','🟪','🟪'],answer:'🟩',options:['🟩','🟪','🟧','🟥']},
+            {id:'p14',sequence:['🪨','🪨','🪵','🪵'],answer:'🪨',options:['🪨','🪵','🧱','💎']},
+            {id:'p15',sequence:['🎵','🎵','🎶','🎶'],answer:'🎵',options:['🎵','🎶','🎤','🎸']},
+            {id:'p16',sequence:['🦁','🦁','🐯','🐯'],answer:'🦁',options:['🦁','🐯','🐻','🐸']},
+        ],
+        [ // Level 3 — ABC patterns
+            {id:'p17',sequence:['🔴','🔵','🟢','🔴','🔵'],answer:'🟢',options:['🔴','🔵','🟢','🟡']},
+            {id:'p18',sequence:['⭐','🌙','☀️','⭐','🌙'],answer:'☀️',options:['⭐','🌙','☀️','🌈']},
+            {id:'p19',sequence:['🍎','🍊','🍋','🍎','🍊'],answer:'🍋',options:['🍎','🍊','🍋','🍇']},
+            {id:'p20',sequence:['🐱','🐶','🐰','🐱','🐶'],answer:'🐰',options:['🐱','🐶','🐰','🦊']},
+            {id:'p21',sequence:['🟥','🟦','🟨','🟥','🟦'],answer:'🟨',options:['🟥','🟦','🟨','🟩']},
+            {id:'p22',sequence:['🌲','🌳','🌴','🌲','🌳'],answer:'🌴',options:['🌲','🌳','🌴','🌵']},
+            {id:'p23',sequence:['❄️','🌧️','☀️','❄️','🌧️'],answer:'☀️',options:['❄️','🌧️','☀️','🌈']},
+            {id:'p24',sequence:['1️⃣','2️⃣','3️⃣','1️⃣','2️⃣'],answer:'3️⃣',options:['1️⃣','2️⃣','3️⃣','4️⃣']},
+        ],
+        [ // Level 4 — AAB patterns
+            {id:'p25',sequence:['🔴','🔴','🔵','🔴','🔴'],answer:'🔵',options:['🔴','🔵','🟢','🟡']},
+            {id:'p26',sequence:['⭐','⭐','🌙','⭐','⭐'],answer:'🌙',options:['⭐','🌙','☀️','🌈']},
+            {id:'p27',sequence:['🍎','🍎','🍊','🍎','🍎'],answer:'🍊',options:['🍎','🍊','🍋','🍇']},
+            {id:'p28',sequence:['🐱','🐱','🐶','🐱','🐱'],answer:'🐶',options:['🐱','🐶','🐰','🦊']},
+            {id:'p29',sequence:['🟩','🟩','🟪','🟩','🟩'],answer:'🟪',options:['🟩','🟪','🟧','🟥']},
+            {id:'p30',sequence:['🪨','🪨','💎','🪨','🪨'],answer:'💎',options:['🪨','💎','🪵','🧱']},
+            {id:'p31',sequence:['🎵','🎵','🎶','🎵','🎵'],answer:'🎶',options:['🎵','🎶','🎤','🎸']},
+            {id:'p32',sequence:['🌲','🌲','🌴','🌲','🌲'],answer:'🌴',options:['🌲','🌴','🌳','🌵']},
+        ],
+        [ // Level 5 — Growing patterns
+            {id:'p33',sequence:['1️⃣','1️⃣','2️⃣','1️⃣','2️⃣','3️⃣','1️⃣','2️⃣','3️⃣'],answer:'4️⃣',options:['3️⃣','4️⃣','5️⃣','6️⃣']},
+            {id:'p34',sequence:['🔴','🔴🔴','🔴🔴🔴'],answer:'🔴🔴🔴🔴',options:['🔴🔴🔴','🔴🔴🔴🔴','🔴🔴🔴🔴🔴','🔵']},
+            {id:'p35',sequence:['⭐','⭐⭐','⭐⭐⭐'],answer:'⭐⭐⭐⭐',options:['⭐⭐⭐','⭐⭐⭐⭐','⭐⭐⭐⭐⭐','🌙']},
+            {id:'p36',sequence:['🍎','🍎🍎','🍎🍎🍎'],answer:'🍎🍎🍎🍎',options:['🍎🍎🍎','🍎🍎🍎🍎','🍎🍎🍎🍎🍎','🍊']},
+            {id:'p37',sequence:['1️⃣','2️⃣','3️⃣'],answer:'4️⃣',options:['3️⃣','4️⃣','5️⃣','6️⃣']},
+            {id:'p38',sequence:['🔵','🔵🔵','🔵🔵🔵'],answer:'🔵🔵🔵🔵',options:['🔵🔵🔵','🔵🔵🔵🔵','🔵🔵🔵🔵🔵','🔴']},
+            {id:'p39',sequence:['🌱','🌿','🌳'],answer:'🏔️',options:['🌳','🌲','🏔️','🌍']},
+            {id:'p40',sequence:['1️⃣','1️⃣','2️⃣','3️⃣','5️⃣'],answer:'8️⃣',options:['6️⃣','7️⃣','8️⃣','9️⃣']},
+        ],
+    ];
+
+    // ---------- Comparing (3 levels) ----------
+    const COMPARING_LEVELS = [
+        [ // Level 1 — Compare up to 5
+            {id:'c1',num1:1,num2:3,answer:'<',emoji1:'🍎',emoji2:'🍊'},
+            {id:'c2',num1:5,num2:2,answer:'>',emoji1:'⭐',emoji2:'🌙'},
+            {id:'c3',num1:4,num2:4,answer:'=',emoji1:'🐱',emoji2:'🐶'},
+            {id:'c4',num1:2,num2:5,answer:'<',emoji1:'🧱',emoji2:'💎'},
+            {id:'c5',num1:3,num2:1,answer:'>',emoji1:'🌸',emoji2:'🌿'},
+            {id:'c6',num1:1,num2:1,answer:'=',emoji1:'🔴',emoji2:'🔵'},
+            {id:'c7',num1:4,num2:2,answer:'>',emoji1:'🐟',emoji2:'🐸'},
+            {id:'c8',num1:2,num2:4,answer:'<',emoji1:'🍎',emoji2:'🍎'},
+            {id:'c9',num1:5,num2:3,answer:'>',emoji1:'⭐',emoji2:'⭐'},
+            {id:'c10',num1:3,num2:5,answer:'<',emoji1:'🌙',emoji2:'🌙'},
+            {id:'c11',num1:2,num2:2,answer:'=',emoji1:'🦁',emoji2:'🐯'},
+            {id:'c12',num1:1,num2:4,answer:'<',emoji1:'🪨',emoji2:'💎'},
+        ],
+        [ // Level 2 — Compare up to 10
+            {id:'c13',num1:7,num2:3,answer:'>',emoji1:'🍎',emoji2:'🍊'},
+            {id:'c14',num1:4,num2:9,answer:'<',emoji1:'⭐',emoji2:'🌙'},
+            {id:'c15',num1:6,num2:6,answer:'=',emoji1:'🐱',emoji2:'🐶'},
+            {id:'c16',num1:8,num2:5,answer:'>',emoji1:'🧱',emoji2:'💎'},
+            {id:'c17',num1:2,num2:10,answer:'<',emoji1:'🌸',emoji2:'🌿'},
+            {id:'c18',num1:9,num2:9,answer:'=',emoji1:'🔴',emoji2:'🔵'},
+            {id:'c19',num1:3,num2:8,answer:'<',emoji1:'🐟',emoji2:'🐸'},
+            {id:'c20',num1:10,num2:6,answer:'>',emoji1:'🦁',emoji2:'🐯'},
+            {id:'c21',num1:5,num2:7,answer:'<',emoji1:'🪨',emoji2:'💎'},
+            {id:'c22',num1:8,num2:4,answer:'>',emoji1:'⭐',emoji2:'🌙'},
+            {id:'c23',num1:7,num2:7,answer:'=',emoji1:'🍎',emoji2:'🍎'},
+            {id:'c24',num1:1,num2:9,answer:'<',emoji1:'🌸',emoji2:'🌿'},
+        ],
+        [ // Level 3 — Compare up to 20
+            {id:'c25',num1:15,num2:8,answer:'>',emoji1:'🍎',emoji2:'🍊'},
+            {id:'c26',num1:6,num2:18,answer:'<',emoji1:'⭐',emoji2:'🌙'},
+            {id:'c27',num1:12,num2:12,answer:'=',emoji1:'🐱',emoji2:'🐶'},
+            {id:'c28',num1:20,num2:14,answer:'>',emoji1:'🧱',emoji2:'💎'},
+            {id:'c29',num1:9,num2:17,answer:'<',emoji1:'🌸',emoji2:'🌿'},
+            {id:'c30',num1:16,num2:16,answer:'=',emoji1:'🔴',emoji2:'🔵'},
+            {id:'c31',num1:5,num2:19,answer:'<',emoji1:'🐟',emoji2:'🐸'},
+            {id:'c32',num1:11,num2:7,answer:'>',emoji1:'🦁',emoji2:'🐯'},
+            {id:'c33',num1:13,num2:20,answer:'<',emoji1:'🪨',emoji2:'💎'},
+            {id:'c34',num1:18,num2:10,answer:'>',emoji1:'⭐',emoji2:'🌙'},
+            {id:'c35',num1:14,num2:14,answer:'=',emoji1:'🍎',emoji2:'🍎'},
+            {id:'c36',num1:3,num2:16,answer:'<',emoji1:'🌸',emoji2:'🌿'},
+        ],
+    ];
+
+    // ---------- Positions (2 levels) ----------
+    const POSITIONS_LEVELS = [
+        [ // Level 1 — above/below, inside/outside, on/under
+            {id:'pos1',emoji1:'🐱',emoji2:'📦',scene:'📦🐱',answer:'on',scenario:'The cat is ON the box'},
+            {id:'pos2',emoji1:'🐱',emoji2:'📦',scene:'📦⬇️🐱',answer:'under',scenario:'The cat is UNDER the box'},
+            {id:'pos3',emoji1:'🐠',emoji2:'🏠',scene:'🏠✅🐠',answer:'inside',scenario:'The fish is INSIDE the house'},
+            {id:'pos4',emoji1:'🐰',emoji2:'🏠',scene:'🏠🚫🐰',answer:'outside',scenario:'The rabbit is OUTSIDE the house'},
+            {id:'pos5',emoji1:'⭐',emoji2:'☁️',scene:'☁️⬆️⭐',answer:'above',scenario:'The star is ABOVE the cloud'},
+            {id:'pos6',emoji1:'🌧️',emoji2:'☁️',scene:'☁️⬇️🌧️',answer:'below',scenario:'The rain is BELOW the cloud'},
+            {id:'pos7',emoji1:'🐸',emoji2:'🪷',scene:'🪷➕🐸',answer:'on',scenario:'The frog is ON the lily pad'},
+            {id:'pos8',emoji1:'🐛',emoji2:'🍎',scene:'🍎✅🐛',answer:'inside',scenario:'The worm is INSIDE the apple'},
+            {id:'pos9',emoji1:'🐦',emoji2:'🌳',scene:'🌳⬆️🐦',answer:'above',scenario:'The bird is ABOVE the tree'},
+            {id:'pos10',emoji1:'🪨',emoji2:'🏔️',scene:'🏔️⬇️🪨',answer:'below',scenario:'The rock is BELOW the mountain'},
+            {id:'pos11',emoji1:'🐟',emoji2:'🌊',scene:'🌊➕🐟',answer:'inside',scenario:'The fish is INSIDE the water'},
+            {id:'pos12',emoji1:'☀️',emoji2:'🌧️',scene:'☀️⬆️🌧️',answer:'above',scenario:'The sun is ABOVE the rain'},
+        ],
+        [ // Level 2 — left/right, in front/behind, between
+            {id:'pos13',emoji1:'🚗',emoji2:'🏠',emoji3:'🌳',scene:'🚗🏠🌳',answer:'between',scenario:'The house is BETWEEN the car and tree'},
+            {id:'pos14',emoji1:'🧑',emoji2:'🚪',scene:'🧑➡️🚪',answer:'left',scenario:'The person is to the LEFT of the door'},
+            {id:'pos15',emoji1:'🧑',emoji2:'🚪',scene:'🚪➡️🧑',answer:'right',scenario:'The person is to the RIGHT of the door'},
+            {id:'pos16',emoji1:'🧑',emoji2:'🚪',scene:'🧑🔵🚪',answer:'in front',scenario:'The person is IN FRONT of the door'},
+            {id:'pos17',emoji1:'🧑',emoji2:'🚪',scene:'🚪🔵🧑',answer:'behind',scenario:'The person is BEHIND the door'},
+            {id:'pos18',emoji1:'🐱',emoji2:'🐶',emoji3:'🐰',scene:'🐱🐶🐰',answer:'between',scenario:'The dog is BETWEEN the cat and rabbit'},
+            {id:'pos19',emoji1:'🍎',emoji2:'🧃',scene:'🍎➡️🧃',answer:'left',scenario:'The apple is to the LEFT of the juice'},
+            {id:'pos20',emoji1:'🍎',emoji2:'🧃',scene:'🧃➡️🍎',answer:'right',scenario:'The apple is to the RIGHT of the juice'},
+            {id:'pos21',emoji1:'🏠',emoji2:'🧑',scene:'🧑🔵🏠',answer:'in front',scenario:'The person is IN FRONT of the house'},
+            {id:'pos22',emoji1:'🏠',emoji2:'🧑',scene:'🏠🔵🧑',answer:'behind',scenario:'The person is BEHIND the house'},
+            {id:'pos23',emoji1:'⚽',emoji2:'🏀',emoji3:'🏈',scene:'⚽🏀🏈',answer:'between',scenario:'The basketball is BETWEEN the soccer ball and football'},
+            {id:'pos24',emoji1:'🌟',emoji2:'⭐',scene:'🌟➡️⭐',answer:'left',scenario:'The glowing star is to the LEFT of the star'},
+        ],
+    ];
+
+    // ---------- Measurement (3 levels) ----------
+    const MEASUREMENT_LEVELS = [
+        [ // Level 1 — long/short
+            {id:'m1',item1:{emoji:'📏',label:'pencil'},item2:{emoji:'✏️',label:'crayon'},question:'Which is longer?',answer:'pencil'},
+            {id:'m2',item1:{emoji:'🐍',label:'snake'},item2:{emoji:'🐛',label:'worm'},question:'Which is longer?',answer:'snake'},
+            {id:'m3',item1:{emoji:'🚂',label:'train'},item2:{emoji:'🚗',label:'car'},question:'Which is longer?',answer:'train'},
+            {id:'m4',item1:{emoji:'🪢',label:'rope'},item2:{emoji:'🧶',label:'yarn'},question:'Which is shorter?',answer:'yarn'},
+            {id:'m5',item1:{emoji:'🐊',label:'crocodile'},item2:{emoji:'🐸',label:'frog'},question:'Which is longer?',answer:'crocodile'},
+            {id:'m6',item1:{emoji:'🛤️',label:'track'},item2:{emoji:'👟',label:'shoe'},question:'Which is longer?',answer:'track'},
+            {id:'m7',item1:{emoji:'🪱',label:'earthworm'},item2:{emoji:'🐛',label:'caterpillar'},question:'Which is shorter?',answer:'caterpillar'},
+            {id:'m8',item1:{emoji:'🚲',label:'bike'},item2:{emoji:'🚌',label:'bus'},question:'Which is shorter?',answer:'bike'},
+        ],
+        [ // Level 2 — heavy/light
+            {id:'m9',item1:{emoji:'🐘',label:'elephant'},item2:{emoji:'🐱',label:'cat'},question:'Which is heavier?',answer:'elephant'},
+            {id:'m10',item1:{emoji:'🪶',label:'feather'},item2:{emoji:'🪨',label:'rock'},question:'Which is lighter?',answer:'feather'},
+            {id:'m11',item1:{emoji:'🧱',label:'brick'},item2:{emoji:'📄',label:'paper'},question:'Which is heavier?',answer:'brick'},
+            {id:'m12',item1:{emoji:'🦛',label:'hippo'},item2:{emoji:'🐰',label:'bunny'},question:'Which is heavier?',answer:'hippo'},
+            {id:'m13',item1:{emoji:'🎈',label:'balloon'},item2:{emoji:'⚽',label:'ball'},question:'Which is lighter?',answer:'balloon'},
+            {id:'m14',item1:{emoji:'📚',label:'books'},item2:{emoji:'📰',label:'newspaper'},question:'Which is heavier?',answer:'books'},
+            {id:'m15',item1:{emoji:'🪶',label:'feather'},item2:{emoji:'⚖️',label:'weight'},question:'Which is lighter?',answer:'feather'},
+            {id:'m16',item1:{emoji:'🪨',label:'boulder'},item2:{emoji:'🏓',label:'ping pong'},question:'Which is heavier?',answer:'boulder'},
+        ],
+        [ // Level 3 — tall/short, big/small
+            {id:'m17',item1:{emoji:'🦒',label:'giraffe'},item2:{emoji:'🐱',label:'cat'},question:'Which is taller?',answer:'giraffe'},
+            {id:'m18',item1:{emoji:'🌳',label:'tree'},item2:{emoji:'🌱',label:'sprout'},question:'Which is taller?',answer:'tree'},
+            {id:'m19',item1:{emoji:'🏔️',label:'mountain'},item2:{emoji:'🐜',label:'ant'},question:'Which is bigger?',answer:'mountain'},
+            {id:'m20',item1:{emoji:'🐘',label:'elephant'},item2:{emoji:'🐁',label:'mouse'},question:'Which is bigger?',answer:'elephant'},
+            {id:'m21',item1:{emoji:'🧍',label:'adult'},item2:{emoji:'👶',label:'baby'},question:'Which is taller?',answer:'adult'},
+            {id:'m22',item1:{emoji:'🏠',label:'house'},item2:{emoji:'⛺',label:'tent'},question:'Which is bigger?',answer:'house'},
+            {id:'m23',item1:{emoji:'🌻',label:'sunflower'},item2:{emoji:'🌼',label:'daisy'},question:'Which is taller?',answer:'sunflower'},
+            {id:'m24',item1:{emoji:'🐋',label:'whale'},item2:{emoji:'🐟',label:'fish'},question:'Which is bigger?',answer:'whale'},
+        ],
+    ];
+
+    // ---------- Time (3 levels) ----------
+    const TIME_LEVELS = [
+        [ // Level 1 — o'clock times
+            {id:'t1',time:'1:00',emoji:'🕐',answer:'1:00',distractors:['2:00','3:00','4:00']},
+            {id:'t2',time:'2:00',emoji:'🕑',answer:'2:00',distractors:['1:00','3:00','5:00']},
+            {id:'t3',time:'3:00',emoji:'🕒',answer:'3:00',distractors:['1:00','2:00','6:00']},
+            {id:'t4',time:'4:00',emoji:'🕓',answer:'4:00',distractors:['2:00','5:00','6:00']},
+            {id:'t5',time:'5:00',emoji:'🕔',answer:'5:00',distractors:['3:00','4:00','7:00']},
+            {id:'t6',time:'6:00',emoji:'🕕',answer:'6:00',distractors:['4:00','5:00','8:00']},
+            {id:'t7',time:'7:00',emoji:'🕖',answer:'7:00',distractors:['5:00','6:00','9:00']},
+            {id:'t8',time:'8:00',emoji:'🕗',answer:'8:00',distractors:['6:00','7:00','10:00']},
+            {id:'t9',time:'9:00',emoji:'🕘',answer:'9:00',distractors:['7:00','8:00','11:00']},
+            {id:'t10',time:'10:00',emoji:'🕙',answer:'10:00',distractors:['8:00','9:00','11:00']},
+            {id:'t11',time:'11:00',emoji:'🕚',answer:'11:00',distractors:['9:00','10:00','12:00']},
+            {id:'t12',time:'12:00',emoji:'🕛',answer:'12:00',distractors:['10:00','11:00','1:00']},
+        ],
+        [ // Level 2 — half-hour
+            {id:'t13',time:'1:30',emoji:'🕜',answer:'1:30',distractors:['2:30','1:00','3:30']},
+            {id:'t14',time:'2:30',emoji:'🕝',answer:'2:30',distractors:['1:30','3:30','2:00']},
+            {id:'t15',time:'3:30',emoji:'🕞',answer:'3:30',distractors:['2:30','4:30','3:00']},
+            {id:'t16',time:'4:30',emoji:'🕟',answer:'4:30',distractors:['3:30','5:30','4:00']},
+            {id:'t17',time:'5:30',emoji:'🕠',answer:'5:30',distractors:['4:30','6:30','5:00']},
+            {id:'t18',time:'6:30',emoji:'🕡',answer:'6:30',distractors:['5:30','7:30','6:00']},
+            {id:'t19',time:'7:30',emoji:'🕢',answer:'7:30',distractors:['6:30','8:30','7:00']},
+            {id:'t20',time:'8:30',emoji:'🕣',answer:'8:30',distractors:['7:30','9:30','8:00']},
+            {id:'t21',time:'9:30',emoji:'🕤',answer:'9:30',distractors:['8:30','10:30','9:00']},
+            {id:'t22',time:'10:30',emoji:'🕥',answer:'10:30',distractors:['9:30','11:30','10:00']},
+            {id:'t23',time:'11:30',emoji:'🕦',answer:'11:30',distractors:['10:30','12:30','11:00']},
+            {id:'t24',time:'12:30',emoji:'🕧',answer:'12:30',distractors:['11:30','1:30','12:00']},
+        ],
+        [ // Level 3 — daily schedule
+            {id:'t25',time:'morning',emoji:'🌅',activity:'Eating breakfast 🥣',answer:'morning',distractors:['afternoon','evening','night']},
+            {id:'t26',time:'afternoon',emoji:'☀️',activity:'Going to school 🏫',answer:'afternoon',distractors:['morning','evening','night']},
+            {id:'t27',time:'night',emoji:'🌙',activity:'Going to sleep 😴',answer:'night',distractors:['morning','afternoon','evening']},
+            {id:'t28',time:'morning',emoji:'🌅',activity:'Waking up ⏰',answer:'morning',distractors:['afternoon','evening','night']},
+            {id:'t29',time:'afternoon',emoji:'☀️',activity:'Playing outside 🛝',answer:'afternoon',distractors:['morning','evening','night']},
+            {id:'t30',time:'evening',emoji:'🌆',activity:'Having dinner 🍽️',answer:'evening',distractors:['morning','afternoon','night']},
+            {id:'t31',time:'night',emoji:'🌙',activity:'Brushing teeth 🪥',answer:'night',distractors:['morning','afternoon','evening']},
+            {id:'t32',time:'morning',emoji:'🌅',activity:'Getting dressed 👕',answer:'morning',distractors:['afternoon','evening','night']},
+            {id:'t33',time:'afternoon',emoji:'☀️',activity:'Having a snack 🍎',answer:'afternoon',distractors:['morning','evening','night']},
+            {id:'t34',time:'evening',emoji:'🌆',activity:'Reading a book 📖',answer:'evening',distractors:['morning','afternoon','night']},
+            {id:'t35',time:'night',emoji:'🌙',activity:'Saying goodnight 💤',answer:'night',distractors:['morning','afternoon','evening']},
+            {id:'t36',time:'evening',emoji:'🌆',activity:'Watching TV 📺',answer:'evening',distractors:['morning','afternoon','night']},
+        ],
+    ];
+
+    // ---------- Money (3 levels) ----------
+    const MONEY_LEVELS = [
+        [ // Level 1 — penny, nickel, dime
+            {id:'mn1',coins:[{emoji:'🪙',label:'1¢',value:1}],total:1},
+            {id:'mn2',coins:[{emoji:'🪙',label:'5¢',value:5}],total:5},
+            {id:'mn3',coins:[{emoji:'🪙',label:'10¢',value:10}],total:10},
+            {id:'mn4',coins:[{emoji:'🪙',label:'1¢'},{emoji:'🪙',label:'1¢'}],total:2},
+            {id:'mn5',coins:[{emoji:'🪙',label:'1¢'},{emoji:'🪙',label:'1¢'},{emoji:'🪙',label:'1¢'}],total:3},
+            {id:'mn6',coins:[{emoji:'🪙',label:'5¢'},{emoji:'🪙',label:'1¢'}],total:6},
+            {id:'mn7',coins:[{emoji:'🪙',label:'10¢'},{emoji:'🪙',label:'1¢'}],total:11},
+            {id:'mn8',coins:[{emoji:'🪙',label:'10¢'},{emoji:'🪙',label:'5¢'}],total:15},
+            {id:'mn9',coins:[{emoji:'🪙',label:'5¢'},{emoji:'🪙',label:'5¢'}],total:10},
+            {id:'mn10',coins:[{emoji:'🪙',label:'10¢'},{emoji:'🪙',label:'10¢'}],total:20},
+        ],
+        [ // Level 2 — quarter, half dollar
+            {id:'mn11',coins:[{emoji:'🪙',label:'25¢',value:25}],total:25},
+            {id:'mn12',coins:[{emoji:'🪙',label:'50¢',value:50}],total:50},
+            {id:'mn13',coins:[{emoji:'🪙',label:'25¢'},{emoji:'🪙',label:'10¢'}],total:35},
+            {id:'mn14',coins:[{emoji:'🪙',label:'25¢'},{emoji:'🪙',label:'25¢'}],total:50},
+            {id:'mn15',coins:[{emoji:'🪙',label:'50¢'},{emoji:'🪙',label:'10¢'}],total:60},
+            {id:'mn16',coins:[{emoji:'🪙',label:'25¢'},{emoji:'🪙',label:'5¢'}],total:30},
+            {id:'mn17',coins:[{emoji:'🪙',label:'25¢'},{emoji:'🪙',label:'1¢'}],total:26},
+            {id:'mn18',coins:[{emoji:'🪙',label:'50¢'},{emoji:'🪙',label:'25¢'}],total:75},
+        ],
+        [ // Level 3 — mixed combinations up to $1
+            {id:'mn19',coins:[{emoji:'🪙',label:'25¢'},{emoji:'🪙',label:'25¢'},{emoji:'🪙',label:'10¢'},{emoji:'🪙',label:'10¢'}],total:70},
+            {id:'mn20',coins:[{emoji:'🪙',label:'50¢'},{emoji:'🪙',label:'25¢'},{emoji:'🪙',label:'10¢'},{emoji:'🪙',label:'10¢'},{emoji:'🪙',label:'5¢'}],total:100},
+            {id:'mn21',coins:[{emoji:'🪙',label:'25¢'},{emoji:'🪙',label:'25¢'},{emoji:'🪙',label:'25¢'},{emoji:'🪙',label:'25¢'}],total:100},
+            {id:'mn22',coins:[{emoji:'🪙',label:'50¢'},{emoji:'🪙',label:'10¢'},{emoji:'🪙',label:'10¢'},{emoji:'🪙',label:'5¢'},{emoji:'🪙',label:'5¢'}],total:80},
+            {id:'mn23',coins:[{emoji:'🪙',label:'50¢'},{emoji:'🪙',label:'25¢'},{emoji:'🪙',label:'25¢'}],total:100},
+            {id:'mn24',coins:[{emoji:'🪙',label:'25¢'},{emoji:'🪙',label:'10¢'},{emoji:'🪙',label:'10¢'},{emoji:'🪙',label:'5¢'},{emoji:'🪙',label:'5¢'},{emoji:'🪙',label:'5¢'}],total:60},
+            {id:'mn25',coins:[{emoji:'🪙',label:'50¢'},{emoji:'🪙',label:'5¢'},{emoji:'🪙',label:'5¢'},{emoji:'🪙',label:'5¢'},{emoji:'🪙',label:'5¢'},{emoji:'🪙',label:'5¢'},{emoji:'🪙',label:'5¢'},{emoji:'🪙',label:'5¢'},{emoji:'🪙',label:'5¢'},{emoji:'🪙',label:'5¢'}],total:100},
+            {id:'mn26',coins:[{emoji:'🪙',label:'25¢'},{emoji:'🪙',label:'25¢'},{emoji:'🪙',label:'10¢'},{emoji:'🪙',label:'5¢'},{emoji:'🪙',label:'5¢'}],total:70},
+        ],
+    ];
+
+    // ---------- One More / One Less (3 levels) ----------
+    const ONEMORELESS_LEVELS = [
+        [ // Level 1 — numbers 1-10
+            {id:'om1',number:5,mode:'more',answer:6},
+            {id:'om2',number:3,mode:'less',answer:2},
+            {id:'om3',number:8,mode:'more',answer:9},
+            {id:'om4',number:7,mode:'less',answer:6},
+            {id:'om5',number:1,mode:'more',answer:2},
+            {id:'om6',number:10,mode:'less',answer:9},
+            {id:'om7',number:4,mode:'more',answer:5},
+            {id:'om8',number:9,mode:'more',answer:10},
+            {id:'om9',number:6,mode:'less',answer:5},
+            {id:'om10',number:2,mode:'more',answer:3},
+        ],
+        [ // Level 2 — numbers 11-20
+            {id:'om11',number:12,mode:'more',answer:13},
+            {id:'om12',number:15,mode:'less',answer:14},
+            {id:'om13',number:18,mode:'more',answer:19},
+            {id:'om14',number:20,mode:'less',answer:19},
+            {id:'om15',number:11,mode:'more',answer:12},
+            {id:'om16',number:16,mode:'less',answer:15},
+            {id:'om17',number:14,mode:'more',answer:15},
+            {id:'om18',number:19,mode:'less',answer:18},
+            {id:'om19',number:13,mode:'more',answer:14},
+            {id:'om20',number:17,mode:'less',answer:16},
+        ],
+        [ // Level 3 — numbers 21-50
+            {id:'om21',number:25,mode:'more',answer:26},
+            {id:'om22',number:30,mode:'less',answer:29},
+            {id:'om23',number:42,mode:'more',answer:43},
+            {id:'om24',number:50,mode:'less',answer:49},
+            {id:'om25',number:21,mode:'more',answer:22},
+            {id:'om26',number:35,mode:'less',answer:34},
+            {id:'om27',number:40,mode:'more',answer:41},
+            {id:'om28',number:48,mode:'less',answer:47},
+            {id:'om29',number:28,mode:'more',answer:29},
+            {id:'om30',number:33,mode:'less',answer:32},
+        ],
+    ];
+
+    // ---------- Rhyming (3 levels) ----------
+    const RHYMING_LEVELS = [
+        [ // Level 1 — simple CVC words
+            {id:'rh1',word:'cat',emoji:'🐱',correct:'hat',distractors:['dog','car','cup']},
+            {id:'rh2',word:'dog',emoji:'🐶',correct:'log',distractors:['cat','dig','dot']},
+            {id:'rh3',word:'bat',emoji:'🦇',correct:'mat',distractors:['big','bit','bed']},
+            {id:'rh4',word:'sun',emoji:'☀️',correct:'fun',distractors:['sin','sum','son']},
+            {id:'rh5',word:'pig',emoji:'🐷',correct:'wig',distractors:['big','peg','pin']},
+            {id:'rh6',word:'hen',emoji:'🐔',correct:'pen',distractors:['hat','hug','hit']},
+            {id:'rh7',word:'bed',emoji:'🛏️',correct:'red',distractors:['bad','bun','bid']},
+            {id:'rh8',word:'cup',emoji:'☕',correct:'pup',distractors:['cap','cop','cut']},
+            {id:'rh9',word:'fan',emoji:'🌀',correct:'ran',distractors:['fun','fin','fin']},
+            {id:'rh10',word:'map',emoji:'🗺️',correct:'cap',distractors:['mop','mud','mix']},
+        ],
+        [ // Level 2 — word families (-ake, -ight, -ound)
+            {id:'rh11',word:'cake',emoji:'🎂',correct:'lake',distractors:['cook','cave','come']},
+            {id:'rh12',word:'snake',emoji:'🐍',correct:'lake',distractors:['snack','sneak','snore']},
+            {id:'rh13',word:'light',emoji:'💡',correct:'night',distractors:['left','late','loud']},
+            {id:'rh14',word:'right',emoji:'👉',correct:'sight',distractors:['write','root','rest']},
+            {id:'rh15',word:'ound',emoji:'🔊',correct:'ground',distractors:['sound','wound','round']},
+            {id:'rh16',word:'lake',emoji:'🏞️',correct:'bake',distractors:['lock','look','luck']},
+            {id:'rh17',word:'kite',emoji:'🪁',correct:'bite',distractors:['knot','kept','kit']},
+            {id:'rh18',word:'moon',emoji:'🌙',correct:'soon',distractors:['moan','map','man']},
+            {id:'rh19',word:'rain',emoji:'🌧️',correct:'train',distractors:['run','ring','ram']},
+            {id:'rh20',word:'stone',emoji:'🪨',correct:'bone',distractors:['stand','start','stay']},
+        ],
+        [ // Level 3 — harder rhymes
+            {id:'rh21',word:'play',emoji:'🎮',correct:'day',distractors:['plow','plan','ply']},
+            {id:'rh22',word:'ring',emoji:'💍',correct:'sing',distractors:['rang','rig','rim']},
+            {id:'rh23',word:'grow',emoji:'🌱',correct:'slow',distractors:['grin','grid','grab']},
+            {id:'rh24',word:'ship',emoji:'🚢',correct:'trip',distractors:['shop','shot','shut']},
+            {id:'rh25',word:'fish',emoji:'🐟',correct:'dish',distractors:['fist','fit','fad']},
+            {id:'rh26',word:'tree',emoji:'🌳',correct:'free',distractors:['true','try','tin']},
+            {id:'rh27',word:'slide',emoji:'🛝',correct:'glide',distractors:['slid','slim','slap']},
+            {id:'rh28',word:'wave',emoji:'🌊',correct:'cave',distractors:['wax','win','wig']},
+            {id:'rh29',word:'star',emoji:'⭐',correct:'car',distractors:['start','store','stay']},
+            {id:'rh30',word:'home',emoji:'🏠',correct:'dome',distractors:['hop','hit','him']},
+        ],
+    ];
+
+    // ---------- Sight Words (5 levels) ----------
+    const SIGHTWORDS_LEVELS = [
+        [ // Level 1
+            {id:'the',emoji:'📖'},{id:'a',emoji:'📝'},{id:'I',emoji:'🙋'},{id:'is',emoji:'✅'},{id:'it',emoji:'🔹'},
+        ],
+        [ // Level 2
+            {id:'my',emoji:'🎒'},{id:'we',emoji:'👫'},{id:'he',emoji:'👦'},{id:'she',emoji:'👧'},{id:'do',emoji:'❓'},
+        ],
+        [ // Level 3
+            {id:'go',emoji:'🏃'},{id:'no',emoji:'🚫'},{id:'so',emoji:'➡️'},{id:'to',emoji:'🎯'},{id:'me',emoji:'🙋‍♂️'},
+        ],
+        [ // Level 4
+            {id:'and',emoji:'➕'},{id:'or',emoji:'🔀'},{id:'but',emoji:'⚡'},{id:'if',emoji:'🤔'},{id:'at',emoji:'📍'},
+        ],
+        [ // Level 5
+            {id:'said',emoji:'💬'},{id:'was',emoji:'⏪'},{id:'have',emoji:'🤲'},{id:'been',emoji:'🕐'},{id:'come',emoji:'🚶'},
+        ],
+    ];
+
+    // ---------- Mapped arrays for new categories ----------
+    const PATTERNS_MAPPED = PATTERNS_LEVELS.map((entries, i) => ({
+        id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: entries
+    }));
+    const COMPARING_MAPPED = COMPARING_LEVELS.map((entries, i) => ({
+        id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: entries
+    }));
+    const POSITIONS_MAPPED = POSITIONS_LEVELS.map((entries, i) => ({
+        id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: entries
+    }));
+    const MEASUREMENT_MAPPED = MEASUREMENT_LEVELS.map((entries, i) => ({
+        id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: entries
+    }));
+    const TIME_MAPPED = TIME_LEVELS.map((entries, i) => ({
+        id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: entries
+    }));
+    const MONEY_MAPPED = MONEY_LEVELS.map((entries, i) => ({
+        id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: entries
+    }));
+    const ONEMORELESS_MAPPED = ONEMORELESS_LEVELS.map((entries, i) => ({
+        id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: entries
+    }));
+    const RHYMING_MAPPED = RHYMING_LEVELS.map((entries, i) => ({
+        id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: entries
+    }));
+    const SIGHTWORDS_MAPPED = SIGHTWORDS_LEVELS.map((entries, i) => ({
+        id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i], items: entries
+    }));
+
 
     // ---------- Category registry ----------
     const CATEGORIES = [
@@ -665,7 +1141,16 @@
         {key:'chinese', name:'Chinese', icon:'🇨🇳', leveled:true, levels:CHINESE_LEVELS},
         {key:'spanish', name:'Spanish', icon:'🇪🇸', leveled:true, levels:SPANISH_LEVELS},
         {key:'math', name:'Math', icon:'➕', leveled:true, levels:MATH_LEVELS},
-        {key:'science', name:'Science', icon:'🔬', leveled:true, levels:SCIENCE_LEVELS_MAPPED}
+        {key:'science', name:'Science', icon:'🔬', leveled:true, levels:SCIENCE_LEVELS_MAPPED},
+        {key:'patterns', name:'Patterns', icon:'🔁', leveled:true, levels:PATTERNS_MAPPED},
+        {key:'comparing', name:'Comparing', icon:'⚖️', leveled:true, levels:COMPARING_MAPPED},
+        {key:'positions', name:'Positions', icon:'📍', leveled:true, levels:POSITIONS_MAPPED},
+        {key:'measurement', name:'Measuring', icon:'📏', leveled:true, levels:MEASUREMENT_MAPPED},
+        {key:'time', name:'Time', icon:'⏰', leveled:true, levels:TIME_MAPPED},
+        {key:'money', name:'Money', icon:'🪙', leveled:true, levels:MONEY_MAPPED},
+        {key:'onemoreless', name:'More or Less', icon:'➕➖', leveled:true, levels:ONEMORELESS_MAPPED},
+        {key:'rhyming', name:'Rhyming', icon:'🎵', leveled:true, levels:RHYMING_MAPPED},
+        {key:'sightwords', name:'Sight Words', icon:'👁️', leveled:true, levels:SIGHTWORDS_MAPPED}
     ];
     function getCategoryItems(key, level) {
         const cat = CATEGORIES.find(c => c.key === key);
@@ -961,6 +1446,11 @@
                 <div class="label">Draw</div>
                 <div class="sublabel">blank canvas</div>
             </div>
+            <div class="card cat-timed" onclick="startTimedChallenge()">
+                <div class="icon">⏱️</div>
+                <div class="label">Timed Challenge</div>
+                <div class="sublabel">⏱ 60s rapid-fire!</div>
+            </div>
             <div class="card cat-progress" onclick="go('progress')">
                 <div class="icon">🏆</div>
                 <div class="label">My Progress</div>
@@ -1065,6 +1555,47 @@
                 visual = `<div class="icon" style="font-size:2.5rem;">${it.emoji}</div>`;
                 label = `<div style="font-size:1.4rem;">${it.id}</div>`;
             }
+            else if (key === 'patterns') {
+                const seq = it.sequence.map(e => `<span>${e}</span>`).join('');
+                visual = `<div style="font-size:1.2rem;display:flex;gap:3px;align-items:center;justify-content:center;">${seq} <span style="color:var(--mc-redstone);font-weight:800;">❓</span></div>`;
+                label = `<div style="font-size:0.9rem;">Pattern</div>`;
+            }
+            else if (key === 'comparing') {
+                const e1 = Array(it.num1).fill(it.emoji1).join('');
+                const e2 = Array(it.num2).fill(it.emoji2).join('');
+                visual = `<div style="font-size:0.9rem;text-align:center;line-height:1.2;">${e1}<br>⚖️<br>${e2}</div>`;
+                label = `<div style="font-size:0.9rem;">${it.num1} vs ${it.num2}</div>`;
+            }
+            else if (key === 'positions') {
+                visual = `<div class="position-scene">${it.scene}</div>`;
+                label = `<div style="font-size:0.9rem;">${it.answer}</div>`;
+            }
+            else if (key === 'measurement') {
+                visual = `<div style="font-size:1.2rem;display:flex;gap:6px;align-items:center;justify-content:center;"><span>${it.item1.emoji}</span> vs <span>${it.item2.emoji}</span></div>`;
+                label = `<div style="font-size:0.9rem;">${it.item1.label} / ${it.item2.label}</div>`;
+            }
+            else if (key === 'time') {
+                visual = `<div style="font-size:2.5rem;">${it.emoji}</div>`;
+                label = `<div style="font-size:1.2rem;font-weight:700;">${it.time || it.activity || ''}</div>`;
+            }
+            else if (key === 'money') {
+                const coinHtml = it.coins.map(c => `<span style="font-size:1rem;">${c.emoji}</span>`).join('');
+                visual = `<div style="font-size:1.2rem;">${coinHtml}</div>`;
+                label = `<div style="font-size:1.2rem;font-weight:700;">${it.total}¢</div>`;
+            }
+            else if (key === 'onemoreless') {
+                const sym = it.mode === 'more' ? '+ 1' : '- 1';
+                visual = `<div style="font-size:2.5rem;font-weight:800;">${it.number} ${sym}</div>`;
+                label = `<div style="font-size:1.2rem;">= ${it.answer}</div>`;
+            }
+            else if (key === 'rhyming') {
+                visual = `<div style="font-size:2.5rem;">${it.emoji}</div>`;
+                label = `<div style="font-size:1.4rem;font-weight:700;">${it.word}</div>`;
+            }
+            else if (key === 'sightwords') {
+                visual = `<div style="font-size:2.5rem;font-weight:800;letter-spacing:3px;">${it.id}</div>`;
+                label = `<div style="font-size:0.9rem;">sight word</div>`;
+            }
             return `<div class="card" onclick="learnTap('${key}','${it.id}','${level}')">
                 ${mastered ? '<div class="mastered-check">✓</div>' : ''}
                 ${visual}
@@ -1134,6 +1665,48 @@
             const it = items.find(s => s.id === id);
             showLearnDisplay(`${it.emoji} ${it.id}`, it.fact);
             await playBrowserUtterance(`${it.id}. ${it.fact}`, 'en-US');
+        } else if (key === 'patterns') {
+            const it = items.find(p => p.id === id);
+            const seq = it.sequence.join(' ');
+            showLearnDisplay(`${seq} ❓`, `The answer is ${it.answer}`);
+            await playBrowserUtterance(`The pattern is ${seq}. What comes next? The answer is ${it.answer}.`, 'en-US');
+        } else if (key === 'comparing') {
+            const it = items.find(c => c.id === id);
+            const sym = it.answer === '>' ? 'greater than' : it.answer === '<' ? 'less than' : 'equal to';
+            showLearnDisplay(`${it.num1} ${it.answer} ${it.num2}`, `${it.num1} is ${sym} ${it.num2}`);
+            await playBrowserUtterance(`${it.num1} is ${sym} ${it.num2}.`, 'en-US');
+        } else if (key === 'positions') {
+            const it = items.find(p => p.id === id);
+            showLearnDisplay(it.scene, it.scenario);
+            await playBrowserUtterance(it.scenario, 'en-US');
+        } else if (key === 'measurement') {
+            const it = items.find(m => m.id === id);
+            showLearnDisplay(`${it.item1.emoji} vs ${it.item2.emoji}`, `${it.question} The answer is ${it.answer}!`);
+            await playBrowserUtterance(`${it.question} The answer is ${it.answer}!`, 'en-US');
+        } else if (key === 'time') {
+            const it = items.find(t => t.id === id);
+            const displayText = it.activity ? `${it.emoji} ${it.activity}` : `${it.emoji} ${it.time}`;
+            showLearnDisplay(displayText, it.activity ? `This happens in the ${it.time}` : `This clock shows ${it.time}`);
+            await playBrowserUtterance(it.activity ? `In the ${it.time}, we ${it.activity.toLowerCase()}` : `This clock shows ${it.time}`, 'en-US');
+        } else if (key === 'money') {
+            const it = items.find(m => m.id === id);
+            const coinList = it.coins.map(c => c.label || (c.value + ' cents')).join(', ');
+            showLearnDisplay(`${it.total}¢`, `Coins: ${coinList}`);
+            await playBrowserUtterance(`These coins add up to ${it.total} cents. That is ${it.total} cents.`, 'en-US');
+        } else if (key === 'onemoreless') {
+            const it = items.find(o => o.id === id);
+            const word = it.mode === 'more' ? 'one more' : 'one less';
+            const expr = it.mode === 'more' ? `${it.number} plus 1` : `${it.number} minus 1`;
+            showLearnDisplay(`${it.number} ${it.mode === 'more' ? '+ 1' : '- 1'} = ${it.answer}`, `${word} of ${it.number} is ${it.answer}`);
+            await playBrowserUtterance(`${expr} is ${it.answer}. ${word} of ${it.number} is ${it.answer}.`, 'en-US');
+        } else if (key === 'rhyming') {
+            const it = items.find(r => r.id === id);
+            showLearnDisplay(`${it.emoji} ${it.word}`, `Rhymes with: ${it.correct}`);
+            await playBrowserUtterance(`${it.word}. ${it.word} rhymes with ${it.correct}.`, 'en-US');
+        } else if (key === 'sightwords') {
+            const it = items.find(s => s.id === id);
+            showLearnDisplay(it.id, 'Sight word');
+            await playBrowserUtterance(it.id, 'en-US');
         } else {
             showLearnDisplay(id);
             await playBrowserUtterance(id, 'en-US');
@@ -1147,7 +1720,7 @@
         const items = getCategoryItems(key, level);
         const questions = [];
         for (let i = 0; i < ROUND_LENGTH; i++) questions.push(buildQuestion(key, items, level));
-        quiz = { key, level, questions, idx: 0, correctFirstTry: 0, firstAttempt: true, awaitingNext: false, stars: 0 };
+        quiz = { key, level, questions, idx: 0, correctFirstTry: 0, firstAttempt: true, awaitingNext: false, stars: 0, streak: 0 };
         go('play', { key, level });
     }
     function buildQuestion(key, items, level) {
@@ -1278,6 +1851,17 @@
             }
         }
         if (key === 'science') {
+            if (correct.options) {
+                // L9+ levels: question-based (magnets, push/pull, materials, survival)
+                const choices = correct.options.map(o => ({ id: o, html: o, speak: o }));
+                return {
+                    mode: 'science-answer',
+                    promptHTML: `<div class="prompt-visual"><span style="font-size:5rem;">${correct.emoji}</span></div><div class="prompt-word">${correct.fact.split('.')[0]}?</div>`,
+                    speakText: `${correct.fact.split('.')[0]}?`,
+                    itemId: correct.answer,
+                    choices: shuffle(choices)
+                };
+            }
             const choices = pickChoices(items, correct, 4);
             return {
                 mode: 'science-find',
@@ -1285,6 +1869,151 @@
                 speakText: `What is this?`,
                 itemId: correct.id,
                 choices: choices.map(c => ({ id: c.id, html: c.id, cls: 'word-choice', speak: c.id }))
+            };
+        }
+        if (key === 'patterns') {
+            const seq = correct.sequence.map(e => `<span>${e}</span>`).join('');
+            const choices = correct.options.map(o => ({ id: o, html: o, speak: o }));
+            return {
+                mode: 'pattern-find',
+                promptHTML: `<div class="prompt-word">What comes next?</div><div class="pattern-seq">${seq} <span class="pattern-q">❓</span></div>`,
+                speakText: `What comes next in the pattern?`,
+                itemId: correct.answer,
+                choices: shuffle(choices)
+            };
+        }
+        if (key === 'comparing') {
+            const emojis1 = Array(correct.num1).fill(correct.emoji1).join('');
+            const emojis2 = Array(correct.num2).fill(correct.emoji2).join('');
+            const options = ['>', '<', '='];
+            const choices = options.map(o => ({ id: o, html: o, cls: 'compare-choice', speak: o === '>' ? 'greater than' : o === '<' ? 'less than' : 'equal to' }));
+            return {
+                mode: 'comparing-find',
+                promptHTML: `<div class="prompt-word">Compare</div><div class="compare-wrap"><div class="compare-emojis"><div class="compare-emoji-row">${emojis1}</div><div style="font-size:1rem;">${correct.num1}</div></div><span class="compare-symbol">⚖️</span><div class="compare-emojis"><div class="compare-emoji-row">${emojis2}</div><div style="font-size:1rem;">${correct.num2}</div></div></div>`,
+                speakText: `Compare ${correct.num1} and ${correct.num2}. Is it greater than, less than, or equal?`,
+                itemId: correct.answer,
+                choices: shuffle(choices)
+            };
+        }
+        if (key === 'positions') {
+            const allPositions = ['on','under','inside','outside','above','below','left','right','in front','behind','between'];
+            const wrong = allPositions.filter(p => p !== correct.answer);
+            const distractors = shuffle(wrong).slice(0, 3);
+            const choices = shuffle([...distractors, correct.answer].map(p => ({ id: p, html: p, speak: p })));
+            return {
+                mode: 'position-find',
+                promptHTML: `<div class="prompt-word">The cat is ___ the box</div><div class="position-scene">${correct.scene}</div><div class="prompt-word" style="font-size:1.2rem;">${correct.scenario}</div>`,
+                speakText: correct.scenario,
+                itemId: correct.answer,
+                choices
+            };
+        }
+        if (key === 'measurement') {
+            const wrong = items.filter(m => m.answer !== correct.answer);
+            const distractors = shuffle(wrong).map(m => ({ id: m.answer, html: m.answer, speak: m.answer }));
+            const correctChoice = { id: correct.answer, html: correct.answer, speak: correct.answer };
+            const allChoices = shuffle([...distractors.slice(0, 3), correctChoice]);
+            return {
+                mode: 'measurement-find',
+                promptHTML: `<div class="prompt-word">${correct.question}</div><div class="measure-wrap"><div class="measure-item"><div class="measure-emoji">${correct.item1.emoji}</div><div>${correct.item1.label}</div></div><div style="font-size:2rem;">VS</div><div class="measure-item"><div class="measure-emoji">${correct.item2.emoji}</div><div>${correct.item2.label}</div></div></div>`,
+                speakText: `${correct.question} ${correct.item1.label} or ${correct.item2.label}?`,
+                itemId: correct.answer,
+                choices: allChoices
+            };
+        }
+        if (key === 'time') {
+            if (correct.activity) {
+                // Schedule questions: show activity, pick time of day
+                const allTimes = ['morning','afternoon','evening','night'];
+                const distractors = allTimes.filter(t => t !== correct.answer);
+                const choices = shuffle([...distractors, correct.answer].map(t => ({ id: t, html: t, speak: t })));
+                return {
+                    mode: 'time-schedule',
+                    promptHTML: `<div class="prompt-word">When do we ${correct.activity.toLowerCase().replace(/_/g,' ')}?</div><div class="prompt-visual">${correct.emoji}</div>`,
+                    speakText: `When do we ${correct.activity.toLowerCase()}?`,
+                    itemId: correct.answer,
+                    choices
+                };
+            } else {
+                // Clock questions: show clock emoji, pick time
+                const distractors = correct.distractors || [];
+                const choices = shuffle([...distractors, correct.time].map(t => ({ id: t, html: t, speak: t })));
+                return {
+                    mode: 'time-find',
+                    promptHTML: `<div class="prompt-word">What time is it?</div><div class="prompt-visual" style="font-size:5rem;">${correct.emoji}</div>`,
+                    speakText: `What time is this clock showing?`,
+                    itemId: correct.time,
+                    choices
+                };
+            }
+        }
+        if (key === 'money') {
+            const coinHtml = correct.coins.map(c => `<div class="coin-stack"><span class="coin">${c.emoji}</span><span class="coin-label">${c.label}</span></div>`).join('');
+            // Build wrong answers
+            const wrongTotals = new Set([correct.total]);
+            let delta = 5;
+            while (wrongTotals.size < 4) {
+                if (correct.total - delta > 0) wrongTotals.add(correct.total - delta);
+                wrongTotals.add(correct.total + delta);
+                delta += 5;
+                if (delta > 50) break;
+            }
+            wrongTotals.delete(correct.total);
+            const wrongList = [...wrongTotals].slice(0, 3);
+            const choices = shuffle([...wrongList.map(w => ({ id: String(w), html: w + '¢', speak: w + ' cents' })), { id: String(correct.total), html: correct.total + '¢', speak: correct.total + ' cents' }]);
+            return {
+                mode: 'money-find',
+                promptHTML: `<div class="prompt-word">How much money?</div><div class="coin-wrap">${coinHtml}</div>`,
+                speakText: `How much money is this? Count the coins.`,
+                itemId: String(correct.total),
+                choices
+            };
+        }
+        if (key === 'onemoreless') {
+            const word = correct.mode === 'more' ? 'more' : 'less';
+            const expr = correct.mode === 'more' ? `${correct.number} + 1` : `${correct.number} − 1`;
+            // Build 4 distinct choices around the answer
+            const wrongSet = new Set([correct.answer]);
+            let d = 1;
+            while (wrongSet.size < 4) {
+                if (correct.answer - d > 0) wrongSet.add(correct.answer - d);
+                wrongSet.add(correct.answer + d);
+                d++;
+            }
+            wrongSet.delete(correct.answer);
+            const wrongList = [...wrongSet].slice(0, 3);
+            const choices = shuffle([...wrongList.map(w => ({ id: String(w), html: w, speak: w })), { id: String(correct.answer), html: correct.answer, speak: correct.answer }]);
+            return {
+                mode: 'onemoreless-find',
+                promptHTML: `<div class="prompt-word">What is ${correct.number} ${correct.mode === 'more' ? '+ 1' : '− 1'}?</div><div class="prompt-visual" style="font-size:4rem;">${correct.number}</div><div class="prompt-word" style="font-size:1.5rem;color:var(--mc-redstone);">${correct.mode === 'more' ? '+ 1' : '− 1'}</div>`,
+                speakText: `What is ${correct.number} ${correct.mode === 'more' ? 'plus 1' : 'minus 1'}?`,
+                itemId: String(correct.answer),
+                choices
+            };
+        }
+        if (key === 'rhyming') {
+            const distractors = correct.distractors.map(d => ({ id: d, html: d, speak: d }));
+            const choices = shuffle([...distractors, { id: correct.correct, html: correct.correct, speak: correct.correct }]);
+            return {
+                mode: 'rhyming-find',
+                promptHTML: `<div class="prompt-word">Which word rhymes with ${correct.word}?</div><div class="prompt-visual">${correct.emoji}</div>`,
+                speakText: `Which word rhymes with ${correct.word}?`,
+                itemId: correct.correct,
+                choices
+            };
+        }
+        if (key === 'sightwords') {
+            // Pick 4 distractors from all sight words that aren't the correct one
+            const allSight = items.map(i => i.id);
+            const others = allSight.filter(w => w !== correct.id);
+            const distractors = shuffle(others).slice(0, 3).map(w => ({ id: w, html: w, cls: 'sightword-choice', speak: w }));
+            const choices = shuffle([...distractors, { id: correct.id, html: correct.id, cls: 'sightword-choice', speak: correct.id }]);
+            return {
+                mode: 'sightword-find',
+                promptHTML: `<div class="prompt-word" style="font-size:3rem;letter-spacing:4px;">${correct.id}</div><div class="prompt-word" style="font-size:1rem;">Find this word!</div>`,
+                speakText: `Find the word ${correct.id}.`,
+                itemId: correct.id,
+                choices
             };
         }
     }
@@ -1305,6 +2034,7 @@
         return `${topbar(true)}
         <div class="center-col">
             <div style="color:#999;margin-bottom:8px;">Question ${quiz.idx + 1} of ${quiz.questions.length}</div>
+            <div id="streakBadge" class="streak-badge"></div>
             <div class="prompt-box">${q.promptHTML}</div>
             <div class="choices">${choicesHTML}</div>
         </div>`;
@@ -1329,6 +2059,11 @@
                 // Research F: reward persistence — celebrate the eventual success too.
                 btnEl.classList.add('persist');
             }
+            // Streak tracking
+            quiz.streak = (quiz.streak || 0) + 1;
+            if (quiz.streak >= 10) { progress.stars += 10; speak('🌟 LEGENDARY! Ten in a row!'); updateStreakBadge('legendary', '🌟 LEGENDARY! +10'); }
+            else if (quiz.streak >= 5) { progress.stars += 5; speak('⚡ Unstoppable! Five in a row!'); updateStreakBadge('unstoppable', '⚡ Unstoppable! +5'); }
+            else if (quiz.streak >= 3) { progress.stars += 2; speak('🔥 On Fire! Three in a row!'); updateStreakBadge('fire', '🔥 On Fire! +2'); }
             saveProgress();
             confettiBurst();
             speak(descriptivePraise(quiz.key, q));
@@ -1337,9 +2072,18 @@
             btnEl.classList.add('incorrect');
             btnEl.disabled = true;
             quiz.firstAttempt = false;
+            quiz.streak = 0;
+            updateStreakBadge(null, '');
             speak(descriptiveRetry(quiz.key, q));
         }
         renderTopbarStarsOnly();
+    }
+    function updateStreakBadge(level, text) {
+        // Streak badge is injected into renderPlay after rendering
+        const badge = document.getElementById('streakBadge');
+        if (!badge) return;
+        badge.className = 'streak-badge' + (level ? ' active ' + level : '');
+        badge.textContent = text;
     }
     function renderTopbarStarsOnly() {
         const badge = document.querySelector('.star-badge');
@@ -1734,6 +2478,124 @@
         URL.revokeObjectURL(url);
     }
 
+    // ---------- Timed Challenge Mode (60s rapid-fire) ----------
+    let timedState = null;
+    let timedInterval = null;
+    function startTimedChallenge() {
+        // Collect all items from all mastered categories (non-math)
+        const pool = [];
+        for (const cat of CATEGORIES) {
+            if (cat.key === 'math') continue;
+            for (const lv of cat.levels) {
+                for (const it of lv.items) {
+                    pool.push({ key: cat.key, item: it, level: lv.id });
+                }
+            }
+        }
+        if (pool.length === 0) { goHome(); return; }
+        const questions = [];
+        for (let i = 0; i < 30; i++) {
+            const pick = pool[Math.floor(Math.random() * pool.length)];
+            questions.push(buildQuestion(pick.key, [pick.item], pick.level));
+        }
+        timedState = { questions, idx: 0, score: 0, timeLeft: 60, streak: 0, awaitingNext: false };
+        go('timed', {});
+    }
+    function renderTimed() {
+        if (!timedState || timedState.idx >= timedState.questions.length) return renderTimedEnd();
+        const q = timedState.questions[timedState.idx];
+        const pct = (timedState.timeLeft / 60) * 100;
+        const circ = 2 * Math.PI * 35;
+        const offset = circ - (pct / 100) * circ;
+        const urgent = timedState.timeLeft <= 10 ? ' urgent' : '';
+        const choicesHTML = q.choices.map(c =>
+            `<button class="choice-btn ${c.cls || ''}" data-id="${esc(c.id)}" onclick="handleTimedChoice('${esc(c.id)}', this)">${c.html}</button>`
+        ).join('');
+        return `${topbar(true)}
+        <div class="center-col">
+            <div class="timer-ring">
+                <svg width="80" height="80" viewBox="0 0 80 80"><circle class="track" cx="40" cy="40" r="35"/><circle class="fill${urgent}" cx="40" cy="40" r="35" style="stroke-dasharray:${circ};stroke-dashoffset:${offset};"/></svg>
+                <div class="timer-text">${timedState.timeLeft}s</div>
+            </div>
+            <div style="color:#999;margin-bottom:8px;">Score: ${timedState.score} | ⏱️ ${timedState.timeLeft}s left</div>
+            <div class="prompt-box">${q.promptHTML}</div>
+            <div class="choices">${choicesHTML}</div>
+        </div>`;
+    }
+    function afterTimedRender() {
+        const q = timedState.questions[timedState.idx];
+        if (q.speakText) speak(q.speakText, { lang: q.lang });
+        // Start countdown if not already running
+        if (!timedInterval) {
+            timedInterval = setInterval(() => {
+                if (!timedState) { clearInterval(timedInterval); timedInterval = null; return; }
+                timedState.timeLeft--;
+                if (timedState.timeLeft <= 0) {
+                    clearInterval(timedInterval);
+                    timedInterval = null;
+                    // Save high score
+                    const best = parseInt(localStorage.getItem('kc_timed_best') || '0', 10);
+                    if (timedState.score > best) localStorage.setItem('kc_timed_best', String(timedState.score));
+                    go('timedEnd', { score: timedState.score, best: Math.max(best, timedState.score) });
+                } else {
+                    render(); // re-render to update timer
+                }
+            }, 1000);
+        }
+    }
+    function handleTimedChoice(id, btnEl) {
+        if (!timedState || timedState.awaitingNext) return;
+        const q = timedState.questions[timedState.idx];
+        const correct = id === q.itemId;
+        if (correct) {
+            btnEl.classList.add('correct');
+            timedState.awaitingNext = true;
+            awardStar();
+            timedState.score++;
+            timedState.streak = (timedState.streak || 0) + 1;
+            if (timedState.streak >= 10) { progress.stars += 10; }
+            else if (timedState.streak >= 5) { progress.stars += 5; }
+            else if (timedState.streak >= 3) { progress.stars += 2; }
+            saveProgress();
+            renderTopbarStarsOnly();
+            speak(descriptivePraise('timed', q));
+            setTimeout(nextTimedQuestion, 600);
+        } else {
+            btnEl.classList.add('incorrect');
+            btnEl.disabled = true;
+            timedState.streak = 0;
+            speak(RETRY[Math.floor(Math.random() * RETRY.length)]);
+        }
+    }
+    function nextTimedQuestion() {
+        if (!timedState) return;
+        timedState.idx++;
+        timedState.awaitingNext = false;
+        if (timedState.idx >= timedState.questions.length || timedState.timeLeft <= 0) {
+            if (timedInterval) { clearInterval(timedInterval); timedInterval = null; }
+            const best = parseInt(localStorage.getItem('kc_timed_best') || '0', 10);
+            if (timedState.score > best) localStorage.setItem('kc_timed_best', String(timedState.score));
+            go('timedEnd', { score: timedState.score, best: Math.max(best, timedState.score) });
+        } else {
+            render();
+        }
+    }
+    function renderTimedEnd() {
+        if (timedInterval) { clearInterval(timedInterval); timedInterval = null; }
+        const score = timedState ? timedState.score : 0;
+        const best = parseInt(localStorage.getItem('kc_timed_best') || '0', 10);
+        timedState = null;
+        return `${topbar(false)}
+        <div class="center-col">
+            <div style="font-size:4rem;">⏱️</div>
+            <h2>Time's Up!</h2>
+            <p style="font-size:1.4rem;color:#0e6b7a;font-weight:700;margin-bottom:8px;">Score: ${score} correct</p>
+            <p style="font-size:1rem;color:#888;margin-bottom:20px;">Best: ${best} 💎</p>
+            <button class="big-btn play" onclick="startTimedChallenge()">🔁 Try Again</button>
+            <button class="big-btn home" onclick="goHome()">🏠 Home</button>
+        </div>`;
+    }
+
     // ---------- Main render ----------
     function render() {
         const app = document.getElementById('app');
@@ -1748,12 +2610,15 @@
         else if (state.screen === 'roundEnd') html = renderRoundEnd();
         else if (state.screen === 'freeplay') html = renderFreeplay();
         else if (state.screen === 'draw') html = renderDraw();
+        else if (state.screen === 'timed') html = renderTimed();
+        else if (state.screen === 'timedEnd') html = renderTimedEnd();
         else if (state.screen === 'progress') html = renderProgress();
         app.innerHTML = html;
         if (state.screen === 'play') afterPlayRender();
         if (state.screen === 'mathPlay') afterMathPlayRender();
         if (state.screen === 'trace') afterTraceRender();
         if (state.screen === 'draw') afterDrawRender();
+        if (state.screen === 'timed') afterTimedRender();
     }
 
     // ---------- Render: Draw (blank canvas) ----------
