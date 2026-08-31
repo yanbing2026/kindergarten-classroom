@@ -1271,27 +1271,53 @@
         const solved = progress.mathCorrect[level] || 0;
         const ops = opsForLevel(lvNum);
         const op = ops[Math.floor(Math.random() * ops.length)];
-        // Max answer = level × 10 (Level 1: max 10, Level 2: max 20, etc.)
+        // Answer range: Level 1 = 1-10, Level 2 = 11-20, Level 3 = 21-30, etc.
+        const minAnswer = (lvNum - 1) * 10 + 1;
         const maxAnswer = lvNum * 10;
         let a, b, answer;
         if (op === 'add') {
-            a = 1 + Math.floor(Math.random() * Math.min(maxAnswer - 1, 10));
-            b = 1 + Math.floor(Math.random() * Math.min(maxAnswer - a, 10));
+            a = 1 + Math.floor(Math.random() * (maxAnswer - 1));
+            b = Math.max(1, minAnswer - a + Math.floor(Math.random() * Math.min(a, maxAnswer - minAnswer + 1)));
             answer = a + b;
+            // Ensure answer is in range
+            while (answer < minAnswer || answer > maxAnswer) {
+                a = 1 + Math.floor(Math.random() * (maxAnswer - 1));
+                b = 1 + Math.floor(Math.random() * Math.min(a, maxAnswer - 1));
+                answer = a + b;
+            }
         } else if (op === 'sub') {
-            a = 2 + Math.floor(Math.random() * Math.min(maxAnswer, 10));
-            b = 1 + Math.floor(Math.random() * Math.min(a - 1, 10));
+            // For subtraction, start with a number that gives answer in range
+            a = minAnswer + Math.floor(Math.random() * (maxAnswer - minAnswer + 1));
+            b = Math.floor(Math.random() * Math.min(a - 1, maxAnswer - minAnswer));
             answer = a - b;
+            // Ensure answer is in range
+            while (answer < minAnswer || answer > maxAnswer) {
+                a = minAnswer + Math.floor(Math.random() * (maxAnswer - minAnswer + 1));
+                b = Math.floor(Math.random() * Math.min(a - 1, maxAnswer - minAnswer));
+                answer = a - b;
+            }
         } else if (op === 'mul') {
             // Keep factors small and friendly for early learners.
-            const maxFactor = Math.min(5, 2 + Math.floor(maxAnswer / 10));
+            const maxFactor = Math.min(10, 2 + Math.floor(maxAnswer / 5));
             a = 1 + Math.floor(Math.random() * maxFactor);
             b = 1 + Math.floor(Math.random() * maxFactor);
             answer = a * b;
+            // Ensure answer is in range
+            while (answer < minAnswer || answer > maxAnswer) {
+                a = 1 + Math.floor(Math.random() * maxFactor);
+                b = 1 + Math.floor(Math.random() * maxFactor);
+                answer = a * b;
+            }
         } else { // div — always clean (no remainders)
-            b = 1 + Math.floor(Math.random() * Math.min(5, 2 + Math.floor(maxAnswer / 10)));
-            answer = 1 + Math.floor(Math.random() * Math.min(6, maxAnswer / 5));
+            b = 1 + Math.floor(Math.random() * Math.min(10, maxAnswer / 5));
+            answer = minAnswer + Math.floor(Math.random() * (maxAnswer - minAnswer + 1));
             a = b * answer;
+            // Ensure answer is in range
+            while (answer < minAnswer || answer > maxAnswer || a > 100) {
+                b = 1 + Math.floor(Math.random() * Math.min(10, maxAnswer / 5));
+                answer = minAnswer + Math.floor(Math.random() * (maxAnswer - minAnswer + 1));
+                a = b * answer;
+            }
         }
         // Build 4 distinct answer choices around the correct value.
         const wrongSet = new Set([answer]);
