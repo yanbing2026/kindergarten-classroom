@@ -289,6 +289,9 @@
         .draw-size-btn { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--mc-ink); background: #f3e6c8; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .draw-size-btn.active { background: var(--mc-gold); }
         .draw-dot { border-radius: 50%; background: var(--mc-ink); }
+        .draw-tool-btn { width: 36px; height: 36px; border-radius: 8px; border: 3px solid var(--mc-ink); background: #f3e6c8; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 2px 2px 0 rgba(0,0,0,0.2); transition: background 0.15s; }
+        .draw-tool-btn:hover { background: #e8d5a8; }
+        .draw-tool-btn.active { background: var(--mc-gold); }
     </style>
 </head>
 <body>
@@ -1575,6 +1578,9 @@
     const DRAW_SIZES = [4, 8, 14, 22];
     let drawColor = DRAW_COLORS[0].hex;
     let drawSize = DRAW_SIZES[1];
+    let drawEraser = false;
+    let drawHistory = [];
+    const DRAW_MAX_HISTORY = 30;
     function renderDraw() {
         return `${topbar(true)}
         <div class="center-col">
@@ -1585,6 +1591,8 @@
                 <div class="draw-size">
                     ${DRAW_SIZES.map(s => `<div class="draw-size-btn${s === drawSize ? ' active' : ''}" onclick="pickDrawSize(${s})" title="Size ${s}"><div class="draw-dot" style="width:${Math.min(s, 20)}px;height:${Math.min(s, 20)}px;"></div></div>`).join('')}
                 </div>
+                <div class="draw-tool-btn${drawEraser ? ' active' : ''}" id="eraserBtn" onclick="toggleEraser()" title="Eraser">🧽</div>
+                <div class="draw-tool-btn" id="undoBtn" onclick="undoDraw()" title="Undo">↩️</div>
                 <button class="icon-btn" onclick="clearDrawCanvas()" title="Clear">🧹</button>
             </div>
         </div>`;
@@ -1602,13 +1610,40 @@
             b.classList.toggle('active', parseInt(dot.style.width) === Math.min(s, 20));
         });
     }
+    function toggleEraser() {
+        drawEraser = !drawEraser;
+        const btn = document.getElementById('eraserBtn');
+        if (btn) btn.classList.toggle('active', drawEraser);
+        const canvas = document.getElementById('drawCanvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            ctx.globalCompositeOperation = drawEraser ? 'destination-out' : 'source-over';
+        }
+    }
+    function saveDrawSnapshot() {
+        const canvas = document.getElementById('drawCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        drawHistory.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+        if (drawHistory.length > DRAW_MAX_HISTORY) drawHistory.shift();
+    }
+    function undoDraw() {
+        if (drawHistory.length === 0) return;
+        const canvas = document.getElementById('drawCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const snap = drawHistory.pop();
+        ctx.putImageData(snap, 0, 0);
+    }
     function clearDrawCanvas() {
         const canvas = document.getElementById('drawCanvas');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
+        saveDrawSnapshot();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
     function afterDrawRender() {
+        drawHistory = [];
         const canvas = document.getElementById('drawCanvas');
         if (!canvas) return;
         const rect = canvas.getBoundingClientRect();
@@ -1621,6 +1656,7 @@
         ctx.lineWidth = drawSize;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
+        ctx.globalCompositeOperation = drawEraser ? 'destination-out' : 'source-over';
         let drawing = false;
         let lastX = 0, lastY = 0;
         const getPos = (e) => {
@@ -1629,8 +1665,10 @@
         };
         canvas.addEventListener('pointerdown', (e) => {
             drawing = true;
+            saveDrawSnapshot();
             const p = getPos(e);
             lastX = p.x; lastY = p.y;
+            ctx.globalCompositeOperation = drawEraser ? 'destination-out' : 'source-over';
             ctx.strokeStyle = drawColor;
             ctx.lineWidth = drawSize;
             e.preventDefault();
