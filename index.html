@@ -279,6 +279,16 @@
         .confetti-burst { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
         .confetti-piece { position: absolute; font-size: 1.8rem; animation: fall 1.1s ease-in forwards; }
         @keyframes fall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 1; } 100% { transform: translateY(70vh) rotate(360deg); opacity: 0; } }
+        .draw-canvas { width: 100%; max-width: 600px; height: 400px; background: #fff; border: 3px solid var(--mc-ink); border-radius: 8px; touch-action: none; cursor: crosshair; box-shadow: inset 4px 4px 0 rgba(255,255,255,0.4), inset -4px -4px 0 rgba(0,0,0,0.15); }
+        .draw-toolbar { display: flex; gap: 8px; justify-content: center; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+        .draw-toolbar .icon-btn { font-size: 1.4rem; }
+        .draw-swatch { width: 32px; height: 32px; border-radius: 50%; border: 3px solid var(--mc-ink); cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 2px 2px 0 rgba(0,0,0,0.2); }
+        .draw-swatch:hover { transform: scale(1.15); }
+        .draw-swatch.active { box-shadow: 0 0 0 3px var(--mc-gold), 2px 2px 0 rgba(0,0,0,0.2); transform: scale(1.15); }
+        .draw-size { display: flex; gap: 6px; align-items: center; margin-left: 8px; }
+        .draw-size-btn { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--mc-ink); background: #f3e6c8; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .draw-size-btn.active { background: var(--mc-gold); }
+        .draw-dot { border-radius: 50%; background: var(--mc-ink); }
     </style>
 </head>
 <body>
@@ -835,6 +845,11 @@
                 <div class="icon">🎨</div>
                 <div class="label">Free Play</div>
                 <div class="sublabel">explore & listen</div>
+            </div>
+            <div class="card cat-draw" onclick="go('draw')">
+                <div class="icon">✏️</div>
+                <div class="label">Draw</div>
+                <div class="sublabel">blank canvas</div>
             </div>
             <div class="card cat-progress" onclick="go('progress')">
                 <div class="icon">🏆</div>
@@ -1536,11 +1551,104 @@
         else if (state.screen === 'trace') html = renderTrace();
         else if (state.screen === 'roundEnd') html = renderRoundEnd();
         else if (state.screen === 'freeplay') html = renderFreeplay();
+        else if (state.screen === 'draw') html = renderDraw();
         else if (state.screen === 'progress') html = renderProgress();
         app.innerHTML = html;
         if (state.screen === 'play') afterPlayRender();
         if (state.screen === 'mathPlay') afterMathPlayRender();
         if (state.screen === 'trace') afterTraceRender();
+        if (state.screen === 'draw') afterDrawRender();
+    }
+
+    // ---------- Render: Draw (blank canvas) ----------
+    const DRAW_COLORS = [
+        { name: 'Black', hex: '#2b1b0e' },
+        { name: 'Red', hex: '#e04040' },
+        { name: 'Orange', hex: '#e67e22' },
+        { name: 'Yellow', hex: '#f1c40f' },
+        { name: 'Green', hex: '#27ae60' },
+        { name: 'Blue', hex: '#2980b9' },
+        { name: 'Purple', hex: '#9b59b6' },
+        { name: 'Pink', hex: '#e84393' },
+        { name: 'Brown', hex: '#8B4513' },
+    ];
+    const DRAW_SIZES = [4, 8, 14, 22];
+    let drawColor = DRAW_COLORS[0].hex;
+    let drawSize = DRAW_SIZES[1];
+    function renderDraw() {
+        return `${topbar(true)}
+        <div class="center-col">
+            <h2>✏️ Draw</h2>
+            <canvas id="drawCanvas" class="draw-canvas"></canvas>
+            <div class="draw-toolbar">
+                ${DRAW_COLORS.map(c => `<div class="draw-swatch${c.hex === drawColor ? ' active' : ''}" style="background:${c.hex};" onclick="pickDrawColor('${c.hex}')" title="${c.name}"></div>`).join('')}
+                <div class="draw-size">
+                    ${DRAW_SIZES.map(s => `<div class="draw-size-btn${s === drawSize ? ' active' : ''}" onclick="pickDrawSize(${s})" title="Size ${s}"><div class="draw-dot" style="width:${Math.min(s, 20)}px;height:${Math.min(s, 20)}px;"></div></div>`).join('')}
+                </div>
+                <button class="icon-btn" onclick="clearDrawCanvas()" title="Clear">🧹</button>
+            </div>
+        </div>`;
+    }
+    function pickDrawColor(hex) {
+        drawColor = hex;
+        document.querySelectorAll('.draw-swatch').forEach(s => {
+            s.classList.toggle('active', s.style.backgroundColor === hex || s.style.background === hex);
+        });
+    }
+    function pickDrawSize(s) {
+        drawSize = s;
+        document.querySelectorAll('.draw-size-btn').forEach(b => {
+            const dot = b.querySelector('.draw-dot');
+            b.classList.toggle('active', parseInt(dot.style.width) === Math.min(s, 20));
+        });
+    }
+    function clearDrawCanvas() {
+        const canvas = document.getElementById('drawCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    function afterDrawRender() {
+        const canvas = document.getElementById('drawCanvas');
+        if (!canvas) return;
+        const rect = canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.max(1, Math.round(rect.width * dpr));
+        canvas.height = Math.max(1, Math.round(rect.height * dpr));
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        ctx.strokeStyle = drawColor;
+        ctx.lineWidth = drawSize;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        let drawing = false;
+        let lastX = 0, lastY = 0;
+        const getPos = (e) => {
+            const r = canvas.getBoundingClientRect();
+            return { x: e.clientX - r.left, y: e.clientY - r.top };
+        };
+        canvas.addEventListener('pointerdown', (e) => {
+            drawing = true;
+            const p = getPos(e);
+            lastX = p.x; lastY = p.y;
+            ctx.strokeStyle = drawColor;
+            ctx.lineWidth = drawSize;
+            e.preventDefault();
+        });
+        canvas.addEventListener('pointermove', (e) => {
+            if (!drawing) return;
+            const p = getPos(e);
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(p.x, p.y);
+            ctx.stroke();
+            lastX = p.x; lastY = p.y;
+            e.preventDefault();
+        });
+        const stop = () => { drawing = false; };
+        canvas.addEventListener('pointerup', stop);
+        canvas.addEventListener('pointerleave', stop);
+        canvas.addEventListener('pointercancel', stop);
     }
 
     // ---------- Render: Free Play (research D — autonomy, no-pressure explore) ----------
