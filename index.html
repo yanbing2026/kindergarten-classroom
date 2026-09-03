@@ -760,7 +760,7 @@
 
     const SCIENCE_LEVELS_MAPPED = SCIENCE_LEVELS.map((entries, i) => ({
         id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i],
-        items: entries.map(v => ({ id:v.id, emoji:v.emoji, fact:v.fact }))
+        items: entries.map(v => ({ id:v.id, emoji:v.emoji, fact:v.fact, img:'images/science/' + v.id + '.png' }))
     }));
 
 
@@ -1847,7 +1847,9 @@
                 label = `<div style="font-size:1.4rem;">${it.es}</div><div style="font-size:0.75rem;color:rgba(43,27,14,0.55);font-weight:400;">${it.en}</div>`;
             }
             else if (key === 'science') {
-                visual = `<div class="icon" style="font-size:2.5rem;">${it.emoji}</div>`;
+                visual = it.img
+                    ? `<div class="icon"><img src="${it.img}" alt="${esc(it.id)}" style="width:80px;height:80px;object-fit:cover;border-radius:12px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><span style="display:none;font-size:2.5rem;">${it.emoji}</span></div>`
+                    : `<div class="icon" style="font-size:2.5rem;">${it.emoji}</div>`;
                 label = `<div style="font-size:1.4rem;">${it.id}</div>`;
             }
             else if (key === 'patterns') {
@@ -2234,7 +2236,7 @@
                 const choices = correct.options.map(o => ({ id: o, html: o, speak: o }));
                 return {
                     mode: 'science-answer',
-                    promptHTML: `<div class="prompt-visual"><span style="font-size:5rem;">${correct.emoji}</span></div><div class="prompt-word">${correct.fact.split('.')[0]}?</div>`,
+                    promptHTML: `<div class="prompt-visual"><img src="${correct.img}" alt="${esc(correct.id)}" style="width:120px;height:120px;object-fit:cover;border-radius:16px;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;font-size:5rem;">${correct.emoji}</span></div><div class="prompt-word">${correct.fact.split('.')[0]}?</div>`,
                     speakText: `${correct.fact.split('.')[0]}?`,
                     itemId: correct.answer,
                     choices: shuffle(choices)
@@ -2243,7 +2245,7 @@
             const choices = pickChoices(items, correct, 4);
             return {
                 mode: 'science-find',
-                promptHTML: `<div class="prompt-visual"><span style="font-size:5rem;">${correct.emoji}</span></div><div class="prompt-word">What is this?</div>`,
+                promptHTML: `<div class="prompt-visual"><img src="${correct.img}" alt="${esc(correct.id)}" style="width:120px;height:120px;object-fit:cover;border-radius:16px;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;font-size:5rem;">${correct.emoji}</span></div><div class="prompt-word">What is this?</div>`,
                 speakText: `What is this?`,
                 itemId: correct.id,
                 choices: choices.map(c => ({ id: c.id, html: c.id, cls: 'word-choice', speak: c.id }))
