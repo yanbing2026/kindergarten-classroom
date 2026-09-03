@@ -1945,7 +1945,7 @@
         <div class="grid">${cards}</div>
         <div class="footer">Tap a card to hear it!</div>`;
     }
-    function showLearnDisplay(bigText, subText) {
+    function showLearnDisplay(bigText, subText, imgUrl) {
         let overlay = document.getElementById('learnDisplay');
         if (!overlay) {
             overlay = document.createElement('div');
@@ -1954,8 +1954,9 @@
             overlay.onclick = () => { hideLearnDisplay(); stopAllAudio(); };
             document.body.appendChild(overlay);
         }
+        const imgHtml = imgUrl ? `<div class="learn-display-letter"><img src="${imgUrl}" style="max-width:200px;max-height:200px;object-fit:contain;border-radius:16px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><span style="display:none;">${esc(bigText)}</span></div>` : `<div class="learn-display-letter">${esc(bigText)}</div>`;
         overlay.innerHTML = `<div class="learn-display-inner">
-            <div class="learn-display-letter">${esc(bigText)}</div>
+            ${imgHtml}
             ${subText ? `<div class="learn-display-word">${esc(subText)}</div>` : ''}
         </div>`;
         overlay.style.display = 'flex';
@@ -2001,7 +2002,7 @@
             await playBrowserUtterance(it.en, 'en-US');
         } else if (key === 'science') {
             const it = items.find(s => s.id === id);
-            showLearnDisplay(`${it.emoji} ${it.id}`, it.fact);
+            showLearnDisplay(`${it.id}`, it.fact, it.img);
             await playBrowserUtterance(`${it.id}. ${it.fact}`, 'en-US');
         } else if (key === 'patterns') {
             const it = items.find(p => p.id === id);
