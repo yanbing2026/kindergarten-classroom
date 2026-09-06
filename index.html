@@ -356,6 +356,9 @@
         .choice-btn.sightword-choice { font-size: 2.5rem; font-weight: 800; letter-spacing: 3px; }
         .choice-btn.compare-choice { font-size: 2.8rem; font-weight: 800; }
         .cat-worksheets { background: #8e44ad; }
+        .card.cat-reviewdue { background: var(--mc-gold); }
+        .card.cat-adventure { background: linear-gradient(135deg, var(--mc-emerald), var(--mc-diamond)); }
+        .card.cat-parentdash { background: #b8e0d2; }
         @media print {
             body { background: white !important; padding: 0 !important; }
             body::after { display: none !important; }
@@ -1540,7 +1543,8 @@
     }
     const PRAISE = ['Great job!','Awesome!','You got it!','Super!','Nice work!','Way to go!','Excellent!'];
     const RETRY = ['Try again!','Almost! Try again.','Not quite, try again!','Keep trying!'];
-    const MASTERY_THRESHOLD = 2;
+    // MASTERY_THRESHOLD removed — see MASTERY_TIERS below for the full
+    // Diamond -> Practiced -> Remembered -> Mastered progression.
     const ROUND_LENGTH = 8;
     const TROPHIES = [10, 25, 50, 100, 200];
     const TRACE_CATEGORIES = ['letters', 'numbers', 'words', 'chinese', 'spanish'];
@@ -1568,10 +1572,12 @@
                     p.mastery = {};
                 }
                 if (!p.due || typeof p.due !== 'object') p.due = {};
+                if (!p.activityLog || typeof p.activityLog !== 'object') p.activityLog = {};
+                if (!Array.isArray(p.recentlyMastered)) p.recentlyMastered = [];
                 return p;
             }
         } catch (e) {}
-        return { stars: 0, mastery: {}, mathCorrect: {} };
+        return { stars: 0, mastery: {}, mathCorrect: {}, due: {}, activityLog: {}, recentlyMastered: [] };
     }
     function saveProgress() { localStorage.setItem('kc_progress_v1', JSON.stringify(progress)); }
     let progress = loadProgress();
@@ -1604,17 +1610,52 @@
     function getMasteryCount(cat, id) {
         return (progress.mastery[cat] && progress.mastery[cat][id]) || 0;
     }
+    // ---------- Mastery tiers (research: one correct answer != mastery) ----------
+    // Tier scales with repeated correct answers AND elapsed spaced-review
+    // intervals, since bumpMastery only advances the count when the item is
+    // actually answered again (naturally gated by scheduleNextReview/isDue
+    // weighting in buildQuestion). A mistake during review knocks the tier
+    // back down instead of just resetting to zero, matching "forgetting" in
+    // real spaced-repetition models.
+    const MASTERY_TIERS = ['New', 'Diamond', 'Practiced', 'Remembered', 'Mastered'];
+    const MASTERY_TIER_ICONS = ['⬜', '🔹', '🟦', '🟩', '💎'];
+    function getMasteryTier(cat, id) {
+        const count = getMasteryCount(cat, id);
+        return Math.max(0, Math.min(count, MASTERY_TIERS.length - 1));
+    }
+    function isMastered(cat, id) {
+        return getMasteryTier(cat, id) >= MASTERY_TIERS.length - 1;
+    }
     function bumpMastery(cat, id) {
         if (!progress.mastery[cat]) progress.mastery[cat] = {};
         const count = (progress.mastery[cat][id] || 0) + 1;
         progress.mastery[cat][id] = count;
         scheduleNextReview(cat, id, count);
+        // Track when an item first reaches the top tier, for the parent
+        // dashboard's "recently mastered" list.
+        if (count === MASTERY_TIERS.length - 1) {
+            if (!progress.recentlyMastered) progress.recentlyMastered = [];
+            progress.recentlyMastered.unshift({ cat, id, ts: Date.now() });
+            progress.recentlyMastered = progress.recentlyMastered.slice(0, 30);
+        }
+    }
+    // Called when a child answers incorrectly on their first attempt at an
+    // item that was already partway (or fully) mastered and due for review.
+    // Models "mistakes during review" pulling mastery back a step, rather
+    // than pretending a single lapse doesn't matter.
+    function decayMastery(cat, id) {
+        if (!progress.mastery[cat]) return;
+        const count = progress.mastery[cat][id] || 0;
+        if (count <= 0) return;
+        const decayed = count - 1;
+        progress.mastery[cat][id] = decayed;
+        scheduleNextReview(cat, id, Math.max(1, decayed));
     }
     function categoryMasteredCount(cat, items) {
-        return items.filter(it => getMasteryCount(cat, it.id) >= MASTERY_THRESHOLD).length;
+        return items.filter(it => isMastered(cat, it.id)).length;
     }
     function categoryDueCount(cat, items) {
-        return items.filter(it => getMasteryCount(cat, it.id) >= MASTERY_THRESHOLD && isDue(cat, it.id)).length;
+        return items.filter(it => getMasteryCount(cat, it.id) >= 1 && isDue(cat, it.id)).length;
     }
     function categoryMasteredAllLevels(cat) {
         let mastered = 0, total = 0;
@@ -1624,6 +1665,47 @@
         }
         return { mastered, total };
     }
+    // Log a day of activity for the parent dashboard's weekly view.
+    function logActivity() {
+        if (!progress.activityLog) progress.activityLog = {};
+        const day = new Date().toISOString().slice(0, 10);
+        progress.activityLog[day] = (progress.activityLog[day] || 0) + 1;
+    }
+    // First level in a category that isn't fully mastered yet — used by
+    // Daily Adventure to keep pushing the child forward at their own pace.
+    function firstIncompleteLevel(catKey) {
+        const cat = CATEGORIES.find(c => c.key === catKey);
+        for (const lv of cat.levels) {
+            const m = categoryMasteredCount(`${catKey}_${lv.id}`, lv.items);
+            if (m < lv.items.length) return lv.id;
+        }
+        return cat.levels[cat.levels.length - 1].id;
+    }
+    function firstIncompleteMathLevel() {
+        for (const lv of MATH_LEVELS) {
+            const solved = progress.mathCorrect[lv.id] || 0;
+            if (solved < 10) return lv.id;
+        }
+        return MATH_LEVELS[MATH_LEVELS.length - 1].id;
+    }
+    // All started (mastery count >= 1), currently-due items across every
+    // non-math category. Powers the "Review Due" home tile and session.
+    function collectDueItems() {
+        const due = [];
+        for (const cat of CATEGORIES) {
+            if (cat.key === 'math') continue;
+            for (const lv of cat.levels) {
+                const catKey = `${cat.key}_${lv.id}`;
+                for (const it of lv.items) {
+                    if (getMasteryCount(catKey, it.id) >= 1 && isDue(catKey, it.id)) {
+                        due.push({ key: cat.key, level: lv.id, item: it });
+                    }
+                }
+            }
+        }
+        return due;
+    }
+    function totalDueCount() { return collectDueItems().length; }
 
     // ---------- Audio ----------
     let muted = localStorage.getItem('kc_muted') === '1';
@@ -1796,6 +1878,7 @@
     // ---------- Render: Home ----------
     function renderHome() {
         const mathSolved = Object.values(progress.mathCorrect).reduce((a, b) => a + (b || 0), 0);
+        const dueCount = totalDueCount();
         const cards = CATEGORIES.map(c => {
             const { mastered, total } = categoryMasteredAllLevels(c);
             let sub = c.key === 'math' ? `${mathSolved} solved` : `${mastered}/${total} mastered`;
@@ -1815,6 +1898,16 @@
         return `
         ${topbar(false)}
         <h1>⛏️ Minecraft Classroom ⛏️</h1>
+        ${dueCount > 0 ? `<div class="card cat-reviewdue" onclick="startReviewDue()" style="max-width:100%;margin-bottom:16px;">
+            <div class="icon">🔄</div>
+            <div class="label">Review ${dueCount} Item${dueCount === 1 ? '' : 's'}</div>
+            <div class="sublabel">Quick practice to keep what you've learned!</div>
+        </div>` : ''}
+        <div class="card cat-adventure" onclick="startDailyAdventure()" style="max-width:100%;margin-bottom:16px;">
+            <div class="icon">⛏️</div>
+            <div class="label">Today's Adventure</div>
+            <div class="sublabel">A quick 5-10 minute mix, just for today!</div>
+        </div>
         <div class="grid">
             ${cards}
             <div class="card cat-freeplay" onclick="go('freeplay')">
@@ -1841,6 +1934,11 @@
                 <div class="icon">🏆</div>
                 <div class="label">My Progress</div>
                 <div class="sublabel">${progress.stars} diamonds</div>
+            </div>
+            <div class="card cat-parentdash" onclick="go('parentdash')">
+                <div class="icon">📊</div>
+                <div class="label">Parent Report</div>
+                <div class="sublabel">weekly summary</div>
             </div>
         </div>
         <div class="footer">Tap a card to start learning!</div>`;
@@ -1924,7 +2022,7 @@
         const items = getCategoryItems(key, level);
         const scopedKey = `${key}_${level}`;
         const cards = items.map(it => {
-            const mastered = getMasteryCount(scopedKey, it.id) >= MASTERY_THRESHOLD;
+            const mastered = isMastered(scopedKey, it.id);
             let visual, label = it.id;
             if (key === 'letters') visual = `<div class="icon">${it.id}</div>`;
             else if (key === 'numbers') visual = `<div class="icon">${it.n}</div>`;
@@ -2188,32 +2286,67 @@
 
     // ---------- Quiz engine ----------
     let quiz = null;
+    // Wraps buildQuestion() so every question remembers which category/level
+    // it came from — needed for mixed-category sessions (Review Due, Daily
+    // Adventure) where quiz.key/quiz.level alone aren't enough.
+    function buildTaggedQuestion(key, items, level, forcedItem) {
+        const q = buildQuestion(key, items, level, forcedItem);
+        if (q) { q.qKey = key; q.qLevel = level; }
+        return q;
+    }
     function startQuiz(key, level) {
         const items = getCategoryItems(key, level);
         const questions = [];
-        for (let i = 0; i < ROUND_LENGTH; i++) questions.push(buildQuestion(key, items, level));
-        quiz = { key, level, questions, idx: 0, correctFirstTry: 0, firstAttempt: true, awaitingNext: false, stars: 0, streak: 0 };
+        for (let i = 0; i < ROUND_LENGTH; i++) questions.push(buildTaggedQuestion(key, items, level));
+        quiz = { key, level, questions, idx: 0, correctFirstTry: 0, firstAttempt: true, awaitingNext: false, stars: 0, streak: 0, mode: 'quiz' };
+        logActivity();
+        saveProgress();
         go('play', { key, level });
     }
-    function buildQuestion(key, items, level) {
+    // ---------- Review Due session ----------
+    // Mixed-category session built entirely from items that are due for
+    // spaced review, prioritizing weak/forgotten items (isDue already
+    // reflects the SR schedule; buildQuestion's own weighting further
+    // favors the weakest of the due items). Distinct from regular Play so
+    // the child understands "review" is different from first-time practice.
+    function startReviewDue() {
+        const due = collectDueItems();
+        if (due.length === 0) { goHome(); return; }
+        const pool = shuffle(due).slice(0, Math.min(ROUND_LENGTH, due.length));
+        const questions = pool.map(d => buildTaggedQuestion(d.key, getCategoryItems(d.key, d.level), d.level, d.item)).filter(Boolean);
+        if (questions.length === 0) { goHome(); return; }
+        quiz = { key: 'reviewdue', level: null, questions, idx: 0, correctFirstTry: 0, firstAttempt: true, awaitingNext: false, stars: 0, streak: 0, mode: 'review' };
+        logActivity();
+        saveProgress();
+        go('play', { key: 'reviewdue', level: null });
+    }
+    function buildQuestion(key, items, level, forcedItem) {
         // Adaptive weighting (research C) + spaced repetition (B):
         // weight each item by how much it needs practice — weak / due items
         // get a higher chance of being selected; already-mastered-and-not-due
         // items are still included but down-weighted.
+        // Callers that already know exactly which item to quiz (Review Due,
+        // Daily Adventure) can pass forcedItem to bypass the weighted pick.
         const catKey = `${key}_${level}`;
-        const weighted = items.map(it => {
-            const count = getMasteryCount(catKey, it.id);
-            const due = isDue(catKey, it.id);
-            let w = 1;
-            if (count === 0) w = 5;            // never seen — high priority
-            else if (count < MASTERY_THRESHOLD) w = 3; // learning — medium-high
-            else if (due) w = 2;                // mastered but due for review
-            else w = 0.4;                       // mastered & not due — low
-            return { it, w };
-        });
-        const totalW = weighted.reduce((a, x) => a + x.w, 0);
-        let r = Math.random() * totalW, correct = weighted[0].it;
-        for (const x of weighted) { r -= x.w; if (r <= 0) { correct = x.it; break; } }
+        let correct;
+        if (forcedItem) {
+            correct = forcedItem;
+        } else {
+            const weighted = items.map(it => {
+                const count = getMasteryCount(catKey, it.id);
+                const due = isDue(catKey, it.id);
+                let w = 1;
+                if (count === 0) w = 5;            // never seen — high priority
+                else if (count < MASTERY_TIERS.length - 1) w = 3; // learning — medium-high
+                else if (due) w = 2;                // mastered but due for review
+                else w = 0.4;                       // mastered & not due — low
+                return { it, w };
+            });
+            const totalW = weighted.reduce((a, x) => a + x.w, 0);
+            let r = Math.random() * totalW;
+            correct = weighted[0].it;
+            for (const x of weighted) { r -= x.w; if (r <= 0) { correct = x.it; break; } }
+        }
         if (key === 'letters') {
             if (Math.random() < 0.5) {
                 const choices = pickChoices(items, correct, 4);
@@ -2643,6 +2776,11 @@
     function handleChoice(id, btnEl) {
         if (quiz.awaitingNext) return;
         const q = quiz.questions[quiz.idx];
+        // Mixed-category sessions (Review Due, Daily Adventure) tag each
+        // question with its own category/level since quiz.key/quiz.level
+        // don't apply to the whole session.
+        const qCatKey = `${q.qKey || quiz.key}_${q.qLevel || quiz.level}`;
+        const praiseKey = q.qKey || quiz.key;
         const correct = id === q.itemId;
         if (correct) {
             btnEl.classList.add('correct');
@@ -2650,7 +2788,7 @@
             awardStar();
             quiz.stars += 1;
             if (quiz.firstAttempt) {
-                bumpMastery(`${quiz.key}_${quiz.level}`, q.itemId);
+                bumpMastery(qCatKey, q.itemId);
                 quiz.correctFirstTry += 1;
             } else {
                 // Research F: reward persistence — celebrate the eventual success too.
@@ -2663,15 +2801,23 @@
             else if (quiz.streak >= 3) { progress.stars += 2; speak('🔥 On Fire! Three in a row!'); updateStreakBadge('fire', '🔥 On Fire! +2'); }
             saveProgress();
             confettiBurst();
-            speak(descriptivePraise(quiz.key, q));
+            speak(descriptivePraise(praiseKey, q));
             setTimeout(nextQuestion, 900);
         } else {
             btnEl.classList.add('incorrect');
             btnEl.disabled = true;
+            // A mistake on the very first attempt at an item that was already
+            // partway mastered and due for review models real forgetting —
+            // pull its mastery tier back a step instead of leaving it frozen.
+            if (quiz.firstAttempt) {
+                if (getMasteryCount(qCatKey, q.itemId) >= 1 && isDue(qCatKey, q.itemId)) {
+                    decayMastery(qCatKey, q.itemId);
+                }
+            }
             quiz.firstAttempt = false;
             quiz.streak = 0;
             updateStreakBadge(null, '');
-            speak(descriptiveRetry(quiz.key, q));
+            speak(descriptiveRetry(praiseKey, q));
         }
         renderTopbarStarsOnly();
     }
@@ -2697,11 +2843,97 @@
         }
     }
 
-    // ---------- Math game ----------
+    // ---------- Daily Adventure ----------
+    // One-click ~5-10 minute mixed session: a small number of items pulled
+    // from the child's current (first-incomplete) level across a curated
+    // set of core subjects, plus a couple of due-review items and a trace
+    // activity. Deliberately short and capped — no streak pressure, no
+    // "come back or lose your streak" messaging, and the child can leave
+    // freely via Home at any time.
+    const ADVENTURE_PLAN = [
+        { key: 'letters', count: 3, label: 'Letters', icon: '🔤' },
+        { key: 'numbers', count: 3, label: 'Numbers', icon: '🔢' },
+        { key: 'words', count: 3, label: 'Minecraft Words', icon: '🧱' },
+        { key: 'math', count: 3, label: 'Math Problems', icon: '➕' },
+    ];
+    function renderAdventurePreview() {
+        const dueCount = totalDueCount();
+        const lines = ADVENTURE_PLAN.map(p => `<div style="font-size:1.1rem;margin:4px 0;">${p.icon} ${p.count} ${p.label}</div>`).join('');
+        return `${topbar(true)}
+        <div class="center-col">
+            <div style="font-size:4rem;">⛏️</div>
+            <h2>Today's Adventure</h2>
+            <div style="margin:12px 0;">${lines}${dueCount > 0 ? `<div style="font-size:1.1rem;margin:4px 0;">🔄 A couple of review items</div>` : ''}</div>
+            <p style="color:#888;margin-bottom:16px;">About 5-10 minutes. Leave anytime — no pressure!</p>
+            <button class="big-btn play" onclick="beginDailyAdventure()">▶️ START</button>
+            <button class="big-btn home" onclick="goHome()">🏠 Not Today</button>
+        </div>`;
+    }
+    function startDailyAdventure() {
+        go('adventurePreview', {});
+    }
+    function beginDailyAdventure() {
+        const questions = [];
+        for (const plan of ADVENTURE_PLAN) {
+            if (plan.key === 'math') {
+                const level = firstIncompleteMathLevel();
+                for (let i = 0; i < plan.count; i++) {
+                    const q = buildMathQuestion(level);
+                    if (q) { q.qKey = 'math'; q.qLevel = level; questions.push(q); }
+                }
+            } else {
+                const level = firstIncompleteLevel(plan.key);
+                const items = getCategoryItems(plan.key, level);
+                for (let i = 0; i < plan.count; i++) {
+                    const q = buildTaggedQuestion(plan.key, items, level);
+                    if (q) questions.push(q);
+                }
+            }
+        }
+        // Mix in up to 2 due-review items so the adventure also reinforces
+        // spaced review, without letting review dominate the short session.
+        const due = shuffle(collectDueItems()).slice(0, 2);
+        for (const d of due) {
+            const q = buildTaggedQuestion(d.key, getCategoryItems(d.key, d.level), d.level, d.item);
+            if (q) questions.push(q);
+        }
+        if (questions.length === 0) { goHome(); return; }
+        adventureState = { questions: shuffle(questions), mathCount: ADVENTURE_PLAN.find(p => p.key === 'math').count };
+        // Adventure questions mix math (handled by mathState machinery) and
+        // regular quiz questions (handled by quiz machinery) — route through
+        // the existing quiz engine since buildMathQuestion output isn't
+        // compatible with renderPlay's choice format. We normalize math
+        // questions into quiz-shaped ones instead.
+        const normalized = adventureState.questions.map(q => normalizeAdventureQuestion(q));
+        quiz = { key: 'adventure', level: null, questions: normalized, idx: 0, correctFirstTry: 0, firstAttempt: true, awaitingNext: false, stars: 0, streak: 0, mode: 'adventure' };
+        logActivity();
+        saveProgress();
+        go('play', { key: 'adventure', level: null });
+    }
+    let adventureState = null;
     let mathState = null;
+    // Math questions from buildMathQuestion() have a different shape
+    // (op/a/b/answer/choices as numbers) than quiz questions (promptHTML/
+    // itemId/choices as {id,html,speak}). Normalize so both can flow
+    // through the same renderPlay/handleChoice pipeline during Adventure.
+    function normalizeAdventureQuestion(q) {
+        if (q.qKey === 'math') {
+            const sym = MATH_SYMBOL[q.op];
+            return {
+                qKey: 'math', qLevel: q.qLevel,
+                promptHTML: `<div class="math-row"><div class="math-eq"><span>${q.a}</span><span class="op">${sym}</span><span>${q.b}</span><span>=</span><span class="qm">?</span></div></div>`,
+                speakText: `${q.a} ${MATH_WORD[q.op]} ${q.b}. What is the answer?`,
+                itemId: String(q.answer),
+                choices: q.choices.map(n => ({ id: String(n), html: String(n), speak: String(n) }))
+            };
+        }
+        return q;
+    }
     function startMath(level) {
         mathState = { idx: 0, stars: 0, level, questions: [] };
         for (let i = 0; i < ROUND_LENGTH; i++) mathState.questions.push(buildMathQuestion(level));
+        logActivity();
+        saveProgress();
         go('mathPlay', { level });
     }
     // ---------- Math operation plan by level ----------
@@ -2880,6 +3112,8 @@
         const items = getCategoryItems(key, level);
         const pool = shuffle(items).slice(0, Math.min(ROUND_LENGTH, items.length));
         traceState = { key, level, items: pool, idx: 0, stars: 0 };
+        logActivity();
+        saveProgress();
         go('trace', { key, level });
     }
     function renderTrace() {
@@ -3015,19 +3249,147 @@
     function renderRoundEnd() {
         const { stars, key, level, category } = state.params;
         const isTrace = key === 'trace';
-        let againAction;
-        if (key === 'math') againAction = `startMath('${level}')`;
-        else if (isTrace) againAction = `startTrace('${category}', '${level}')`;
-        else againAction = `startQuiz('${key}', '${level}')`;
+        const isReview = key === 'reviewdue';
+        const isAdventure = key === 'adventure';
+        let againAction, title;
+        if (key === 'math') { againAction = `startMath('${level}')`; title = 'Round Complete!'; }
+        else if (isTrace) { againAction = `startTrace('${category}', '${level}')`; title = 'Great Writing!'; }
+        else if (isReview) { againAction = `startReviewDue()`; title = 'Review Complete!'; }
+        else if (isAdventure) { againAction = `startDailyAdventure()`; title = "Adventure Complete!"; }
+        else { againAction = `startQuiz('${key}', '${level}')`; title = 'Round Complete!'; }
+        // Daily Adventure and Review Due end with a small positive reward
+        // rather than pushing straight back into another round — matches
+        // "keep sessions short, avoid streak pressure" from the roadmap.
+        const encouragement = isAdventure
+            ? `<p style="color:#888;margin-bottom:16px;">Great adventure today! Come back tomorrow for a new one.</p>`
+            : (isReview ? `<p style="color:#888;margin-bottom:16px;">Nice review! You're keeping everything fresh.</p>` : '');
         return `${topbar(false)}
         <div class="center-col">
             <div style="font-size:4rem;">🎉</div>
-            <h2>${isTrace ? 'Great Writing!' : 'Round Complete!'}</h2>
-            <p style="font-size:1.4rem;color:#0e6b7a;font-weight:700;margin-bottom:20px;">You earned ${stars} 💎</p>
-            <button class="big-btn again" onclick="${againAction}">🔁 ${isTrace ? 'Write More' : 'Play Again'}</button>
+            <h2>${title}</h2>
+            <p style="font-size:1.4rem;color:#0e6b7a;font-weight:700;margin-bottom:8px;">You earned ${stars} 💎</p>
+            ${encouragement}
+            <button class="big-btn again" onclick="${againAction}">🔁 ${isTrace ? 'Write More' : (isAdventure ? 'Another Round' : 'Play Again')}</button>
             <button class="big-btn home" onclick="goHome()">🏠 Home</button>
         </div>`;
     }
+    // ---------- Parent Dashboard ----------
+    // Human-readable weekly report replacing raw JSON as the primary view.
+    // The machine-readable JSON export is kept via exportProgress() below
+    // for backup/portability, per the roadmap's "retain a machine-readable
+    // export for backup" requirement.
+    function weeklyActivityDays() {
+        // Last 7 calendar days, oldest first, each as {date, count}.
+        const days = [];
+        const log = progress.activityLog || {};
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const key = d.toISOString().slice(0, 10);
+            days.push({ date: key, label: d.toLocaleDateString(undefined, { weekday: 'short' }), count: log[key] || 0 });
+        }
+        return days;
+    }
+    function subjectMasteryPercents() {
+        return CATEGORIES.filter(c => c.key !== 'math').map(c => {
+            const { mastered, total } = categoryMasteredAllLevels(c);
+            const pct = total > 0 ? Math.round((mastered / total) * 100) : 0;
+            return { name: c.name, icon: c.icon, key: c.key, pct, mastered, total };
+        }).sort((a, b) => b.pct - a.pct);
+    }
+    function needsPracticeItems(limit) {
+        // Items with mastery count between 1 and just-below-mastered — i.e.
+        // started but not yet solid — ranked by lowest tier first.
+        const weak = [];
+        for (const cat of CATEGORIES) {
+            if (cat.key === 'math') continue;
+            for (const lv of cat.levels) {
+                const catKey = `${cat.key}_${lv.id}`;
+                for (const it of lv.items) {
+                    const count = getMasteryCount(catKey, it.id);
+                    if (count >= 1 && count < MASTERY_TIERS.length - 1) {
+                        weak.push({ label: it.id, tier: count });
+                    }
+                }
+            }
+        }
+        return weak.sort((a, b) => a.tier - b.tier).slice(0, limit).map(w => w.label);
+    }
+    function strongItems(limit) {
+        const strong = [];
+        for (const cat of CATEGORIES) {
+            if (cat.key === 'math') continue;
+            for (const lv of cat.levels) {
+                const catKey = `${cat.key}_${lv.id}`;
+                for (const it of lv.items) {
+                    if (isMastered(catKey, it.id)) strong.push(it.id);
+                }
+            }
+        }
+        return shuffle(strong).slice(0, limit);
+    }
+    function renderParentDashboard() {
+        const days = weeklyActivityDays();
+        const maxCount = Math.max(1, ...days.map(d => d.count));
+        const dayBars = days.map(d => {
+            const h = Math.max(4, Math.round((d.count / maxCount) * 60));
+            return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+                <div style="width:100%;max-width:28px;height:${h}px;background:var(--mc-emerald);border-radius:3px;"></div>
+                <div style="font-size:0.7rem;color:#888;">${d.label}</div>
+                <div style="font-size:0.7rem;color:#666;">${d.count || ''}</div>
+            </div>`;
+        }).join('');
+        const subjects = subjectMasteryPercents();
+        const subjectBars = subjects.map(s => {
+            const filled = Math.round(s.pct / 10);
+            const bar = '█'.repeat(filled) + '░'.repeat(10 - filled);
+            return `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-family:monospace;">
+                <span style="width:110px;font-family:var(--font-clear);">${s.icon} ${s.name}</span>
+                <span style="letter-spacing:-1px;color:var(--mc-emerald);">${bar}</span>
+                <span style="width:44px;text-align:right;">${s.pct}%</span>
+            </div>`;
+        }).join('');
+        const dueCount = totalDueCount();
+        const needsPractice = needsPracticeItems(6);
+        const strong = strongItems(6);
+        const recentlyMastered = (progress.recentlyMastered || []).slice(0, 8).map(m => m.id);
+        const daysActive = days.filter(d => d.count > 0).length;
+        return `${topbar(true)}
+        <h2>📊 Parent Report</h2>
+        <div style="background:#f3e6c8;border:2px solid var(--mc-ink);border-radius:8px;padding:16px;margin-bottom:16px;">
+            <div style="font-weight:700;margin-bottom:10px;">This Week's Activity</div>
+            <div style="display:flex;gap:6px;">${dayBars}</div>
+            <div style="text-align:center;margin-top:8px;color:#666;font-size:0.85rem;">Active ${daysActive} of the last 7 days</div>
+        </div>
+        <div style="background:#f3e6c8;border:2px solid var(--mc-ink);border-radius:8px;padding:16px;margin-bottom:16px;">
+            <div style="font-weight:700;margin-bottom:10px;">Progress by Subject</div>
+            ${subjectBars || '<div style="color:#888;">No progress yet — start learning!</div>'}
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+            <div style="flex:1;min-width:140px;background:#f3e6c8;border:2px solid var(--mc-ink);border-radius:8px;padding:14px;">
+                <div style="font-weight:700;color:var(--mc-redstone);margin-bottom:6px;">Needs Practice</div>
+                <div style="font-size:0.95rem;">${needsPractice.length ? needsPractice.join(', ') : 'Nothing flagged right now!'}</div>
+            </div>
+            <div style="flex:1;min-width:140px;background:#f3e6c8;border:2px solid var(--mc-ink);border-radius:8px;padding:14px;">
+                <div style="font-weight:700;color:var(--mc-emerald);margin-bottom:6px;">Strong</div>
+                <div style="font-size:0.95rem;">${strong.length ? strong.join(', ') : 'Keep practicing to build strengths!'}</div>
+            </div>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+            <div style="flex:1;min-width:140px;background:#f3e6c8;border:2px solid var(--mc-ink);border-radius:8px;padding:14px;">
+                <div style="font-weight:700;margin-bottom:6px;">🔄 Review Due</div>
+                <div style="font-size:0.95rem;">${dueCount} item${dueCount === 1 ? '' : 's'} ready for review</div>
+            </div>
+            <div style="flex:1;min-width:140px;background:#f3e6c8;border:2px solid var(--mc-ink);border-radius:8px;padding:14px;">
+                <div style="font-weight:700;margin-bottom:6px;">💎 Recently Mastered</div>
+                <div style="font-size:0.95rem;">${recentlyMastered.length ? recentlyMastered.join(', ') : 'None yet — keep going!'}</div>
+            </div>
+        </div>
+        <div style="text-align:center;margin-top:8px;">
+            <button class="choice-btn" style="padding:12px 20px;font-size:1rem;" onclick="exportProgress()">📤 Export raw data (backup)</button>
+        </div>`;
+    }
+
     function renderProgress() {
         const rows = CATEGORIES.map(c => {
             const { mastered, total } = categoryMasteredAllLevels(c);
@@ -3064,6 +3426,8 @@
             mastery: progress.mastery,
             due: progress.due,
             mathCorrect: progress.mathCorrect,
+            activityLog: progress.activityLog,
+            recentlyMastered: progress.recentlyMastered,
             version: 'kc_progress_v1'
         }, null, 2);
         const blob = new Blob([data], { type: 'application/json' });
@@ -3333,6 +3697,8 @@ ${html}
       else if (state.screen === 'timedEnd') html = renderTimedEnd();
       else if (state.screen === 'worksheets') html = renderWorksheets();
       else if (state.screen === 'progress') html = renderProgress();
+      else if (state.screen === 'adventurePreview') html = renderAdventurePreview();
+      else if (state.screen === 'parentdash') html = renderParentDashboard();
       app.innerHTML = html + renderDebugPanel();
       if (state.screen === 'play') afterPlayRender();
       if (state.screen === 'mathPlay') afterMathPlayRender();
