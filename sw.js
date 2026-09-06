@@ -41,15 +41,11 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
-  if (url.origin !== self.location.origin) return;
+  const reqUrl = new URL(event.request.url);
+  if (reqUrl.origin !== self.location.origin) return;
   if (event.request.method !== 'GET') return;
 
   event.respondWith((async () => {
-    const url = new URL(event.request.url);
-    if (url.origin !== self.location.origin) return fetch(event.request);
-    if (event.request.method !== 'GET') return fetch(event.request);
-
     // Network-first for page navigations so HTML/level updates are always fresh.
     if (event.request.mode === 'navigate') {
       try {
@@ -77,8 +73,7 @@ self.addEventListener('fetch', (event) => {
     if (network && network.status === 200) {
       // Dynamically cache educational images so offline works across the full
       // curriculum without a brittle manual precache list.
-      const url = new URL(event.request.url);
-      if (url.pathname.startsWith('./images/')) {
+      if (reqUrl.pathname.includes('/images/')) {
         caches.open(IMAGE_CACHE).then((cache) => cache.put(event.request, network.clone()));
       } else {
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, network.clone()));
