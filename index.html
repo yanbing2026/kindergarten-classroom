@@ -369,6 +369,97 @@
     <div class="container" id="app"></div>
 
     <script>
+    // ---------- App version ----------
+    const APP_VERSION = 'v2-20250906';
+
+    // ---------- Debug / Dev Mode ----------
+    // Hidden diagnostic screen for parents and developers.
+    // Activate by tapping the version badge 5 times quickly, or
+    // by adding ?debug=1 to the URL.
+    let debugMode = false;
+    let debugTapCount = 0;
+    let debugTapTimer = null;
+    function activateDebug() {
+      debugMode = !debugMode;
+      render();
+    }
+    function handleDebugTap() {
+      debugTapCount++;
+      if (debugTapTimer) clearTimeout(debugTapTimer);
+      debugTapTimer = setTimeout(() => { debugTapCount = 0; }, 2000);
+      if (debugTapCount >= 5) {
+        debugTapCount = 0;
+        activateDebug();
+      }
+    }
+    function renderDebugPanel() {
+      if (!debugMode) return '';
+      const cacheNames = [];
+      if ('caches' in self) {
+        caches.keys().then(names => {
+          const el = document.getElementById('debugCacheNames');
+          if (el) el.textContent = names.join('\n');
+        }).catch(() => {});
+      }
+      const swReg = navigator.serviceWorker ? 'registered' : 'unsupported';
+      const offlineReady = navigator.onLine ? 'online' : 'offline';
+      // Count total content
+      let totalItems = 0;
+      const catCounts = CATEGORIES.map(c => {
+        const items = c.levels.reduce((a, l) => a + l.items.length, 0);
+        totalItems += items;
+        return `${c.icon} ${c.name}: ${items} items`;
+      }).join('\n');
+      // Find missing images
+      const missingImages = [];
+      CATEGORIES.forEach(c => {
+        c.levels.forEach(lv => {
+          lv.items.forEach(it => {
+            if (it.img) {
+              // We can't easily test image existence here without async,
+              // but we can flag references that don't end in known extensions.
+              if (!/\.(png|webp|jpg|jpeg|gif|svg)$/i.test(it.img)) {
+                missingImages.push(`[format] ${c.key}/${lv.id}/${it.id}: ${it.img}`);
+              }
+            }
+          });
+        });
+      });
+      // Duplicate IDs per category/level
+      const dupIds = [];
+      CATEGORIES.forEach(c => {
+        c.levels.forEach(lv => {
+          const seen = new Map();
+          lv.items.forEach(it => {
+            if (seen.has(it.id)) dupIds.push(`[dup] ${c.key}/${lv.id}: ${it.id}`);
+            seen.set(it.id, true);
+          });
+        });
+      });
+      const progressCounts = Object.entries(progress.mastery || {}).map(([k,v]) => {
+        const count = typeof v === 'object' ? Object.keys(v).length : 0;
+        return `${k}: ${count} items`;
+      }).join('\n');
+      return `
+      <div style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;overflow:auto;padding:20px;font-family:monospace;color:#0f0;font-size:0.85rem;">
+        <div style="max-width:800px;margin:0 auto;background:#111;border:2px solid #0f0;border-radius:8px;padding:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h2 style="color:#0f0;margin:0;">🛠️ Developer Debug</h2>
+            <button onclick="activateDebug()" style="background:#333;color:#0f0;border:1px solid #0f0;padding:6px 12px;cursor:pointer;border-radius:4px;">Close</button>
+          </div>
+          <div style="margin-bottom:12px;"><strong>App version:</strong> ${APP_VERSION}</div>
+          <div style="margin-bottom:12px;"><strong>Service Worker:</strong> ${swReg}</div>
+          <div style="margin-bottom:12px;"><strong>Network:</strong> ${offlineReady}</div>
+          <div style="margin-bottom:12px;"><strong>Cache names:</strong>\n<pre id="debugCacheNames" style="color:#ff0;">scanning...</pre></div>
+          <div style="margin-bottom:12px;"><strong>Content summary:</strong>\n<pre>${catCounts}\nTotal items: ${totalItems}</pre></div>
+          <div style="margin-bottom:12px;"><strong>Progress records:</strong>\n<pre>${progressCounts || 'none yet'}</pre></div>
+          <div style="margin-bottom:12px;"><strong>Duplicate IDs:</strong>\n<pre>${dupIds.length ? dupIds.join('\n') : 'none detected'}</pre></div>
+          <div style="margin-bottom:12px;"><strong>Image reference issues:</strong>\n<pre>${missingImages.length ? missingImages.join('\n') : 'none detected'}</pre></div>
+          <div style="margin-top:16px;color:#888;font-size:0.75rem;">Tap the version badge 5x to toggle this panel.</div>
+        </div>
+      </div>`;
+    }
+
     // ---------- Data ----------
     // ---------- Levels ----------
     // Per-index level icons, reused by every leveled subject.
@@ -1788,7 +1879,7 @@
                 <button class="icon-btn" onclick="goHome()">🏠</button>
             </div>
             <div class="topbar-right">
-                <div class="star-badge">💎 ${progress.stars}</div>
+                <div class="star-badge" onclick="handleDebugTap()" style="cursor:pointer;" title="App version">💎 ${progress.stars} <span style="font-size:0.65rem;opacity:0.7;">${APP_VERSION}</span></div>
                 <button class="icon-btn" onclick="toggleMute()">${muted ? '🔇' : '🔊'}</button>
             </div>
         </div>`;
@@ -3222,28 +3313,32 @@ ${html}
 
     // ---------- Main render ----------
     function render() {
-        const app = document.getElementById('app');
-        let html = '';
-        if (state.screen === 'home') html = renderHome();
-        else if (state.screen === 'level') html = renderLevelPicker();
-        else if (state.screen === 'category') html = renderCategory();
-        else if (state.screen === 'learn') html = renderLearn();
-        else if (state.screen === 'play') html = renderPlay();
-        else if (state.screen === 'mathPlay') html = renderMathPlay();
-        else if (state.screen === 'trace') html = renderTrace();
-        else if (state.screen === 'roundEnd') html = renderRoundEnd();
-        else if (state.screen === 'freeplay') html = renderFreeplay();
-        else if (state.screen === 'draw') html = renderDraw();
-        else if (state.screen === 'timed') html = renderTimed();
-        else if (state.screen === 'timedEnd') html = renderTimedEnd();
-        else if (state.screen === 'worksheets') html = renderWorksheets();
-        else if (state.screen === 'progress') html = renderProgress();
-        app.innerHTML = html;
-        if (state.screen === 'play') afterPlayRender();
-        if (state.screen === 'mathPlay') afterMathPlayRender();
-        if (state.screen === 'trace') afterTraceRender();
-        if (state.screen === 'draw') afterDrawRender();
-        if (state.screen === 'timed') afterTimedRender();
+      // Check for ?debug=1 URL parameter
+      if (!debugMode && window.location.search.includes('debug=1')) {
+        debugMode = true;
+      }
+      const app = document.getElementById('app');
+      let html = '';
+      if (state.screen === 'home') html = renderHome();
+      else if (state.screen === 'level') html = renderLevelPicker();
+      else if (state.screen === 'category') html = renderCategory();
+      else if (state.screen === 'learn') html = renderLearn();
+      else if (state.screen === 'play') html = renderPlay();
+      else if (state.screen === 'mathPlay') html = renderMathPlay();
+      else if (state.screen === 'trace') html = renderTrace();
+      else if (state.screen === 'roundEnd') html = renderRoundEnd();
+      else if (state.screen === 'freeplay') html = renderFreeplay();
+      else if (state.screen === 'draw') html = renderDraw();
+      else if (state.screen === 'timed') html = renderTimed();
+      else if (state.screen === 'timedEnd') html = renderTimedEnd();
+      else if (state.screen === 'worksheets') html = renderWorksheets();
+      else if (state.screen === 'progress') html = renderProgress();
+      app.innerHTML = html + renderDebugPanel();
+      if (state.screen === 'play') afterPlayRender();
+      if (state.screen === 'mathPlay') afterMathPlayRender();
+      if (state.screen === 'trace') afterTraceRender();
+      if (state.screen === 'draw') afterDrawRender();
+      if (state.screen === 'timed') afterTimedRender();
     }
 
     // ---------- Render: Draw (blank canvas) ----------

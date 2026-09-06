@@ -1,43 +1,24 @@
-const CACHE_NAME = 'kc-shell-v3';
+// App version — bump this on every deployment to invalidate stale caches.
+// Keep in sync with APP_VERSION in index.html.
+const APP_VERSION = 'v2-20250906';
+const CACHE_NAME = `kc-${APP_VERSION}`;
+
+// Minimal app shell: HTML, manifest, icons, fonts, service worker itself.
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.json',
+  './sw.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/apple-touch-icon.png',
   './icons/favicon-32.png',
-  './images/words/apple.png',
-  './images/words/axe.png',
-  './images/words/bat.png',
-  './images/words/bed.png',
-  './images/words/bee.png',
-  './images/words/boat.png',
-  './images/words/book.png',
-  './images/words/bow.png',
-  './images/words/bread.png',
-  './images/words/cake.png',
-  './images/words/cat.png',
-  './images/words/chest.png',
-  './images/words/cow.png',
-  './images/words/cube.png',
-  './images/words/dog.png',
-  './images/words/egg.png',
-  './images/words/fox.png',
-  './images/words/gate.png',
-  './images/words/gem.png',
-  './images/words/gold.png',
-  './images/words/iron.png',
-  './images/words/log.png',
-  './images/words/map.png',
-  './images/words/mine.png',
-  './images/words/pig.png',
-  './images/words/shield.png',
-  './images/words/slime.png',
-  './images/words/sword.png',
-  './images/words/torch.png',
-  './images/words/web.png'
 ];
+
+// Dynamic image cache: all educational images are cached on first request
+// so offline works across the full curriculum without manually maintaining
+// a fragile precache list.
+const IMAGE_CACHE = `kc-images-${APP_VERSION}`;
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -50,7 +31,11 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))))
+      .then((keys) => Promise.all(
+        keys
+          .filter((k) => k !== CACHE_NAME && k !== IMAGE_CACHE)
+          .map((k) => caches.delete(k))
+      ))
       .then(() => self.clients.claim())
   );
 });
@@ -90,7 +75,14 @@ self.addEventListener('fetch', (event) => {
     }
     const network = await fetch(event.request);
     if (network && network.status === 200) {
-      caches.open(CACHE_NAME).then((cache) => cache.put(event.request, network.clone()));
+      // Dynamically cache educational images so offline works across the full
+      // curriculum without a brittle manual precache list.
+      const url = new URL(event.request.url);
+      if (url.pathname.startsWith('./images/')) {
+        caches.open(IMAGE_CACHE).then((cache) => cache.put(event.request, network.clone()));
+      } else {
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, network.clone()));
+      }
     }
     return network;
   })());
