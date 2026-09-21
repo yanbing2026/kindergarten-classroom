@@ -2281,7 +2281,6 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         const lessonLabel = lesson.item ? (lesson.cat.key === 'letters' ? lesson.item.id : lesson.cat.key === 'numbers' ? lesson.item.n : lesson.item.id) : lesson.cat.name;
         return `${topbar(false)}
         <div class="home-hero"><div class="home-kicker">⛏️ BLOCKQUEST CLASSROOM</div><h1>Ready for an adventure?</h1><p>Learn a little. Play a little. Build your skills!</p></div>
-        ${renderWorldProgress()}
         ${renderDailyMissions()}
         ${renderTodayReview()}
         <div class="today-card" onclick="${todayAction}"><div class="today-icon">⭐</div><div class="today-copy"><div class="today-kicker">TODAY'S ADVENTURE</div><div class="today-title">${lesson.cat.icon} ${lesson.cat.name}</div><div class="today-sub">${lesson.reason}${lesson.item ? ' • ' + lessonLabel : ''}</div></div><button class="big-btn play">START ▶</button></div>
