@@ -2716,6 +2716,7 @@
         }
         if (correct) {
             btnEl.classList.add('correct');
+            mcRewardBurst('⭐', '💎');
             quiz.awaitingNext = true;
             awardStar();
             quiz.stars += 1;
@@ -3466,6 +3467,27 @@ ${html}
         return html;
     }
 
+
+    // ---------- Lightweight feedback animation helpers ----------
+    function mcRewardBurst(...icons) {
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const wrap=document.createElement('div');
+        wrap.className='mc-floaters';
+        const chosen=icons.length ? icons : ['⭐'];
+        for(let i=0;i<7;i++) {
+            const el=document.createElement('span');
+            el.className='mc-floater';
+            el.textContent=chosen[i%chosen.length];
+            el.style.left=(42 + Math.random()*16)+'%';
+            el.style.top=(42 + Math.random()*12)+'%';
+            el.style.setProperty('--dx', ((Math.random()-.5)*150)+'px');
+            el.style.animationDelay=(Math.random()*.12)+'s';
+            wrap.appendChild(el);
+        }
+        document.body.appendChild(wrap);
+        setTimeout(()=>wrap.remove(),1200);
+    }
+
     // ---------- Main render ----------
     function render() {
         const app = document.getElementById('app');
@@ -3486,6 +3508,10 @@ ${html}
         else if (state.screen === 'worksheets') html = renderWorksheets();
         else if (state.screen === 'progress') html = renderProgress();
         app.innerHTML = html;
+        if (state.screen !== 'home') {
+            const first = app.querySelector('.center-col, h2, .grid, .parent-card');
+            if (first) first.classList.add('mc-animate-in');
+        }
         if (state.screen === 'play') afterPlayRender();
         if (state.screen === 'mathPlay') afterMathPlayRender();
         if (state.screen === 'trace') afterTraceRender();
