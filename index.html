@@ -2069,7 +2069,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
     }
 
     // ---------- Nav ----------
-    let state = { screen: 'home', params: null, stack: [] };
+    let state = { screen: 'home', params: null, stack: [] };\n    let blipolaVoiceSession = 0;
     const navigationTimers = new Set();
     function scheduleNavigation(fn, delay) {
         const timer = setTimeout(() => {
