@@ -2095,12 +2095,12 @@
     let quiz = null;
     function startQuiz(key, level) {
         const items = getCategoryItems(key, level);
-        const questions = [];
-        for (let i = 0; i < ROUND_LENGTH; i++) questions.push(buildQuestion(key, items, level));
-        quiz = { key, level, questions, idx: 0, correctFirstTry: 0, firstAttempt: true, awaitingNext: false, stars: 0, streak: 0 };
+        quiz = { key, level, items, questions: [], idx: 0, correctFirstTry: 0, firstAttempt: true, awaitingNext: false, stars: 0, streak: 0, retryQueue: [] };
+        // Generate one question at a time so recent performance can affect the next question.
+        quiz.questions.push(buildQuestion(key, items, level));
         go('play', { key, level });
     }
-    function buildQuestion(key, items, level) {
+    function buildQuestion(key, items, level, targetId) {
         // Adaptive weighting (research C) + spaced repetition (B):
         // weight each item by how much it needs practice — weak / due items
         // get a higher chance of being selected; already-mastered-and-not-due
@@ -2119,6 +2119,10 @@
         const totalW = weighted.reduce((a, x) => a + x.w, 0);
         let r = Math.random() * totalW, correct = weighted[0].it;
         for (const x of weighted) { r -= x.w; if (r <= 0) { correct = x.it; break; } }
+        if (targetId) {
+            const target = items.find(it => it.id === targetId);
+            if (target) correct = target;
+        }
         if (key === 'letters') {
             if (Math.random() < 0.5) {
                 const choices = pickChoices(items, correct, 4);
@@ -2575,6 +2579,7 @@
             btnEl.disabled = true;
             quiz.firstAttempt = false;
             quiz.streak = 0;
+            if (!quiz.retryQueue.includes(q.itemId)) quiz.retryQueue.unshift(q.itemId);
             updateStreakBadge(null, '');
             speak(descriptiveRetry(quiz.key, q));
         }
@@ -2595,11 +2600,13 @@
         quiz.idx += 1;
         quiz.firstAttempt = true;
         quiz.awaitingNext = false;
-        if (quiz.idx >= quiz.questions.length) {
+        if (quiz.idx >= ROUND_LENGTH) {
             go('roundEnd', { stars: quiz.stars, key: quiz.key, level: quiz.level });
-        } else {
-            render();
+            return;
         }
+        const retryId = quiz.retryQueue.length ? quiz.retryQueue.shift() : null;
+        quiz.questions[quiz.idx] = buildQuestion(quiz.key, quiz.items, quiz.level, retryId);
+        render();
     }
 
     // ---------- Math game ----------
