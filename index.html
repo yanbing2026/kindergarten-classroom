@@ -3463,6 +3463,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
                 return { x: e.clientX - r.left, y: e.clientY - r.top };
             };
             canvas.addEventListener('pointerdown', (e) => {
+                if (e.pointerType === 'touch' && !e.isPrimary) return;
                 drawing = true;
                 if (canvas.setPointerCapture) canvas.setPointerCapture(e.pointerId);
                 const p = getPos(e);
@@ -3479,10 +3480,16 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
                 lastX = p.x; lastY = p.y;
                 e.preventDefault();
             });
-            const stop = () => { drawing = false; };
+            const stop = (e) => {
+                drawing = false;
+                if (e && canvas.releasePointerCapture && canvas.hasPointerCapture && canvas.hasPointerCapture(e.pointerId)) {
+                    try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
+                }
+            };
             canvas.addEventListener('pointerup', stop);
             canvas.addEventListener('pointerleave', stop);
             canvas.addEventListener('pointercancel', stop);
+            canvas.addEventListener('lostpointercapture', () => { drawing = false; });
         }
         const item = traceState.items[traceState.idx];
         fitTraceGhost(getTraceText(traceState.key, item));
@@ -4052,6 +4059,7 @@ ${html}
             return { x: e.clientX - r.left, y: e.clientY - r.top };
         };
         canvas.addEventListener('pointerdown', (e) => {
+            if (e.pointerType === 'touch' && !e.isPrimary) return;
             drawing = true;
             if (canvas.setPointerCapture) canvas.setPointerCapture(e.pointerId);
             saveDrawSnapshot();
@@ -4072,10 +4080,16 @@ ${html}
             lastX = p.x; lastY = p.y;
             e.preventDefault();
         });
-        const stop = () => { drawing = false; };
+        const stop = (e) => {
+            drawing = false;
+            if (e && canvas.releasePointerCapture && canvas.hasPointerCapture && canvas.hasPointerCapture(e.pointerId)) {
+                try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
+            }
+        };
         canvas.addEventListener('pointerup', stop);
         canvas.addEventListener('pointerleave', stop);
         canvas.addEventListener('pointercancel', stop);
+        canvas.addEventListener('lostpointercapture', () => { drawing = false; });
     }
 
     // ---------- Render: Free Play (research D — autonomy, no-pressure explore) ----------
