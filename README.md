@@ -80,3 +80,18 @@ Spanish translations use the localization names from BlockQuest's Spanish langua
 2. Place the sprite in `images/words/` (lowercase filename, e.g. `diamond.png`).
 3. Add one entry to `VOCAB_LEVELS` in `index.html` with `id`, `img`, `en`, `zh.hanzi`, and `es`.
 4. The word automatically appears in English, Chinese, and Spanish sections.
+
+## Blipola learning buddy
+
+This branch now includes an offline-first Blipola runtime in `js/blipola-runtime.js`. It is connected directly to the existing quiz engine rather than replacing it.
+
+- Observes every real quiz/review question and answer.
+- Tracks per-skill/per-item learning evidence separately under `progress.__blipola`.
+- Provides adaptive recommendation, hint levels, review timing, and Buddy states.
+- Shows a Blipola Buddy bar with a child-friendly hint action during Play mode.
+- Seeds from the existing Classroom `mastery`, `due`, and `activityLog` data without changing the existing progress schema.
+- Keeps the existing Classroom scoring, rewards, navigation, accounts, and question generation authoritative.
+- No external AI API is required; the runtime works offline.
+- The integration is deliberately local so the app remains usable without a network connection after installation.
+
+The standalone Blipola library lives in the separate yanbing2026/Blipola repository. This Classroom branch contains the browser runtime needed for a self-contained offline build.
