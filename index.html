@@ -545,6 +545,14 @@ button, input, select, textarea { max-width: 100%; }
   .world-detail.open { max-height: 70vh; overflow-y: auto; }
   .account-bar { flex-wrap: wrap; }
 }
+/* ---------- Extra narrow-screen layout hardening ---------- */
+.parent-focus-row > *, .skill-top > * { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 430px) {
+  .home-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .home-tool { padding-left: 7px; padding-right: 7px; }
+  .skill-top { flex-wrap: wrap; }
+  .parent-focus-row { flex-wrap: wrap; }
+}
 /* ---------- Narrow-screen component hardening ---------- */
 #blipolaBuddy { flex-wrap: wrap; }
 #blipolaBuddy #blipolaMessage { min-width: 0; flex: 1 1 150px; overflow-wrap: anywhere; }
