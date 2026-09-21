@@ -477,26 +477,12 @@
         @media (prefers-reduced-motion:no-preference) { .world-building.finished .building-art { animation:mcBuildingFinish .75s cubic-bezier(.2,1.4,.4,1); } .building-fill { animation:mcBuildFill .8s ease-out both; } }
         @keyframes mcBuildingFinish { 0%{transform:scale(.85) rotate(-2deg);filter:brightness(1)} 55%{transform:scale(1.08) rotate(1deg);filter:brightness(1.25)} 100%{transform:scale(1)} }
         @keyframes mcBuildFill { from{transform:scaleX(0)} to{transform:scaleX(1)} }
-
-        .account-bar {
-<div id="accountBar" class="account-bar"></div>
-<div id="accountModal" class="account-modal" style="display:none" onclick="if(event.target===this)closeAccountModal()"></div>
- display:flex; justify-content:flex-end; margin:8px 0; }
-        .account-btn { border:2px solid #333; border-radius:9px; background:#fff; padding:8px 12px; font-weight:800; cursor:pointer; box-shadow:0 3px 0 #333; }
-        .account-modal { position:fixed; inset:0; z-index:80; display:grid; place-items:center; background:rgba(0,0,0,.45); padding:18px; }
-        .account-box { width:min(420px,100%); background:#f7fbf1; border:4px solid #333; border-radius:16px; padding:22px; box-shadow:0 10px 0 #222,0 20px 40px rgba(0,0,0,.3); }
-        .account-box h2 { margin:0 0 8px; }
-        .account-box p { font-size:.85rem; opacity:.75; }
-        .account-box input { width:100%; box-sizing:border-box; margin:7px 0; padding:11px; border:2px solid #999; border-radius:8px; font-size:1rem; }
-        .account-actions { display:flex; gap:8px; margin-top:10px; }
-        .account-actions button { flex:1; padding:10px; border:2px solid #333; border-radius:8px; font-weight:800; cursor:pointer; }
-        .account-status { min-height:22px; margin-top:8px; font-size:.82rem; font-weight:700; }
-        .account-name { font-size:.8rem; margin-right:8px; align-self:center; font-weight:800; }
-        @media (prefers-reduced-motion:no-preference) { .account-box { animation:mcAccountIn .35s cubic-bezier(.2,1.3,.4,1); } }
-        @keyframes mcAccountIn { from{opacity:0;transform:scale(.9) translateY(12px)} to{opacity:1;transform:none} }
-</style>
+<style>.account-bar{display:flex;justify-content:flex-end;align-items:center;gap:6px;margin:8px 0}.account-btn{border:2px solid #333;border-radius:9px;background:#fff;padding:8px 11px;font-weight:800;cursor:pointer;box-shadow:0 3px 0 #333}.account-name{font-size:.82rem;font-weight:800}.account-modal{position:fixed;inset:0;z-index:80;display:grid;place-items:center;background:rgba(0,0,0,.45);padding:18px}.account-box{width:min(410px,100%);box-sizing:border-box;background:#f7fbf1;border:4px solid #333;border-radius:16px;padding:22px;box-shadow:0 10px 0 #222,0 20px 40px rgba(0,0,0,.3)}.account-box h2{margin:0 0 8px}.account-box p{font-size:.84rem;opacity:.72}.account-box input{width:100%;box-sizing:border-box;margin:7px 0;padding:11px;border:2px solid #999;border-radius:8px;font-size:1rem}.account-actions{display:flex;gap:8px;margin-top:10px}.account-actions button,.account-switch button{flex:1;padding:10px;border:2px solid #333;border-radius:8px;background:#fff;font-weight:800;cursor:pointer}.account-status{min-height:22px;margin-top:8px;font-size:.82rem;font-weight:700}.account-switch{margin-top:9px;text-align:center}.account-switch button{width:100%;border:0;padding:6px;background:transparent;font-size:.76rem;box-shadow:none}@media(prefers-reduced-motion:no-preference){.account-box{animation:mcAccountIn .35s cubic-bezier(.2,1.3,.4,1)}}@keyframes mcAccountIn{from{opacity:0;transform:scale(.9) translateY(12px)}to{opacity:1;transform:none}}</style></style>
 </head>
 <body>
+<div id="accountBar" class="account-bar"></div>
+<div id="accountModal" class="account-modal" style="display:none"></div>
+
     <div class="container" id="app"></div>
 
     <script>
@@ -1637,32 +1623,7 @@
             return '<span class="world-skill-chip '+(pct===100?'mastered':'')+'">'+cat.icon+' '+esc(name)+' <b>'+pct+'%</b></span>';
         }).join('');
         const buildings = data.buildings.map(b => buildingVisual(b.slice(b.indexOf(' ')+1), Math.min(100, Math.round(data.skills.reduce((sum,name) => sum + getWorldSkillPercent(name), 0) / Math.max(1, data.skills.length))))).join('');
-        panel.innerHTML='<div class="world-detail-title">'+stage.icon+' '+esc(stage.name)+' <button class="world-close" onclick="toggleWorldStage('+index+')">✕</button></div><div class="world-detail-grid"><div><div class="world-detail-label">📚 LEARNING SKILLS</div><div class="world-skills">'+skills+'</div></div><div><div class="world-detail-label">🏗️ BUILDINGS</div><div class="world-buildings">'+buildings+'</div></div></
-    // ---------- Local child accounts ----------
-    function getAccounts() { try { return JSON.parse(localStorage.getItem('kc_accounts_v1') || '{}'); } catch(e) { return {}; } }
-    function getCurrentAccount() { return localStorage.getItem('kc_current_account') || ''; }
-    function accountProgressKey(name) { return 'kc_account_progress_v1_' + name.toLowerCase(); }
-    function openAccountModal(mode='login') {
-        const modal=document.getElementById('accountModal'); if(!modal)return;
-        modal.style.display='grid';
-        modal.innerHTML='<div class="account-box"><h2>⛏️ '+(mode==='create'?'Create Your Minecraft Account':'Welcome Back!')+'</h2><p>'+ (mode==='create' ? 'Create a simple child profile on this device.' : 'Log in to switch between profiles on this device.') +'</p><input id="accountName" maxlength="24" placeholder="Player name"><input id="accountPin" maxlength="6" inputmode="numeric" type="password" placeholder="4–6 digit PIN"><div class="account-actions"><button onclick="submitAccount(\''+mode+'\')">'+(mode==='create'?'Create':'Log In')+'</button><button onclick="closeAccountModal()">Cancel</button></div><div id="accountStatus" class="account-status"></div><div style="text-align:center;margin-top:8px;font-size:.78rem"><a href="#" onclick="event.preventDefault();openAccountModal(\''+(mode==='create'?'login':'create')+'\')">'+(mode==='create'?'Already have an account? Log in':'New player? Create an account')+'</a></div></div>';
-    }
-    function closeAccountModal(){ const m=document.getElementById('accountModal'); if(m)m.style.display='none'; }
-    function submitAccount(mode){
-        const name=(document.getElementById('accountName')?.value||'').trim(); const pin=(document.getElementById('accountPin')?.value||'').trim(); const status=document.getElementById('accountStatus');
-        if(!/^[A-Za-z0-9 _-]{2,24}$/.test(name)){status.textContent='Use 2–24 letters, numbers, spaces, _ or -.';return;}
-        if(!/^\d{4,6}$/.test(pin)){status.textContent='PIN must be 4–6 digits.';return;}
-        const accounts=getAccounts(), key=name.toLowerCase();
-        if(mode==='create' && accounts[key]){status.textContent='That player name already exists on this device.';return;}
-        if(mode==='login' && (!accounts[key] || accounts[key].pin!==pin)){status.textContent='Player name or PIN is incorrect.';return;}
-        if(mode==='create'){ accounts[key]={name,pin}; localStorage.setItem('kc_accounts_v1',JSON.stringify(accounts)); }
-        localStorage.setItem('kc_current_account',key);
-        closeAccountModal(); renderAccountBar();
-        if(typeof loadProgress==='function'){ progress=loadProgress(); if(typeof render==='function')render(); }
-    }
-    function logoutAccount(){ localStorage.removeItem('kc_current_account'); renderAccountBar(); if(typeof loadProgress==='function'){ progress=loadProgress(); if(typeof render==='function')render(); } }
-    function renderAccountBar(){ const el=document.getElementById('accountBar'); if(!el)return; const key=getCurrentAccount(); const accounts=getAccounts(); const acct=accounts[key]; el.innerHTML=acct ? '<span class="account-name">👤 '+esc(acct.name)+'</span><button class="account-btn" onclick="logoutAccount()">Log out</button>' : '<button class="account-btn" onclick="openAccountModal(\'login\')">👤 Log in</button><button class="account-btn" style="margin-left:6px" onclick="openAccountModal(\'create\')">➕ Create account</button>'; }
-div>';
+        panel.innerHTML='<div class="world-detail-title">'+stage.icon+' '+esc(stage.name)+' <button class="world-close" onclick="toggleWorldStage('+index+')">✕</button></div><div class="world-detail-grid"><div><div class="world-detail-label">📚 LEARNING SKILLS</div><div class="world-skills">'+skills+'</div></div><div><div class="world-detail-label">🏗️ BUILDINGS</div><div class="world-buildings">'+buildings+'</div></div></div>';
         panel.classList.remove('open'); void panel.offsetWidth; panel.classList.add('open');
     }
     function renderWorldProgress(compact = false) {
@@ -1674,6 +1635,15 @@ div>';
         }).join('<div class="world-connector"></div>');
         return '<div class="world-progress '+(compact?'compact':'')+'"><div class="world-header"><span>🗺️ <strong>My Minecraft World</strong></span><span>💎 '+stars+(next?' / '+next.threshold:'')+'</span></div><div class="world-map">'+nodes+'</div><div class="world-detail" aria-live="polite"></div><div class="world-track"><div class="world-fill" style="width:'+pct+'%"></div></div><div class="world-text">'+(next?next.icon+' '+esc(next.name)+' is '+(next.threshold-stars)+' diamonds away!':'🌈 Your world is fully unlocked!')+'</div></div>';
     }
+    function getAccounts(){try{return JSON.parse(localStorage.getItem('kc_accounts_v1')||'{}')}catch(e){return {};}}
+    function getCurrentAccount(){return localStorage.getItem('kc_current_account')||'';}
+    function accountProgressKey(name){return 'kc_account_progress_v1_'+name.toLowerCase();}
+    function closeAccountModal(){const m=document.getElementById('accountModal');if(m)m.style.display='none';}
+    function openAccountModal(mode){const m=document.getElementById('accountModal');if(!m)return;const create=mode==='create';m.style.display='grid';m.innerHTML='<div class="account-box"><h2>⛏️ '+(create?'Create Your Minecraft Account':'Welcome Back!')+'</h2><p>'+(create?'Create a child profile on this device.':'Log in to switch profiles on this device.')+'</p><input id="accountName" maxlength="24" placeholder="Player name"><input id="accountPin" maxlength="6" inputmode="numeric" type="password" placeholder="4–6 digit PIN"><div class="account-actions"><button id="accountSubmit">'+(create?'Create':'Log In')+'</button><button id="accountCancel">Cancel</button></div><div id="accountStatus" class="account-status"></div><div class="account-switch"><button id="accountSwitch">'+(create?'Already have an account? Log in':'New player? Create an account')+'</button></div></div>';document.getElementById('accountSubmit').onclick=()=>submitAccount(mode);document.getElementById('accountCancel').onclick=closeAccountModal;document.getElementById('accountSwitch').onclick=()=>openAccountModal(create?'login':'create');}
+    function submitAccount(mode){const name=(document.getElementById('accountName')?.value||'').trim(),pin=(document.getElementById('accountPin')?.value||'').trim(),status=document.getElementById('accountStatus');if(!/^[A-Za-z0-9 _-]{2,24}$/.test(name)){status.textContent='Use 2–24 letters, numbers, spaces, _ or -.';return;}if(!/^\\d{4,6}$/.test(pin)){status.textContent='PIN must be 4–6 digits.';return;}const accounts=getAccounts(),key=name.toLowerCase();if(mode==='create'&&accounts[key]){status.textContent='That player name already exists on this device.';return;}if(mode==='login'&&(!accounts[key]||accounts[key].pin!==pin)){status.textContent='Player name or PIN is incorrect.';return;}if(mode==='create'){accounts[key]={name:name,pin:pin};localStorage.setItem('kc_accounts_v1',JSON.stringify(accounts));}localStorage.setItem('kc_current_account',key);closeAccountModal();renderAccountBar();progress=loadProgress();render();}
+    function logoutAccount(){localStorage.removeItem('kc_current_account');renderAccountBar();progress=loadProgress();render();}
+    function renderAccountBar(){const el=document.getElementById('accountBar');if(!el)return;const key=getCurrentAccount(),acct=getAccounts()[key];if(acct){el.innerHTML='<span class="account-name">👤 '+esc(acct.name)+'</span><button class="account-btn" id="logoutBtn">Log out</button>';document.getElementById('logoutBtn').onclick=logoutAccount;}else{el.innerHTML='<button class="account-btn" id="loginBtn">👤 Log in</button><button class="account-btn" id="createBtn">➕ Create account</button>';document.getElementById('loginBtn').onclick=()=>openAccountModal('login');document.getElementById('createBtn').onclick=()=>openAccountModal('create');}}
+
 
     // ---------- Progress storage ----------
     function loadProgress() {
