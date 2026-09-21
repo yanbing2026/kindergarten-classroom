@@ -2070,6 +2070,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
 
     // ---------- Nav ----------
     let state = { screen: 'home', params: null, stack: [] };
+    let blipolaVoiceSession = 0;
     const navigationTimers = new Set();
     function scheduleNavigation(fn, delay) {
         const timer = setTimeout(() => {
@@ -2080,6 +2081,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         return timer;
     }
     function cancelNavigationTasks() {
+        blipolaVoiceSession += 1;
         navigationTimers.forEach(timer => clearTimeout(timer));
         navigationTimers.clear();
         if (timedInterval) {
@@ -3096,12 +3098,15 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         const q = quiz && quiz.questions && quiz.questions[quiz.idx];
         if (!q || !window.BlipolaVoice) return;
         stopAllAudio();
+        const voiceSession = ++blipolaVoiceSession;
         window.BlipolaVoice.start(q, {
             onTranscript: function (text, matched) {
+                if (voiceSession !== blipolaVoiceSession || !quiz || quiz.questions[quiz.idx] !== q) return;
                 const el = document.getElementById('blipolaMessage');
                 if (el) el.textContent = matched ? '👂 I heard you!' : '👂 ' + text;
             },
             onChoice: function (id) {
+                if (voiceSession !== blipolaVoiceSession || !quiz || quiz.questions[quiz.idx] !== q || quiz.awaitingNext) return;
                 const buttons = Array.from(document.querySelectorAll('.choice-btn[data-id]'));
                 const btn = buttons.find(b => b.getAttribute('data-id') === String(id));
                 if (btn) handleChoice(id, btn);
