@@ -1453,6 +1453,20 @@
     const ROUND_LENGTH = 8;
     const TROPHIES = [10, 25, 50, 100, 200];
     const TRACE_CATEGORIES = ['letters', 'numbers', 'words', 'chinese', 'spanish'];
+    const WORLD_STAGES = [
+        { threshold: 0, icon: '🌱', name: 'Spawn Point', text: 'Your adventure begins!' },
+        { threshold: 10, icon: '🌲', name: 'Forest', text: 'The forest is growing!' },
+        { threshold: 25, icon: '🏘️', name: 'Village', text: 'Build a friendly village!' },
+        { threshold: 50, icon: '⛏️', name: 'Mine', text: 'Dig deeper and discover!' },
+        { threshold: 100, icon: '🏰', name: 'Castle', text: 'Your learning kingdom!' },
+        { threshold: 200, icon: '🌈', name: 'Sky Realm', text: 'A whole new world!' }
+    ];
+    function getWorldStage(stars = progress.stars) { let stage = WORLD_STAGES[0]; for (const s of WORLD_STAGES) if (stars >= s.threshold) stage = s; return stage; }
+    function renderWorldProgress(compact = false) {
+        const stars = progress.stars, stage = getWorldStage(stars), next = WORLD_STAGES.find(s => s.threshold > stars);
+        const pct = next ? Math.min(100, Math.round(((stars - stage.threshold) / (next.threshold - stage.threshold)) * 100)) : 100;
+        return '<div class="world-progress ' + (compact ? 'compact' : '') + '"><div class="world-header"><span>' + stage.icon + ' <strong>' + stage.name + '</strong></span><span>💎 ' + stars + (next ? ' / ' + next.threshold : '') + '</span></div><div class="world-track"><div class="world-fill" style="width:' + pct + '%"></div></div><div class="world-text">' + (next ? next.icon + ' ' + next.name + ' is ' + (next.threshold - stars) + ' diamonds away!' : '🌈 Your world is fully unlocked!') + '</div></div>';
+    }
 
     // ---------- Progress storage ----------
     function loadProgress() {
@@ -1702,6 +1716,7 @@
         return `<span style="font-size:${size * 0.55}px;">${item.emoji}</span>`;
     }
 
+    .world-progress{max-width:760px;margin:0 auto 18px;padding:13px 15px;border:3px solid var(--mc-ink);border-radius:16px;background:var(--mc-wood);box-shadow:inset 2px 2px 0 rgba(255,255,255,.25)}.world-header{display:flex;justify-content:space-between;gap:10px;font-weight:800}.world-track{height:14px;margin:9px 0 6px;background:var(--mc-stone);border:2px solid var(--mc-ink);border-radius:8px;overflow:hidden}.world-fill{height:100%;background:var(--mc-diamond);transition:width .35s ease}.world-text{font-size:.82rem;font-weight:700;opacity:.85}
     /* ---------- Home dashboard ---------- */
     .home-hero{text-align:center;padding:8px 12px 16px}.home-kicker{font-weight:900;letter-spacing:.12em;font-size:.78rem;opacity:.7}.home-hero h1{margin:6px 0 4px}.home-hero p{margin:0;color:#777}
     .today-card{display:flex;align-items:center;gap:14px;max-width:760px;margin:0 auto 20px;padding:18px;border:3px solid #d9b44a;border-radius:22px;background:linear-gradient(135deg,#fff9d8,#fff);box-shadow:0 6px 0 rgba(0,0,0,.08);cursor:pointer}.today-icon{font-size:2.5rem}.today-copy{flex:1;min-width:0;text-align:left}.today-kicker{font-size:.75rem;font-weight:900;letter-spacing:.1em;color:#9b7410}.today-title{font-size:1.35rem;font-weight:900;margin-top:2px}.today-sub{color:#777;margin-top:3px}.today-card .big-btn{width:auto;min-width:110px;margin:0}
@@ -1745,6 +1760,7 @@
         const lessonLabel = lesson.item ? (lesson.cat.key === 'letters' ? lesson.item.id : lesson.cat.key === 'numbers' ? lesson.item.n : lesson.item.id) : lesson.cat.name;
         return `${topbar(false)}
         <div class="home-hero"><div class="home-kicker">⛏️ MINECRAFT CLASSROOM</div><h1>Ready for an adventure?</h1><p>Learn a little. Play a little. Build your skills!</p></div>
+        ${renderWorldProgress()}
         <div class="today-card" onclick="${todayAction}"><div class="today-icon">⭐</div><div class="today-copy"><div class="today-kicker">TODAY'S ADVENTURE</div><div class="today-title">${lesson.cat.icon} ${lesson.cat.name}</div><div class="today-sub">${lesson.reason}${lesson.item ? ' • ' + lessonLabel : ''}</div></div><button class="big-btn play">START ▶</button></div>
         <h2 class="home-section-title">🎮 Play & Learn</h2><div class="grid home-featured">${cards}</div>
         <h2 class="home-section-title">🌎 More Learning</h2>
@@ -2961,6 +2977,7 @@
         return `${topbar(true)}
         <h2>🏆 My Progress</h2>
         <div class="star-badge" style="margin:0 auto 20px;width:fit-content;font-size:1.1rem;">💎 ${progress.stars} total diamonds</div>
+        ${renderWorldProgress()}
         ${rows}
         <div style="margin-top:10px;font-weight:700;">Math solved: ${Object.values(progress.mathCorrect).reduce((a, b) => a + (b || 0), 0)} total</div>
         <div class="trophy-grid">${trophies}</div>
