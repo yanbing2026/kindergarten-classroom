@@ -446,6 +446,25 @@
         @keyframes mcWorldNodeIn { 0%{transform:scale(.5) rotate(-8deg);opacity:.2} 70%{transform:scale(1.12) rotate(2deg)} 100%{transform:scale(1) rotate(0)} }
         @keyframes mcWorldPulse { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px) scale(1.05)} }
         @media (max-width:600px) { .world-node { min-width:68px; } .world-node-icon { width:46px; height:46px; font-size:1.55rem; } }
+
+        .world-node { appearance:none; border:0; padding:0; color:inherit; font:inherit; background:transparent; cursor:default; }
+        .world-node.unlocked { cursor:pointer; }
+        .world-node.selected .world-node-icon { box-shadow:0 4px 0 #333, 0 0 0 4px rgba(76,175,80,.45); }
+        .world-detail { max-height:0; overflow:hidden; opacity:0; margin:0; border-radius:12px; background:#f4f8ef; border:0 solid #333; transition:max-height .45s ease, opacity .3s ease, margin .3s ease, padding .3s ease; }
+        .world-detail.open { max-height:420px; opacity:1; margin:4px 0 12px; padding:14px; border-width:2px; box-shadow:0 4px 0 rgba(0,0,0,.18); }
+        .world-detail-title { display:flex; align-items:center; justify-content:space-between; font-size:1.05rem; font-weight:900; }
+        .world-close { border:2px solid #333; background:#fff; border-radius:7px; width:30px; height:30px; cursor:pointer; font-weight:900; }
+        .world-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:10px; }
+        .world-detail-label { font-size:.68rem; font-weight:900; letter-spacing:.7px; margin-bottom:7px; opacity:.7; }
+        .world-skills { display:flex; flex-wrap:wrap; gap:6px; }
+        .world-skill-chip { display:inline-flex; gap:5px; align-items:center; padding:6px 8px; border:2px solid #bbb; border-radius:8px; background:#fff; font-size:.76rem; }
+        .world-skill-chip.mastered { border-color:#6e9e45; background:#edf8df; }
+        .world-building { display:flex; align-items:center; gap:8px; padding:7px 8px; margin-bottom:6px; border:2px solid #bbb; border-radius:8px; background:#fff; font-size:.78rem; }
+        .world-building span { font-size:1.25rem; }
+        @media (prefers-reduced-motion:no-preference) { .world-detail.open { animation:mcWorldDetailIn .45s ease-out both; } .world-node.selected .world-node-icon { animation:mcWorldSelect .55s cubic-bezier(.2,1.4,.4,1); } }
+        @keyframes mcWorldDetailIn { from{transform:translateY(-8px);opacity:0} to{transform:translateY(0);opacity:1} }
+        @keyframes mcWorldSelect { 0%{transform:scale(1)} 55%{transform:scale(1.13) rotate(-2deg)} 100%{transform:scale(1)} }
+        @media (max-width:600px) { .world-detail-grid { grid-template-columns:1fr; gap:10px; } }
 </style>
 </head>
 <body>
@@ -1545,14 +1564,43 @@
         { threshold: 200, icon: '🌈', name: 'Sky Realm', text: 'A whole new world!' }
     ];
     function getWorldStage(stars = progress.stars) { let stage = WORLD_STAGES[0]; for (const s of WORLD_STAGES) if (stars >= s.threshold) stage = s; return stage; }
+    const WORLD_CONTENT = [
+        { skills:['Letters','Sounds','Numbers'], buildings:['🏠 Starter House','🌾 Learning Farm','🪵 Crafting Table'] },
+        { skills:['Words','Rhyming','Sight Words'], buildings:['🌲 Forest Library','🪵 Word Workshop','🐑 Animal Pen'] },
+        { skills:['Sentences','Categories','Prepositions'], buildings:['🏘️ Village School','📚 Trading Hall','🛤️ Village Path'] },
+        { skills:['Math','Measuring','Time','Money'], buildings:['⛏️ Diamond Mine','⚒️ Math Forge','🚂 Minecart Station'] },
+        { skills:['Science','Patterns','3D Shapes','Sort & Classify'], buildings:['🏰 Castle Lab','🔬 Experiment Room','🗼 Shape Tower'] },
+        { skills:['Chinese','Spanish','Free Play','Challenge'], buildings:['🌈 Sky Temple','☁️ Cloud Library','🚀 Adventure Port'] }
+    ];
+    let openWorldStage = null;
+    function toggleWorldStage(index) {
+        const stage = WORLD_STAGES[index], stars = progress.stars;
+        if (!stage || stars < stage.threshold) return;
+        openWorldStage = openWorldStage === index ? null : index;
+        document.querySelectorAll('.world-node').forEach((el,i) => el.classList.toggle('selected', i === openWorldStage));
+        const panel = document.querySelector('.world-detail');
+        if (!panel) return;
+        if (openWorldStage === null) { panel.classList.remove('open'); panel.innerHTML=''; return; }
+        const data = WORLD_CONTENT[index] || WORLD_CONTENT[0];
+        const skills = data.skills.map(name => {
+            const cat = CATEGORIES.find(c => c.name === name);
+            if (!cat) return '<span class="world-skill-chip">📘 '+esc(name)+'</span>';
+            const stats = categoryLearningStats(cat);
+            const pct = stats.total ? Math.round(stats.mastered / stats.total * 100) : 0;
+            return '<span class="world-skill-chip '+(pct===100?'mastered':'')+'">'+cat.icon+' '+esc(name)+' <b>'+pct+'%</b></span>';
+        }).join('');
+        const buildings = data.buildings.map(b => '<div class="world-building"><span>'+b.split(' ')[0]+'</span><strong>'+esc(b.slice(b.indexOf(' ')+1))+'</strong></div>').join('');
+        panel.innerHTML='<div class="world-detail-title">'+stage.icon+' '+esc(stage.name)+' <button class="world-close" onclick="toggleWorldStage('+index+')">✕</button></div><div class="world-detail-grid"><div><div class="world-detail-label">📚 LEARNING SKILLS</div><div class="world-skills">'+skills+'</div></div><div><div class="world-detail-label">🏗️ BUILDINGS</div><div class="world-buildings">'+buildings+'</div></div></div>';
+        panel.classList.remove('open'); void panel.offsetWidth; panel.classList.add('open');
+    }
     function renderWorldProgress(compact = false) {
         const stars = progress.stars, stage = getWorldStage(stars), next = WORLD_STAGES.find(s => s.threshold > stars);
         const pct = next ? Math.min(100, Math.round(((stars - stage.threshold) / (next.threshold - stage.threshold)) * 100)) : 100;
         const nodes = WORLD_STAGES.map((s, i) => {
             const unlocked = stars >= s.threshold, active = i === stage.index;
-            return '<div class="world-node ' + (unlocked ? 'unlocked ' : '') + (active ? 'active' : '') + '"><div class="world-node-icon">' + (unlocked ? s.icon : '🔒') + '</div><div class="world-node-name">' + s.name + '</div><div class="world-node-threshold">' + s.threshold + ' 💎</div></div>';
+            return '<button type="button" class="world-node '+(unlocked?'unlocked ':'')+(active?'active ':'')+'" '+(unlocked?'onclick="toggleWorldStage('+i+')"':'disabled')+' aria-label="'+esc(s.name)+(unlocked?', open world details':', locked')+'"><div class="world-node-icon">'+(unlocked?s.icon:'🔒')+'</div><div class="world-node-name">'+esc(s.name)+'</div><div class="world-node-threshold">'+s.threshold+' 💎</div></button>';
         }).join('<div class="world-connector"></div>');
-        return '<div class="world-progress ' + (compact ? 'compact' : '') + '"><div class="world-header"><span>🗺️ <strong>My Minecraft World</strong></span><span>💎 ' + stars + (next ? ' / ' + next.threshold : '') + '</span></div><div class="world-map">' + nodes + '</div><div class="world-track"><div class="world-fill" style="width:' + pct + '%"></div></div><div class="world-text">' + (next ? next.icon + ' ' + next.name + ' is ' + (next.threshold - stars) + ' diamonds away!' : '🌈 Your world is fully unlocked!') + '</div></div>';
+        return '<div class="world-progress '+(compact?'compact':'')+'"><div class="world-header"><span>🗺️ <strong>My Minecraft World</strong></span><span>💎 '+stars+(next?' / '+next.threshold:'')+'</span></div><div class="world-map">'+nodes+'</div><div class="world-detail" aria-live="polite"></div><div class="world-track"><div class="world-fill" style="width:'+pct+'%"></div></div><div class="world-text">'+(next?next.icon+' '+esc(next.name)+' is '+(next.threshold-stars)+' diamonds away!':'🌈 Your world is fully unlocked!')+'</div></div>';
     }
 
     // ---------- Progress storage ----------
