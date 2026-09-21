@@ -1516,6 +1516,61 @@
         return { attempts: recent.length, correct: recent.filter(x => x.correct).length, firstTry: recent.filter(x => x.correct && x.firstTry).length, days: new Set(recent.map(x => new Date(x.at).toLocaleDateString())).size, skills: Object.values(byKey).sort((a,b) => b.correct - a.correct || b.attempts - a.attempts) };
     }
     function saveProgress() { localStorage.setItem('kc_progress_v1', JSON.stringify(progress)); }
+    function todayKey() { return new Date().toISOString().slice(0, 10); }
+    function ensureDailyState() {
+        if (!progress.daily || progress.daily.date !== todayKey()) {
+            progress.daily = { date: todayKey(), tasks: {}, completed: false, rewardClaimed: false };
+        }
+        if (!progress.daily.tasks) progress.daily.tasks = {};
+        return progress.daily;
+    }
+    function recordDailyTask(task) {
+        const d = ensureDailyState();
+        if (d.tasks[task]) return false;
+        d.tasks[task] = true;
+        const done = ['practice','math','review'].every(t => d.tasks[t]);
+        if (done && !d.completed) {
+            d.completed = true;
+            if (!d.rewardClaimed) {
+                d.rewardClaimed = true;
+                progress.stars += 5;
+                progress.dailyReward = { date: d.date, stars: 5 };
+            }
+            updateLearningStreak();
+        }
+        saveProgress();
+        return done;
+    }
+    function updateLearningStreak() {
+        const d = ensureDailyState();
+        if (!d.completed) return;
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yKey = yesterday.toISOString().slice(0, 10);
+        const last = progress.learningStreak || { current: 0, best: 0, lastDate: null };
+        if (last.lastDate === d.date) return;
+        last.current = last.lastDate === yKey ? last.current + 1 : 1;
+        last.best = Math.max(last.best || 0, last.current);
+        last.lastDate = d.date;
+        progress.learningStreak = last;
+    }
+    function getDailyMissionSummary() {
+        const d = ensureDailyState();
+        const done = ['practice','math','review'].filter(t => d.tasks[t]).length;
+        const streak = progress.learningStreak || { current: 0, best: 0 };
+        return { done, total: 3, completed: d.completed, reward: d.rewardClaimed ? 5 : 0, streak: streak.current || 0, best: streak.best || 0 };
+    }
+    function renderDailyMissions() {
+        const m = getDailyMissionSummary();
+        const labels = [
+            ['practice','🎮 Practice'],
+            ['math','➕ Math'],
+            ['review','🔄 Review']
+        ];
+        const tasks = labels.map(([key,label]) => '<span class="review-chip">' + (ensureDailyState().tasks[key] ? '✅ ' : '⬜ ') + label + '</span>').join('');
+        return '<div class="parent-card daily-missions"><div class="parent-header" style="margin:0 0 8px;"><div><div class="parent-kicker">DAILY QUEST</div><h3>⛏️ Today’s Missions</h3></div><div style="font-size:1.4rem;">🔥 ' + m.streak + '</div></div><div class="review-result-chips">' + tasks + '</div><div class="parent-progress-label">' + (m.completed ? '🎉 Complete! +5 💎 earned today.' : m.done + ' of 3 missions complete · Finish all 3 for +5 💎') + '</div></div>';
+    }
+
     let progress = loadProgress();
 
     // ---------- Spaced repetition (research B) ----------
@@ -1842,6 +1897,7 @@
         return `${topbar(false)}
         <div class="home-hero"><div class="home-kicker">⛏️ MINECRAFT CLASSROOM</div><h1>Ready for an adventure?</h1><p>Learn a little. Play a little. Build your skills!</p></div>
         ${renderWorldProgress()}
+        ${renderDailyMissions()}
         ${renderTodayReview()}
         <div class="today-card" onclick="${todayAction}"><div class="today-icon">⭐</div><div class="today-copy"><div class="today-kicker">TODAY'S ADVENTURE</div><div class="today-title">${lesson.cat.icon} ${lesson.cat.name}</div><div class="today-sub">${lesson.reason}${lesson.item ? ' • ' + lessonLabel : ''}</div></div><button class="big-btn play">START ▶</button></div>
         <h2 class="home-section-title">🎮 Play & Learn</h2><div class="grid home-featured">${cards}</div>
@@ -3048,6 +3104,9 @@
 
     // ---------- Round end / Progress ----------
     function renderRoundEnd() {
+        if (quiz && quiz.reviewMode) recordDailyTask('review');
+        else if (state.params.key === 'math') recordDailyTask('math');
+        else if (state.params.key === 'quiz' || state.params.key !== 'trace') recordDailyTask('practice');
         const { stars, key, level, category } = state.params;
         if (key === 'review' && quiz && quiz.reviewMode) {
             const stats = quiz.reviewStats;
