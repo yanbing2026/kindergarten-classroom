@@ -1501,11 +1501,14 @@
                     p.mastery = {};
                 }
                 if (!p.due || typeof p.due !== 'object') p.due = {};
+                if (!Array.isArray(p.activityLog)) p.activityLog = [];
                 return p;
             }
         } catch (e) {}
-        return { stars: 0, mastery: {}, mathCorrect: {} };
+        return { stars: 0, mastery: {}, due: {}, mathCorrect: {}, activityLog: [] };
     }
+    function logActivity(type, key, itemId, correct, firstTry) { if (!Array.isArray(progress.activityLog)) progress.activityLog = []; progress.activityLog.push({ at: Date.now(), type, key, itemId, correct: !!correct, firstTry: !!firstTry }); if (progress.activityLog.length > 300) progress.activityLog = progress.activityLog.slice(-300); }
+    function getActivitySummary(days = 7) { const cutoff = Date.now() - days * 86400000; const recent = (progress.activityLog || []).filter(x => x.at >= cutoff); return { attempts: recent.length, correct: recent.filter(x => x.correct).length, firstTry: recent.filter(x => x.correct && x.firstTry).length, days: new Set(recent.map(x => new Date(x.at).toLocaleDateString())).size }; }
     function saveProgress() { localStorage.setItem('kc_progress_v1', JSON.stringify(progress)); }
     let progress = loadProgress();
 
@@ -2630,6 +2633,7 @@
         if (quiz.awaitingNext) return;
         const q = quiz.questions[quiz.idx];
         const correct = id === q.itemId;
+        logActivity(quiz.reviewMode ? 'review' : 'quiz', q.sourceKey || quiz.key, q.itemId, correct, quiz.firstAttempt);
         if (quiz.reviewMode && !quiz.awaitingNext) {
             quiz.reviewStats.attempted += 1;
             const skillKey = q.sourceCatKey || quiz.key;
@@ -3076,6 +3080,7 @@
             return acc;
         }, { total: 0, mastered: 0, learning: 0, review: 0, focus: [] });
         const pct = stats.total ? Math.round(stats.mastered / stats.total * 100) : 0;
+        const activity = getActivitySummary(7);
         const focus = stats.focus.slice(0, 6).map(x => {
             const status = skillStatus(x.stats);
             return '<div class="parent-focus-row"><span>' + x.cat.icon + ' <strong>' + x.cat.name + '</strong></span><span>' + status.icon + ' ' + status.label + '</span></div>';
@@ -3084,7 +3089,7 @@
         <div class="parent-dashboard">
             <div class="parent-header"><div><div class="parent-kicker">FOR PARENTS</div><h2>📋 Learning Snapshot</h2><div class="parent-date">${new Date().toLocaleDateString()}</div></div><div class="parent-diamond">💎 ${progress.stars}</div></div>
             <div class="parent-grid"><div class="parent-stat"><div class="parent-stat-number">${pct}%</div><div>Mastered</div></div><div class="parent-stat"><div class="parent-stat-number">${stats.learning}</div><div>Learning</div></div><div class="parent-stat"><div class="parent-stat-number">${stats.review}</div><div>Due for review</div></div></div>
-            <div class="parent-card"><h3>🧭 What to focus on</h3>${focus || '<div class="parent-good">🏆 No immediate learning gaps. Keep exploring!</div>'}</div>
+            <div class="parent-card"><h3>📅 Last 7 days</h3><div class="parent-grid" style="margin:0;"><div class="parent-stat"><div class="parent-stat-number">${activity.attempts}</div><div>Attempts</div></div><div class="parent-stat"><div class="parent-stat-number">${activity.correct}</div><div>Correct</div></div><div class="parent-stat"><div class="parent-stat-number">${activity.firstTry}</div><div>First try</div></div></div><div class="parent-progress-label">Active on ${activity.days} day${activity.days === 1 ? "" : "s"}</div></div><div class="parent-card"><h3>🧭 What to focus on</h3>${focus || '<div class="parent-good">🏆 No immediate learning gaps. Keep exploring!</div>'}</div>
             <div class="parent-card"><h3>📚 Overall progress</h3><div class="parent-progress"><div class="parent-progress-fill" style="width:${pct}%"></div></div><div class="parent-progress-label">${stats.mastered} of ${stats.total} learning items mastered</div></div>
             <div class="parent-card"><h3>💎 Learning rewards</h3><div class="parent-progress-label">${progress.stars} diamonds earned · ${Object.values(progress.mathCorrect).reduce((a,b)=>a+(b||0),0)} math problems solved</div></div>
             <button class="big-btn home" onclick="go('progress')">← Back to Progress</button>
