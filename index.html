@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-title" content="Classroom">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="description" content="A supplemental kindergarten learning app: letters, numbers, English, Chinese, Spanish, and math.">
-    <title>⛏️ Minecraft Classroom ⛏️</title>
+    <title>⛏️ BlockQuest Classroom ⛏️</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -374,7 +374,7 @@
     .home-section-title{max-width:760px;margin:18px auto 10px;padding:0 4px}.home-featured{max-width:760px;margin:0 auto}.home-tools{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px}.home-tool{border:2px solid rgba(43,27,14,.12);border-radius:16px;padding:13px 10px;background:#fff;font:inherit;font-weight:800;cursor:pointer;min-height:52px}.home-tool:active,.today-card:active{transform:translateY(1px)}
     @media(max-width:560px){.today-card{flex-wrap:wrap}.today-card .big-btn{width:100%}.home-hero h1{font-size:1.65rem}}
 
-        /* ---------- Minecraft Classroom Animation System ---------- */
+        /* ---------- BlockQuest Classroom Animation System ---------- */
         @media (prefers-reduced-motion: no-preference) {
             .container { animation: mcPageIn 0.45s ease-out both; }
             .grid .card { animation: mcCardIn 0.38s cubic-bezier(.2,.8,.2,1) both; }
@@ -509,226 +509,193 @@
     // One source of truth per level. Add a word here and it appears in all three
     // languages automatically. To add a level, append another array to VOCAB_LEVELS.
     const VOCAB_LEVELS = [
-        [ // Level 1 — 3–4 letters (mob + item catalog)
-            {id:'axe',emoji:'🪓',img:'images/words/axe.png',en:'Axe',zh:{hanzi:'斧'},es:'Hacha'},
-            {id:'bat',emoji:'🦇',img:'images/words/bat.png',en:'Bat',zh:{hanzi:'蝙蝠'},es:'Murciélago'},
-            {id:'bee',emoji:'🐝',img:'images/words/bee.png',en:'Bee',zh:{hanzi:'蜜蜂'},es:'Abeja'},
-            {id:'bow',emoji:'🏹',img:'images/words/bow.png',en:'Bow',zh:{hanzi:'弓'},es:'Arco'},
-            {id:'cat',emoji:'🐱',img:'images/words/cat.png',en:'Cat',zh:{hanzi:'猫'},es:'Gato'},
-            {id:'cod',emoji:'🐟',img:'images/words/cod.png',en:'Cod',zh:{hanzi:'鳕鱼'},es:'Bacalao'},
-            {id:'cow',emoji:'🐮',img:'images/words/cow.png',en:'Cow',zh:{hanzi:'牛'},es:'Vaca'},
-            {id:'egg',emoji:'🥚',img:'images/words/egg.png',en:'Egg',zh:{hanzi:'鸡蛋'},es:'Huevo'},
-            {id:'fox',emoji:'🦊',img:'images/words/fox.png',en:'Fox',zh:{hanzi:'狐狸'},es:'Zorro'},
-            {id:'hoe',emoji:'🌾',img:'images/words/hoe.png',en:'Hoe',zh:{hanzi:'锄'},es:'Azada'},
-            {id:'ice',emoji:'🧊',img:'images/words/ice.png',en:'Ice',zh:{hanzi:'冰'},es:'Hielo'},
-            {id:'log',emoji:'🪵',img:'images/words/log.png',en:'Log',zh:{hanzi:'原木'},es:'Tronco'},
-            {id:'map',emoji:'🗺️',img:'images/words/map.png',en:'Map',zh:{hanzi:'地图'},es:'Mapa'},
-            {id:'pig',emoji:'🐷',img:'images/words/pig.png',en:'Pig',zh:{hanzi:'猪'},es:'Cerdo'},
-            {id:'tnt',emoji:'🧨',img:'images/words/tnt.png',en:'TNT',zh:{hanzi:'TNT'},es:'Dinamita'},
-            {id:'vex',emoji:'👿',img:'images/words/vex.png',en:'Vex',zh:{hanzi:'恼鬼'},es:'Vex'},
-            {id:'bell',emoji:'🔔',img:'images/words/bell.png',en:'Bell',zh:{hanzi:'钟'},es:'Campana'},
-            {id:'boat',emoji:'🚤',img:'images/words/boat.png',en:'Boat',zh:{hanzi:'船'},es:'Barca'},
-            {id:'cake',emoji:'🎂',img:'images/words/cake.png',en:'Cake',zh:{hanzi:'蛋糕'},es:'Tarta'},
-            {id:'book',emoji:'📖',img:'images/words/book.png',en:'Book',zh:{hanzi:'书'},es:'Libro'},
+        [ // Level 1 — original kindergarten vocabulary
+            {id:'ant',emoji:'🐜',en:'Ant',zh:{hanzi:'蚂蚁'},es:'Hormiga'},
+            {id:'apple',emoji:'🍎',en:'Apple',zh:{hanzi:'苹果'},es:'Manzana'},
+            {id:'baby',emoji:'👶',en:'Baby',zh:{hanzi:'婴儿'},es:'Bebé'},
+            {id:'ball',emoji:'⚽',en:'Ball',zh:{hanzi:'球'},es:'Pelota'},
+            {id:'bear',emoji:'🐻',en:'Bear',zh:{hanzi:'熊'},es:'Oso'},
+            {id:'bird',emoji:'🐦',en:'Bird',zh:{hanzi:'鸟'},es:'Pájaro'},
+            {id:'book',emoji:'📖',en:'Book',zh:{hanzi:'书'},es:'Libro'},
+            {id:'bus',emoji:'🚌',en:'Bus',zh:{hanzi:'公共汽车'},es:'Autobús'},
+            {id:'cake',emoji:'🎂',en:'Cake',zh:{hanzi:'蛋糕'},es:'Pastel'},
+            {id:'cat',emoji:'🐱',en:'Cat',zh:{hanzi:'猫'},es:'Gato'},
+            {id:'dog',emoji:'🐶',en:'Dog',zh:{hanzi:'狗'},es:'Perro'},
+            {id:'egg',emoji:'🥚',en:'Egg',zh:{hanzi:'鸡蛋'},es:'Huevo'},
+            {id:'fish',emoji:'🐟',en:'Fish',zh:{hanzi:'鱼'},es:'Pez'},
+            {id:'frog',emoji:'🐸',en:'Frog',zh:{hanzi:'青蛙'},es:'Rana'},
+            {id:'hand',emoji:'✋',en:'Hand',zh:{hanzi:'手'},es:'Mano'},
+            {id:'hat',emoji:'🧢',en:'Hat',zh:{hanzi:'帽子'},es:'Gorra'},
+            {id:'moon',emoji:'🌙',en:'Moon',zh:{hanzi:'月亮'},es:'Luna'},
+            {id:'sun',emoji:'☀️',en:'Sun',zh:{hanzi:'太阳'},es:'Sol'},
         ],
-        [ // Level 2 — 4–5 letters (mob + item catalog)
-            {id:'clay',emoji:'🟫',img:'images/words/clay.png',en:'Clay',zh:{hanzi:'黏土'},es:'Bloque de arcilla'},
-            {id:'coal',emoji:'⚫',img:'images/words/coal.png',en:'Coal',zh:{hanzi:'煤炭'},es:'Carbón'},
-            {id:'dirt',emoji:'🟫',img:'images/words/dirt.png',en:'Dirt',zh:{hanzi:'泥土'},es:'Tierra'},
-            {id:'door',emoji:'🚪',img:'images/words/door.png',en:'Door',zh:{hanzi:'门'},es:'Puerta'},
-            {id:'frog',emoji:'🐸',img:'images/words/frog.png',en:'Frog',zh:{hanzi:'青蛙'},es:'Rana'},
-            {id:'goat',emoji:'🐐',img:'images/words/goat.png',en:'Goat',zh:{hanzi:'山羊'},es:'Cabra'},
-            {id:'gold',emoji:'🥇',img:'images/words/gold.png',en:'Gold',zh:{hanzi:'金'},es:'Oro'},
-            {id:'husk',emoji:'🧟',img:'images/words/husk.png',en:'Husk',zh:{hanzi:'尸壳'},es:'Husk'},
-            {id:'iron',emoji:'⚙️',img:'images/words/iron.png',en:'Iron',zh:{hanzi:'铁'},es:'Hierro'},
-            {id:'lava',emoji:'🌋',img:'images/words/lava.png',en:'Lava',zh:{hanzi:'熔岩'},es:'Lava'},
-            {id:'lead',emoji:'🔗',img:'images/words/lead.png',en:'Lead',zh:{hanzi:'拴绳'},es:'Rienda'},
-            {id:'mule',emoji:'🐴',img:'images/words/mule.png',en:'Mule',zh:{hanzi:'骡子'},es:'Mula'},
-            {id:'rail',emoji:'🛤️',img:'images/words/rail.png',en:'Rail',zh:{hanzi:'铁轨'},es:'Raíl'},
-            {id:'sand',emoji:'🏖️',img:'images/words/sand.png',en:'Sand',zh:{hanzi:'沙子'},es:'Arena'},
-            {id:'wolf',emoji:'🐺',img:'images/words/wolf.png',en:'Wolf',zh:{hanzi:'狼'},es:'Lobo'},
-            {id:'wood',emoji:'🪵',img:'images/words/wood.png',en:'Wood',zh:{hanzi:'木头'},es:'Leño'},
-            {id:'wool',emoji:'🧶',img:'images/words/wool.png',en:'Wool',zh:{hanzi:'羊毛'},es:'Lana'},
-            {id:'allay',emoji:'🩷',img:'images/words/allay.png',en:'Allay',zh:{hanzi:'悦灵'},es:'Allay'},
-            {id:'anvil',emoji:'🔨',img:'images/words/anvil.png',en:'Anvil',zh:{hanzi:'铁砧'},es:'Yunque'},
+        [ // Level 2 — original kindergarten vocabulary
+            {id:'banana',emoji:'🍌',en:'Banana',zh:{hanzi:'香蕉'},es:'Plátano'},
+            {id:'bread',emoji:'🍞',en:'Bread',zh:{hanzi:'面包'},es:'Pan'},
+            {id:'chair',emoji:'🪑',en:'Chair',zh:{hanzi:'椅子'},es:'Silla'},
+            {id:'cloud',emoji:'☁️',en:'Cloud',zh:{hanzi:'云'},es:'Nube'},
+            {id:'corn',emoji:'🌽',en:'Corn',zh:{hanzi:'玉米'},es:'Maíz'},
+            {id:'door',emoji:'🚪',en:'Door',zh:{hanzi:'门'},es:'Puerta'},
+            {id:'dress',emoji:'👗',en:'Dress',zh:{hanzi:'连衣裙'},es:'Vestido'},
+            {id:'green',emoji:'🟢',en:'Green',zh:{hanzi:'绿色'},es:'Verde'},
+            {id:'house',emoji:'🏠',en:'House',zh:{hanzi:'房子'},es:'Casa'},
+            {id:'juice',emoji:'🧃',en:'Juice',zh:{hanzi:'果汁'},es:'Jugo'},
+            {id:'lemon',emoji:'🍋',en:'Lemon',zh:{hanzi:'柠檬'},es:'Limón'},
+            {id:'mouse',emoji:'🐭',en:'Mouse',zh:{hanzi:'老鼠'},es:'Ratón'},
+            {id:'ocean',emoji:'🌊',en:'Ocean',zh:{hanzi:'海洋'},es:'Océano'},
+            {id:'panda',emoji:'🐼',en:'Panda',zh:{hanzi:'熊猫'},es:'Panda'},
+            {id:'pizza',emoji:'🍕',en:'Pizza',zh:{hanzi:'披萨'},es:'Pizza'},
+            {id:'rain',emoji:'🌧️',en:'Rain',zh:{hanzi:'雨'},es:'Lluvia'},
+            {id:'robot',emoji:'🤖',en:'Robot',zh:{hanzi:'机器人'},es:'Robot'},
+            {id:'school',emoji:'🏫',en:'School',zh:{hanzi:'学校'},es:'Escuela'},
         ],
-        [ // Level 3 — 5 letters (mob + item catalog)
-            {id:'arrow',emoji:'🏹',img:'images/words/arrow.png',en:'Arrow',zh:{hanzi:'箭'},es:'Flecha'},
-            {id:'blaze',emoji:'🔥',img:'images/words/blaze.png',en:'Blaze',zh:{hanzi:'烈焰人'},es:'Blaze'},
-            {id:'boots',emoji:'🥾',img:'images/words/boots.png',en:'Boots',zh:{hanzi:'靴子'},es:'Botas'},
-            {id:'bread',emoji:'🍞',img:'images/words/bread.png',en:'Bread',zh:{hanzi:'面包'},es:'Pan'},
-            {id:'brick',emoji:'🧱',img:'images/words/brick.png',en:'Brick',zh:{hanzi:'红砖'},es:'Ladrillo'},
-            {id:'camel',emoji:'🐫',img:'images/words/camel.png',en:'Camel',zh:{hanzi:'骆驼'},es:'Camello'},
-            {id:'chest',emoji:'🧰',img:'images/words/chest.png',en:'Chest',zh:{hanzi:'箱子'},es:'Cofre'},
-            {id:'clock',emoji:'⏰',img:'images/words/clock.png',en:'Clock',zh:{hanzi:'时钟'},es:'Reloj'},
-            {id:'ghast',emoji:'👹',img:'images/words/ghast.png',en:'Ghast',zh:{hanzi:'恶魂'},es:'Ghast'},
-            {id:'glass',emoji:'🪟',img:'images/words/glass.png',en:'Glass',zh:{hanzi:'玻璃'},es:'Cristal'},
-            {id:'horse',emoji:'🐴',img:'images/words/horse.png',en:'Horse',zh:{hanzi:'马'},es:'Caballo'},
-            {id:'llama',emoji:'🦙',img:'images/words/llama.png',en:'Llama',zh:{hanzi:'羊驼'},es:'Llama'},
-            {id:'panda',emoji:'🐼',img:'images/words/panda.png',en:'Panda',zh:{hanzi:'熊猫'},es:'Panda'},
-            {id:'sheep',emoji:'🐑',img:'images/words/sheep.png',en:'Sheep',zh:{hanzi:'羊'},es:'Oveja'},
-            {id:'slime',emoji:'🟢',img:'images/words/slime.png',en:'Slime',zh:{hanzi:'史莱姆'},es:'Slime'},
-            {id:'squid',emoji:'🦑',img:'images/words/squid.png',en:'Squid',zh:{hanzi:'鱿鱼'},es:'Calamar'},
-            {id:'steak',emoji:'🥩',img:'images/words/steak.png',en:'Steak',zh:{hanzi:'牛排'},es:'Filete asado'},
-            {id:'stone',emoji:'🪨',img:'images/words/stone.png',en:'Stone',zh:{hanzi:'石头'},es:'Piedra'},
-            {id:'stray',emoji:'💀',img:'images/words/stray.png',en:'Stray',zh:{hanzi:'流浪者'},es:'Stray'},
-            {id:'stick',emoji:'🪵',img:'images/words/stick.png',en:'Stick',zh:{hanzi:'木棍'},es:'Palo'},
-            {id:'paper',emoji:'📄',img:'images/words/paper.png',en:'Paper',zh:{hanzi:'纸'},es:'Papel'},
-            {id:'sugar',emoji:'🍬',img:'images/words/sugar.png',en:'Sugar',zh:{hanzi:'糖'},es:'Azúcar'},
-            {id:'honey',emoji:'🍯',img:'images/words/honey.png',en:'Honey Bottle',zh:{hanzi:'蜂蜜瓶'},es:'Frasco de miel'},
-            {id:'melon',emoji:'🍉',img:'images/words/melon.png',en:'Melon',zh:{hanzi:'西瓜'},es:'Sandía'},
-            {id:'apple',emoji:'🍎',img:'images/words/apple.png',en:'Apple',zh:{hanzi:'苹果'},es:'Manzana'},
-            {id:'wheat',emoji:'🌾',img:'images/words/wheat.png',en:'Wheat',zh:{hanzi:'小麦'},es:'Trigo'},
+        [ // Level 3 — original kindergarten vocabulary
+            {id:'tree',emoji:'🌳',en:'Tree',zh:{hanzi:'树'},es:'Árbol'},
+            {id:'animal',emoji:'🐾',en:'Animal',zh:{hanzi:'动物'},es:'Animal'},
+            {id:'basket',emoji:'🧺',en:'Basket',zh:{hanzi:'篮子'},es:'Cesta'},
+            {id:'bottle',emoji:'🍼',en:'Bottle',zh:{hanzi:'瓶子'},es:'Botella'},
+            {id:'button',emoji:'🔘',en:'Button',zh:{hanzi:'按钮'},es:'Botón'},
+            {id:'candle',emoji:'🕯️',en:'Candle',zh:{hanzi:'蜡烛'},es:'Vela'},
+            {id:'carrot',emoji:'🥕',en:'Carrot',zh:{hanzi:'胡萝卜'},es:'Zanahoria'},
+            {id:'circle',emoji:'⭕',en:'Circle',zh:{hanzi:'圆形'},es:'Círculo'},
+            {id:'cookie',emoji:'🍪',en:'Cookie',zh:{hanzi:'饼干'},es:'Galleta'},
+            {id:'dinner',emoji:'🍽️',en:'Dinner',zh:{hanzi:'晚餐'},es:'Cena'},
+            {id:'flower',emoji:'🌸',en:'Flower',zh:{hanzi:'花'},es:'Flor'},
+            {id:'garden',emoji:'🌷',en:'Garden',zh:{hanzi:'花园'},es:'Jardín'},
+            {id:'guitar',emoji:'🎸',en:'Guitar',zh:{hanzi:'吉他'},es:'Guitarra'},
+            {id:'happy',emoji:'😊',en:'Happy',zh:{hanzi:'开心的'},es:'Feliz'},
+            {id:'inside',emoji:'🏠',en:'Inside',zh:{hanzi:'里面'},es:'Dentro'},
+            {id:'jacket',emoji:'🧥',en:'Jacket',zh:{hanzi:'夹克'},es:'Chaqueta'},
+            {id:'kitten',emoji:'🐱',en:'Kitten',zh:{hanzi:'小猫'},es:'Gatito'},
+            {id:'ladder',emoji:'🪜',en:'Ladder',zh:{hanzi:'梯子'},es:'Escalera'},
         ],
-        [ // Level 4 — 5–6 letters (mob + item catalog)
-            {id:'sword',emoji:'⚔️',img:'images/words/sword.png',en:'Sword',zh:{hanzi:'剑'},es:'Espada'},
-            {id:'torch',emoji:'🔦',img:'images/words/torch.png',en:'Torch',zh:{hanzi:'火把'},es:'Antorcha'},
-            {id:'water',emoji:'💧',img:'images/words/water.png',en:'Water',zh:{hanzi:'水'},es:'Agua'},
-            {id:'witch',emoji:'🧙',img:'images/words/witch.png',en:'Witch',zh:{hanzi:'女巫'},es:'Bruja'},
-            {id:'bamboo',emoji:'🎋',img:'images/words/bamboo.png',en:'Bamboo',zh:{hanzi:'竹子'},es:'Bambú'},
-            {id:'barrel',emoji:'🛢️',img:'images/words/barrel.png',en:'Barrel',zh:{hanzi:'木桶'},es:'Barril'},
-            {id:'beacon',emoji:'📡',img:'images/words/beacon.png',en:'Beacon',zh:{hanzi:'信标'},es:'Faro'},
-            {id:'bogged',emoji:'🧟',img:'images/words/bogged.png',en:'Bogged',zh:{hanzi:'沼骸'},es:'Bogged'},
-            {id:'breeze',emoji:'🌬️',img:'images/words/breeze.png',en:'Breeze',zh:{hanzi:'旋风人'},es:'Breeze'},
-            {id:'bucket',emoji:'🪣',img:'images/words/bucket.png',en:'Bucket',zh:{hanzi:'铁桶'},es:'Cubo'},
-            {id:'bundle',emoji:'🎒',img:'images/words/bundle.png',en:'Bundle',zh:{hanzi:'收纳袋'},es:'Saco'},
-            {id:'carrot',emoji:'🥕',img:'images/words/carrot.png',en:'Carrot',zh:{hanzi:'胡萝卜'},es:'Zanahoria'},
-            {id:'cookie',emoji:'🍪',img:'images/words/cookie.png',en:'Cookie',zh:{hanzi:'曲奇'},es:'Galleta'},
-            {id:'copper',emoji:'🟤',img:'images/words/copper.png',en:'Copper',zh:{hanzi:'铜'},es:'Cobre'},
-            {id:'donkey',emoji:'🐴',img:'images/words/donkey.png',en:'Donkey',zh:{hanzi:'驴'},es:'Burro'},
-            {id:'elytra',emoji:'🦋',img:'images/words/elytra.png',en:'Elytra',zh:{hanzi:'鞘翅'},es:'Élitros'},
-            {id:'evoker',emoji:'🧙',img:'images/words/evoker.png',en:'Evoker',zh:{hanzi:'唤魔者'},es:'Evocador'},
-            {id:'gravel',emoji:'🪨',img:'images/words/gravel.png',en:'Gravel',zh:{hanzi:'沙砾'},es:'Grava'},
-            {id:'helmet',emoji:'⛑️',img:'images/words/helmet.png',en:'Helmet',zh:{hanzi:'头盔'},es:'Casco'},
+        [ // Level 4 — original kindergarten vocabulary
+            {id:'little',emoji:'🤏',en:'Little',zh:{hanzi:'小的'},es:'Pequeño'},
+            {id:'music',emoji:'🎵',en:'Music',zh:{hanzi:'音乐'},es:'Música'},
+            {id:'airport',emoji:'✈️',en:'Airport',zh:{hanzi:'机场'},es:'Aeropuerto'},
+            {id:'backpack',emoji:'🎒',en:'Backpack',zh:{hanzi:'背包'},es:'Mochila'},
+            {id:'birthday',emoji:'🎈',en:'Birthday',zh:{hanzi:'生日'},es:'Cumpleaños'},
+            {id:'breakfast',emoji:'🥣',en:'Breakfast',zh:{hanzi:'早餐'},es:'Desayuno'},
+            {id:'building',emoji:'🏢',en:'Building',zh:{hanzi:'建筑物'},es:'Edificio'},
+            {id:'butterfly',emoji:'🦋',en:'Butterfly',zh:{hanzi:'蝴蝶'},es:'Mariposa'},
+            {id:'computer',emoji:'💻',en:'Computer',zh:{hanzi:'电脑'},es:'Computadora'},
+            {id:'elephant',emoji:'🐘',en:'Elephant',zh:{hanzi:'大象'},es:'Elefante'},
+            {id:'family',emoji:'👨‍👩‍👧',en:'Family',zh:{hanzi:'家庭'},es:'Familia'},
+            {id:'football',emoji:'🏈',en:'Football',zh:{hanzi:'橄榄球'},es:'Fútbol'},
+            {id:'grandma',emoji:'👵',en:'Grandma',zh:{hanzi:'奶奶'},es:'Abuela'},
+            {id:'hospital',emoji:'🏥',en:'Hospital',zh:{hanzi:'医院'},es:'Hospital'},
+            {id:'jellyfish',emoji:'🪼',en:'Jellyfish',zh:{hanzi:'水母'},es:'Medusa'},
+            {id:'library',emoji:'📚',en:'Library',zh:{hanzi:'图书馆'},es:'Biblioteca'},
+            {id:'mountain',emoji:'⛰️',en:'Mountain',zh:{hanzi:'山'},es:'Montaña'},
+            {id:'rainbow',emoji:'🌈',en:'Rainbow',zh:{hanzi:'彩虹'},es:'Arcoíris'},
         ],
-        [ // Level 5 — 6 letters (mob + item catalog)
-            {id:'hoglin',emoji:'🐗',img:'images/words/hoglin.png',en:'Hoglin',zh:{hanzi:'疣猪兽'},es:'Hoglin'},
-            {id:'ladder',emoji:'🪜',img:'images/words/ladder.png',en:'Ladder',zh:{hanzi:'梯子'},es:'Escalera de mano'},
-            {id:'parrot',emoji:'🦜',img:'images/words/parrot.png',en:'Parrot',zh:{hanzi:'鹦鹉'},es:'Loro'},
-            {id:'piglin',emoji:'🐷',img:'images/words/piglin.png',en:'Piglin',zh:{hanzi:'猪灵'},es:'Piglin'},
-            {id:'potato',emoji:'🥔',img:'images/words/potato.png',en:'Potato',zh:{hanzi:'马铃薯'},es:'Patata'},
-            {id:'potion',emoji:'🧪',img:'images/words/potion.png',en:'Potion',zh:{hanzi:'药水'},es:'Poción'},
-            {id:'quartz',emoji:'⬜',img:'images/words/quartz.png',en:'Quartz',zh:{hanzi:'石英'},es:'Quartz'},
-            {id:'rabbit',emoji:'🐰',img:'images/words/rabbit.png',en:'Rabbit',zh:{hanzi:'兔子'},es:'Conejo'},
-            {id:'saddle',emoji:'🐴',img:'images/words/saddle.png',en:'Saddle',zh:{hanzi:'鞍'},es:'Montura'},
-            {id:'salmon',emoji:'🐟',img:'images/words/salmon.png',en:'Salmon',zh:{hanzi:'鲑鱼'},es:'Salmón'},
-            {id:'shears',emoji:'✂️',img:'images/words/shears.png',en:'Shears',zh:{hanzi:'剪刀'},es:'Tijeras'},
-            {id:'shield',emoji:'🛡️',img:'images/words/shield.png',en:'Shield',zh:{hanzi:'盾牌'},es:'Escudo'},
-            {id:'shovel',emoji:'🥄',img:'images/words/shovel.png',en:'Shovel',zh:{hanzi:'锹'},es:'Pala'},
-            {id:'spider',emoji:'🕷️',img:'images/words/spider.png',en:'Spider',zh:{hanzi:'蜘蛛'},es:'Araña'},
-            {id:'sponge',emoji:'🧽',img:'images/words/sponge.png',en:'Sponge',zh:{hanzi:'海绵'},es:'Esponja'},
-            {id:'turtle',emoji:'🐢',img:'images/words/turtle.png',en:'Turtle',zh:{hanzi:'海龟'},es:'Tortuga'},
-            {id:'warden',emoji:'👂',img:'images/words/warden.png',en:'Warden',zh:{hanzi:'监守者'},es:'Warden'},
-            {id:'wither',emoji:'💀',img:'images/words/wither.png',en:'Wither',zh:{hanzi:'凋灵'},es:'Wither'},
-            {id:'zoglin',emoji:'🐗',img:'images/words/zoglin.png',en:'Zoglin',zh:{hanzi:'僵尸疣猪兽'},es:'Zoglin'},
-            {id:'candle',emoji:'🕯️',img:'images/words/candle.png',en:'Candle',zh:{hanzi:'蜡烛'},es:'Vela'},
-            {id:'cactus',emoji:'🌵',img:'images/words/cactus.png',en:'Cactus',zh:{hanzi:'仙人掌'},es:'Cactus'},
+        [ // Level 5 — original kindergarten vocabulary
+            {id:'sandwich',emoji:'🥪',en:'Sandwich',zh:{hanzi:'三明治'},es:'Sándwich'},
+            {id:'teacher',emoji:'🧑‍🏫',en:'Teacher',zh:{hanzi:'老师'},es:'Maestro'},
+            {id:'window',emoji:'🪟',en:'Window',zh:{hanzi:'窗户'},es:'Ventana'},
+            {id:'adventure',emoji:'🧭',en:'Adventure',zh:{hanzi:'冒险'},es:'Aventura'},
+            {id:'beautiful',emoji:'🌸',en:'Beautiful',zh:{hanzi:'美丽的'},es:'Hermoso'},
+            {id:'careful',emoji:'👀',en:'Careful',zh:{hanzi:'小心的'},es:'Cuidadoso'},
+            {id:'classroom',emoji:'🏫',en:'Classroom',zh:{hanzi:'教室'},es:'Aula'},
+            {id:'dinosaur',emoji:'🦖',en:'Dinosaur',zh:{hanzi:'恐龙'},es:'Dinosaurio'},
+            {id:'exercise',emoji:'🏃',en:'Exercise',zh:{hanzi:'运动'},es:'Ejercicio'},
+            {id:'favorite',emoji:'❤️',en:'Favorite',zh:{hanzi:'最喜欢的'},es:'Favorito'},
+            {id:'firefly',emoji:'✨',en:'Firefly',zh:{hanzi:'萤火虫'},es:'Luciérnaga'},
+            {id:'friendship',emoji:'🤝',en:'Friendship',zh:{hanzi:'友谊'},es:'Amistad'},
+            {id:'giraffe',emoji:'🦒',en:'Giraffe',zh:{hanzi:'长颈鹿'},es:'Jirafa'},
+            {id:'important',emoji:'⭐',en:'Important',zh:{hanzi:'重要的'},es:'Importante'},
+            {id:'jellybean',emoji:'🍬',en:'Jellybean',zh:{hanzi:'软糖'},es:'Gominola'},
+            {id:'kangaroo',emoji:'🦘',en:'Kangaroo',zh:{hanzi:'袋鼠'},es:'Canguro'},
+            {id:'playground',emoji:'🛝',en:'Playground',zh:{hanzi:'游乐场'},es:'Patio'},
+            {id:'sunshine',emoji:'☀️',en:'Sunshine',zh:{hanzi:'阳光'},es:'Luz solar'},
         ],
-        [ // Level 6 — 6–7 letters (mob + item catalog)
-            {id:'zombie',emoji:'🧟',img:'images/words/zombie.png',en:'Zombie',zh:{hanzi:'僵尸'},es:'Zombi'},
-            {id:'axolotl',emoji:'🐲',img:'images/words/axolotl.png',en:'Axolotl',zh:{hanzi:'美西螈'},es:'Axolote'},
-            {id:'bedrock',emoji:'⬛',img:'images/words/bedrock.png',en:'Bedrock',zh:{hanzi:'基岩'},es:'Piedra base'},
-            {id:'chicken',emoji:'🐔',img:'images/words/chicken.png',en:'Chicken',zh:{hanzi:'鸡'},es:'Pollo'},
-            {id:'compass',emoji:'🧭',img:'images/words/compass.png',en:'Compass',zh:{hanzi:'指南针'},es:'Brújula'},
-            {id:'creeper',emoji:'💥',img:'images/words/creeper.png',en:'Creeper',zh:{hanzi:'苦力怕'},es:'Creeper'},
-            {id:'diamond',emoji:'💎',img:'images/words/diamond.png',en:'Diamond',zh:{hanzi:'钻石'},es:'Diamante'},
-            {id:'dolphin',emoji:'🐬',img:'images/words/dolphin.png',en:'Dolphin',zh:{hanzi:'海豚'},es:'Delfín'},
-            {id:'drowned',emoji:'🧟',img:'images/words/drowned.png',en:'Drowned',zh:{hanzi:'溺尸'},es:'Ahogado'},
-            {id:'emerald',emoji:'💚',img:'images/words/emerald.png',en:'Emerald',zh:{hanzi:'绿宝石'},es:'Esmeralda'},
-            {id:'furnace',emoji:'🔥',img:'images/words/furnace.png',en:'Furnace',zh:{hanzi:'熔炉'},es:'Horno'},
-            {id:'lantern',emoji:'🏮',img:'images/words/lantern.png',en:'Lantern',zh:{hanzi:'灯笼'},es:'Farol'},
-            {id:'nametag',emoji:'🏷️',img:'images/words/nametag.png',en:'Name Tag',zh:{hanzi:'命名牌'},es:'Etiqueta'},
-            {id:'phantom',emoji:'👻',img:'images/words/phantom.png',en:'Phantom',zh:{hanzi:'幻翼'},es:'Fantasma'},
-            {id:'pickaxe',emoji:'⛏️',img:'images/words/pickaxe.png',en:'Pickaxe',zh:{hanzi:'镐'},es:'Pico'},
-            {id:'pumpkin',emoji:'🎃',img:'images/words/pumpkin.png',en:'Pumpkin',zh:{hanzi:'南瓜'},es:'Calabaza'},
-            {id:'ravager',emoji:'🐗',img:'images/words/ravager.png',en:'Ravager',zh:{hanzi:'劫掠兽'},es:'Devastador'},
-            {id:'shulker',emoji:'📦',img:'images/words/shulker.png',en:'Shulker',zh:{hanzi:'潜影贝'},es:'Shulker'},
-            {id:'sniffer',emoji:'🦕',img:'images/words/sniffer.png',en:'Sniffer',zh:{hanzi:'嗅探兽'},es:'Sniffer'},
+        [ // Level 6 — original kindergarten vocabulary
+            {id:'teamwork',emoji:'🤝',en:'Teamwork',zh:{hanzi:'团队合作'},es:'Trabajo en equipo'},
+            {id:'wonderful',emoji:'🌟',en:'Wonderful',zh:{hanzi:'精彩的'},es:'Maravilloso'},
+            {id:'zebra',emoji:'🦓',en:'Zebra',zh:{hanzi:'斑马'},es:'Cebra'},
+            {id:'butterfly',emoji:'🦋',en:'Butterfly',zh:{hanzi:'蝴蝶'},es:'Mariposa'},
+            {id:'caterpillar',emoji:'🐛',en:'Caterpillar',zh:{hanzi:'毛毛虫'},es:'Oruga'},
+            {id:'chocolate',emoji:'🍫',en:'Chocolate',zh:{hanzi:'巧克力'},es:'Chocolate'},
+            {id:'community',emoji:'🏘️',en:'Community',zh:{hanzi:'社区'},es:'Comunidad'},
+            {id:'discover',emoji:'🔎',en:'Discover',zh:{hanzi:'发现'},es:'Descubrir'},
+            {id:'everywhere',emoji:'🌎',en:'Everywhere',zh:{hanzi:'到处'},es:'En todas partes'},
+            {id:'friendly',emoji:'😊',en:'Friendly',zh:{hanzi:'友好的'},es:'Amistoso'},
+            {id:'happiness',emoji:'😄',en:'Happiness',zh:{hanzi:'幸福'},es:'Felicidad'},
+            {id:'imagine',emoji:'💭',en:'Imagine',zh:{hanzi:'想象'},es:'Imaginar'},
+            {id:'kindness',emoji:'💗',en:'Kindness',zh:{hanzi:'善良'},es:'Amabilidad'},
+            {id:'learning',emoji:'📘',en:'Learning',zh:{hanzi:'学习'},es:'Aprendizaje'},
+            {id:'medicine',emoji:'💊',en:'Medicine',zh:{hanzi:'药'},es:'Medicina'},
+            {id:'question',emoji:'❓',en:'Question',zh:{hanzi:'问题'},es:'Pregunta'},
+            {id:'remember',emoji:'🧠',en:'Remember',zh:{hanzi:'记住'},es:'Recordar'},
+            {id:'together',emoji:'🤝',en:'Together',zh:{hanzi:'一起'},es:'Juntos'},
         ],
-        [ // Level 7 — 7–8 letters (mob + item catalog)
-            {id:'strider',emoji:'🕷️',img:'images/words/strider.png',en:'Strider',zh:{hanzi:'炽足兽'},es:'Strider'},
-            {id:'tadpole',emoji:'🐸',img:'images/words/tadpole.png',en:'Tadpole',zh:{hanzi:'蝌蚪'},es:'Renacuajo'},
-            {id:'trident',emoji:'🔱',img:'images/words/trident.png',en:'Trident',zh:{hanzi:'三叉戟'},es:'Tridente'},
-            {id:'beetroot',emoji:'🥬',img:'images/words/beetroot.png',en:'Beetroot',zh:{hanzi:'甜菜根'},es:'Remolacha'},
-            {id:'blazerod',emoji:'🔥',img:'images/words/blazerod.png',en:'Blaze Rod',zh:{hanzi:'烈焰棒'},es:'Vara de blaze'},
-            {id:'campfire',emoji:'🔥',img:'images/words/campfire.png',en:'Campfire',zh:{hanzi:'营火'},es:'Hoguera'},
-            {id:'cauldron',emoji:'🍲',img:'images/words/cauldron.png',en:'Cauldron',zh:{hanzi:'炼药锅'},es:'Caldero'},
-            {id:'creaking',emoji:'🪵',img:'images/words/creaking.png',en:'Creaking',zh:{hanzi:'吱吱作响的'},es:'Creaking'},
-            {id:'crossbow',emoji:'🏹',img:'images/words/crossbow.png',en:'Crossbow',zh:{hanzi:'弩'},es:'Ballesta'},
-            {id:'endstone',emoji:'🟨',img:'images/words/endstone.png',en:'End Stone',zh:{hanzi:'末地石'},es:'Piedra del End'},
-            {id:'enderman',emoji:'👁️',img:'images/words/enderman.png',en:'Enderman',zh:{hanzi:'末影人'},es:'Enderman'},
-            {id:'guardian',emoji:'🐡',img:'images/words/guardian.png',en:'Guardian',zh:{hanzi:'守卫者'},es:'Guardián'},
-            {id:'minecart',emoji:'🛤️',img:'images/words/minecart.png',en:'Minecart',zh:{hanzi:'矿车'},es:'Vagoneta'},
-            {id:'obsidian',emoji:'⬛',img:'images/words/obsidian.png',en:'Obsidian',zh:{hanzi:'黑曜石'},es:'Obsidiana'},
-            {id:'painting',emoji:'🖼️',img:'images/words/painting.png',en:'Painting',zh:{hanzi:'画'},es:'Cuadro'},
-            {id:'pillager',emoji:'🏹',img:'images/words/pillager.png',en:'Pillager',zh:{hanzi:'掠夺者'},es:'Saqueador'},
-            {id:'redstone',emoji:'🔴',img:'images/words/redstone.png',en:'Redstone',zh:{hanzi:'红石（消歧义）'},es:'Redstone'},
-            {id:'skeleton',emoji:'💀',img:'images/words/skeleton.png',en:'Skeleton',zh:{hanzi:'骷髅'},es:'Esqueleto'},
-            {id:'spyglass',emoji:'🔭',img:'images/words/spyglass.png',en:'Spyglass',zh:{hanzi:'望远镜'},es:'Catalejo'},
-            {id:'feather',emoji:'🪶',img:'images/words/feather.png',en:'Feather',zh:{hanzi:'羽毛'},es:'Pluma'},
-            {id:'mushroom',emoji:'🍄',img:'images/words/mushroom.png',en:'Mushroom',zh:{hanzi:'蘑菇'},es:'Champiñón'},
+        [ // Level 7 — original kindergarten vocabulary
+            {id:'vegetable',emoji:'🥦',en:'Vegetable',zh:{hanzi:'蔬菜'},es:'Verdura'},
+            {id:'yesterday',emoji:'📅',en:'Yesterday',zh:{hanzi:'昨天'},es:'Ayer'},
+            {id:'yourself',emoji:'🙂',en:'Yourself',zh:{hanzi:'你自己'},es:'Tú mismo'},
+            {id:'celebrate',emoji:'🎉',en:'Celebrate',zh:{hanzi:'庆祝'},es:'Celebrar'},
+            {id:'conversation',emoji:'💬',en:'Conversation',zh:{hanzi:'对话'},es:'Conversación'},
+            {id:'creativity',emoji:'🎨',en:'Creativity',zh:{hanzi:'创造力'},es:'Creatividad'},
+            {id:'different',emoji:'🔀',en:'Different',zh:{hanzi:'不同的'},es:'Diferente'},
+            {id:'education',emoji:'🎓',en:'Education',zh:{hanzi:'教育'},es:'Educación'},
+            {id:'exploring',emoji:'🧭',en:'Exploring',zh:{hanzi:'探索'},es:'Explorando'},
+            {id:'generous',emoji:'💝',en:'Generous',zh:{hanzi:'慷慨的'},es:'Generoso'},
+            {id:'imagination',emoji:'🌈',en:'Imagination',zh:{hanzi:'想象力'},es:'Imaginación'},
+            {id:'knowledge',emoji:'📚',en:'Knowledge',zh:{hanzi:'知识'},es:'Conocimiento'},
+            {id:'listening',emoji:'👂',en:'Listening',zh:{hanzi:'倾听'},es:'Escuchar'},
+            {id:'neighborhood',emoji:'🏘️',en:'Neighborhood',zh:{hanzi:'社区'},es:'Vecindario'},
+            {id:'practice',emoji:'✏️',en:'Practice',zh:{hanzi:'练习'},es:'Práctica'},
+            {id:'responsible',emoji:'✅',en:'Responsible',zh:{hanzi:'负责的'},es:'Responsable'},
+            {id:'storybook',emoji:'📖',en:'Storybook',zh:{hanzi:'故事书'},es:'Libro de cuentos'},
+            {id:'understanding',emoji:'💡',en:'Understanding',zh:{hanzi:'理解'},es:'Comprensión'},
         ],
-        [ // Level 8 — 8–10 letters (mob + item catalog)
-            {id:'villager',emoji:'🧑‍🌾',img:'images/words/villager.png',en:'Villager',zh:{hanzi:'村民'},es:'Aldeano'},
-            {id:'armadillo',emoji:'🐾',img:'images/words/armadillo.png',en:'Armadillo',zh:{hanzi:'犰狳'},es:'Armadillo'},
-            {id:'bookshelf',emoji:'📚',img:'images/words/bookshelf.png',en:'Bookshelf',zh:{hanzi:'书架'},es:'Librería'},
-            {id:'endermite',emoji:'🐛',img:'images/words/endermite.png',en:'Endermite',zh:{hanzi:'末影螨'},es:'Endermite'},
-            {id:'glowsquid',emoji:'🦑',img:'images/words/glowsquid.png',en:'Glow Squid',zh:{hanzi:'发光鱿鱼'},es:'Calamar luminoso'},
-            {id:'glowstone',emoji:'💡',img:'images/words/glowstone.png',en:'Glowstone',zh:{hanzi:'荧石'},es:'Piedra luminosa'},
-            {id:'irongolem',emoji:'🛡️',img:'images/words/irongolem.png',en:'Iron Golem',zh:{hanzi:'铁傀儡'},es:'Golem de hierro'},
-            {id:'itemframe',emoji:'🖼️',img:'images/words/itemframe.png',en:'Item Frame',zh:{hanzi:'物品展示框'},es:'Marco'},
-            {id:'magmacube',emoji:'🟠',img:'images/words/magmacube.png',en:'Magma Cube',zh:{hanzi:'岩浆怪'},es:'Cubo de magma'},
-            {id:'musicdisc',emoji:'💿',img:'images/words/musicdisc.png',en:'Music Disc',zh:{hanzi:'音乐唱片'},es:'Disco de música'},
-            {id:'netherite',emoji:'⬛',img:'images/words/netherite.png',en:'Netherite',zh:{hanzi:'下界合金'},es:'Netherita'},
-            {id:'polarbear',emoji:'🐻‍❄️',img:'images/words/polarbear.png',en:'Polar Bear',zh:{hanzi:'北极熊'},es:'Oso polar'},
-            {id:'sandstone',emoji:'🟨',img:'images/words/sandstone.png',en:'Sandstone',zh:{hanzi:'砂岩'},es:'Arenisca'},
-            {id:'snowgolem',emoji:'⛄',img:'images/words/snowgolem.png',en:'Snow Golem',zh:{hanzi:'雪傀儡'},es:'Golem de nieve'},
-            {id:'cavespider',emoji:'🕷️',img:'images/words/cavespider.png',en:'Cave Spider',zh:{hanzi:'洞穴蜘蛛'},es:'Araña de cueva'},
-            {id:'enderpearl',emoji:'🔮',img:'images/words/enderpearl.png',en:'Ender Pearl',zh:{hanzi:'末影珍珠'},es:'Perla de ender'},
-            {id:'eyeofender',emoji:'👁️',img:'images/words/eyeofender.png',en:'Eye of Ender',zh:{hanzi:'末影之眼'},es:'Ojo de ender'},
-            {id:'fishingrod',emoji:'🎣',img:'images/words/fishingrod.png',en:'Fishing Rod',zh:{hanzi:'钓鱼竿'},es:'Caña de pescar'},
-            {id:'netherstar',emoji:'⭐',img:'images/words/netherstar.png',en:'Nether Star',zh:{hanzi:'下界之星'},es:'Estrella del Nether'},
+        [ // Level 8 — original kindergarten vocabulary
+            {id:'vegetable',emoji:'🥦',en:'Vegetable',zh:{hanzi:'蔬菜'},es:'Verdura'},
+            {id:'wonderful',emoji:'🌟',en:'Wonderful',zh:{hanzi:'精彩的'},es:'Maravilloso'},
+            {id:'yesterday',emoji:'📅',en:'Yesterday',zh:{hanzi:'昨天'},es:'Ayer'},
+            {id:'yourself',emoji:'🙂',en:'Yourself',zh:{hanzi:'你自己'},es:'Tú mismo'},
+            {id:'achievement',emoji:'🏆',en:'Achievement',zh:{hanzi:'成就'},es:'Logro'},
+            {id:'communication',emoji:'💬',en:'Communication',zh:{hanzi:'交流'},es:'Comunicación'},
+            {id:'cooperation',emoji:'🤝',en:'Cooperation',zh:{hanzi:'合作'},es:'Cooperación'},
+            {id:'development',emoji:'🌱',en:'Development',zh:{hanzi:'发展'},es:'Desarrollo'},
+            {id:'educational',emoji:'🎓',en:'Educational',zh:{hanzi:'教育的'},es:'Educativo'},
+            {id:'independent',emoji:'🦋',en:'Independent',zh:{hanzi:'独立的'},es:'Independiente'},
+            {id:'motivation',emoji:'⭐',en:'Motivation',zh:{hanzi:'动力'},es:'Motivación'},
+            {id:'opportunity',emoji:'🚪',en:'Opportunity',zh:{hanzi:'机会'},es:'Oportunidad'},
+            {id:'responsibility',emoji:'✅',en:'Responsibility',zh:{hanzi:'责任'},es:'Responsabilidad'},
+            {id:'scientist',emoji:'🔬',en:'Scientist',zh:{hanzi:'科学家'},es:'Científico'},
+            {id:'improvement',emoji:'📈',en:'Improvement',zh:{hanzi:'进步'},es:'Mejora'},
+            {id:'investigation',emoji:'🔎',en:'Investigation',zh:{hanzi:'调查'},es:'Investigación'},
+            {id:'measurement',emoji:'📏',en:'Measurement',zh:{hanzi:'测量'},es:'Medición'},
+            {id:'relationship',emoji:'❤️',en:'Relationship',zh:{hanzi:'关系'},es:'Relación'},
         ],
-        [ // Level 9 — 10–12 letters (mob + item catalog)
-            {id:'netherrack',emoji:'🔥',img:'images/words/netherrack.png',en:'Netherrack',zh:{hanzi:'下界岩'},es:'Netherrack'},
-            {id:'prismarine',emoji:'🟩',img:'images/words/prismarine.png',en:'Prismarine',zh:{hanzi:'海晶石'},es:'Prismarina'},
-            {id:'pufferfish',emoji:'🐡',img:'images/words/pufferfish.png',en:'Pufferfish',zh:{hanzi:'河豚'},es:'Pez globo'},
-            {id:'rabbitstew',emoji:'🍲',img:'images/words/rabbitstew.png',en:'Rabbit Stew',zh:{hanzi:'兔肉煲'},es:'Estofado de conejo'},
-            {id:'silverfish',emoji:'🐛',img:'images/words/silverfish.png',en:'Silverfish',zh:{hanzi:'蠹虫'},es:'Pececillo de plata'},
-            {id:'vindicator',emoji:'🪓',img:'images/words/vindicator.png',en:'Vindicator',zh:{hanzi:'卫道士'},es:'Vindicador'},
-            {id:'cobblestone',emoji:'🪨',img:'images/words/cobblestone.png',en:'Cobblestone',zh:{hanzi:'圆石'},es:'Roca'},
-            {id:'enderdragon',emoji:'🐉',img:'images/words/enderdragon.png',en:'Ender Dragon',zh:{hanzi:'末影龙'},es:'Dragón Ender'},
-            {id:'glowberries',emoji:'🍓',img:'images/words/glowberries.png',en:'Glow Berries',zh:{hanzi:'发光浆果'},es:'Bayas luminosas'},
-            {id:'goldenapple',emoji:'🍎',img:'images/words/goldenapple.png',en:'Golden Apple',zh:{hanzi:'金苹果'},es:'Manzana dorada'},
-            {id:'honeybottle',emoji:'🍯',img:'images/words/honeybottle.png',en:'Honey Bottle',zh:{hanzi:'蜂蜜瓶'},es:'Frasco con miel'},
-            {id:'lapislazuli',emoji:'🔵',img:'images/words/lapislazuli.png',en:'Lapis Lazuli',zh:{hanzi:'青金石'},es:'Lapislázuli'},
-            {id:'piglinbrute',emoji:'🐷',img:'images/words/piglinbrute.png',en:'Piglin Brute',zh:{hanzi:'猪灵蛮兵'},es:'Piglin bruto'},
-            {id:'beetrootsoup',emoji:'🍲',img:'images/words/beetrootsoup.png',en:'Beetroot Soup',zh:{hanzi:'甜菜汤'},es:'Estofado de remolacha'},
-            {id:'cookedsalmon',emoji:'🐟',img:'images/words/cookedsalmon.png',en:'Cooked Salmon',zh:{hanzi:'熟鲑鱼'},es:'Salmón cocinado'},
-            {id:'goldencarrot',emoji:'🥕',img:'images/words/goldencarrot.png',en:'Golden Carrot',zh:{hanzi:'金胡萝卜'},es:'Zanahoria dorada'},
-            {id:'mushroomstew',emoji:'🍲',img:'images/words/mushroomstew.png',en:'Mushroom Stew',zh:{hanzi:'蘑菇煲'},es:'Estofado de champiñones'},
-            {id:'shulkershell',emoji:'🐚',img:'images/words/shulkershell.png',en:'Shulker Shell',zh:{hanzi:'潜影壳'},es:'Caparazón de shulker'},
-            {id:'sweetberries',emoji:'🍓',img:'images/words/sweetberries.png',en:'Sweet Berries',zh:{hanzi:'甜浆果'},es:'Bayas dulces'},
+        [ // Level 9 — original kindergarten vocabulary
+            {id:'successful',emoji:'🏆',en:'Successful',zh:{hanzi:'成功的'},es:'Exitoso'},
+            {id:'vocabulary',emoji:'📚',en:'Vocabulary',zh:{hanzi:'词汇'},es:'Vocabulario'},
+            {id:'adventure',emoji:'🧭',en:'Adventure',zh:{hanzi:'冒险'},es:'Aventura'},
+            {id:'discovery',emoji:'🔍',en:'Discovery',zh:{hanzi:'发现'},es:'Descubrimiento'},
+            {id:'explorer',emoji:'🧭',en:'Explorer',zh:{hanzi:'探险家'},es:'Explorador'},
+            {id:'alphabet',emoji:'🔤',en:'Alphabet',zh:{hanzi:'字母表'},es:'Alfabeto'},
+            {id:'celebration',emoji:'🎊',en:'Celebration',zh:{hanzi:'庆典'},es:'Celebración'},
+            {id:'curiosity',emoji:'🔍',en:'Curiosity',zh:{hanzi:'好奇心'},es:'Curiosidad'},
+            {id:'determination',emoji:'💪',en:'Determination',zh:{hanzi:'决心'},es:'Determinación'},
+            {id:'environment',emoji:'🌎',en:'Environment',zh:{hanzi:'环境'},es:'Medio ambiente'},
+            {id:'experiment',emoji:'🧪',en:'Experiment',zh:{hanzi:'实验'},es:'Experimento'},
+            {id:'geography',emoji:'🗺️',en:'Geography',zh:{hanzi:'地理'},es:'Geografía'},
+            {id:'impossible',emoji:'🚫',en:'Impossible',zh:{hanzi:'不可能的'},es:'Imposible'},
+            {id:'kindergarten',emoji:'🏫',en:'Kindergarten',zh:{hanzi:'幼儿园'},es:'Jardín de infancia'},
+            {id:'mathematics',emoji:'➕',en:'Mathematics',zh:{hanzi:'数学'},es:'Matemáticas'},
+            {id:'observation',emoji:'👀',en:'Observation',zh:{hanzi:'观察'},es:'Observación'},
+            {id:'preparation',emoji:'🎒',en:'Preparation',zh:{hanzi:'准备'},es:'Preparación'},
+            {id:'recycling',emoji:'♻️',en:'Recycling',zh:{hanzi:'回收'},es:'Reciclaje'},
         ],
-        [ // Level 10 — 12–15 letters (mob + item catalog)
-            {id:'tropicalfish',emoji:'🐠',img:'images/words/tropicalfish.png',en:'Tropical Fish',zh:{hanzi:'热带鱼'},es:'Pez tropical'},
-            {id:'amethystshard',emoji:'💜',img:'images/words/amethystshard.png',en:'Amethyst Shard',zh:{hanzi:'紫水晶碎片'},es:'Fragmento de amatista'},
-            {id:'cookedchicken',emoji:'🍗',img:'images/words/cookedchicken.png',en:'Cooked Chicken',zh:{hanzi:'熟鸡肉'},es:'Pollo asado'},
-            {id:'craftingtable',emoji:'🛠️',img:'images/words/craftingtable.png',en:'Crafting Table',zh:{hanzi:'工作台'},es:'Mesa de trabajo'},
-            {id:'elderguardian',emoji:'🐡',img:'images/words/elderguardian.png',en:'Elder Guardian',zh:{hanzi:'远古守卫者'},es:'Guardián anciano'},
-            {id:'flintandsteel',emoji:'🔥',img:'images/words/flintandsteel.png',en:'Flint and Steel',zh:{hanzi:'打火石'},es:'Mechero'},
-            {id:'heartofthesea',emoji:'💙',img:'images/words/heartofthesea.png',en:'Heart of the Sea',zh:{hanzi:'海洋之心'},es:'Corazón del mar'},
-            {id:'nautilusshell',emoji:'🐚',img:'images/words/nautilusshell.png',en:'Nautilus Shell',zh:{hanzi:'鹦鹉螺壳'},es:'Caparazón de nautilo'},
-            {id:'cookedporkchop',emoji:'🥩',img:'images/words/cookedporkchop.png',en:'Cooked Porkchop',zh:{hanzi:'熟猪排'},es:'Chuleta de cerdo cocinada'},
-            {id:'fireworkrocket',emoji:'🎆',img:'images/words/fireworkrocket.png',en:'Firework Rocket',zh:{hanzi:'烟花火箭'},es:'Cohete de fuegos artificiales'},
-            {id:'honeycombblock',emoji:'🍯',img:'images/words/honeycombblock.png',en:'Honeycomb Block',zh:{hanzi:'蜜脾块'},es:'Bloque de panal'},
-            {id:'suspiciousstew',emoji:'🍲',img:'images/words/suspiciousstew.png',en:'Suspicious Stew',zh:{hanzi:'谜之炖菜'},es:'Estofado sospechoso'},
-            {id:'totemofundying',emoji:'🗿',img:'images/words/totemofundying.png',en:'Totem of Undying',zh:{hanzi:'不死图腾'},es:'Tótem de inmortalidad'},
-            {id:'witherskeleton',emoji:'💀',img:'images/words/witherskeleton.png',en:'Wither Skeleton',zh:{hanzi:'凋灵骷髅'},es:'Esqueleto wither'},
-            {id:'zombievillager',emoji:'🧟',img:'images/words/zombievillager.png',en:'Zombie Villager',zh:{hanzi:'僵尸村民'},es:'Aldeano zombi'},
-            {id:'phantommembrane',emoji:'🌫️',img:'images/words/phantommembrane.png',en:'Phantom Membrane',zh:{hanzi:'幻翼膜'},es:'Membrana de fantasma'},
-            {id:'wanderingtrader',emoji:'🧙',img:'images/words/wanderingtrader.png',en:'Wandering Trader',zh:{hanzi:'流浪商人'},es:'Comerciante ambulante'},
-            {id:'zombifiedpiglin',emoji:'🐷',img:'images/words/zombifiedpiglin.png',en:'Zombified Piglin',zh:{hanzi:'僵尸猪灵'},es:'Piglin zombificado'},
+        [ // Level 10 — original kindergarten vocabulary
+            {id:'storytelling',emoji:'📖',en:'Storytelling',zh:{hanzi:'讲故事'},es:'Narración'},
+            {id:'technology',emoji:'💻',en:'Technology',zh:{hanzi:'技术'},es:'Tecnología'},
+            {id:'understand',emoji:'💡',en:'Understand',zh:{hanzi:'理解'},es:'Entender'},
+            {id:'wondering',emoji:'🤔',en:'Wondering',zh:{hanzi:'思考'},es:'Preguntándose'},
+            {id:'yesterday',emoji:'📅',en:'Yesterday',zh:{hanzi:'昨天'},es:'Ayer'},
+            {id:'youngster',emoji:'🧒',en:'Youngster',zh:{hanzi:'小朋友'},es:'Niño'},
         ],
     ];
 
@@ -1633,13 +1600,13 @@
             const unlocked = stars >= s.threshold, active = i === stage.index;
             return '<button type="button" class="world-node '+(unlocked?'unlocked ':'')+(active?'active ':'')+'" '+(unlocked?'onclick="toggleWorldStage('+i+')"':'disabled')+' aria-label="'+esc(s.name)+(unlocked?', open world details':', locked')+'"><div class="world-node-icon">'+(unlocked?s.icon:'🔒')+'</div><div class="world-node-name">'+esc(s.name)+'</div><div class="world-node-threshold">'+s.threshold+' 💎</div></button>';
         }).join('<div class="world-connector"></div>');
-        return '<div class="world-progress '+(compact?'compact':'')+'"><div class="world-header"><span>🗺️ <strong>My Minecraft World</strong></span><span>💎 '+stars+(next?' / '+next.threshold:'')+'</span></div><div class="world-map">'+nodes+'</div><div class="world-detail" aria-live="polite"></div><div class="world-track"><div class="world-fill" style="width:'+pct+'%"></div></div><div class="world-text">'+(next?next.icon+' '+esc(next.name)+' is '+(next.threshold-stars)+' diamonds away!':'🌈 Your world is fully unlocked!')+'</div></div>';
+        return '<div class="world-progress '+(compact?'compact':'')+'"><div class="world-header"><span>🗺️ <strong>My Learning World</strong></span><span>💎 '+stars+(next?' / '+next.threshold:'')+'</span></div><div class="world-map">'+nodes+'</div><div class="world-detail" aria-live="polite"></div><div class="world-track"><div class="world-fill" style="width:'+pct+'%"></div></div><div class="world-text">'+(next?next.icon+' '+esc(next.name)+' is '+(next.threshold-stars)+' diamonds away!':'🌈 Your world is fully unlocked!')+'</div></div>';
     }
     function getAccounts(){try{return JSON.parse(localStorage.getItem('kc_accounts_v1')||'{}')}catch(e){return {};}}
     function getCurrentAccount(){return localStorage.getItem('kc_current_account')||'';}
     function accountProgressKey(name){return 'kc_account_progress_v1_'+name.toLowerCase();}
     function closeAccountModal(){const m=document.getElementById('accountModal');if(m)m.style.display='none';}
-    function openAccountModal(mode){const m=document.getElementById('accountModal');if(!m)return;const create=mode==='create';m.style.display='grid';m.innerHTML='<div class="account-box"><h2>⛏️ '+(create?'Create Your Minecraft Account':'Welcome Back!')+'</h2><p>'+(create?'Create a child profile on this device.':'Log in to switch profiles on this device.')+'</p><input id="accountName" maxlength="24" placeholder="Player name"><input id="accountPin" maxlength="6" inputmode="numeric" type="password" placeholder="4–6 digit PIN"><div class="account-actions"><button id="accountSubmit">'+(create?'Create':'Log In')+'</button><button id="accountCancel">Cancel</button></div><div id="accountStatus" class="account-status"></div><div class="account-switch"><button id="accountSwitch">'+(create?'Already have an account? Log in':'New player? Create an account')+'</button></div></div>';document.getElementById('accountSubmit').onclick=()=>submitAccount(mode);document.getElementById('accountCancel').onclick=closeAccountModal;document.getElementById('accountSwitch').onclick=()=>openAccountModal(create?'login':'create');}
+    function openAccountModal(mode){const m=document.getElementById('accountModal');if(!m)return;const create=mode==='create';m.style.display='grid';m.innerHTML='<div class="account-box"><h2>⛏️ '+(create?'Create Your BlockQuest Account':'Welcome Back!')+'</h2><p>'+(create?'Create a child profile on this device.':'Log in to switch profiles on this device.')+'</p><input id="accountName" maxlength="24" placeholder="Player name"><input id="accountPin" maxlength="6" inputmode="numeric" type="password" placeholder="4–6 digit PIN"><div class="account-actions"><button id="accountSubmit">'+(create?'Create':'Log In')+'</button><button id="accountCancel">Cancel</button></div><div id="accountStatus" class="account-status"></div><div class="account-switch"><button id="accountSwitch">'+(create?'Already have an account? Log in':'New player? Create an account')+'</button></div></div>';document.getElementById('accountSubmit').onclick=()=>submitAccount(mode);document.getElementById('accountCancel').onclick=closeAccountModal;document.getElementById('accountSwitch').onclick=()=>openAccountModal(create?'login':'create');}
     function submitAccount(mode){const name=(document.getElementById('accountName')?.value||'').trim(),pin=(document.getElementById('accountPin')?.value||'').trim(),status=document.getElementById('accountStatus');if(!/^[A-Za-z0-9 _-]{2,24}$/.test(name)){status.textContent='Use 2–24 letters, numbers, spaces, _ or -.';return;}if(!/^\\d{4,6}$/.test(pin)){status.textContent='PIN must be 4–6 digits.';return;}const accounts=getAccounts(),key=name.toLowerCase();if(mode==='create'&&accounts[key]){status.textContent='That player name already exists on this device.';return;}if(mode==='login'&&(!accounts[key]||accounts[key].pin!==pin)){status.textContent='Player name or PIN is incorrect.';return;}if(mode==='create'){accounts[key]={name:name,pin:pin};localStorage.setItem('kc_accounts_v1',JSON.stringify(accounts));}localStorage.setItem('kc_current_account',key);closeAccountModal();renderAccountBar();progress=loadProgress();render();}
     function logoutAccount(){localStorage.removeItem('kc_current_account');renderAccountBar();progress=loadProgress();render();}
     function renderAccountBar(){const el=document.getElementById('accountBar');if(!el)return;const key=getCurrentAccount(),acct=getAccounts()[key];if(acct){el.innerHTML='<span class="account-name">👤 '+esc(acct.name)+'</span><button class="account-btn" id="logoutBtn">Log out</button>';document.getElementById('logoutBtn').onclick=logoutAccount;}else{el.innerHTML='<button class="account-btn" id="loginBtn">👤 Log in</button><button class="account-btn" id="createBtn">➕ Create account</button>';document.getElementById('loginBtn').onclick=()=>openAccountModal('login');document.getElementById('createBtn').onclick=()=>openAccountModal('create');}}
@@ -1995,7 +1962,7 @@
         setTimeout(() => layer.remove(), 1500);
     }
 
-    // ---------- Word media (Minecraft sprite or emoji fallback) ----------
+    // ---------- Word media (original visual or emoji fallback) ----------
     function wordMediaHTML(item, size) {
         size = size || 64;
         if (item.img) return `<img src="${item.img}" alt="${esc(item.id)}" style="width:${size}px;height:${size}px;object-fit:contain;">`;
@@ -2081,7 +2048,7 @@
         const todayAction = 'startTodayAdventure()';
         const lessonLabel = lesson.item ? (lesson.cat.key === 'letters' ? lesson.item.id : lesson.cat.key === 'numbers' ? lesson.item.n : lesson.item.id) : lesson.cat.name;
         return `${topbar(false)}
-        <div class="home-hero"><div class="home-kicker">⛏️ MINECRAFT CLASSROOM</div><h1>Ready for an adventure?</h1><p>Learn a little. Play a little. Build your skills!</p></div>
+        <div class="home-hero"><div class="home-kicker">⛏️ BLOCKQUEST CLASSROOM</div><h1>Ready for an adventure?</h1><p>Learn a little. Play a little. Build your skills!</p></div>
         ${renderWorldProgress()}
         ${renderDailyMissions()}
         ${renderTodayReview()}
@@ -3588,7 +3555,7 @@ h2{text-align:center;margin-bottom:16px;font-size:1.1rem;color:#555;}
 .sightword-row .draw-area{width:80px;height:80px;border:2px dashed #ccc;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:0.8rem;}
 @media print{body{padding:12px;}.no-print{display:none;}}
 </style></head><body>
-<h1>⛏️ Minecraft Classroom Worksheet ⛏️</h1>
+<h1>⛏️ BlockQuest Classroom Worksheet ⛏️</h1>
 <h2>${getWorksheetTitle(type)}</h2>
 ${html}
 <div class="no-print" style="text-align:center;margin-top:20px;"><button onclick="window.print()" style="padding:10px 24px;font-size:1.1rem;border:2px solid #333;border-radius:8px;cursor:pointer;">🖨️ Print</button></div>
@@ -3844,7 +3811,7 @@ ${html}
     // ---------- Render: Free Play (research D — autonomy, no-pressure explore) ----------
     function renderFreeplay() {
         // Reuse the EXACT same card visuals as Learn mode so Free Play matches
-        // the rest of the app (real Minecraft PNGs via wordMediaHTML, letters as
+        // the rest of the app (original emoji-based learning visuals via wordMediaHTML, letters as
         // the big glyph, numbers as the digit). No quiz, no mastery check.
         const groups = [];
         for (const c of CATEGORIES) {
