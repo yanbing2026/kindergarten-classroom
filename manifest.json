@@ -1,6 +1,6 @@
 {
-  "name": "Minecraft Classroom",
-  "short_name": "Classroom",
+  "name": "BlockQuest Classroom",
+  "short_name": "BlockQuest",
   "description": "A supplemental kindergarten learning app: letters, numbers, words, Chinese, Spanish, colors, shapes, animals, and math.",
   "start_url": "./index.html",
   "scope": "./",
