@@ -2614,7 +2614,7 @@
         `).join('');
         return `${topbar(true)}
         <div class="center-col">
-            <div style="color:#999;margin-bottom:8px;">Question ${quiz.idx + 1} of ${quiz.questions.length}</div>
+            <div style="color:#999;margin-bottom:8px;">Question ${quiz.idx + 1} of ${quiz.reviewMode ? ROUND_LENGTH : quiz.questions.length}</div>
             <div id="streakBadge" class="streak-badge"></div>
             <div class="prompt-box">${q.promptHTML}</div>
             <div class="choices">${choicesHTML}</div>
@@ -3022,11 +3022,12 @@
         let againAction;
         if (key === 'math') againAction = `startMath('${level}')`;
         else if (isTrace) againAction = `startTrace('${category}', '${level}')`;
+        else if (key === 'review') againAction = 'startReview()';
         else againAction = `startQuiz('${key}', '${level}')`;
         return `${topbar(false)}
         <div class="center-col">
             <div style="font-size:4rem;">🎉</div>
-            <h2>${isTrace ? 'Great Writing!' : 'Round Complete!'}</h2>
+            <h2>${isTrace ? 'Great Writing!' : key === 'review' ? 'Review Complete!' : 'Round Complete!'}</h2>
             <p style="font-size:1.4rem;color:#0e6b7a;font-weight:700;margin-bottom:20px;">You earned ${stars} 💎</p>
             <button class="big-btn again" onclick="${againAction}">🔁 ${isTrace ? 'Write More' : 'Play Again'}</button>
             <button class="big-btn home" onclick="goHome()">🏠 Home</button>
