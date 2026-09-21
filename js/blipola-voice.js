@@ -72,6 +72,35 @@
     };
     const ordinal = ordinals[heard];
     if (ordinal !== undefined && choices[ordinal]) return choices[ordinal];
+
+    const numberWords = {
+      zero:'0', one:'1', two:'2', three:'3', four:'4', five:'5',
+      six:'6', seven:'7', eight:'8', nine:'9', ten:'10',
+      eleven:'11', twelve:'12', thirteen:'13', fourteen:'14',
+      fifteen:'15', sixteen:'16', seventeen:'17', eighteen:'18', nineteen:'19',
+      twenty:'20'
+    };
+    const numeric = numberWords[heard];
+    if (numeric) {
+      const numericMatch = choices.find(c =>
+        [c.id, c.speak, c.text, c.html].map(normalize).includes(numeric)
+      );
+      if (numericMatch) return numericMatch;
+    }
+
+    const letterWords = {
+      'ay':'A','bee':'B','sea':'C','dee':'D','ee':'E','eff':'F','gee':'G',
+      'aitch':'H','eye':'I','jay':'J','kay':'K','el':'L','em':'M','en':'N',
+      'oh':'O','pee':'P','cue':'Q','are':'R','ess':'S','tee':'T','you':'U',
+      'vee':'V','double you':'W','ex':'X','why':'Y','zee':'Z','zed':'Z'
+    };
+    const letter = letterWords[heard];
+    if (letter) {
+      const letterMatch = choices.find(c =>
+        [c.id, c.speak, c.text, c.html].map(normalize).includes(normalize(letter))
+      );
+      if (letterMatch) return letterMatch;
+    }
     return null;
   }
 
