@@ -1702,59 +1702,55 @@
         return `<span style="font-size:${size * 0.55}px;">${item.emoji}</span>`;
     }
 
+    /* ---------- Home dashboard ---------- */
+    .home-hero{text-align:center;padding:8px 12px 16px}.home-kicker{font-weight:900;letter-spacing:.12em;font-size:.78rem;opacity:.7}.home-hero h1{margin:6px 0 4px}.home-hero p{margin:0;color:#777}
+    .today-card{display:flex;align-items:center;gap:14px;max-width:760px;margin:0 auto 20px;padding:18px;border:3px solid #d9b44a;border-radius:22px;background:linear-gradient(135deg,#fff9d8,#fff);box-shadow:0 6px 0 rgba(0,0,0,.08);cursor:pointer}.today-icon{font-size:2.5rem}.today-copy{flex:1;min-width:0;text-align:left}.today-kicker{font-size:.75rem;font-weight:900;letter-spacing:.1em;color:#9b7410}.today-title{font-size:1.35rem;font-weight:900;margin-top:2px}.today-sub{color:#777;margin-top:3px}.today-card .big-btn{width:auto;min-width:110px;margin:0}
+    .home-section-title{max-width:760px;margin:18px auto 10px;padding:0 4px}.home-featured{max-width:760px;margin:0 auto}.home-tools{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px}.home-tool{border:2px solid rgba(43,27,14,.12);border-radius:16px;padding:13px 10px;background:#fff;font:inherit;font-weight:800;cursor:pointer;min-height:52px}.home-tool:active,.today-card:active{transform:translateY(1px)}
+    @media(max-width:560px){.today-card{flex-wrap:wrap}.today-card .big-btn{width:100%}.home-hero h1{font-size:1.65rem}}
     // ---------- Render: Home ----------
-    function renderHome() {
-        const mathSolved = Object.values(progress.mathCorrect).reduce((a, b) => a + (b || 0), 0);
-        const cards = CATEGORIES.map(c => {
-            const { mastered, total } = categoryMasteredAllLevels(c);
-            let sub = c.key === 'math' ? `${mathSolved} solved` : `${mastered}/${total} mastered`;
-            // Show a review nudge when spaced-repetition items are due.
-            if (c.key !== 'math') {
-                let due = 0;
-                for (const lv of c.levels) due += categoryDueCount(`${c.key}_${lv.id}`, lv.items);
-                if (due > 0) sub = `🔄 ${due} to review`;
+    function getTodayLesson() {
+        // Use existing mastery/due data to make a lightweight daily recommendation.
+        for (const c of CATEGORIES) {
+            if (c.key === 'math') continue;
+            for (const lv of c.levels) {
+                const catKey = `${c.key}_${lv.id}`;
+                const due = lv.items.find(it => isDue(catKey, it.id) && getMasteryCount(catKey, it.id) > 0);
+                if (due) return { cat: c, level: lv, item: due, reason: 'Review time!' };
             }
-            const action = c.leveled ? `go('level', {key:'${c.key}'})` : `go('category', {key:'${c.key}', level:'L1'})`;
-            return `<div class="card cat-${c.key}" onclick="${action}">
-                <div class="icon">${c.icon}</div>
-                <div class="label">${c.name}</div>
-                <div class="sublabel">${sub}</div>
-            </div>`;
-        }).join('');
-        return `
-        ${topbar(false)}
-        <h1>⛏️ Minecraft Classroom ⛏️</h1>
-        <div class="grid">
-            ${cards}
-            <div class="card cat-freeplay" onclick="go('freeplay')">
-                <div class="icon">🎨</div>
-                <div class="label">Free Play</div>
-                <div class="sublabel">explore & listen</div>
-            </div>
-            <div class="card cat-draw" onclick="go('draw')">
-                <div class="icon">✏️</div>
-                <div class="label">Draw</div>
-                <div class="sublabel">blank canvas</div>
-            </div>
-            <div class="card cat-timed" onclick="startTimedChallenge()">
-                <div class="icon">⏱️</div>
-                <div class="label">Timed Challenge</div>
-                <div class="sublabel">⏱ 60s rapid-fire!</div>
-            </div>
-            <div class="card cat-worksheets" onclick="go('worksheets')">
-                <div class="icon">🖨️</div>
-                <div class="label">Worksheets</div>
-                <div class="sublabel">print & practice</div>
-            </div>
-            <div class="card cat-progress" onclick="go('progress')">
-                <div class="icon">🏆</div>
-                <div class="label">My Progress</div>
-                <div class="sublabel">${progress.stars} diamonds</div>
-            </div>
-        </div>
-        <div class="footer">Tap a card to start learning!</div>`;
+        }
+        for (const key of ['letters', 'numbers', 'words', 'math']) {
+            const c = CATEGORIES.find(x => x.key === key);
+            if (!c) continue;
+            const lv = c.levels[0];
+            if (key === 'math') return { cat: c, level: lv, item: null, reason: 'Practice your math!' };
+            const catKey = `${key}_${lv.id}`;
+            const next = lv.items.find(it => getMasteryCount(catKey, it.id) < MASTERY_THRESHOLD);
+            if (next) return { cat: c, level: lv, item: next, reason: 'Keep building your skills!' };
+        }
+        const c = CATEGORIES.find(x => x.key === 'math') || CATEGORIES[0];
+        return { cat: c, level: c.levels[0], item: null, reason: 'Ready for another adventure?' };
     }
 
+    function renderHome() {
+        const lesson = getTodayLesson();
+        const mathSolved = Object.values(progress.mathCorrect).reduce((a, b) => a + (b || 0), 0);
+        const featured = ['letters', 'numbers', 'words', 'math'].map(key => CATEGORIES.find(c => c.key === key)).filter(Boolean);
+        const cards = featured.map(c => {
+            const { mastered, total } = categoryMasteredAllLevels(c);
+            const sub = c.key === 'math' ? `${mathSolved} solved` : `${mastered}/${total} mastered`;
+            const action = c.leveled ? `go('level', {key:'${c.key}'})` : `go('category', {key:'${c.key}', level:'L1'})`;
+            return `<div class="card cat-${c.key}" onclick="${action}"><div class="icon">${c.icon}</div><div class="label">${c.name}</div><div class="sublabel">${sub}</div></div>`;
+        }).join('');
+        const todayAction = lesson.cat.leveled ? `go('level', {key:'${lesson.cat.key}'})` : `go('category', {key:'${lesson.cat.key}', level:'${lesson.level.id}'})`;
+        const lessonLabel = lesson.item ? (lesson.cat.key === 'letters' ? lesson.item.id : lesson.cat.key === 'numbers' ? lesson.item.n : lesson.item.id) : lesson.cat.name;
+        return `${topbar(false)}
+        <div class="home-hero"><div class="home-kicker">⛏️ MINECRAFT CLASSROOM</div><h1>Ready for an adventure?</h1><p>Learn a little. Play a little. Build your skills!</p></div>
+        <div class="today-card" onclick="${todayAction}"><div class="today-icon">⭐</div><div class="today-copy"><div class="today-kicker">TODAY'S ADVENTURE</div><div class="today-title">${lesson.cat.icon} ${lesson.cat.name}</div><div class="today-sub">${lesson.reason}${lesson.item ? ' • ' + lessonLabel : ''}</div></div><button class="big-btn play">START ▶</button></div>
+        <h2 class="home-section-title">🎮 Play & Learn</h2><div class="grid home-featured">${cards}</div>
+        <h2 class="home-section-title">🌎 More Learning</h2>
+        <div class="home-tools"><button class="home-tool" onclick="go('category',{key:'chinese',level:'L1'})">🇨🇳 Chinese</button><button class="home-tool" onclick="go('category',{key:'spanish',level:'L1'})">🇪🇸 Spanish</button><button class="home-tool" onclick="go('freeplay')">🎨 Free Play</button><button class="home-tool" onclick="go('draw')">✏️ Draw</button><button class="home-tool" onclick="go('worksheets')">🖨️ Worksheets</button><button class="home-tool" onclick="startTimedChallenge()">⏱️ Challenge</button><button class="home-tool" onclick="go('progress')">🏆 Progress</button></div>
+        <div class="footer">You have 💎 ${progress.stars} diamonds. Keep learning!</div>`;
+    }
     // ---------- Render: Level picker ----------
     function renderLevelPicker() {
         const key = state.params.key;
