@@ -42,6 +42,7 @@
             font-family: var(--font-clear);
             background: linear-gradient(180deg, var(--mc-sky-top) 0%, var(--mc-sky-bottom) 70%);
             min-height: 100vh;
+            min-height: 100dvh;
             padding: 16px 16px 46px;
             position: relative;
         }
@@ -68,6 +69,7 @@
             margin: 0 auto;
             box-shadow: 0 12px 0 rgba(0,0,0,0.25), inset 4px 4px 0 rgba(255,255,255,0.25), inset -4px -4px 0 rgba(0,0,0,0.2);
             min-height: calc(100vh - 32px);
+            min-height: calc(100dvh - 32px);
             display: flex;
             flex-direction: column;
             position: relative;
@@ -3361,6 +3363,7 @@ button, input, select, textarea { max-width: 100%; }
             };
             canvas.addEventListener('pointerdown', (e) => {
                 drawing = true;
+                if (canvas.setPointerCapture) canvas.setPointerCapture(e.pointerId);
                 const p = getPos(e);
                 lastX = p.x; lastY = p.y;
                 e.preventDefault();
@@ -3949,6 +3952,7 @@ ${html}
         };
         canvas.addEventListener('pointerdown', (e) => {
             drawing = true;
+            if (canvas.setPointerCapture) canvas.setPointerCapture(e.pointerId);
             saveDrawSnapshot();
             const p = getPos(e);
             lastX = p.x; lastY = p.y;
