@@ -1516,12 +1516,13 @@
         return { attempts: recent.length, correct: recent.filter(x => x.correct).length, firstTry: recent.filter(x => x.correct && x.firstTry).length, days: new Set(recent.map(x => new Date(x.at).toLocaleDateString())).size, skills: Object.values(byKey).sort((a,b) => b.correct - a.correct || b.attempts - a.attempts) };
     }
     function saveProgress() { localStorage.setItem('kc_progress_v1', JSON.stringify(progress)); }
-    function todayKey() { return new Date().toISOString().slice(0, 10); }
+    function todayKey() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
     function ensureDailyState() {
         if (!progress.daily || progress.daily.date !== todayKey()) {
             progress.daily = { date: todayKey(), tasks: {}, completed: false, rewardClaimed: false };
         }
         if (!progress.daily.tasks) progress.daily.tasks = {};
+        if (!getDueReviewItems(1).length && !progress.daily.tasks.review) progress.daily.tasks.review = true;
         return progress.daily;
     }
     function recordDailyTask(task) {
