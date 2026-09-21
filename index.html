@@ -2102,6 +2102,7 @@
             </div>
             <div class="topbar-right">
                 <div class="star-badge">💎 ${progress.stars}</div>
+                <button class="icon-btn" onclick="blipolaVoiceAction()" title="Blipola Voice">🎤</button>
                 <button class="icon-btn" onclick="toggleMute()">${muted ? '🔇' : '🔊'}</button>
             </div>
         </div>`;
@@ -2110,6 +2111,23 @@
         muted = !muted;
         localStorage.setItem('kc_muted', muted ? '1' : '0');
         render();
+    }
+
+    // Global Blipola voice button: always visible in the top bar.
+    function blipolaVoiceAction() {
+        if (state.screen === 'play' && typeof blipolaVoiceAnswer === 'function') {
+            blipolaVoiceAnswer();
+            return;
+        }
+        if (muted) {
+            muted = false;
+            localStorage.setItem('kc_muted', '0');
+            render();
+        }
+        if ('speechSynthesis' in window) {
+            stopAllAudio();
+            speak('Hi! I am Blipola. Tap Play, then tap my microphone to answer.', { lang: 'en-US' });
+        }
     }
 
     // ---------- Render: Category ----------
