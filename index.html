@@ -367,6 +367,7 @@
     .skill-map{max-width:760px;margin:22px auto;padding:16px;border:3px solid var(--mc-ink);border-radius:16px;background:#fff}.skill-map h3{margin:0 0 4px}.skill-intro{margin:0 0 14px;color:#777;font-size:.9rem}.skill-row{padding:10px 0;border-top:1px solid rgba(0,0,0,.12)}.skill-top{display:flex;justify-content:space-between;gap:10px;font-size:.88rem}.skill-track{height:10px;margin:6px 0 4px;background:var(--mc-stone);border:1px solid var(--mc-ink);border-radius:6px;overflow:hidden}.skill-fill{height:100%;background:var(--mc-grass);transition:width .3s ease}.skill-meta{font-size:.75rem;color:#777}
     .review-card{max-width:760px;margin:0 auto 18px;padding:15px;border:3px solid var(--mc-ink);border-radius:18px;background:#fff}.review-head{display:flex;justify-content:space-between;gap:10px;font-weight:800}.review-sub{margin-top:3px;color:#777;font-size:.86rem}.review-icon{font-size:2rem;float:left;margin-right:12px}.review-chips{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}.review-chip{padding:6px 9px;border-radius:12px;background:#eef7e9;font-size:.82rem;font-weight:700}.review-btn{border:2px solid var(--mc-ink);border-radius:12px;padding:9px 14px;background:var(--mc-grass);font:inherit;font-weight:900;cursor:pointer}.review-btn:active{transform:translateY(1px)}
     .review-results{max-width:760px}.review-score{font-size:2rem;font-weight:900;color:#0e6b7a;margin:8px 0}.review-summary{font-size:1rem;font-weight:700}.review-result-card{margin:14px 0;padding:14px;border:2px solid var(--mc-ink);border-radius:14px;background:#fff;text-align:left}.review-result-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.parent-dashboard{max-width:820px;margin:0 auto}.parent-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.parent-kicker{font-size:.75rem;font-weight:900;letter-spacing:2px;color:#0e6b7a}.parent-date{font-size:.85rem;color:#666}.parent-diamond{font-size:1.25rem;font-weight:900}.parent-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}.parent-stat{padding:18px 10px;border:2px solid var(--mc-ink);border-radius:14px;background:#fff;text-align:center;font-weight:800}.parent-stat-number{font-size:2rem;color:#0e6b7a}.parent-card{margin:14px 0;padding:16px;border:2px solid var(--mc-ink);border-radius:14px;background:#fff}.parent-card h3{margin:0 0 12px}.parent-focus-row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #ddd}.parent-focus-row:last-child{border-bottom:0}.parent-good{font-weight:800}.parent-progress{height:18px;background:#eee;border-radius:10px;overflow:hidden;border:1px solid #bbb}.parent-progress-fill{height:100%;background:var(--mc-green);border-radius:10px}.parent-progress-label{margin-top:8px;font-size:.9rem;font-weight:700;color:#555}@media(max-width:600px){.parent-grid{grid-template-columns:1fr}.parent-focus-row{font-size:.9rem}}
     /* ---------- Home dashboard ---------- */
     .home-hero{text-align:center;padding:8px 12px 16px}.home-kicker{font-weight:900;letter-spacing:.12em;font-size:.78rem;opacity:.7}.home-hero h1{margin:6px 0 4px}.home-hero p{margin:0;color:#777}
     .today-card{display:flex;align-items:center;gap:14px;max-width:760px;margin:0 auto 20px;padding:18px;border:3px solid #d9b44a;border-radius:22px;background:linear-gradient(135deg,#fff9d8,#fff);box-shadow:0 6px 0 rgba(0,0,0,.08);cursor:pointer}.today-icon{font-size:2.5rem}.today-copy{flex:1;min-width:0;text-align:left}.today-kicker{font-size:.75rem;font-weight:900;letter-spacing:.1em;color:#9b7410}.today-title{font-size:1.35rem;font-weight:900;margin-top:2px}.today-sub{color:#777;margin-top:3px}.today-card .big-btn{width:auto;min-width:110px;margin:0}
@@ -3067,6 +3068,28 @@
             <button class="big-btn home" onclick="goHome()">🏠 Home</button>
         </div>`;
     }
+    function renderParentDashboard() {
+        const stats = CATEGORIES.reduce((acc, cat) => {
+            const s = categoryLearningStats(cat);
+            acc.total += s.total; acc.mastered += s.mastered; acc.learning += s.learning; acc.review += s.review;
+            if (s.learning > 0 || s.review > 0) acc.focus.push({ cat, stats: s });
+            return acc;
+        }, { total: 0, mastered: 0, learning: 0, review: 0, focus: [] });
+        const pct = stats.total ? Math.round(stats.mastered / stats.total * 100) : 0;
+        const focus = stats.focus.slice(0, 6).map(x => {
+            const status = skillStatus(x.stats);
+            return '<div class="parent-focus-row"><span>' + x.cat.icon + ' <strong>' + x.cat.name + '</strong></span><span>' + status.icon + ' ' + status.label + '</span></div>';
+        }).join('');
+        return `${topbar(true)}
+        <div class="parent-dashboard">
+            <div class="parent-header"><div><div class="parent-kicker">FOR PARENTS</div><h2>📋 Learning Snapshot</h2><div class="parent-date">${new Date().toLocaleDateString()}</div></div><div class="parent-diamond">💎 ${progress.stars}</div></div>
+            <div class="parent-grid"><div class="parent-stat"><div class="parent-stat-number">${pct}%</div><div>Mastered</div></div><div class="parent-stat"><div class="parent-stat-number">${stats.learning}</div><div>Learning</div></div><div class="parent-stat"><div class="parent-stat-number">${stats.review}</div><div>Due for review</div></div></div>
+            <div class="parent-card"><h3>🧭 What to focus on</h3>${focus || '<div class="parent-good">🏆 No immediate learning gaps. Keep exploring!</div>'}</div>
+            <div class="parent-card"><h3>📚 Overall progress</h3><div class="parent-progress"><div class="parent-progress-fill" style="width:${pct}%"></div></div><div class="parent-progress-label">${stats.mastered} of ${stats.total} learning items mastered</div></div>
+            <div class="parent-card"><h3>💎 Learning rewards</h3><div class="parent-progress-label">${progress.stars} diamonds earned · ${Object.values(progress.mathCorrect).reduce((a,b)=>a+(b||0),0)} math problems solved</div></div>
+            <button class="big-btn home" onclick="go('progress')">← Back to Progress</button>
+        </div>`;
+    }
     function renderProgress() {
         const rows = CATEGORIES.map(c => {
             const { mastered, total } = categoryMasteredAllLevels(c);
@@ -3090,6 +3113,7 @@
         <div class="star-badge" style="margin:0 auto 20px;width:fit-content;font-size:1.1rem;">💎 ${progress.stars} total diamonds</div>
         ${renderWorldProgress()}
         ${renderSkillMap()}
+        <div style="text-align:center;margin:18px 0;"><button class="choice-btn" style="padding:12px 20px;font-size:1rem;" onclick="go('parentDashboard')">👨‍👩‍👧 Parent Dashboard</button></div>
         ${rows}
         <div style="margin-top:10px;font-weight:700;">Math solved: ${Object.values(progress.mathCorrect).reduce((a, b) => a + (b || 0), 0)} total</div>
         <div class="trophy-grid">${trophies}</div>
@@ -3364,6 +3388,7 @@ ${html}
         else if (state.screen === 'mathPlay') html = renderMathPlay();
         else if (state.screen === 'trace') html = renderTrace();
         else if (state.screen === 'roundEnd') html = renderRoundEnd();
+        else if (state.screen === 'parentDashboard') html = renderParentDashboard();
         else if (state.screen === 'freeplay') html = renderFreeplay();
         else if (state.screen === 'draw') html = renderDraw();
         else if (state.screen === 'timed') html = renderTimed();
