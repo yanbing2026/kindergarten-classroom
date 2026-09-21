@@ -543,7 +543,25 @@ button, input, select, textarea { max-width: 100%; }
   .world-detail.open { max-height: 70vh; overflow-y: auto; }
   .account-bar { flex-wrap: wrap; }
 }
+@media (max-width: 430px) {
+  .container { min-height: calc(100dvh - 62px); }
+  .account-modal { padding: 10px; }
+  .account-box { padding: 16px; border-width: 3px; }
+  .account-actions { flex-direction: column; }
+}
+@media (orientation: landscape) and (max-height: 600px) {
+  body { padding-bottom: 44px; }
+  .container { min-height: auto; }
+  .draw-canvas { height: 55vh; min-height: 220px; }
+  .trace-box { height: 220px; }
+  .learn-display-inner { max-height: 82vh; }
+}
 @media (max-width: 380px) {
+  .topbar { gap: 4px; }
+  .topbar-left, .topbar-right { gap: 4px; }
+  .topbar .icon-btn { width: 38px; height: 38px; flex-basis: 38px; font-size: 1rem; }
+  .topbar .star-badge { max-width: 78px; padding: 6px 5px; font-size: .58rem; overflow:hidden; text-overflow:ellipsis; }
+  .topbar-right .icon-btn { flex: 0 0 38px; }
   .container { padding: 8px; }
   .topbar .icon-btn { width: 42px; height: 42px; flex-basis: 42px; font-size: 1.1rem; }
   .star-badge { padding: 7px 6px; font-size: .62rem; }
@@ -557,7 +575,7 @@ button, input, select, textarea { max-width: 100%; }
   .big-btn { font-size: .7rem; }
 }
 
-</style></style>
+</style>
 </head>
 <body>
 <div id="accountBar" class="account-bar"></div>
