@@ -486,6 +486,7 @@
     <div class="container" id="app"></div>
 
     <script src="./js/blipola-runtime.js"></script>
+    <script src="./js/blipola-voice.js"></script>
     <script>
     // ---------- Data ----------
     // ---------- Levels ----------
@@ -2857,7 +2858,7 @@
         `).join('');
         return `${topbar(true)}
         <div class="center-col">
-            <div id="blipolaBuddy" style="display:flex;align-items:center;gap:10px;margin:0 auto 10px;max-width:720px;padding:9px 12px;border:2px solid #333;border-radius:14px;background:#fff;font-weight:800;">🤖 <span>Blipola</span><span id="blipolaMessage" style="font-weight:600;opacity:.78;">Think first. You can ask me for a clue.</span><button class="choice-btn" type="button" onclick="blipolaHint()" style="margin-left:auto;padding:7px 10px;">💡 Hint</button></div>
+            <div id="blipolaBuddy" style="display:flex;align-items:center;gap:10px;margin:0 auto 10px;max-width:720px;padding:9px 12px;border:2px solid #333;border-radius:14px;background:#fff;font-weight:800;">🤖 <span>Blipola</span><span id="blipolaMessage" style="font-weight:600;opacity:.78;">Think first. You can ask me for a clue.</span><button class="choice-btn" type="button" onclick="blipolaHint()" style="margin-left:auto;padding:7px 10px;">💡 Hint</button><button id="blipolaVoiceBtn" class="choice-btn" type="button" onclick="blipolaVoiceAnswer()" style="padding:7px 10px;">🎤 Speak</button><span id="blipolaVoiceStatus" style="font-size:.78rem;opacity:.7;">Tap Speak and answer out loud.</span></div>
             <div style="color:#999;margin-bottom:8px;">Question ${quiz.idx + 1} of ${quiz.reviewMode ? ROUND_LENGTH : quiz.questions.length}</div>
             <div id="streakBadge" class="streak-badge"></div>
             <div class="prompt-box">${q.promptHTML}</div>
@@ -2867,6 +2868,29 @@
     function afterPlayRender() {
         const q = quiz.questions[quiz.idx];
         if (q.speakText) speak(q.speakText, { lang: q.lang });
+        if (!window.BlipolaVoice || !window.BlipolaVoice.supported()) {
+            const btn = document.getElementById('blipolaVoiceBtn');
+            if (btn) { btn.disabled = true; btn.textContent = '🎤 Voice unavailable'; }
+            const status = document.getElementById('blipolaVoiceStatus');
+            if (status) status.textContent = 'Try Chrome or Edge for voice answers.';
+        }
+    }
+
+    function blipolaVoiceAnswer() {
+        const q = quiz && quiz.questions && quiz.questions[quiz.idx];
+        if (!q || !window.BlipolaVoice) return;
+        stopAllAudio();
+        window.BlipolaVoice.start(q, {
+            onTranscript: function (text, matched) {
+                const el = document.getElementById('blipolaMessage');
+                if (el) el.textContent = matched ? '👂 I heard you!' : '👂 ' + text;
+            },
+            onChoice: function (id) {
+                const buttons = Array.from(document.querySelectorAll('.choice-btn[data-id]'));
+                const btn = buttons.find(b => b.getAttribute('data-id') === String(id));
+                if (btn) handleChoice(id, btn);
+            }
+        });
     }
     function handleChoice(id, btnEl) {
         if (quiz.awaitingNext) return;
