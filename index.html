@@ -1744,12 +1744,32 @@
     }
 
     .skill-map{max-width:760px;margin:22px auto;padding:16px;border:3px solid var(--mc-ink);border-radius:16px;background:#fff}.skill-map h3{margin:0 0 4px}.skill-intro{margin:0 0 14px;color:#777;font-size:.9rem}.skill-row{padding:10px 0;border-top:1px solid rgba(0,0,0,.12)}.skill-top{display:flex;justify-content:space-between;gap:10px;font-size:.88rem}.skill-track{height:10px;margin:6px 0 4px;background:var(--mc-stone);border:1px solid var(--mc-ink);border-radius:6px;overflow:hidden}.skill-fill{height:100%;background:var(--mc-grass);transition:width .3s ease}.skill-meta{font-size:.75rem;color:#777}
+    .review-card{max-width:760px;margin:0 auto 18px;padding:15px;border:3px solid var(--mc-ink);border-radius:18px;background:#fff}.review-head{display:flex;justify-content:space-between;gap:10px;font-weight:800}.review-sub{margin-top:3px;color:#777;font-size:.86rem}.review-icon{font-size:2rem;float:left;margin-right:12px}.review-chips{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}.review-chip{padding:6px 9px;border-radius:12px;background:#eef7e9;font-size:.82rem;font-weight:700}.review-btn{border:2px solid var(--mc-ink);border-radius:12px;padding:9px 14px;background:var(--mc-grass);font:inherit;font-weight:900;cursor:pointer}.review-btn:active{transform:translateY(1px)}
     /* ---------- Home dashboard ---------- */
     .home-hero{text-align:center;padding:8px 12px 16px}.home-kicker{font-weight:900;letter-spacing:.12em;font-size:.78rem;opacity:.7}.home-hero h1{margin:6px 0 4px}.home-hero p{margin:0;color:#777}
     .today-card{display:flex;align-items:center;gap:14px;max-width:760px;margin:0 auto 20px;padding:18px;border:3px solid #d9b44a;border-radius:22px;background:linear-gradient(135deg,#fff9d8,#fff);box-shadow:0 6px 0 rgba(0,0,0,.08);cursor:pointer}.today-icon{font-size:2.5rem}.today-copy{flex:1;min-width:0;text-align:left}.today-kicker{font-size:.75rem;font-weight:900;letter-spacing:.1em;color:#9b7410}.today-title{font-size:1.35rem;font-weight:900;margin-top:2px}.today-sub{color:#777;margin-top:3px}.today-card .big-btn{width:auto;min-width:110px;margin:0}
     .home-section-title{max-width:760px;margin:18px auto 10px;padding:0 4px}.home-featured{max-width:760px;margin:0 auto}.home-tools{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px}.home-tool{border:2px solid rgba(43,27,14,.12);border-radius:16px;padding:13px 10px;background:#fff;font:inherit;font-weight:800;cursor:pointer;min-height:52px}.home-tool:active,.today-card:active{transform:translateY(1px)}
     @media(max-width:560px){.today-card{flex-wrap:wrap}.today-card .big-btn{width:100%}.home-hero h1{font-size:1.65rem}}
     // ---------- Render: Home ----------
+    function getDueReviewItems(limit = 5) {
+        const found = [];
+        for (const c of CATEGORIES) {
+            if (c.key === 'math') continue;
+            for (const lv of c.levels) {
+                const catKey = `${c.key}_${lv.id}`;
+                for (const item of lv.items) if (getMasteryCount(catKey, item.id) >= MASTERY_THRESHOLD && isDue(catKey, item.id)) found.push({ cat: c, level: lv, item, catKey });
+            }
+        }
+        return found.slice(0, limit);
+    }
+    function startReview() { const due = getDueReviewItems(8); if (!due.length) return; const first = due[0]; startQuiz(first.cat.key, first.level.id); }
+    function renderTodayReview() {
+        const due = getDueReviewItems(4);
+        if (!due.length) return '<div class="review-card"><div class="review-icon">🌟</div><div><strong>All caught up!</strong><div class="review-sub">No skills need review right now.</div></div></div>';
+        const items = due.map(x => { const label = x.cat.key === 'letters' ? x.item.id : x.cat.key === 'numbers' ? x.item.n : x.item.id; return '<span class="review-chip">' + x.cat.icon + ' ' + label + '</span>'; }).join('');
+        return '<div class="review-card"><div class="review-head"><span>🔄 <strong>Today\'s Review</strong></span><span>' + due.length + ' ready</span></div><div class="review-chips">' + items + '</div><button class="review-btn" onclick="startReview()">START REVIEW ▶</button></div>';
+    }
+
     function getTodayLesson() {
         // Use existing mastery/due data to make a lightweight daily recommendation.
         for (const c of CATEGORIES) {
@@ -1788,6 +1808,7 @@
         return `${topbar(false)}
         <div class="home-hero"><div class="home-kicker">⛏️ MINECRAFT CLASSROOM</div><h1>Ready for an adventure?</h1><p>Learn a little. Play a little. Build your skills!</p></div>
         ${renderWorldProgress()}
+        ${renderTodayReview()}
         <div class="today-card" onclick="${todayAction}"><div class="today-icon">⭐</div><div class="today-copy"><div class="today-kicker">TODAY'S ADVENTURE</div><div class="today-title">${lesson.cat.icon} ${lesson.cat.name}</div><div class="today-sub">${lesson.reason}${lesson.item ? ' • ' + lessonLabel : ''}</div></div><button class="big-btn play">START ▶</button></div>
         <h2 class="home-section-title">🎮 Play & Learn</h2><div class="grid home-featured">${cards}</div>
         <h2 class="home-section-title">🌎 More Learning</h2>
