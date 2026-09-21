@@ -1609,7 +1609,7 @@
     function closeAccountModal(){const m=document.getElementById('accountModal');if(m)m.style.display='none';}
     function openAccountModal(mode){const m=document.getElementById('accountModal');if(!m)return;const create=mode==='create';m.style.display='grid';m.innerHTML='<div class="account-box"><h2>⛏️ '+(create?'Create Your BlockQuest Account':'Welcome Back!')+'</h2><p>'+(create?'Create a child profile on this device.':'Log in to switch profiles on this device.')+'</p><input id="accountName" maxlength="24" placeholder="Player name"><input id="accountPin" maxlength="6" inputmode="numeric" type="password" placeholder="4–6 digit PIN"><div class="account-actions"><button id="accountSubmit">'+(create?'Create':'Log In')+'</button><button id="accountCancel">Cancel</button></div><div id="accountStatus" class="account-status"></div><div class="account-switch"><button id="accountSwitch">'+(create?'Already have an account? Log in':'New player? Create an account')+'</button></div></div>';document.getElementById('accountSubmit').onclick=()=>submitAccount(mode);document.getElementById('accountCancel').onclick=closeAccountModal;document.getElementById('accountSwitch').onclick=()=>openAccountModal(create?'login':'create');}
     function submitAccount(mode){const name=(document.getElementById('accountName')?.value||'').trim(),pin=(document.getElementById('accountPin')?.value||'').trim(),status=document.getElementById('accountStatus');if(!/^[A-Za-z0-9 _-]{2,24}$/.test(name)){status.textContent='Use 2–24 letters, numbers, spaces, _ or -.';return;}if(!/^\\d{4,6}$/.test(pin)){status.textContent='PIN must be 4–6 digits.';return;}const accounts=getAccounts(),key=name.toLowerCase();if(mode==='create'&&accounts[key]){status.textContent='That player name already exists on this device.';return;}if(mode==='login'&&(!accounts[key]||accounts[key].pin!==pin)){status.textContent='Player name or PIN is incorrect.';return;}if(mode==='create'){accounts[key]={name:name,pin:pin};localStorage.setItem('kc_accounts_v1',JSON.stringify(accounts));}localStorage.setItem('kc_current_account',key);closeAccountModal();renderAccountBar();progress=loadProgress(); blipola=window.BlipolaClassroom.create(progress); render();}
-    function logoutAccount(){localStorage.removeItem('kc_current_account');renderAccountBar();progress=loadProgress();render();}
+    function logoutAccount(){localStorage.removeItem('kc_current_account');renderAccountBar();progress=loadProgress();blipola=window.BlipolaClassroom.create(progress);render();}
     function renderAccountBar(){const el=document.getElementById('accountBar');if(!el)return;const key=getCurrentAccount(),acct=getAccounts()[key];if(acct){el.innerHTML='<span class="account-name">👤 '+esc(acct.name)+'</span><button class="account-btn" id="logoutBtn">Log out</button>';document.getElementById('logoutBtn').onclick=logoutAccount;}else{el.innerHTML='<button class="account-btn" id="loginBtn">👤 Log in</button><button class="account-btn" id="createBtn">➕ Create account</button>';document.getElementById('loginBtn').onclick=()=>openAccountModal('login');document.getElementById('createBtn').onclick=()=>openAccountModal('create');}}
 
 
@@ -2872,6 +2872,13 @@
         if (quiz.awaitingNext) return;
         const q = quiz.questions[quiz.idx];
         const correct = id === q.itemId;
+        if (quiz.blipolaContext) {
+            blipola.complete(quiz.blipolaContext, {
+                correct,
+                firstTry: quiz.firstAttempt,
+                attempts: (quiz.wrongAttempts || 0) + 1
+            });
+        }
         logActivity(quiz.reviewMode ? 'review' : 'quiz', q.sourceKey || quiz.key, q.itemId, correct, quiz.firstAttempt);
         if (quiz.reviewMode && !quiz.awaitingNext) {
             quiz.reviewStats.attempted += 1;
@@ -2937,6 +2944,7 @@
     function nextQuestion() {
         quiz.idx += 1;
         quiz.firstAttempt = true;
+        quiz.wrongAttempts = 0;
         quiz.awaitingNext = false;
         if (quiz.idx >= ROUND_LENGTH) {
             go('roundEnd', { stars: quiz.stars, key: quiz.key, level: quiz.level });
@@ -2952,6 +2960,7 @@
             quiz.questions[quiz.idx].sourceKey = target.cat.key;
             quiz.questions[quiz.idx].sourceLevel = target.level.id;
             quiz.blipolaContext = blipola.startQuestion(quiz.questions[quiz.idx]);
+            quiz.blipolaRecommendation = blipola.recommend(target.cat.key, target.item.id);
             quiz.blipolaRecommendation = blipola.recommend(target.cat.key, target.item.id);
             quiz.questions[quiz.idx].sourceCatKey = target.catKey;
         } else {
