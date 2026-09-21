@@ -1540,6 +1540,32 @@
     function categoryDueCount(cat, items) {
         return items.filter(it => getMasteryCount(cat, it.id) >= MASTERY_THRESHOLD && isDue(cat, it.id)).length;
     }
+    function categoryLearningStats(cat) {
+        let mastered = 0, learning = 0, review = 0, total = 0;
+        for (const lv of cat.levels) {
+            const key = `${cat.key}_${lv.id}`;
+            for (const it of lv.items) {
+                const count = getMasteryCount(key, it.id); total++;
+                if (count >= MASTERY_THRESHOLD) { mastered++; if (isDue(key, it.id)) review++; }
+                else if (count > 0) learning++;
+            }
+        }
+        return { mastered, learning, review, total };
+    }
+    function skillStatus(stats) {
+        if (stats.review > 0) return { icon: '🔄', label: `${stats.review} to review` };
+        if (stats.learning > 0) return { icon: '🌱', label: `${stats.learning} learning` };
+        if (stats.mastered === stats.total && stats.total > 0) return { icon: '🏆', label: 'Mastered' };
+        return { icon: '⬜', label: 'Ready to learn' };
+    }
+    function renderSkillMap() {
+        const rows = CATEGORIES.map(cat => {
+            const s = categoryLearningStats(cat), pct = s.total ? Math.round((s.mastered / s.total) * 100) : 0, status = skillStatus(s);
+            return `<div class="skill-row"><div class="skill-top"><span>${cat.icon} <strong>${cat.name}</strong></span><span>${status.icon} ${status.label}</span></div><div class="skill-track"><div class="skill-fill" style="width:${pct}%"></div></div><div class="skill-meta">${s.mastered}/${s.total} mastered${s.learning ? ` · ${s.learning} learning` : ''}</div></div>`;
+        }).join('');
+        return `<div class="skill-map"><h3>🗺️ My Skill Map</h3><p class="skill-intro">See what you know and what is ready for a little more practice.</p>${rows}</div>`;
+    }
+
     function categoryMasteredAllLevels(cat) {
         let mastered = 0, total = 0;
         for (const lv of cat.levels) {
@@ -1717,6 +1743,7 @@
         return `<span style="font-size:${size * 0.55}px;">${item.emoji}</span>`;
     }
 
+    .skill-map{max-width:760px;margin:22px auto;padding:16px;border:3px solid var(--mc-ink);border-radius:16px;background:#fff}.skill-map h3{margin:0 0 4px}.skill-intro{margin:0 0 14px;color:#777;font-size:.9rem}.skill-row{padding:10px 0;border-top:1px solid rgba(0,0,0,.12)}.skill-top{display:flex;justify-content:space-between;gap:10px;font-size:.88rem}.skill-track{height:10px;margin:6px 0 4px;background:var(--mc-stone);border:1px solid var(--mc-ink);border-radius:6px;overflow:hidden}.skill-fill{height:100%;background:var(--mc-grass);transition:width .3s ease}.skill-meta{font-size:.75rem;color:#777}
     /* ---------- Home dashboard ---------- */
     .home-hero{text-align:center;padding:8px 12px 16px}.home-kicker{font-weight:900;letter-spacing:.12em;font-size:.78rem;opacity:.7}.home-hero h1{margin:6px 0 4px}.home-hero p{margin:0;color:#777}
     .today-card{display:flex;align-items:center;gap:14px;max-width:760px;margin:0 auto 20px;padding:18px;border:3px solid #d9b44a;border-radius:22px;background:linear-gradient(135deg,#fff9d8,#fff);box-shadow:0 6px 0 rgba(0,0,0,.08);cursor:pointer}.today-icon{font-size:2.5rem}.today-copy{flex:1;min-width:0;text-align:left}.today-kicker{font-size:.75rem;font-weight:900;letter-spacing:.1em;color:#9b7410}.today-title{font-size:1.35rem;font-weight:900;margin-top:2px}.today-sub{color:#777;margin-top:3px}.today-card .big-btn{width:auto;min-width:110px;margin:0}
@@ -2978,6 +3005,7 @@
         <h2>🏆 My Progress</h2>
         <div class="star-badge" style="margin:0 auto 20px;width:fit-content;font-size:1.1rem;">💎 ${progress.stars} total diamonds</div>
         ${renderWorldProgress()}
+        ${renderSkillMap()}
         ${rows}
         <div style="margin-top:10px;font-weight:700;">Math solved: ${Object.values(progress.mathCorrect).reduce((a, b) => a + (b || 0), 0)} total</div>
         <div class="trophy-grid">${trophies}</div>
