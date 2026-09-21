@@ -545,6 +545,20 @@ button, input, select, textarea { max-width: 100%; }
   .world-detail.open { max-height: 70vh; overflow-y: auto; }
   .account-bar { flex-wrap: wrap; }
 }
+/* ---------- Narrow-screen component hardening ---------- */
+#blipolaBuddy { flex-wrap: wrap; }
+#blipolaBuddy #blipolaMessage { min-width: 0; flex: 1 1 150px; overflow-wrap: anywhere; }
+#blipolaBuddy #blipolaVoiceStatus { flex: 1 1 100%; min-width: 0; overflow-wrap: anywhere; text-align: center; }
+#blipolaBuddy .choice-btn { width: auto; max-width: 100%; min-height: 44px; flex: 0 0 auto; }
+.mc-levelup-box { width: min(92vw, 520px); max-width: 100%; min-width: 0; }
+@media (max-width: 430px) {
+  #blipolaBuddy { gap: 7px; padding: 8px 9px !important; }
+  #blipolaBuddy > .choice-btn { padding: 8px 9px !important; font-size: .9rem; }
+  #blipolaBuddy #blipolaVoiceStatus { font-size: .68rem !important; }
+  .mc-levelup-box { padding: 18px 14px; }
+  .mc-levelup-title { font-size: 1.5rem; letter-spacing: 1px; }
+  .mc-levelup-reward { font-size: 1.05rem; }
+}
 @media (max-width: 430px) {
   .container { min-height: calc(100dvh - 62px); }
   .account-modal { padding: 10px; }
