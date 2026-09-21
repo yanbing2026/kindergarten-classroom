@@ -595,6 +595,33 @@ button, input, select, textarea { max-width: 100%; }
   .big-btn { font-size: .7rem; }
 }
 
+/* ---------- Mobile touch UX and safe-area hardening ---------- */
+body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
+.global-blipola-voice { bottom: calc(58px + env(safe-area-inset-bottom)); }
+.learn-display { padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left)); overflow-y: auto; }
+.learn-display-inner { width: min(90vw, 760px); max-width: 100%; max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); overflow-y: auto; overflow-x: hidden; }
+.account-modal { padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left)); overflow-y: auto; }
+.account-box { max-height: calc(100dvh - 20px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); overflow-y: auto; }
+.world-close { width: 44px; height: 44px; min-width: 44px; min-height: 44px; }
+.review-btn { min-height: 44px; }
+@media (max-width: 600px) {
+  body { padding-bottom: calc(54px + env(safe-area-inset-bottom)); }
+  .global-blipola-voice { bottom: calc(48px + env(safe-area-inset-bottom)); }
+  .draw-size-btn { width: 44px; height: 44px; }
+  .draw-swatch { width: 42px; height: 42px; }
+  .color-swatch { width: 42px; height: 42px; }
+  .world-detail.open { max-height: min(70vh, calc(100dvh - 150px)); }
+}
+@media (max-width: 380px) {
+  .draw-toolbar { gap: 6px; }
+  .draw-swatch { width: 40px; height: 40px; }
+  .color-swatch { width: 40px; height: 40px; }
+}
+@media (orientation: landscape) and (max-height: 600px) {
+  body { padding-bottom: calc(44px + env(safe-area-inset-bottom)); }
+  .learn-display-inner { max-height: calc(82vh - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
+}
+
 </style>
 </head>
 <body>
