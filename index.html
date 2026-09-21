@@ -1793,26 +1793,38 @@
     }
 
     function getTodayLesson() {
-        // Use existing mastery/due data to make a lightweight daily recommendation.
-        for (const c of CATEGORIES) {
-            if (c.key === 'math') continue;
-            for (const lv of c.levels) {
-                const catKey = `${c.key}_${lv.id}`;
-                const due = lv.items.find(it => isDue(catKey, it.id) && getMasteryCount(catKey, it.id) > 0);
-                if (due) return { cat: c, level: lv, item: due, reason: 'Review time!' };
-            }
+        // Smart daily recommendation: prioritize due reviews, recent mistakes, learning items, then unseen skills.
+        const recent = (progress.activityLog || []).filter(x => x.at >= Date.now() - 7 * 86400000);
+        const errors = {};
+        recent.filter(x => !x.correct).forEach(x => { errors[x.key] = (errors[x.key] || 0) + 1; });
+        const candidates = [];
+        for (const c of CATEGORIES) for (const lv of c.levels) {
+            const catKey = `${c.key}_${lv.id}`;
+            const due = lv.items.filter(it => getMasteryCount(catKey, it.id) >= MASTERY_THRESHOLD && isDue(catKey, it.id)).length;
+            const learning = lv.items.filter(it => { const n=getMasteryCount(catKey,it.id); return n>0 && n<MASTERY_THRESHOLD; }).length;
+            const unseen = lv.items.filter(it => getMasteryCount(catKey,it.id)===0).length;
+            const recentErrors = errors[catKey] || errors[c.key] || 0;
+            const score = due*6 + recentErrors*5 + learning*2 + Math.min(unseen,3)*1.5;
+            if (score > 0) candidates.push({cat:c,level:lv,score,due,learning,recentErrors});
         }
-        for (const key of ['letters', 'numbers', 'words', 'math']) {
-            const c = CATEGORIES.find(x => x.key === key);
-            if (!c) continue;
-            const lv = c.levels[0];
-            if (key === 'math') return { cat: c, level: lv, item: null, reason: 'Practice your math!' };
-            const catKey = `${key}_${lv.id}`;
-            const next = lv.items.find(it => getMasteryCount(catKey, it.id) < MASTERY_THRESHOLD);
-            if (next) return { cat: c, level: lv, item: next, reason: 'Keep building your skills!' };
+        candidates.sort((a,b) => b.score-a.score);
+        const best=candidates[0];
+        if (best) {
+            const catKey=`${best.cat.key}_${best.level.id}`;
+            const item=best.level.items.find(it => {
+                const n=getMasteryCount(catKey,it.id);
+                return (best.recentErrors && n<MASTERY_THRESHOLD) || (n>=MASTERY_THRESHOLD && isDue(catKey,it.id)) || n===0;
+            }) || null;
+            const reason=best.recentErrors ? 'Let’s practice this one again!' : best.due ? 'Review time!' : best.learning ? 'Keep building your skills!' : 'A new skill awaits!';
+            return {cat:best.cat,level:best.level,item,reason};
         }
-        const c = CATEGORIES.find(x => x.key === 'math') || CATEGORIES[0];
-        return { cat: c, level: c.levels[0], item: null, reason: 'Ready for another adventure?' };
+        const c=CATEGORIES.find(x=>x.key==='math') || CATEGORIES[0];
+        return {cat:c,level:c.levels[0],item:null,reason:'Ready for another adventure?'};
+    }
+    function startTodayAdventure() {
+        const lesson=getTodayLesson();
+        if (lesson.cat.key==='math') return startMath(lesson.level.id);
+        startQuiz(lesson.cat.key, lesson.level.id, lesson.item ? lesson.item.id : null);
     }
 
     function renderHome() {
@@ -1825,7 +1837,7 @@
             const action = c.leveled ? `go('level', {key:'${c.key}'})` : `go('category', {key:'${c.key}', level:'L1'})`;
             return `<div class="card cat-${c.key}" onclick="${action}"><div class="icon">${c.icon}</div><div class="label">${c.name}</div><div class="sublabel">${sub}</div></div>`;
         }).join('');
-        const todayAction = lesson.cat.leveled ? `go('level', {key:'${lesson.cat.key}'})` : `go('category', {key:'${lesson.cat.key}', level:'${lesson.level.id}'})`;
+        const todayAction = 'startTodayAdventure()';
         const lessonLabel = lesson.item ? (lesson.cat.key === 'letters' ? lesson.item.id : lesson.cat.key === 'numbers' ? lesson.item.n : lesson.item.id) : lesson.cat.name;
         return `${topbar(false)}
         <div class="home-hero"><div class="home-kicker">⛏️ MINECRAFT CLASSROOM</div><h1>Ready for an adventure?</h1><p>Learn a little. Play a little. Build your skills!</p></div>
@@ -2179,11 +2191,11 @@
 
     // ---------- Quiz engine ----------
     let quiz = null;
-    function startQuiz(key, level) {
+    function startQuiz(key, level, targetId) {
         const items = getCategoryItems(key, level);
         quiz = { key, level, items, questions: [], idx: 0, correctFirstTry: 0, firstAttempt: true, awaitingNext: false, stars: 0, streak: 0, retryQueue: [] };
         // Generate one question at a time so recent performance can affect the next question.
-        quiz.questions.push(buildQuestion(key, items, level));
+        quiz.questions.push(buildQuestion(key, items, level, targetId));
         go('play', { key, level });
     }
     function buildQuestion(key, items, level, targetId) {
