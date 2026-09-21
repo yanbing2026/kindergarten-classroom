@@ -2069,7 +2069,8 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
     }
 
     // ---------- Nav ----------
-    let state = { screen: 'home', params: null, stack: [] };\n    let blipolaVoiceSession = 0;
+    let state = { screen: 'home', params: null, stack: [] };
+    let blipolaVoiceSession = 0;
     const navigationTimers = new Set();
     function scheduleNavigation(fn, delay) {
         const timer = setTimeout(() => {
@@ -2080,6 +2081,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         return timer;
     }
     function cancelNavigationTasks() {
+        blipolaVoiceSession += 1;
         navigationTimers.forEach(timer => clearTimeout(timer));
         navigationTimers.clear();
         if (timedInterval) {
