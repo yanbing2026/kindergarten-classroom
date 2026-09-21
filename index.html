@@ -366,6 +366,7 @@
     .world-progress{max-width:760px;margin:0 auto 18px;padding:13px 15px;border:3px solid var(--mc-ink);border-radius:16px;background:var(--mc-wood);box-shadow:inset 2px 2px 0 rgba(255,255,255,.25)}.world-header{display:flex;justify-content:space-between;gap:10px;font-weight:800}.world-track{height:14px;margin:9px 0 6px;background:var(--mc-stone);border:2px solid var(--mc-ink);border-radius:8px;overflow:hidden}.world-fill{height:100%;background:var(--mc-diamond);transition:width .35s ease}.world-text{font-size:.82rem;font-weight:700;opacity:.85}
     .skill-map{max-width:760px;margin:22px auto;padding:16px;border:3px solid var(--mc-ink);border-radius:16px;background:#fff}.skill-map h3{margin:0 0 4px}.skill-intro{margin:0 0 14px;color:#777;font-size:.9rem}.skill-row{padding:10px 0;border-top:1px solid rgba(0,0,0,.12)}.skill-top{display:flex;justify-content:space-between;gap:10px;font-size:.88rem}.skill-track{height:10px;margin:6px 0 4px;background:var(--mc-stone);border:1px solid var(--mc-ink);border-radius:6px;overflow:hidden}.skill-fill{height:100%;background:var(--mc-grass);transition:width .3s ease}.skill-meta{font-size:.75rem;color:#777}
     .review-card{max-width:760px;margin:0 auto 18px;padding:15px;border:3px solid var(--mc-ink);border-radius:18px;background:#fff}.review-head{display:flex;justify-content:space-between;gap:10px;font-weight:800}.review-sub{margin-top:3px;color:#777;font-size:.86rem}.review-icon{font-size:2rem;float:left;margin-right:12px}.review-chips{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}.review-chip{padding:6px 9px;border-radius:12px;background:#eef7e9;font-size:.82rem;font-weight:700}.review-btn{border:2px solid var(--mc-ink);border-radius:12px;padding:9px 14px;background:var(--mc-grass);font:inherit;font-weight:900;cursor:pointer}.review-btn:active{transform:translateY(1px)}
+    .review-results{max-width:760px}.review-score{font-size:2rem;font-weight:900;color:#0e6b7a;margin:8px 0}.review-summary{font-size:1rem;font-weight:700}.review-result-card{margin:14px 0;padding:14px;border:2px solid var(--mc-ink);border-radius:14px;background:#fff;text-align:left}.review-result-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
     /* ---------- Home dashboard ---------- */
     .home-hero{text-align:center;padding:8px 12px 16px}.home-kicker{font-weight:900;letter-spacing:.12em;font-size:.78rem;opacity:.7}.home-hero h1{margin:6px 0 4px}.home-hero p{margin:0;color:#777}
     .today-card{display:flex;align-items:center;gap:14px;max-width:760px;margin:0 auto 20px;padding:18px;border:3px solid #d9b44a;border-radius:22px;background:linear-gradient(135deg,#fff9d8,#fff);box-shadow:0 6px 0 rgba(0,0,0,.08);cursor:pointer}.today-icon{font-size:2.5rem}.today-copy{flex:1;min-width:0;text-align:left}.today-kicker{font-size:.75rem;font-weight:900;letter-spacing:.1em;color:#9b7410}.today-title{font-size:1.35rem;font-weight:900;margin-top:2px}.today-sub{color:#777;margin-top:3px}.today-card .big-btn{width:auto;min-width:110px;margin:0}
@@ -1765,7 +1766,7 @@
     function startReview() {
         const due = getDueReviewItems(8);
         if (!due.length) return;
-        quiz = { key: 'review', level: 'mixed', items: [], questions: [], idx: 0, correctFirstTry: 0, firstAttempt: true, awaitingNext: false, stars: 0, streak: 0, retryQueue: [], reviewMode: true, reviewItems: due };
+        quiz = { key: 'review', level: 'mixed', items: [], questions: [], idx: 0, correctFirstTry: 0, firstAttempt: true, awaitingNext: false, stars: 0, streak: 0, retryQueue: [], reviewMode: true, reviewItems: due, reviewStats: { attempted: 0, correct: 0, firstTry: 0, skills: {}, needsPractice: [] } };
         const first = due[0];
         const items = first.cat.levels.find(lv => lv.id === first.level.id).items;
         quiz.questions.push(buildQuestion(first.cat.key, items, first.level.id, first.item.id));
@@ -2628,6 +2629,11 @@
         if (quiz.awaitingNext) return;
         const q = quiz.questions[quiz.idx];
         const correct = id === q.itemId;
+        if (quiz.reviewMode && !quiz.awaitingNext) {
+            quiz.reviewStats.attempted += 1;
+            const skillKey = q.sourceCatKey || quiz.key;
+            if (!quiz.reviewStats.skills[skillKey]) quiz.reviewStats.skills[skillKey] = { key: q.sourceKey || quiz.key, level: q.sourceLevel || quiz.level, correct: 0, wrong: 0, firstTry: 0 };
+        }
         if (correct) {
             btnEl.classList.add('correct');
             quiz.awaitingNext = true;
@@ -2636,9 +2642,11 @@
             if (quiz.firstAttempt) {
                 bumpMastery(q.sourceCatKey || `${quiz.key}_${quiz.level}`, q.itemId);
                 quiz.correctFirstTry += 1;
+                if (quiz.reviewMode) { const skill = quiz.reviewStats.skills[q.sourceCatKey || quiz.key]; skill.correct += 1; skill.firstTry += 1; quiz.reviewStats.correct += 1; quiz.reviewStats.firstTry += 1; }
             } else {
                 // Research F: reward persistence — celebrate the eventual success too.
                 btnEl.classList.add('persist');
+                if (quiz.reviewMode) { const skill = quiz.reviewStats.skills[q.sourceCatKey || quiz.key]; skill.correct += 1; quiz.reviewStats.correct += 1; }
             }
             // Streak tracking
             quiz.streak = (quiz.streak || 0) + 1;
@@ -3018,6 +3026,32 @@
     // ---------- Round end / Progress ----------
     function renderRoundEnd() {
         const { stars, key, level, category } = state.params;
+        if (key === 'review' && quiz && quiz.reviewMode) {
+            const stats = quiz.reviewStats;
+            const skills = Object.values(stats.skills);
+            const skillNames = skills.map(s => {
+                const cat = CATEGORIES.find(c => c.key === s.key);
+                return cat ? cat.icon + ' ' + cat.name : s.key;
+            });
+            const needs = skills.filter(s => s.wrong > 0);
+            return `${topbar(false)}
+            <div class="center-col review-results">
+                <div style="font-size:4rem;">🎉</div>
+                <h2>Review Complete!</h2>
+                <div class="review-score">${stats.correct}/${stats.attempted} correct</div>
+                <p class="review-summary">You practiced ${skillNames.length} skill${skillNames.length === 1 ? '' : 's'} and earned ${stars} 💎</p>
+                <div class="review-result-card">
+                    <strong>🗺️ Skills practiced</strong>
+                    <div class="review-result-chips">${skillNames.map(n => '<span class="review-chip">' + n + '</span>').join('')}</div>
+                </div>
+                <div class="review-result-card">
+                    <strong>${needs.length ? '🌱 Keep practicing' : '🏆 Great job — all skills were answered correctly!'}</strong>
+                    ${needs.length ? '<div class="review-sub">' + needs.map(s => { const cat = CATEGORIES.find(c => c.key === s.key); return (cat ? cat.icon + ' ' + cat.name : s.key) + ' · ' + s.wrong + ' retry' + (s.wrong === 1 ? '' : 'ies'); }).join('<br>') + '</div>' : '<div class="review-sub">You stayed on track today.</div>'}
+                </div>
+                <button class="big-btn again" onclick="startReview()">🔁 Review Again</button>
+                <button class="big-btn home" onclick="goHome()">🏠 Home</button>
+            </div>`;
+        }
         const isTrace = key === 'trace';
         let againAction;
         if (key === 'math') againAction = `startMath('${level}')`;
