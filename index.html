@@ -416,6 +416,17 @@
         @keyframes mcCorrectPop { 0%{transform:scale(1)} 45%{transform:scale(1.1) rotate(-1deg)} 100%{transform:scale(1)} }
         @keyframes mcWrongShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-7px)} 50%{transform:translateX(7px)} 75%{transform:translateX(-4px)} }
         @keyframes mcWorldUnlock { 0%{transform:scale(.96);filter:brightness(1)} 45%{transform:scale(1.04);filter:brightness(1.18)} 100%{transform:scale(1);filter:brightness(1)} }
+
+        .mc-levelup { position:fixed; inset:0; display:grid; place-items:center; pointer-events:none; z-index:70; background:rgba(0,0,0,.08); }
+        .mc-levelup-box { text-align:center; min-width:260px; padding:24px 30px; border:4px solid #222; border-radius:14px; background:linear-gradient(#f8fff0,#e5f7d8); box-shadow:0 10px 0 #222, 0 18px 30px rgba(0,0,0,.22); }
+        .mc-levelup-icon { font-size:3rem; }
+        .mc-levelup-title { margin-top:4px; font-size:2rem; font-weight:900; letter-spacing:2px; }
+        .mc-levelup-skill { margin-top:8px; font-weight:700; }
+        .mc-levelup-reward { margin-top:12px; font-size:1.3rem; font-weight:900; }
+        @media (prefers-reduced-motion: no-preference) { .mc-levelup-box { animation:mcLevelUpBox .85s cubic-bezier(.2,1.35,.4,1) both; } .mc-levelup-icon { animation:mcLevelUpIcon .8s ease-out both; } }
+        @keyframes mcLevelUpBox { 0%{opacity:0;transform:scale(.45) rotate(-3deg)} 65%{opacity:1;transform:scale(1.08) rotate(1deg)} 100%{transform:scale(1)} }
+        @keyframes mcLevelUpIcon { 0%{transform:translateY(18px) scale(.3);opacity:0} 70%{transform:translateY(-5px) scale(1.2);opacity:1} 100%{transform:none} }
+        @media (prefers-reduced-motion: reduce) { .mc-levelup-box,.mc-levelup-icon { animation:none; } }
 </style>
 </head>
 <body>
@@ -1647,9 +1658,27 @@
     }
     function bumpMastery(cat, id) {
         if (!progress.mastery[cat]) progress.mastery[cat] = {};
-        const count = (progress.mastery[cat][id] || 0) + 1;
+        const before = progress.mastery[cat][id] || 0;
+        const count = before + 1;
         progress.mastery[cat][id] = count;
         scheduleNextReview(cat, id, count);
+        if (count === MASTERY_THRESHOLD && before < MASTERY_THRESHOLD) {
+            mcLevelUpBurst(cat);
+        }
+    }
+    function mcLevelUpBurst(catKey) {
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const cat = CATEGORIES.find(c => c.key === String(catKey).split('_')[0]);
+        const name = cat ? cat.name : 'Skill';
+        const layer = document.createElement('div');
+        layer.className = 'mc-levelup';
+        layer.innerHTML = '<div class="mc-levelup-box"><div class="mc-levelup-icon">⬆️</div><div class="mc-levelup-title">LEVEL UP!</div><div class="mc-levelup-skill">' + esc(name) + ' mastered!</div><div class="mc-levelup-reward">+2 💎</div></div>';
+        document.body.appendChild(layer);
+        progress.stars += 2;
+        saveProgress();
+        setTimeout(() => layer.remove(), 1700);
+        mcRewardBurst('⭐','💎','🧱','✨');
+        speak('Level up! ' + name + ' mastered!');
     }
     function categoryMasteredCount(cat, items) {
         return items.filter(it => getMasteryCount(cat, it.id) >= MASTERY_THRESHOLD).length;
