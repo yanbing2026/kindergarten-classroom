@@ -2070,18 +2070,39 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
 
     // ---------- Nav ----------
     let state = { screen: 'home', params: null, stack: [] };
+    const navigationTimers = new Set();
+    function scheduleNavigation(fn, delay) {
+        const timer = setTimeout(() => {
+            navigationTimers.delete(timer);
+            fn();
+        }, delay);
+        navigationTimers.add(timer);
+        return timer;
+    }
+    function cancelNavigationTasks() {
+        navigationTimers.forEach(timer => clearTimeout(timer));
+        navigationTimers.clear();
+        if (timedInterval) {
+            clearInterval(timedInterval);
+            timedInterval = null;
+        }
+        if (window.BlipolaVoice) window.BlipolaVoice.stop();
+        stopAllAudio();
+    }
     function go(screen, params) {
+        cancelNavigationTasks();
         state.stack.push({ screen: state.screen, params: state.params });
         state.screen = screen; state.params = params || null;
         render();
     }
     function goBack() {
+        cancelNavigationTasks();
         const prev = state.stack.pop();
         if (prev) { state.screen = prev.screen; state.params = prev.params; }
         else { state.screen = 'home'; state.params = null; }
         render();
     }
-    function goHome() { state.stack = []; state.screen = 'home'; state.params = null; render(); }
+    function goHome() { cancelNavigationTasks(); state.stack = []; state.screen = 'home'; state.params = null; render(); }
 
     // ---------- Descriptive praise (research: specific feedback > generic) ----------
     // Builds an item-aware confirmation instead of a random "Good job!".
@@ -3127,7 +3148,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             saveProgress();
             confettiBurst();
             speak(descriptivePraise(q.sourceKey || quiz.key, q));
-            setTimeout(nextQuestion, 900);
+            scheduleNavigation(nextQuestion, 900);
         } else {
             btnEl.classList.add('incorrect');
             btnEl.disabled = true;
@@ -3314,7 +3335,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             saveProgress();
             confettiBurst();
             speak(descriptivePraise('math', q));
-            setTimeout(nextMathQuestion, 900);
+            scheduleNavigation(nextMathQuestion, 900);
         } else {
             btnEl.classList.add('incorrect');
             btnEl.disabled = true;
@@ -3714,7 +3735,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             saveProgress();
             renderTopbarStarsOnly();
             speak(descriptivePraise('timed', q));
-            setTimeout(nextTimedQuestion, 600);
+            scheduleNavigation(nextTimedQuestion, 600);
         } else {
             btnEl.classList.add('incorrect');
             btnEl.disabled = true;
