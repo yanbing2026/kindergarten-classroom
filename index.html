@@ -407,6 +407,15 @@
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration:.001ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; transition-duration:.001ms !important; }
         }
+
+        @media (prefers-reduced-motion: no-preference) {
+            .choice-btn.correct { animation: mcCorrectPop .45s cubic-bezier(.2,1.5,.4,1); }
+            .choice-btn.incorrect { animation: mcWrongShake .42s ease-in-out; }
+            .world-progress.world-unlock { animation: mcWorldUnlock .8s cubic-bezier(.2,1.4,.4,1); }
+        }
+        @keyframes mcCorrectPop { 0%{transform:scale(1)} 45%{transform:scale(1.1) rotate(-1deg)} 100%{transform:scale(1)} }
+        @keyframes mcWrongShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-7px)} 50%{transform:translateX(7px)} 75%{transform:translateX(-4px)} }
+        @keyframes mcWorldUnlock { 0%{transform:scale(.96);filter:brightness(1)} 45%{transform:scale(1.04);filter:brightness(1.18)} 100%{transform:scale(1);filter:brightness(1)} }
 </style>
 </head>
 <body>
@@ -1825,7 +1834,7 @@
         return shuffle(chosen);
     }
     function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
-    function awardStar() { progress.stars += 1; saveProgress(); }
+    function awardStar() { const before=getWorldStage(); progress.stars += 1; saveProgress(); const after=getWorldStage(); if(after.index>before.index) mcWorldUnlockBurst(after); }
 
     function confettiBurst() {
         const layer = document.createElement('div');
@@ -3522,7 +3531,15 @@ ${html}
         setTimeout(()=>wrap.remove(),1200);
     }
 
-    // ---------- Main render ----------
+    
+    function mcWorldUnlockBurst(stage) {
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        mcRewardBurst('🧱','⭐','💎','✨','⛏️','🎉');
+        const el=document.querySelector('.world-progress');
+        if(el){ el.classList.remove('world-unlock'); void el.offsetWidth; el.classList.add('world-unlock'); }
+        if(stage && stage.name) setTimeout(()=>speak('New world unlocked: '+stage.name),180);
+    }
+// ---------- Main render ----------
     function render() {
         const app = document.getElementById('app');
         let html = '';
