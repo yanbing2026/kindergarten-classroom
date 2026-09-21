@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-title" content="Classroom">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="description" content="A supplemental kindergarten learning app: letters, numbers, English, Chinese, Spanish, and math.">
-    <title>⛏️ Minecraft Classroom ⛏️</title>
+    <title>⛏️ BlockQuest Classroom ⛏️</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -363,11 +363,130 @@
             .topbar { display: none !important; }
             .footer { display: none !important; }
         }
-    </style>
+    .world-progress{max-width:760px;margin:0 auto 18px;padding:13px 15px;border:3px solid var(--mc-ink);border-radius:16px;background:var(--mc-wood);box-shadow:inset 2px 2px 0 rgba(255,255,255,.25)}.world-header{display:flex;justify-content:space-between;gap:10px;font-weight:800}.world-track{height:14px;margin:9px 0 6px;background:var(--mc-stone);border:2px solid var(--mc-ink);border-radius:8px;overflow:hidden}.world-fill{height:100%;background:var(--mc-diamond);transition:width .35s ease}.world-text{font-size:.82rem;font-weight:700;opacity:.85}
+    .skill-map{max-width:760px;margin:22px auto;padding:16px;border:3px solid var(--mc-ink);border-radius:16px;background:#fff}.skill-map h3{margin:0 0 4px}.skill-intro{margin:0 0 14px;color:#777;font-size:.9rem}.skill-row{padding:10px 0;border-top:1px solid rgba(0,0,0,.12)}.skill-top{display:flex;justify-content:space-between;gap:10px;font-size:.88rem}.skill-track{height:10px;margin:6px 0 4px;background:var(--mc-stone);border:1px solid var(--mc-ink);border-radius:6px;overflow:hidden}.skill-fill{height:100%;background:var(--mc-grass);transition:width .3s ease}.skill-meta{font-size:.75rem;color:#777}
+    .review-card{max-width:760px;margin:0 auto 18px;padding:15px;border:3px solid var(--mc-ink);border-radius:18px;background:#fff}.review-head{display:flex;justify-content:space-between;gap:10px;font-weight:800}.review-sub{margin-top:3px;color:#777;font-size:.86rem}.review-icon{font-size:2rem;float:left;margin-right:12px}.review-chips{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}.review-chip{padding:6px 9px;border-radius:12px;background:#eef7e9;font-size:.82rem;font-weight:700}.review-btn{border:2px solid var(--mc-ink);border-radius:12px;padding:9px 14px;background:var(--mc-grass);font:inherit;font-weight:900;cursor:pointer}.review-btn:active{transform:translateY(1px)}
+    .review-results{max-width:760px}.review-score{font-size:2rem;font-weight:900;color:#0e6b7a;margin:8px 0}.review-summary{font-size:1rem;font-weight:700}.review-result-card{margin:14px 0;padding:14px;border:2px solid var(--mc-ink);border-radius:14px;background:#fff;text-align:left}.review-result-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.parent-dashboard{max-width:820px;margin:0 auto}.parent-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.parent-kicker{font-size:.75rem;font-weight:900;letter-spacing:2px;color:#0e6b7a}.parent-date{font-size:.85rem;color:#666}.parent-diamond{font-size:1.25rem;font-weight:900}.parent-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}.parent-stat{padding:18px 10px;border:2px solid var(--mc-ink);border-radius:14px;background:#fff;text-align:center;font-weight:800}.parent-stat-number{font-size:2rem;color:#0e6b7a}.parent-card{margin:14px 0;padding:16px;border:2px solid var(--mc-ink);border-radius:14px;background:#fff}.parent-card h3{margin:0 0 12px}.parent-focus-row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #ddd}.parent-focus-row:last-child{border-bottom:0}.parent-good{font-weight:800}.parent-progress{height:18px;background:#eee;border-radius:10px;overflow:hidden;border:1px solid #bbb}.parent-progress-fill{height:100%;background:var(--mc-green);border-radius:10px}.parent-progress-label{margin-top:8px;font-size:.9rem;font-weight:700;color:#555}@media(max-width:600px){.parent-grid{grid-template-columns:1fr}.parent-focus-row{font-size:.9rem}}
+    /* ---------- Home dashboard ---------- */
+    .home-hero{text-align:center;padding:8px 12px 16px}.home-kicker{font-weight:900;letter-spacing:.12em;font-size:.78rem;opacity:.7}.home-hero h1{margin:6px 0 4px}.home-hero p{margin:0;color:#777}
+    .today-card{display:flex;align-items:center;gap:14px;max-width:760px;margin:0 auto 20px;padding:18px;border:3px solid #d9b44a;border-radius:22px;background:linear-gradient(135deg,#fff9d8,#fff);box-shadow:0 6px 0 rgba(0,0,0,.08);cursor:pointer}.today-icon{font-size:2.5rem}.today-copy{flex:1;min-width:0;text-align:left}.today-kicker{font-size:.75rem;font-weight:900;letter-spacing:.1em;color:#9b7410}.today-title{font-size:1.35rem;font-weight:900;margin-top:2px}.today-sub{color:#777;margin-top:3px}.today-card .big-btn{width:auto;min-width:110px;margin:0}
+    .home-section-title{max-width:760px;margin:18px auto 10px;padding:0 4px}.home-featured{max-width:760px;margin:0 auto}.home-tools{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px}.home-tool{border:2px solid rgba(43,27,14,.12);border-radius:16px;padding:13px 10px;background:#fff;font:inherit;font-weight:800;cursor:pointer;min-height:52px}.home-tool:active,.today-card:active{transform:translateY(1px)}
+    @media(max-width:560px){.today-card{flex-wrap:wrap}.today-card .big-btn{width:100%}.home-hero h1{font-size:1.65rem}}
+
+        /* ---------- BlockQuest Classroom Animation System ---------- */
+        @media (prefers-reduced-motion: no-preference) {
+            .container { animation: mcPageIn 0.45s ease-out both; }
+            .grid .card { animation: mcCardIn 0.38s cubic-bezier(.2,.8,.2,1) both; }
+            .grid .card:nth-child(2n) { animation-delay: .04s; }
+            .grid .card:nth-child(3n) { animation-delay: .08s; }
+            .grid .card:nth-child(4n) { animation-delay: .12s; }
+            .big-btn, .choice-btn, .review-chip, .parent-card, .trophy { transition: transform .16s ease, filter .16s ease; }
+            .big-btn:hover, .choice-btn:hover, .card:hover, .review-chip:hover { transform: translateY(-3px); filter: brightness(1.04); }
+            .daily-missions { animation: mcSlideUp .42s ease-out both; }
+            .streak-badge.active { animation: mcFirePulse 1.2s ease-in-out infinite; }
+            .star-badge { animation: mcFloat 2.8s ease-in-out infinite; }
+            .mastered-check { animation: mcPopIn .35s cubic-bezier(.2,1.5,.4,1) both; }
+            .progress-bar-fill, .world-fill, .skill-fill { animation: mcProgressIn .8s ease-out both; transform-origin: left center; }
+            .mc-animate-in { animation: mcSlideUp .4s ease-out both; }
+            .mc-reward { animation: mcReward .75s cubic-bezier(.2,1.4,.4,1) both; }
+            .mc-celebrate { animation: mcCelebrate .9s ease-out both; }
+        }
+        @keyframes mcPageIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+        @keyframes mcCardIn { from { opacity:0; transform:translateY(14px) scale(.97); } to { opacity:1; transform:none; } }
+        @keyframes mcSlideUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+        @keyframes mcPopIn { 0% { opacity:0; transform:scale(.4); } 70% { transform:scale(1.18); } 100% { opacity:1; transform:scale(1); } }
+        @keyframes mcProgressIn { from { transform:scaleX(0); } to { transform:scaleX(1); } }
+        @keyframes mcFloat { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-2px); } }
+        @keyframes mcFirePulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.06); } }
+        @keyframes mcReward { 0% { opacity:0; transform:translateY(12px) scale(.5) rotate(-8deg); } 60% { opacity:1; transform:translateY(-5px) scale(1.12) rotate(3deg); } 100% { opacity:1; transform:none; } }
+        @keyframes mcCelebrate { 0% { transform:scale(.85); opacity:.2; } 55% { transform:scale(1.06); opacity:1; } 100% { transform:scale(1); opacity:1; } }
+        .mc-floaters { position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:60; }
+        .mc-floater { position:absolute; font-size:1.8rem; animation:mcFloatUp 1s ease-out forwards; }
+        @keyframes mcFloatUp { 0% { opacity:0; transform:translate(0,10px) scale(.5) rotate(0); } 20% { opacity:1; } 100% { opacity:0; transform:translate(var(--dx),-90px) scale(1.2) rotate(18deg); } }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration:.001ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; transition-duration:.001ms !important; }
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            .choice-btn.correct { animation: mcCorrectPop .45s cubic-bezier(.2,1.5,.4,1); }
+            .choice-btn.incorrect { animation: mcWrongShake .42s ease-in-out; }
+            .world-progress.world-unlock { animation: mcWorldUnlock .8s cubic-bezier(.2,1.4,.4,1); }
+        }
+        @keyframes mcCorrectPop { 0%{transform:scale(1)} 45%{transform:scale(1.1) rotate(-1deg)} 100%{transform:scale(1)} }
+        @keyframes mcWrongShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-7px)} 50%{transform:translateX(7px)} 75%{transform:translateX(-4px)} }
+        @keyframes mcWorldUnlock { 0%{transform:scale(.96);filter:brightness(1)} 45%{transform:scale(1.04);filter:brightness(1.18)} 100%{transform:scale(1);filter:brightness(1)} }
+
+        .mc-levelup { position:fixed; inset:0; display:grid; place-items:center; pointer-events:none; z-index:70; background:rgba(0,0,0,.08); }
+        .mc-levelup-box { text-align:center; min-width:260px; padding:24px 30px; border:4px solid #222; border-radius:14px; background:linear-gradient(#f8fff0,#e5f7d8); box-shadow:0 10px 0 #222, 0 18px 30px rgba(0,0,0,.22); }
+        .mc-levelup-icon { font-size:3rem; }
+        .mc-levelup-title { margin-top:4px; font-size:2rem; font-weight:900; letter-spacing:2px; }
+        .mc-levelup-skill { margin-top:8px; font-weight:700; }
+        .mc-levelup-reward { margin-top:12px; font-size:1.3rem; font-weight:900; }
+        @media (prefers-reduced-motion: no-preference) { .mc-levelup-box { animation:mcLevelUpBox .85s cubic-bezier(.2,1.35,.4,1) both; } .mc-levelup-icon { animation:mcLevelUpIcon .8s ease-out both; } }
+        @keyframes mcLevelUpBox { 0%{opacity:0;transform:scale(.45) rotate(-3deg)} 65%{opacity:1;transform:scale(1.08) rotate(1deg)} 100%{transform:scale(1)} }
+        @keyframes mcLevelUpIcon { 0%{transform:translateY(18px) scale(.3);opacity:0} 70%{transform:translateY(-5px) scale(1.2);opacity:1} 100%{transform:none} }
+        @media (prefers-reduced-motion: reduce) { .mc-levelup-box,.mc-levelup-icon { animation:none; } }
+
+        .world-map { display:flex; align-items:flex-start; gap:6px; margin:12px 0 10px; overflow-x:auto; padding:5px 2px 8px; scrollbar-width:thin; }
+        .world-node { min-width:74px; text-align:center; opacity:.42; transform:scale(.94); transition:opacity .3s ease, transform .3s ease, filter .3s ease; }
+        .world-node-icon { width:52px; height:52px; margin:auto; display:grid; place-items:center; border:3px solid #333; border-radius:10px; background:#d7d7d7; font-size:1.8rem; box-shadow:0 4px 0 #333; }
+        .world-node-name { margin-top:6px; font-size:.72rem; font-weight:800; white-space:nowrap; }
+        .world-node-threshold { font-size:.62rem; opacity:.72; margin-top:2px; }
+        .world-node.unlocked { opacity:1; transform:scale(1); filter:none; }
+        .world-node.unlocked .world-node-icon { background:#eaf7df; }
+        .world-node.active .world-node-icon { box-shadow:0 4px 0 #333, 0 0 0 3px rgba(255,215,0,.45); }
+        .world-node.active { transform:scale(1.06); }
+        .world-connector { flex:1; min-width:18px; height:5px; margin-top:25px; border-radius:4px; background:#aaa; box-shadow:inset 0 1px 0 rgba(255,255,255,.5); }
+        .world-node.unlocked + .world-connector { background:#78a84b; }
+        @media (prefers-reduced-motion:no-preference) {
+            .world-node.unlocked .world-node-icon { animation:mcWorldNodeIn .55s cubic-bezier(.2,1.4,.4,1) both; }
+            .world-node.active .world-node-icon { animation:mcWorldPulse 1.8s ease-in-out infinite; }
+        }
+        @keyframes mcWorldNodeIn { 0%{transform:scale(.5) rotate(-8deg);opacity:.2} 70%{transform:scale(1.12) rotate(2deg)} 100%{transform:scale(1) rotate(0)} }
+        @keyframes mcWorldPulse { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px) scale(1.05)} }
+        @media (max-width:600px) { .world-node { min-width:68px; } .world-node-icon { width:46px; height:46px; font-size:1.55rem; } }
+
+        .world-node { appearance:none; border:0; padding:0; color:inherit; font:inherit; background:transparent; cursor:default; }
+        .world-node.unlocked { cursor:pointer; }
+        .world-node.selected .world-node-icon { box-shadow:0 4px 0 #333, 0 0 0 4px rgba(76,175,80,.45); }
+        .world-detail { max-height:0; overflow:hidden; opacity:0; margin:0; border-radius:12px; background:#f4f8ef; border:0 solid #333; transition:max-height .45s ease, opacity .3s ease, margin .3s ease, padding .3s ease; }
+        .world-detail.open { max-height:420px; opacity:1; margin:4px 0 12px; padding:14px; border-width:2px; box-shadow:0 4px 0 rgba(0,0,0,.18); }
+        .world-detail-title { display:flex; align-items:center; justify-content:space-between; font-size:1.05rem; font-weight:900; }
+        .world-close { border:2px solid #333; background:#fff; border-radius:7px; width:30px; height:30px; cursor:pointer; font-weight:900; }
+        .world-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:10px; }
+        .world-detail-label { font-size:.68rem; font-weight:900; letter-spacing:.7px; margin-bottom:7px; opacity:.7; }
+        .world-skills { display:flex; flex-wrap:wrap; gap:6px; }
+        .world-skill-chip { display:inline-flex; gap:5px; align-items:center; padding:6px 8px; border:2px solid #bbb; border-radius:8px; background:#fff; font-size:.76rem; }
+        .world-skill-chip.mastered { border-color:#6e9e45; background:#edf8df; }
+        .world-building { display:flex; align-items:center; gap:8px; padding:7px 8px; margin-bottom:6px; border:2px solid #bbb; border-radius:8px; background:#fff; font-size:.78rem; }
+        .world-building span { font-size:1.25rem; }
+        @media (prefers-reduced-motion:no-preference) { .world-detail.open { animation:mcWorldDetailIn .45s ease-out both; } .world-node.selected .world-node-icon { animation:mcWorldSelect .55s cubic-bezier(.2,1.4,.4,1); } }
+        @keyframes mcWorldDetailIn { from{transform:translateY(-8px);opacity:0} to{transform:translateY(0);opacity:1} }
+        @keyframes mcWorldSelect { 0%{transform:scale(1)} 55%{transform:scale(1.13) rotate(-2deg)} 100%{transform:scale(1)} }
+        @media (max-width:600px) { .world-detail-grid { grid-template-columns:1fr; gap:10px; } }
+
+        .world-building { display:flex; align-items:center; gap:10px; padding:9px; margin-bottom:7px; border:2px solid #bbb; border-radius:9px; background:#fff; overflow:hidden; }
+        .building-art { min-width:78px; height:52px; display:flex; align-items:center; justify-content:center; gap:2px; font-size:1.45rem; background:repeating-linear-gradient(0deg,#e7e7e7 0 8px,#f5f5f5 8px 16px); border:2px solid #999; border-radius:7px; }
+        .building-info { min-width:0; flex:1; }
+        .building-info strong { display:block; font-size:.76rem; }
+        .building-info span { display:block; font-size:.64rem; opacity:.72; margin:2px 0 5px; }
+        .building-track { height:6px; background:#ddd; border-radius:5px; overflow:hidden; }
+        .building-fill { height:100%; transform-origin:left; background:#6f9d48; transition:width .7s ease; }
+        .world-building.finished { border-color:#6f9d48; background:#f0f9e8; }
+        @media (prefers-reduced-motion:no-preference) { .world-building.finished .building-art { animation:mcBuildingFinish .75s cubic-bezier(.2,1.4,.4,1); } .building-fill { animation:mcBuildFill .8s ease-out both; } }
+        @keyframes mcBuildingFinish { 0%{transform:scale(.85) rotate(-2deg);filter:brightness(1)} 55%{transform:scale(1.08) rotate(1deg);filter:brightness(1.25)} 100%{transform:scale(1)} }
+        @keyframes mcBuildFill { from{transform:scaleX(0)} to{transform:scaleX(1)} }
+<style>.account-bar{display:flex;justify-content:flex-end;align-items:center;gap:6px;margin:8px 0}.account-btn{border:2px solid #333;border-radius:9px;background:#fff;padding:8px 11px;font-weight:800;cursor:pointer;box-shadow:0 3px 0 #333}.account-name{font-size:.82rem;font-weight:800}.account-modal{position:fixed;inset:0;z-index:80;display:grid;place-items:center;background:rgba(0,0,0,.45);padding:18px}.account-box{width:min(410px,100%);box-sizing:border-box;background:#f7fbf1;border:4px solid #333;border-radius:16px;padding:22px;box-shadow:0 10px 0 #222,0 20px 40px rgba(0,0,0,.3)}.account-box h2{margin:0 0 8px}.account-box p{font-size:.84rem;opacity:.72}.account-box input{width:100%;box-sizing:border-box;margin:7px 0;padding:11px;border:2px solid #999;border-radius:8px;font-size:1rem}.account-actions{display:flex;gap:8px;margin-top:10px}.account-actions button,.account-switch button{flex:1;padding:10px;border:2px solid #333;border-radius:8px;background:#fff;font-weight:800;cursor:pointer}.account-status{min-height:22px;margin-top:8px;font-size:.82rem;font-weight:700}.account-switch{margin-top:9px;text-align:center}.account-switch button{width:100%;border:0;padding:6px;background:transparent;font-size:.76rem;box-shadow:none}@media(prefers-reduced-motion:no-preference){.account-box{animation:mcAccountIn .35s cubic-bezier(.2,1.3,.4,1)}}@keyframes mcAccountIn{from{opacity:0;transform:scale(.9) translateY(12px)}to{opacity:1;transform:none}}</style></style>
 </head>
 <body>
+<div id="accountBar" class="account-bar"></div>
+<div id="accountModal" class="account-modal" style="display:none"></div>
+
     <div class="container" id="app"></div>
 
+    <script src="./js/blipola-runtime.js"></script>
+    <script src="./js/blipola-voice.js"></script>
     <script>
     // ---------- Data ----------
     // ---------- Levels ----------
@@ -392,226 +511,193 @@
     // One source of truth per level. Add a word here and it appears in all three
     // languages automatically. To add a level, append another array to VOCAB_LEVELS.
     const VOCAB_LEVELS = [
-        [ // Level 1 — 3–4 letters (mob + item catalog)
-            {id:'axe',emoji:'🪓',img:'images/words/axe.png',en:'Axe',zh:{hanzi:'斧'},es:'Hacha'},
-            {id:'bat',emoji:'🦇',img:'images/words/bat.png',en:'Bat',zh:{hanzi:'蝙蝠'},es:'Murciélago'},
-            {id:'bee',emoji:'🐝',img:'images/words/bee.png',en:'Bee',zh:{hanzi:'蜜蜂'},es:'Abeja'},
-            {id:'bow',emoji:'🏹',img:'images/words/bow.png',en:'Bow',zh:{hanzi:'弓'},es:'Arco'},
-            {id:'cat',emoji:'🐱',img:'images/words/cat.png',en:'Cat',zh:{hanzi:'猫'},es:'Gato'},
-            {id:'cod',emoji:'🐟',img:'images/words/cod.png',en:'Cod',zh:{hanzi:'鳕鱼'},es:'Bacalao'},
-            {id:'cow',emoji:'🐮',img:'images/words/cow.png',en:'Cow',zh:{hanzi:'牛'},es:'Vaca'},
-            {id:'egg',emoji:'🥚',img:'images/words/egg.png',en:'Egg',zh:{hanzi:'鸡蛋'},es:'Huevo'},
-            {id:'fox',emoji:'🦊',img:'images/words/fox.png',en:'Fox',zh:{hanzi:'狐狸'},es:'Zorro'},
-            {id:'hoe',emoji:'🌾',img:'images/words/hoe.png',en:'Hoe',zh:{hanzi:'锄'},es:'Azada'},
-            {id:'ice',emoji:'🧊',img:'images/words/ice.png',en:'Ice',zh:{hanzi:'冰'},es:'Hielo'},
-            {id:'log',emoji:'🪵',img:'images/words/log.png',en:'Log',zh:{hanzi:'原木'},es:'Tronco'},
-            {id:'map',emoji:'🗺️',img:'images/words/map.png',en:'Map',zh:{hanzi:'地图'},es:'Mapa'},
-            {id:'pig',emoji:'🐷',img:'images/words/pig.png',en:'Pig',zh:{hanzi:'猪'},es:'Cerdo'},
-            {id:'tnt',emoji:'🧨',img:'images/words/tnt.png',en:'TNT',zh:{hanzi:'TNT'},es:'Dinamita'},
-            {id:'vex',emoji:'👿',img:'images/words/vex.png',en:'Vex',zh:{hanzi:'恼鬼'},es:'Vex'},
-            {id:'bell',emoji:'🔔',img:'images/words/bell.png',en:'Bell',zh:{hanzi:'钟'},es:'Campana'},
-            {id:'boat',emoji:'🚤',img:'images/words/boat.png',en:'Boat',zh:{hanzi:'船'},es:'Barca'},
-            {id:'cake',emoji:'🎂',img:'images/words/cake.png',en:'Cake',zh:{hanzi:'蛋糕'},es:'Tarta'},
-            {id:'book',emoji:'📖',img:'images/words/book.png',en:'Book',zh:{hanzi:'书'},es:'Libro'},
+        [ // Level 1 — original kindergarten vocabulary
+            {id:'ant',emoji:'🐜',en:'Ant',zh:{hanzi:'蚂蚁'},es:'Hormiga'},
+            {id:'apple',emoji:'🍎',en:'Apple',zh:{hanzi:'苹果'},es:'Manzana'},
+            {id:'baby',emoji:'👶',en:'Baby',zh:{hanzi:'婴儿'},es:'Bebé'},
+            {id:'ball',emoji:'⚽',en:'Ball',zh:{hanzi:'球'},es:'Pelota'},
+            {id:'bear',emoji:'🐻',en:'Bear',zh:{hanzi:'熊'},es:'Oso'},
+            {id:'bird',emoji:'🐦',en:'Bird',zh:{hanzi:'鸟'},es:'Pájaro'},
+            {id:'book',emoji:'📖',en:'Book',zh:{hanzi:'书'},es:'Libro'},
+            {id:'bus',emoji:'🚌',en:'Bus',zh:{hanzi:'公共汽车'},es:'Autobús'},
+            {id:'cake',emoji:'🎂',en:'Cake',zh:{hanzi:'蛋糕'},es:'Pastel'},
+            {id:'cat',emoji:'🐱',en:'Cat',zh:{hanzi:'猫'},es:'Gato'},
+            {id:'dog',emoji:'🐶',en:'Dog',zh:{hanzi:'狗'},es:'Perro'},
+            {id:'egg',emoji:'🥚',en:'Egg',zh:{hanzi:'鸡蛋'},es:'Huevo'},
+            {id:'fish',emoji:'🐟',en:'Fish',zh:{hanzi:'鱼'},es:'Pez'},
+            {id:'frog',emoji:'🐸',en:'Frog',zh:{hanzi:'青蛙'},es:'Rana'},
+            {id:'hand',emoji:'✋',en:'Hand',zh:{hanzi:'手'},es:'Mano'},
+            {id:'hat',emoji:'🧢',en:'Hat',zh:{hanzi:'帽子'},es:'Gorra'},
+            {id:'moon',emoji:'🌙',en:'Moon',zh:{hanzi:'月亮'},es:'Luna'},
+            {id:'sun',emoji:'☀️',en:'Sun',zh:{hanzi:'太阳'},es:'Sol'},
         ],
-        [ // Level 2 — 4–5 letters (mob + item catalog)
-            {id:'clay',emoji:'🟫',img:'images/words/clay.png',en:'Clay',zh:{hanzi:'黏土'},es:'Bloque de arcilla'},
-            {id:'coal',emoji:'⚫',img:'images/words/coal.png',en:'Coal',zh:{hanzi:'煤炭'},es:'Carbón'},
-            {id:'dirt',emoji:'🟫',img:'images/words/dirt.png',en:'Dirt',zh:{hanzi:'泥土'},es:'Tierra'},
-            {id:'door',emoji:'🚪',img:'images/words/door.png',en:'Door',zh:{hanzi:'门'},es:'Puerta'},
-            {id:'frog',emoji:'🐸',img:'images/words/frog.png',en:'Frog',zh:{hanzi:'青蛙'},es:'Rana'},
-            {id:'goat',emoji:'🐐',img:'images/words/goat.png',en:'Goat',zh:{hanzi:'山羊'},es:'Cabra'},
-            {id:'gold',emoji:'🥇',img:'images/words/gold.png',en:'Gold',zh:{hanzi:'金'},es:'Oro'},
-            {id:'husk',emoji:'🧟',img:'images/words/husk.png',en:'Husk',zh:{hanzi:'尸壳'},es:'Husk'},
-            {id:'iron',emoji:'⚙️',img:'images/words/iron.png',en:'Iron',zh:{hanzi:'铁'},es:'Hierro'},
-            {id:'lava',emoji:'🌋',img:'images/words/lava.png',en:'Lava',zh:{hanzi:'熔岩'},es:'Lava'},
-            {id:'lead',emoji:'🔗',img:'images/words/lead.png',en:'Lead',zh:{hanzi:'拴绳'},es:'Rienda'},
-            {id:'mule',emoji:'🐴',img:'images/words/mule.png',en:'Mule',zh:{hanzi:'骡子'},es:'Mula'},
-            {id:'rail',emoji:'🛤️',img:'images/words/rail.png',en:'Rail',zh:{hanzi:'铁轨'},es:'Raíl'},
-            {id:'sand',emoji:'🏖️',img:'images/words/sand.png',en:'Sand',zh:{hanzi:'沙子'},es:'Arena'},
-            {id:'wolf',emoji:'🐺',img:'images/words/wolf.png',en:'Wolf',zh:{hanzi:'狼'},es:'Lobo'},
-            {id:'wood',emoji:'🪵',img:'images/words/wood.png',en:'Wood',zh:{hanzi:'木头'},es:'Leño'},
-            {id:'wool',emoji:'🧶',img:'images/words/wool.png',en:'Wool',zh:{hanzi:'羊毛'},es:'Lana'},
-            {id:'allay',emoji:'🩷',img:'images/words/allay.png',en:'Allay',zh:{hanzi:'悦灵'},es:'Allay'},
-            {id:'anvil',emoji:'🔨',img:'images/words/anvil.png',en:'Anvil',zh:{hanzi:'铁砧'},es:'Yunque'},
+        [ // Level 2 — original kindergarten vocabulary
+            {id:'banana',emoji:'🍌',en:'Banana',zh:{hanzi:'香蕉'},es:'Plátano'},
+            {id:'bread',emoji:'🍞',en:'Bread',zh:{hanzi:'面包'},es:'Pan'},
+            {id:'chair',emoji:'🪑',en:'Chair',zh:{hanzi:'椅子'},es:'Silla'},
+            {id:'cloud',emoji:'☁️',en:'Cloud',zh:{hanzi:'云'},es:'Nube'},
+            {id:'corn',emoji:'🌽',en:'Corn',zh:{hanzi:'玉米'},es:'Maíz'},
+            {id:'door',emoji:'🚪',en:'Door',zh:{hanzi:'门'},es:'Puerta'},
+            {id:'dress',emoji:'👗',en:'Dress',zh:{hanzi:'连衣裙'},es:'Vestido'},
+            {id:'green',emoji:'🟢',en:'Green',zh:{hanzi:'绿色'},es:'Verde'},
+            {id:'house',emoji:'🏠',en:'House',zh:{hanzi:'房子'},es:'Casa'},
+            {id:'juice',emoji:'🧃',en:'Juice',zh:{hanzi:'果汁'},es:'Jugo'},
+            {id:'lemon',emoji:'🍋',en:'Lemon',zh:{hanzi:'柠檬'},es:'Limón'},
+            {id:'mouse',emoji:'🐭',en:'Mouse',zh:{hanzi:'老鼠'},es:'Ratón'},
+            {id:'ocean',emoji:'🌊',en:'Ocean',zh:{hanzi:'海洋'},es:'Océano'},
+            {id:'panda',emoji:'🐼',en:'Panda',zh:{hanzi:'熊猫'},es:'Panda'},
+            {id:'pizza',emoji:'🍕',en:'Pizza',zh:{hanzi:'披萨'},es:'Pizza'},
+            {id:'rain',emoji:'🌧️',en:'Rain',zh:{hanzi:'雨'},es:'Lluvia'},
+            {id:'robot',emoji:'🤖',en:'Robot',zh:{hanzi:'机器人'},es:'Robot'},
+            {id:'school',emoji:'🏫',en:'School',zh:{hanzi:'学校'},es:'Escuela'},
         ],
-        [ // Level 3 — 5 letters (mob + item catalog)
-            {id:'arrow',emoji:'🏹',img:'images/words/arrow.png',en:'Arrow',zh:{hanzi:'箭'},es:'Flecha'},
-            {id:'blaze',emoji:'🔥',img:'images/words/blaze.png',en:'Blaze',zh:{hanzi:'烈焰人'},es:'Blaze'},
-            {id:'boots',emoji:'🥾',img:'images/words/boots.png',en:'Boots',zh:{hanzi:'靴子'},es:'Botas'},
-            {id:'bread',emoji:'🍞',img:'images/words/bread.png',en:'Bread',zh:{hanzi:'面包'},es:'Pan'},
-            {id:'brick',emoji:'🧱',img:'images/words/brick.png',en:'Brick',zh:{hanzi:'红砖'},es:'Ladrillo'},
-            {id:'camel',emoji:'🐫',img:'images/words/camel.png',en:'Camel',zh:{hanzi:'骆驼'},es:'Camello'},
-            {id:'chest',emoji:'🧰',img:'images/words/chest.png',en:'Chest',zh:{hanzi:'箱子'},es:'Cofre'},
-            {id:'clock',emoji:'⏰',img:'images/words/clock.png',en:'Clock',zh:{hanzi:'时钟'},es:'Reloj'},
-            {id:'ghast',emoji:'👹',img:'images/words/ghast.png',en:'Ghast',zh:{hanzi:'恶魂'},es:'Ghast'},
-            {id:'glass',emoji:'🪟',img:'images/words/glass.png',en:'Glass',zh:{hanzi:'玻璃'},es:'Cristal'},
-            {id:'horse',emoji:'🐴',img:'images/words/horse.png',en:'Horse',zh:{hanzi:'马'},es:'Caballo'},
-            {id:'llama',emoji:'🦙',img:'images/words/llama.png',en:'Llama',zh:{hanzi:'羊驼'},es:'Llama'},
-            {id:'panda',emoji:'🐼',img:'images/words/panda.png',en:'Panda',zh:{hanzi:'熊猫'},es:'Panda'},
-            {id:'sheep',emoji:'🐑',img:'images/words/sheep.png',en:'Sheep',zh:{hanzi:'羊'},es:'Oveja'},
-            {id:'slime',emoji:'🟢',img:'images/words/slime.png',en:'Slime',zh:{hanzi:'史莱姆'},es:'Slime'},
-            {id:'squid',emoji:'🦑',img:'images/words/squid.png',en:'Squid',zh:{hanzi:'鱿鱼'},es:'Calamar'},
-            {id:'steak',emoji:'🥩',img:'images/words/steak.png',en:'Steak',zh:{hanzi:'牛排'},es:'Filete asado'},
-            {id:'stone',emoji:'🪨',img:'images/words/stone.png',en:'Stone',zh:{hanzi:'石头'},es:'Piedra'},
-            {id:'stray',emoji:'💀',img:'images/words/stray.png',en:'Stray',zh:{hanzi:'流浪者'},es:'Stray'},
-            {id:'stick',emoji:'🪵',img:'images/words/stick.png',en:'Stick',zh:{hanzi:'木棍'},es:'Palo'},
-            {id:'paper',emoji:'📄',img:'images/words/paper.png',en:'Paper',zh:{hanzi:'纸'},es:'Papel'},
-            {id:'sugar',emoji:'🍬',img:'images/words/sugar.png',en:'Sugar',zh:{hanzi:'糖'},es:'Azúcar'},
-            {id:'honey',emoji:'🍯',img:'images/words/honey.png',en:'Honey Bottle',zh:{hanzi:'蜂蜜瓶'},es:'Frasco de miel'},
-            {id:'melon',emoji:'🍉',img:'images/words/melon.png',en:'Melon',zh:{hanzi:'西瓜'},es:'Sandía'},
-            {id:'apple',emoji:'🍎',img:'images/words/apple.png',en:'Apple',zh:{hanzi:'苹果'},es:'Manzana'},
-            {id:'wheat',emoji:'🌾',img:'images/words/wheat.png',en:'Wheat',zh:{hanzi:'小麦'},es:'Trigo'},
+        [ // Level 3 — original kindergarten vocabulary
+            {id:'tree',emoji:'🌳',en:'Tree',zh:{hanzi:'树'},es:'Árbol'},
+            {id:'animal',emoji:'🐾',en:'Animal',zh:{hanzi:'动物'},es:'Animal'},
+            {id:'basket',emoji:'🧺',en:'Basket',zh:{hanzi:'篮子'},es:'Cesta'},
+            {id:'bottle',emoji:'🍼',en:'Bottle',zh:{hanzi:'瓶子'},es:'Botella'},
+            {id:'button',emoji:'🔘',en:'Button',zh:{hanzi:'按钮'},es:'Botón'},
+            {id:'candle',emoji:'🕯️',en:'Candle',zh:{hanzi:'蜡烛'},es:'Vela'},
+            {id:'carrot',emoji:'🥕',en:'Carrot',zh:{hanzi:'胡萝卜'},es:'Zanahoria'},
+            {id:'circle',emoji:'⭕',en:'Circle',zh:{hanzi:'圆形'},es:'Círculo'},
+            {id:'cookie',emoji:'🍪',en:'Cookie',zh:{hanzi:'饼干'},es:'Galleta'},
+            {id:'dinner',emoji:'🍽️',en:'Dinner',zh:{hanzi:'晚餐'},es:'Cena'},
+            {id:'flower',emoji:'🌸',en:'Flower',zh:{hanzi:'花'},es:'Flor'},
+            {id:'garden',emoji:'🌷',en:'Garden',zh:{hanzi:'花园'},es:'Jardín'},
+            {id:'guitar',emoji:'🎸',en:'Guitar',zh:{hanzi:'吉他'},es:'Guitarra'},
+            {id:'happy',emoji:'😊',en:'Happy',zh:{hanzi:'开心的'},es:'Feliz'},
+            {id:'inside',emoji:'🏠',en:'Inside',zh:{hanzi:'里面'},es:'Dentro'},
+            {id:'jacket',emoji:'🧥',en:'Jacket',zh:{hanzi:'夹克'},es:'Chaqueta'},
+            {id:'kitten',emoji:'🐱',en:'Kitten',zh:{hanzi:'小猫'},es:'Gatito'},
+            {id:'ladder',emoji:'🪜',en:'Ladder',zh:{hanzi:'梯子'},es:'Escalera'},
         ],
-        [ // Level 4 — 5–6 letters (mob + item catalog)
-            {id:'sword',emoji:'⚔️',img:'images/words/sword.png',en:'Sword',zh:{hanzi:'剑'},es:'Espada'},
-            {id:'torch',emoji:'🔦',img:'images/words/torch.png',en:'Torch',zh:{hanzi:'火把'},es:'Antorcha'},
-            {id:'water',emoji:'💧',img:'images/words/water.png',en:'Water',zh:{hanzi:'水'},es:'Agua'},
-            {id:'witch',emoji:'🧙',img:'images/words/witch.png',en:'Witch',zh:{hanzi:'女巫'},es:'Bruja'},
-            {id:'bamboo',emoji:'🎋',img:'images/words/bamboo.png',en:'Bamboo',zh:{hanzi:'竹子'},es:'Bambú'},
-            {id:'barrel',emoji:'🛢️',img:'images/words/barrel.png',en:'Barrel',zh:{hanzi:'木桶'},es:'Barril'},
-            {id:'beacon',emoji:'📡',img:'images/words/beacon.png',en:'Beacon',zh:{hanzi:'信标'},es:'Faro'},
-            {id:'bogged',emoji:'🧟',img:'images/words/bogged.png',en:'Bogged',zh:{hanzi:'沼骸'},es:'Bogged'},
-            {id:'breeze',emoji:'🌬️',img:'images/words/breeze.png',en:'Breeze',zh:{hanzi:'旋风人'},es:'Breeze'},
-            {id:'bucket',emoji:'🪣',img:'images/words/bucket.png',en:'Bucket',zh:{hanzi:'铁桶'},es:'Cubo'},
-            {id:'bundle',emoji:'🎒',img:'images/words/bundle.png',en:'Bundle',zh:{hanzi:'收纳袋'},es:'Saco'},
-            {id:'carrot',emoji:'🥕',img:'images/words/carrot.png',en:'Carrot',zh:{hanzi:'胡萝卜'},es:'Zanahoria'},
-            {id:'cookie',emoji:'🍪',img:'images/words/cookie.png',en:'Cookie',zh:{hanzi:'曲奇'},es:'Galleta'},
-            {id:'copper',emoji:'🟤',img:'images/words/copper.png',en:'Copper',zh:{hanzi:'铜'},es:'Cobre'},
-            {id:'donkey',emoji:'🐴',img:'images/words/donkey.png',en:'Donkey',zh:{hanzi:'驴'},es:'Burro'},
-            {id:'elytra',emoji:'🦋',img:'images/words/elytra.png',en:'Elytra',zh:{hanzi:'鞘翅'},es:'Élitros'},
-            {id:'evoker',emoji:'🧙',img:'images/words/evoker.png',en:'Evoker',zh:{hanzi:'唤魔者'},es:'Evocador'},
-            {id:'gravel',emoji:'🪨',img:'images/words/gravel.png',en:'Gravel',zh:{hanzi:'沙砾'},es:'Grava'},
-            {id:'helmet',emoji:'⛑️',img:'images/words/helmet.png',en:'Helmet',zh:{hanzi:'头盔'},es:'Casco'},
+        [ // Level 4 — original kindergarten vocabulary
+            {id:'little',emoji:'🤏',en:'Little',zh:{hanzi:'小的'},es:'Pequeño'},
+            {id:'music',emoji:'🎵',en:'Music',zh:{hanzi:'音乐'},es:'Música'},
+            {id:'airport',emoji:'✈️',en:'Airport',zh:{hanzi:'机场'},es:'Aeropuerto'},
+            {id:'backpack',emoji:'🎒',en:'Backpack',zh:{hanzi:'背包'},es:'Mochila'},
+            {id:'birthday',emoji:'🎈',en:'Birthday',zh:{hanzi:'生日'},es:'Cumpleaños'},
+            {id:'breakfast',emoji:'🥣',en:'Breakfast',zh:{hanzi:'早餐'},es:'Desayuno'},
+            {id:'building',emoji:'🏢',en:'Building',zh:{hanzi:'建筑物'},es:'Edificio'},
+            {id:'butterfly',emoji:'🦋',en:'Butterfly',zh:{hanzi:'蝴蝶'},es:'Mariposa'},
+            {id:'computer',emoji:'💻',en:'Computer',zh:{hanzi:'电脑'},es:'Computadora'},
+            {id:'elephant',emoji:'🐘',en:'Elephant',zh:{hanzi:'大象'},es:'Elefante'},
+            {id:'family',emoji:'👨‍👩‍👧',en:'Family',zh:{hanzi:'家庭'},es:'Familia'},
+            {id:'football',emoji:'🏈',en:'Football',zh:{hanzi:'橄榄球'},es:'Fútbol'},
+            {id:'grandma',emoji:'👵',en:'Grandma',zh:{hanzi:'奶奶'},es:'Abuela'},
+            {id:'hospital',emoji:'🏥',en:'Hospital',zh:{hanzi:'医院'},es:'Hospital'},
+            {id:'jellyfish',emoji:'🪼',en:'Jellyfish',zh:{hanzi:'水母'},es:'Medusa'},
+            {id:'library',emoji:'📚',en:'Library',zh:{hanzi:'图书馆'},es:'Biblioteca'},
+            {id:'mountain',emoji:'⛰️',en:'Mountain',zh:{hanzi:'山'},es:'Montaña'},
+            {id:'rainbow',emoji:'🌈',en:'Rainbow',zh:{hanzi:'彩虹'},es:'Arcoíris'},
         ],
-        [ // Level 5 — 6 letters (mob + item catalog)
-            {id:'hoglin',emoji:'🐗',img:'images/words/hoglin.png',en:'Hoglin',zh:{hanzi:'疣猪兽'},es:'Hoglin'},
-            {id:'ladder',emoji:'🪜',img:'images/words/ladder.png',en:'Ladder',zh:{hanzi:'梯子'},es:'Escalera de mano'},
-            {id:'parrot',emoji:'🦜',img:'images/words/parrot.png',en:'Parrot',zh:{hanzi:'鹦鹉'},es:'Loro'},
-            {id:'piglin',emoji:'🐷',img:'images/words/piglin.png',en:'Piglin',zh:{hanzi:'猪灵'},es:'Piglin'},
-            {id:'potato',emoji:'🥔',img:'images/words/potato.png',en:'Potato',zh:{hanzi:'马铃薯'},es:'Patata'},
-            {id:'potion',emoji:'🧪',img:'images/words/potion.png',en:'Potion',zh:{hanzi:'药水'},es:'Poción'},
-            {id:'quartz',emoji:'⬜',img:'images/words/quartz.png',en:'Quartz',zh:{hanzi:'石英'},es:'Quartz'},
-            {id:'rabbit',emoji:'🐰',img:'images/words/rabbit.png',en:'Rabbit',zh:{hanzi:'兔子'},es:'Conejo'},
-            {id:'saddle',emoji:'🐴',img:'images/words/saddle.png',en:'Saddle',zh:{hanzi:'鞍'},es:'Montura'},
-            {id:'salmon',emoji:'🐟',img:'images/words/salmon.png',en:'Salmon',zh:{hanzi:'鲑鱼'},es:'Salmón'},
-            {id:'shears',emoji:'✂️',img:'images/words/shears.png',en:'Shears',zh:{hanzi:'剪刀'},es:'Tijeras'},
-            {id:'shield',emoji:'🛡️',img:'images/words/shield.png',en:'Shield',zh:{hanzi:'盾牌'},es:'Escudo'},
-            {id:'shovel',emoji:'🥄',img:'images/words/shovel.png',en:'Shovel',zh:{hanzi:'锹'},es:'Pala'},
-            {id:'spider',emoji:'🕷️',img:'images/words/spider.png',en:'Spider',zh:{hanzi:'蜘蛛'},es:'Araña'},
-            {id:'sponge',emoji:'🧽',img:'images/words/sponge.png',en:'Sponge',zh:{hanzi:'海绵'},es:'Esponja'},
-            {id:'turtle',emoji:'🐢',img:'images/words/turtle.png',en:'Turtle',zh:{hanzi:'海龟'},es:'Tortuga'},
-            {id:'warden',emoji:'👂',img:'images/words/warden.png',en:'Warden',zh:{hanzi:'监守者'},es:'Warden'},
-            {id:'wither',emoji:'💀',img:'images/words/wither.png',en:'Wither',zh:{hanzi:'凋灵'},es:'Wither'},
-            {id:'zoglin',emoji:'🐗',img:'images/words/zoglin.png',en:'Zoglin',zh:{hanzi:'僵尸疣猪兽'},es:'Zoglin'},
-            {id:'candle',emoji:'🕯️',img:'images/words/candle.png',en:'Candle',zh:{hanzi:'蜡烛'},es:'Vela'},
-            {id:'cactus',emoji:'🌵',img:'images/words/cactus.png',en:'Cactus',zh:{hanzi:'仙人掌'},es:'Cactus'},
+        [ // Level 5 — original kindergarten vocabulary
+            {id:'sandwich',emoji:'🥪',en:'Sandwich',zh:{hanzi:'三明治'},es:'Sándwich'},
+            {id:'teacher',emoji:'🧑‍🏫',en:'Teacher',zh:{hanzi:'老师'},es:'Maestro'},
+            {id:'window',emoji:'🪟',en:'Window',zh:{hanzi:'窗户'},es:'Ventana'},
+            {id:'adventure',emoji:'🧭',en:'Adventure',zh:{hanzi:'冒险'},es:'Aventura'},
+            {id:'beautiful',emoji:'🌸',en:'Beautiful',zh:{hanzi:'美丽的'},es:'Hermoso'},
+            {id:'careful',emoji:'👀',en:'Careful',zh:{hanzi:'小心的'},es:'Cuidadoso'},
+            {id:'classroom',emoji:'🏫',en:'Classroom',zh:{hanzi:'教室'},es:'Aula'},
+            {id:'dinosaur',emoji:'🦖',en:'Dinosaur',zh:{hanzi:'恐龙'},es:'Dinosaurio'},
+            {id:'exercise',emoji:'🏃',en:'Exercise',zh:{hanzi:'运动'},es:'Ejercicio'},
+            {id:'favorite',emoji:'❤️',en:'Favorite',zh:{hanzi:'最喜欢的'},es:'Favorito'},
+            {id:'firefly',emoji:'✨',en:'Firefly',zh:{hanzi:'萤火虫'},es:'Luciérnaga'},
+            {id:'friendship',emoji:'🤝',en:'Friendship',zh:{hanzi:'友谊'},es:'Amistad'},
+            {id:'giraffe',emoji:'🦒',en:'Giraffe',zh:{hanzi:'长颈鹿'},es:'Jirafa'},
+            {id:'important',emoji:'⭐',en:'Important',zh:{hanzi:'重要的'},es:'Importante'},
+            {id:'jellybean',emoji:'🍬',en:'Jellybean',zh:{hanzi:'软糖'},es:'Gominola'},
+            {id:'kangaroo',emoji:'🦘',en:'Kangaroo',zh:{hanzi:'袋鼠'},es:'Canguro'},
+            {id:'playground',emoji:'🛝',en:'Playground',zh:{hanzi:'游乐场'},es:'Patio'},
+            {id:'sunshine',emoji:'☀️',en:'Sunshine',zh:{hanzi:'阳光'},es:'Luz solar'},
         ],
-        [ // Level 6 — 6–7 letters (mob + item catalog)
-            {id:'zombie',emoji:'🧟',img:'images/words/zombie.png',en:'Zombie',zh:{hanzi:'僵尸'},es:'Zombi'},
-            {id:'axolotl',emoji:'🐲',img:'images/words/axolotl.png',en:'Axolotl',zh:{hanzi:'美西螈'},es:'Axolote'},
-            {id:'bedrock',emoji:'⬛',img:'images/words/bedrock.png',en:'Bedrock',zh:{hanzi:'基岩'},es:'Piedra base'},
-            {id:'chicken',emoji:'🐔',img:'images/words/chicken.png',en:'Chicken',zh:{hanzi:'鸡'},es:'Pollo'},
-            {id:'compass',emoji:'🧭',img:'images/words/compass.png',en:'Compass',zh:{hanzi:'指南针'},es:'Brújula'},
-            {id:'creeper',emoji:'💥',img:'images/words/creeper.png',en:'Creeper',zh:{hanzi:'苦力怕'},es:'Creeper'},
-            {id:'diamond',emoji:'💎',img:'images/words/diamond.png',en:'Diamond',zh:{hanzi:'钻石'},es:'Diamante'},
-            {id:'dolphin',emoji:'🐬',img:'images/words/dolphin.png',en:'Dolphin',zh:{hanzi:'海豚'},es:'Delfín'},
-            {id:'drowned',emoji:'🧟',img:'images/words/drowned.png',en:'Drowned',zh:{hanzi:'溺尸'},es:'Ahogado'},
-            {id:'emerald',emoji:'💚',img:'images/words/emerald.png',en:'Emerald',zh:{hanzi:'绿宝石'},es:'Esmeralda'},
-            {id:'furnace',emoji:'🔥',img:'images/words/furnace.png',en:'Furnace',zh:{hanzi:'熔炉'},es:'Horno'},
-            {id:'lantern',emoji:'🏮',img:'images/words/lantern.png',en:'Lantern',zh:{hanzi:'灯笼'},es:'Farol'},
-            {id:'nametag',emoji:'🏷️',img:'images/words/nametag.png',en:'Name Tag',zh:{hanzi:'命名牌'},es:'Etiqueta'},
-            {id:'phantom',emoji:'👻',img:'images/words/phantom.png',en:'Phantom',zh:{hanzi:'幻翼'},es:'Fantasma'},
-            {id:'pickaxe',emoji:'⛏️',img:'images/words/pickaxe.png',en:'Pickaxe',zh:{hanzi:'镐'},es:'Pico'},
-            {id:'pumpkin',emoji:'🎃',img:'images/words/pumpkin.png',en:'Pumpkin',zh:{hanzi:'南瓜'},es:'Calabaza'},
-            {id:'ravager',emoji:'🐗',img:'images/words/ravager.png',en:'Ravager',zh:{hanzi:'劫掠兽'},es:'Devastador'},
-            {id:'shulker',emoji:'📦',img:'images/words/shulker.png',en:'Shulker',zh:{hanzi:'潜影贝'},es:'Shulker'},
-            {id:'sniffer',emoji:'🦕',img:'images/words/sniffer.png',en:'Sniffer',zh:{hanzi:'嗅探兽'},es:'Sniffer'},
+        [ // Level 6 — original kindergarten vocabulary
+            {id:'teamwork',emoji:'🤝',en:'Teamwork',zh:{hanzi:'团队合作'},es:'Trabajo en equipo'},
+            {id:'wonderful',emoji:'🌟',en:'Wonderful',zh:{hanzi:'精彩的'},es:'Maravilloso'},
+            {id:'zebra',emoji:'🦓',en:'Zebra',zh:{hanzi:'斑马'},es:'Cebra'},
+            {id:'butterfly',emoji:'🦋',en:'Butterfly',zh:{hanzi:'蝴蝶'},es:'Mariposa'},
+            {id:'caterpillar',emoji:'🐛',en:'Caterpillar',zh:{hanzi:'毛毛虫'},es:'Oruga'},
+            {id:'chocolate',emoji:'🍫',en:'Chocolate',zh:{hanzi:'巧克力'},es:'Chocolate'},
+            {id:'community',emoji:'🏘️',en:'Community',zh:{hanzi:'社区'},es:'Comunidad'},
+            {id:'discover',emoji:'🔎',en:'Discover',zh:{hanzi:'发现'},es:'Descubrir'},
+            {id:'everywhere',emoji:'🌎',en:'Everywhere',zh:{hanzi:'到处'},es:'En todas partes'},
+            {id:'friendly',emoji:'😊',en:'Friendly',zh:{hanzi:'友好的'},es:'Amistoso'},
+            {id:'happiness',emoji:'😄',en:'Happiness',zh:{hanzi:'幸福'},es:'Felicidad'},
+            {id:'imagine',emoji:'💭',en:'Imagine',zh:{hanzi:'想象'},es:'Imaginar'},
+            {id:'kindness',emoji:'💗',en:'Kindness',zh:{hanzi:'善良'},es:'Amabilidad'},
+            {id:'learning',emoji:'📘',en:'Learning',zh:{hanzi:'学习'},es:'Aprendizaje'},
+            {id:'medicine',emoji:'💊',en:'Medicine',zh:{hanzi:'药'},es:'Medicina'},
+            {id:'question',emoji:'❓',en:'Question',zh:{hanzi:'问题'},es:'Pregunta'},
+            {id:'remember',emoji:'🧠',en:'Remember',zh:{hanzi:'记住'},es:'Recordar'},
+            {id:'together',emoji:'🤝',en:'Together',zh:{hanzi:'一起'},es:'Juntos'},
         ],
-        [ // Level 7 — 7–8 letters (mob + item catalog)
-            {id:'strider',emoji:'🕷️',img:'images/words/strider.png',en:'Strider',zh:{hanzi:'炽足兽'},es:'Strider'},
-            {id:'tadpole',emoji:'🐸',img:'images/words/tadpole.png',en:'Tadpole',zh:{hanzi:'蝌蚪'},es:'Renacuajo'},
-            {id:'trident',emoji:'🔱',img:'images/words/trident.png',en:'Trident',zh:{hanzi:'三叉戟'},es:'Tridente'},
-            {id:'beetroot',emoji:'🥬',img:'images/words/beetroot.png',en:'Beetroot',zh:{hanzi:'甜菜根'},es:'Remolacha'},
-            {id:'blazerod',emoji:'🔥',img:'images/words/blazerod.png',en:'Blaze Rod',zh:{hanzi:'烈焰棒'},es:'Vara de blaze'},
-            {id:'campfire',emoji:'🔥',img:'images/words/campfire.png',en:'Campfire',zh:{hanzi:'营火'},es:'Hoguera'},
-            {id:'cauldron',emoji:'🍲',img:'images/words/cauldron.png',en:'Cauldron',zh:{hanzi:'炼药锅'},es:'Caldero'},
-            {id:'creaking',emoji:'🪵',img:'images/words/creaking.png',en:'Creaking',zh:{hanzi:'吱吱作响的'},es:'Creaking'},
-            {id:'crossbow',emoji:'🏹',img:'images/words/crossbow.png',en:'Crossbow',zh:{hanzi:'弩'},es:'Ballesta'},
-            {id:'endstone',emoji:'🟨',img:'images/words/endstone.png',en:'End Stone',zh:{hanzi:'末地石'},es:'Piedra del End'},
-            {id:'enderman',emoji:'👁️',img:'images/words/enderman.png',en:'Enderman',zh:{hanzi:'末影人'},es:'Enderman'},
-            {id:'guardian',emoji:'🐡',img:'images/words/guardian.png',en:'Guardian',zh:{hanzi:'守卫者'},es:'Guardián'},
-            {id:'minecart',emoji:'🛤️',img:'images/words/minecart.png',en:'Minecart',zh:{hanzi:'矿车'},es:'Vagoneta'},
-            {id:'obsidian',emoji:'⬛',img:'images/words/obsidian.png',en:'Obsidian',zh:{hanzi:'黑曜石'},es:'Obsidiana'},
-            {id:'painting',emoji:'🖼️',img:'images/words/painting.png',en:'Painting',zh:{hanzi:'画'},es:'Cuadro'},
-            {id:'pillager',emoji:'🏹',img:'images/words/pillager.png',en:'Pillager',zh:{hanzi:'掠夺者'},es:'Saqueador'},
-            {id:'redstone',emoji:'🔴',img:'images/words/redstone.png',en:'Redstone',zh:{hanzi:'红石（消歧义）'},es:'Redstone'},
-            {id:'skeleton',emoji:'💀',img:'images/words/skeleton.png',en:'Skeleton',zh:{hanzi:'骷髅'},es:'Esqueleto'},
-            {id:'spyglass',emoji:'🔭',img:'images/words/spyglass.png',en:'Spyglass',zh:{hanzi:'望远镜'},es:'Catalejo'},
-            {id:'feather',emoji:'🪶',img:'images/words/feather.png',en:'Feather',zh:{hanzi:'羽毛'},es:'Pluma'},
-            {id:'mushroom',emoji:'🍄',img:'images/words/mushroom.png',en:'Mushroom',zh:{hanzi:'蘑菇'},es:'Champiñón'},
+        [ // Level 7 — original kindergarten vocabulary
+            {id:'vegetable',emoji:'🥦',en:'Vegetable',zh:{hanzi:'蔬菜'},es:'Verdura'},
+            {id:'yesterday',emoji:'📅',en:'Yesterday',zh:{hanzi:'昨天'},es:'Ayer'},
+            {id:'yourself',emoji:'🙂',en:'Yourself',zh:{hanzi:'你自己'},es:'Tú mismo'},
+            {id:'celebrate',emoji:'🎉',en:'Celebrate',zh:{hanzi:'庆祝'},es:'Celebrar'},
+            {id:'conversation',emoji:'💬',en:'Conversation',zh:{hanzi:'对话'},es:'Conversación'},
+            {id:'creativity',emoji:'🎨',en:'Creativity',zh:{hanzi:'创造力'},es:'Creatividad'},
+            {id:'different',emoji:'🔀',en:'Different',zh:{hanzi:'不同的'},es:'Diferente'},
+            {id:'education',emoji:'🎓',en:'Education',zh:{hanzi:'教育'},es:'Educación'},
+            {id:'exploring',emoji:'🧭',en:'Exploring',zh:{hanzi:'探索'},es:'Explorando'},
+            {id:'generous',emoji:'💝',en:'Generous',zh:{hanzi:'慷慨的'},es:'Generoso'},
+            {id:'imagination',emoji:'🌈',en:'Imagination',zh:{hanzi:'想象力'},es:'Imaginación'},
+            {id:'knowledge',emoji:'📚',en:'Knowledge',zh:{hanzi:'知识'},es:'Conocimiento'},
+            {id:'listening',emoji:'👂',en:'Listening',zh:{hanzi:'倾听'},es:'Escuchar'},
+            {id:'neighborhood',emoji:'🏘️',en:'Neighborhood',zh:{hanzi:'社区'},es:'Vecindario'},
+            {id:'practice',emoji:'✏️',en:'Practice',zh:{hanzi:'练习'},es:'Práctica'},
+            {id:'responsible',emoji:'✅',en:'Responsible',zh:{hanzi:'负责的'},es:'Responsable'},
+            {id:'storybook',emoji:'📖',en:'Storybook',zh:{hanzi:'故事书'},es:'Libro de cuentos'},
+            {id:'understanding',emoji:'💡',en:'Understanding',zh:{hanzi:'理解'},es:'Comprensión'},
         ],
-        [ // Level 8 — 8–10 letters (mob + item catalog)
-            {id:'villager',emoji:'🧑‍🌾',img:'images/words/villager.png',en:'Villager',zh:{hanzi:'村民'},es:'Aldeano'},
-            {id:'armadillo',emoji:'🐾',img:'images/words/armadillo.png',en:'Armadillo',zh:{hanzi:'犰狳'},es:'Armadillo'},
-            {id:'bookshelf',emoji:'📚',img:'images/words/bookshelf.png',en:'Bookshelf',zh:{hanzi:'书架'},es:'Librería'},
-            {id:'endermite',emoji:'🐛',img:'images/words/endermite.png',en:'Endermite',zh:{hanzi:'末影螨'},es:'Endermite'},
-            {id:'glowsquid',emoji:'🦑',img:'images/words/glowsquid.png',en:'Glow Squid',zh:{hanzi:'发光鱿鱼'},es:'Calamar luminoso'},
-            {id:'glowstone',emoji:'💡',img:'images/words/glowstone.png',en:'Glowstone',zh:{hanzi:'荧石'},es:'Piedra luminosa'},
-            {id:'irongolem',emoji:'🛡️',img:'images/words/irongolem.png',en:'Iron Golem',zh:{hanzi:'铁傀儡'},es:'Golem de hierro'},
-            {id:'itemframe',emoji:'🖼️',img:'images/words/itemframe.png',en:'Item Frame',zh:{hanzi:'物品展示框'},es:'Marco'},
-            {id:'magmacube',emoji:'🟠',img:'images/words/magmacube.png',en:'Magma Cube',zh:{hanzi:'岩浆怪'},es:'Cubo de magma'},
-            {id:'musicdisc',emoji:'💿',img:'images/words/musicdisc.png',en:'Music Disc',zh:{hanzi:'音乐唱片'},es:'Disco de música'},
-            {id:'netherite',emoji:'⬛',img:'images/words/netherite.png',en:'Netherite',zh:{hanzi:'下界合金'},es:'Netherita'},
-            {id:'polarbear',emoji:'🐻‍❄️',img:'images/words/polarbear.png',en:'Polar Bear',zh:{hanzi:'北极熊'},es:'Oso polar'},
-            {id:'sandstone',emoji:'🟨',img:'images/words/sandstone.png',en:'Sandstone',zh:{hanzi:'砂岩'},es:'Arenisca'},
-            {id:'snowgolem',emoji:'⛄',img:'images/words/snowgolem.png',en:'Snow Golem',zh:{hanzi:'雪傀儡'},es:'Golem de nieve'},
-            {id:'cavespider',emoji:'🕷️',img:'images/words/cavespider.png',en:'Cave Spider',zh:{hanzi:'洞穴蜘蛛'},es:'Araña de cueva'},
-            {id:'enderpearl',emoji:'🔮',img:'images/words/enderpearl.png',en:'Ender Pearl',zh:{hanzi:'末影珍珠'},es:'Perla de ender'},
-            {id:'eyeofender',emoji:'👁️',img:'images/words/eyeofender.png',en:'Eye of Ender',zh:{hanzi:'末影之眼'},es:'Ojo de ender'},
-            {id:'fishingrod',emoji:'🎣',img:'images/words/fishingrod.png',en:'Fishing Rod',zh:{hanzi:'钓鱼竿'},es:'Caña de pescar'},
-            {id:'netherstar',emoji:'⭐',img:'images/words/netherstar.png',en:'Nether Star',zh:{hanzi:'下界之星'},es:'Estrella del Nether'},
+        [ // Level 8 — original kindergarten vocabulary
+            {id:'vegetable',emoji:'🥦',en:'Vegetable',zh:{hanzi:'蔬菜'},es:'Verdura'},
+            {id:'wonderful',emoji:'🌟',en:'Wonderful',zh:{hanzi:'精彩的'},es:'Maravilloso'},
+            {id:'yesterday',emoji:'📅',en:'Yesterday',zh:{hanzi:'昨天'},es:'Ayer'},
+            {id:'yourself',emoji:'🙂',en:'Yourself',zh:{hanzi:'你自己'},es:'Tú mismo'},
+            {id:'achievement',emoji:'🏆',en:'Achievement',zh:{hanzi:'成就'},es:'Logro'},
+            {id:'communication',emoji:'💬',en:'Communication',zh:{hanzi:'交流'},es:'Comunicación'},
+            {id:'cooperation',emoji:'🤝',en:'Cooperation',zh:{hanzi:'合作'},es:'Cooperación'},
+            {id:'development',emoji:'🌱',en:'Development',zh:{hanzi:'发展'},es:'Desarrollo'},
+            {id:'educational',emoji:'🎓',en:'Educational',zh:{hanzi:'教育的'},es:'Educativo'},
+            {id:'independent',emoji:'🦋',en:'Independent',zh:{hanzi:'独立的'},es:'Independiente'},
+            {id:'motivation',emoji:'⭐',en:'Motivation',zh:{hanzi:'动力'},es:'Motivación'},
+            {id:'opportunity',emoji:'🚪',en:'Opportunity',zh:{hanzi:'机会'},es:'Oportunidad'},
+            {id:'responsibility',emoji:'✅',en:'Responsibility',zh:{hanzi:'责任'},es:'Responsabilidad'},
+            {id:'scientist',emoji:'🔬',en:'Scientist',zh:{hanzi:'科学家'},es:'Científico'},
+            {id:'improvement',emoji:'📈',en:'Improvement',zh:{hanzi:'进步'},es:'Mejora'},
+            {id:'investigation',emoji:'🔎',en:'Investigation',zh:{hanzi:'调查'},es:'Investigación'},
+            {id:'measurement',emoji:'📏',en:'Measurement',zh:{hanzi:'测量'},es:'Medición'},
+            {id:'relationship',emoji:'❤️',en:'Relationship',zh:{hanzi:'关系'},es:'Relación'},
         ],
-        [ // Level 9 — 10–12 letters (mob + item catalog)
-            {id:'netherrack',emoji:'🔥',img:'images/words/netherrack.png',en:'Netherrack',zh:{hanzi:'下界岩'},es:'Netherrack'},
-            {id:'prismarine',emoji:'🟩',img:'images/words/prismarine.png',en:'Prismarine',zh:{hanzi:'海晶石'},es:'Prismarina'},
-            {id:'pufferfish',emoji:'🐡',img:'images/words/pufferfish.png',en:'Pufferfish',zh:{hanzi:'河豚'},es:'Pez globo'},
-            {id:'rabbitstew',emoji:'🍲',img:'images/words/rabbitstew.png',en:'Rabbit Stew',zh:{hanzi:'兔肉煲'},es:'Estofado de conejo'},
-            {id:'silverfish',emoji:'🐛',img:'images/words/silverfish.png',en:'Silverfish',zh:{hanzi:'蠹虫'},es:'Pececillo de plata'},
-            {id:'vindicator',emoji:'🪓',img:'images/words/vindicator.png',en:'Vindicator',zh:{hanzi:'卫道士'},es:'Vindicador'},
-            {id:'cobblestone',emoji:'🪨',img:'images/words/cobblestone.png',en:'Cobblestone',zh:{hanzi:'圆石'},es:'Roca'},
-            {id:'enderdragon',emoji:'🐉',img:'images/words/enderdragon.png',en:'Ender Dragon',zh:{hanzi:'末影龙'},es:'Dragón Ender'},
-            {id:'glowberries',emoji:'🍓',img:'images/words/glowberries.png',en:'Glow Berries',zh:{hanzi:'发光浆果'},es:'Bayas luminosas'},
-            {id:'goldenapple',emoji:'🍎',img:'images/words/goldenapple.png',en:'Golden Apple',zh:{hanzi:'金苹果'},es:'Manzana dorada'},
-            {id:'honeybottle',emoji:'🍯',img:'images/words/honeybottle.png',en:'Honey Bottle',zh:{hanzi:'蜂蜜瓶'},es:'Frasco con miel'},
-            {id:'lapislazuli',emoji:'🔵',img:'images/words/lapislazuli.png',en:'Lapis Lazuli',zh:{hanzi:'青金石'},es:'Lapislázuli'},
-            {id:'piglinbrute',emoji:'🐷',img:'images/words/piglinbrute.png',en:'Piglin Brute',zh:{hanzi:'猪灵蛮兵'},es:'Piglin bruto'},
-            {id:'beetrootsoup',emoji:'🍲',img:'images/words/beetrootsoup.png',en:'Beetroot Soup',zh:{hanzi:'甜菜汤'},es:'Estofado de remolacha'},
-            {id:'cookedsalmon',emoji:'🐟',img:'images/words/cookedsalmon.png',en:'Cooked Salmon',zh:{hanzi:'熟鲑鱼'},es:'Salmón cocinado'},
-            {id:'goldencarrot',emoji:'🥕',img:'images/words/goldencarrot.png',en:'Golden Carrot',zh:{hanzi:'金胡萝卜'},es:'Zanahoria dorada'},
-            {id:'mushroomstew',emoji:'🍲',img:'images/words/mushroomstew.png',en:'Mushroom Stew',zh:{hanzi:'蘑菇煲'},es:'Estofado de champiñones'},
-            {id:'shulkershell',emoji:'🐚',img:'images/words/shulkershell.png',en:'Shulker Shell',zh:{hanzi:'潜影壳'},es:'Caparazón de shulker'},
-            {id:'sweetberries',emoji:'🍓',img:'images/words/sweetberries.png',en:'Sweet Berries',zh:{hanzi:'甜浆果'},es:'Bayas dulces'},
+        [ // Level 9 — original kindergarten vocabulary
+            {id:'successful',emoji:'🏆',en:'Successful',zh:{hanzi:'成功的'},es:'Exitoso'},
+            {id:'vocabulary',emoji:'📚',en:'Vocabulary',zh:{hanzi:'词汇'},es:'Vocabulario'},
+            {id:'adventure',emoji:'🧭',en:'Adventure',zh:{hanzi:'冒险'},es:'Aventura'},
+            {id:'discovery',emoji:'🔍',en:'Discovery',zh:{hanzi:'发现'},es:'Descubrimiento'},
+            {id:'explorer',emoji:'🧭',en:'Explorer',zh:{hanzi:'探险家'},es:'Explorador'},
+            {id:'alphabet',emoji:'🔤',en:'Alphabet',zh:{hanzi:'字母表'},es:'Alfabeto'},
+            {id:'celebration',emoji:'🎊',en:'Celebration',zh:{hanzi:'庆典'},es:'Celebración'},
+            {id:'curiosity',emoji:'🔍',en:'Curiosity',zh:{hanzi:'好奇心'},es:'Curiosidad'},
+            {id:'determination',emoji:'💪',en:'Determination',zh:{hanzi:'决心'},es:'Determinación'},
+            {id:'environment',emoji:'🌎',en:'Environment',zh:{hanzi:'环境'},es:'Medio ambiente'},
+            {id:'experiment',emoji:'🧪',en:'Experiment',zh:{hanzi:'实验'},es:'Experimento'},
+            {id:'geography',emoji:'🗺️',en:'Geography',zh:{hanzi:'地理'},es:'Geografía'},
+            {id:'impossible',emoji:'🚫',en:'Impossible',zh:{hanzi:'不可能的'},es:'Imposible'},
+            {id:'kindergarten',emoji:'🏫',en:'Kindergarten',zh:{hanzi:'幼儿园'},es:'Jardín de infancia'},
+            {id:'mathematics',emoji:'➕',en:'Mathematics',zh:{hanzi:'数学'},es:'Matemáticas'},
+            {id:'observation',emoji:'👀',en:'Observation',zh:{hanzi:'观察'},es:'Observación'},
+            {id:'preparation',emoji:'🎒',en:'Preparation',zh:{hanzi:'准备'},es:'Preparación'},
+            {id:'recycling',emoji:'♻️',en:'Recycling',zh:{hanzi:'回收'},es:'Reciclaje'},
         ],
-        [ // Level 10 — 12–15 letters (mob + item catalog)
-            {id:'tropicalfish',emoji:'🐠',img:'images/words/tropicalfish.png',en:'Tropical Fish',zh:{hanzi:'热带鱼'},es:'Pez tropical'},
-            {id:'amethystshard',emoji:'💜',img:'images/words/amethystshard.png',en:'Amethyst Shard',zh:{hanzi:'紫水晶碎片'},es:'Fragmento de amatista'},
-            {id:'cookedchicken',emoji:'🍗',img:'images/words/cookedchicken.png',en:'Cooked Chicken',zh:{hanzi:'熟鸡肉'},es:'Pollo asado'},
-            {id:'craftingtable',emoji:'🛠️',img:'images/words/craftingtable.png',en:'Crafting Table',zh:{hanzi:'工作台'},es:'Mesa de trabajo'},
-            {id:'elderguardian',emoji:'🐡',img:'images/words/elderguardian.png',en:'Elder Guardian',zh:{hanzi:'远古守卫者'},es:'Guardián anciano'},
-            {id:'flintandsteel',emoji:'🔥',img:'images/words/flintandsteel.png',en:'Flint and Steel',zh:{hanzi:'打火石'},es:'Mechero'},
-            {id:'heartofthesea',emoji:'💙',img:'images/words/heartofthesea.png',en:'Heart of the Sea',zh:{hanzi:'海洋之心'},es:'Corazón del mar'},
-            {id:'nautilusshell',emoji:'🐚',img:'images/words/nautilusshell.png',en:'Nautilus Shell',zh:{hanzi:'鹦鹉螺壳'},es:'Caparazón de nautilo'},
-            {id:'cookedporkchop',emoji:'🥩',img:'images/words/cookedporkchop.png',en:'Cooked Porkchop',zh:{hanzi:'熟猪排'},es:'Chuleta de cerdo cocinada'},
-            {id:'fireworkrocket',emoji:'🎆',img:'images/words/fireworkrocket.png',en:'Firework Rocket',zh:{hanzi:'烟花火箭'},es:'Cohete de fuegos artificiales'},
-            {id:'honeycombblock',emoji:'🍯',img:'images/words/honeycombblock.png',en:'Honeycomb Block',zh:{hanzi:'蜜脾块'},es:'Bloque de panal'},
-            {id:'suspiciousstew',emoji:'🍲',img:'images/words/suspiciousstew.png',en:'Suspicious Stew',zh:{hanzi:'谜之炖菜'},es:'Estofado sospechoso'},
-            {id:'totemofundying',emoji:'🗿',img:'images/words/totemofundying.png',en:'Totem of Undying',zh:{hanzi:'不死图腾'},es:'Tótem de inmortalidad'},
-            {id:'witherskeleton',emoji:'💀',img:'images/words/witherskeleton.png',en:'Wither Skeleton',zh:{hanzi:'凋灵骷髅'},es:'Esqueleto wither'},
-            {id:'zombievillager',emoji:'🧟',img:'images/words/zombievillager.png',en:'Zombie Villager',zh:{hanzi:'僵尸村民'},es:'Aldeano zombi'},
-            {id:'phantommembrane',emoji:'🌫️',img:'images/words/phantommembrane.png',en:'Phantom Membrane',zh:{hanzi:'幻翼膜'},es:'Membrana de fantasma'},
-            {id:'wanderingtrader',emoji:'🧙',img:'images/words/wanderingtrader.png',en:'Wandering Trader',zh:{hanzi:'流浪商人'},es:'Comerciante ambulante'},
-            {id:'zombifiedpiglin',emoji:'🐷',img:'images/words/zombifiedpiglin.png',en:'Zombified Piglin',zh:{hanzi:'僵尸猪灵'},es:'Piglin zombificado'},
+        [ // Level 10 — original kindergarten vocabulary
+            {id:'storytelling',emoji:'📖',en:'Storytelling',zh:{hanzi:'讲故事'},es:'Narración'},
+            {id:'technology',emoji:'💻',en:'Technology',zh:{hanzi:'技术'},es:'Tecnología'},
+            {id:'understand',emoji:'💡',en:'Understand',zh:{hanzi:'理解'},es:'Entender'},
+            {id:'wondering',emoji:'🤔',en:'Wondering',zh:{hanzi:'思考'},es:'Preguntándose'},
+            {id:'yesterday',emoji:'📅',en:'Yesterday',zh:{hanzi:'昨天'},es:'Ayer'},
+            {id:'youngster',emoji:'🧒',en:'Youngster',zh:{hanzi:'小朋友'},es:'Niño'},
         ],
     ];
 
@@ -1453,11 +1539,85 @@
     const ROUND_LENGTH = 8;
     const TROPHIES = [10, 25, 50, 100, 200];
     const TRACE_CATEGORIES = ['letters', 'numbers', 'words', 'chinese', 'spanish'];
+    const WORLD_STAGES = [
+        { threshold: 0, icon: '🌱', name: 'Spawn Point', text: 'Your adventure begins!' },
+        { threshold: 10, icon: '🌲', name: 'Forest', text: 'The forest is growing!' },
+        { threshold: 25, icon: '🏘️', name: 'Village', text: 'Build a friendly village!' },
+        { threshold: 50, icon: '⛏️', name: 'Mine', text: 'Dig deeper and discover!' },
+        { threshold: 100, icon: '🏰', name: 'Castle', text: 'Your learning kingdom!' },
+        { threshold: 200, icon: '🌈', name: 'Sky Realm', text: 'A whole new world!' }
+    ];
+    function getWorldStage(stars = progress.stars) { let stage = WORLD_STAGES[0]; for (const s of WORLD_STAGES) if (stars >= s.threshold) stage = s; return stage; }
+    const WORLD_CONTENT = [
+        { skills:['Letters','Sounds','Numbers'], buildings:['🏠 Starter House','🌾 Learning Farm','🪵 Crafting Table'] },
+        { skills:['Words','Rhyming','Sight Words'], buildings:['🌲 Forest Library','🪵 Word Workshop','🐑 Animal Pen'] },
+        { skills:['Sentences','Categories','Prepositions'], buildings:['🏘️ Village School','📚 Trading Hall','🛤️ Village Path'] },
+        { skills:['Math','Measuring','Time','Money'], buildings:['⛏️ Diamond Mine','⚒️ Math Forge','🚂 Minecart Station'] },
+        { skills:['Science','Patterns','3D Shapes','Sort & Classify'], buildings:['🏰 Castle Lab','🔬 Experiment Room','🗼 Shape Tower'] },
+        { skills:['Chinese','Spanish','Free Play','Challenge'], buildings:['🌈 Sky Temple','☁️ Cloud Library','🚀 Adventure Port'] }
+    ];
+    const BUILDING_PHASES = ['🧱 Foundation','🏗️ Framing','🏠 Building','✨ Finished'];
+    function getWorldSkillPercent(name) {
+        const cat = CATEGORIES.find(c => c.name === name);
+        if (!cat) return 0;
+        const s = categoryLearningStats(cat);
+        return s.total ? Math.round(s.mastered / s.total * 100) : 0;
+    }
+    function getBuildingPhase(percent) {
+        if (percent >= 100) return { index:3, label:BUILDING_PHASES[3] };
+        if (percent >= 67) return { index:2, label:BUILDING_PHASES[2] };
+        if (percent >= 34) return { index:1, label:BUILDING_PHASES[1] };
+        return { index:0, label:BUILDING_PHASES[0] };
+    }
+    function buildingVisual(name, percent) {
+        const phase=getBuildingPhase(percent);
+        const icons = phase.index===0 ? ['🧱','🌱'] : phase.index===1 ? ['🧱','🪵','🔨'] : phase.index===2 ? ['🏠','🪟','🚪'] : ['🏠','✨','💎'];
+        return '<div class="world-building '+(phase.index===3?'finished':'')+'"><div class="building-art">'+icons.join('')+'</div><div class="building-info"><strong>'+esc(name)+'</strong><span>'+phase.label+' · '+percent+'%</span><div class="building-track"><div class="building-fill" style="width:'+percent+'%"></div></div></div></div>';
+    }
+    let openWorldStage = null;
+    function toggleWorldStage(index) {
+        const stage = WORLD_STAGES[index], stars = progress.stars;
+        if (!stage || stars < stage.threshold) return;
+        openWorldStage = openWorldStage === index ? null : index;
+        document.querySelectorAll('.world-node').forEach((el,i) => el.classList.toggle('selected', i === openWorldStage));
+        const panel = document.querySelector('.world-detail');
+        if (!panel) return;
+        if (openWorldStage === null) { panel.classList.remove('open'); panel.innerHTML=''; return; }
+        const data = WORLD_CONTENT[index] || WORLD_CONTENT[0];
+        const skills = data.skills.map(name => {
+            const cat = CATEGORIES.find(c => c.name === name);
+            if (!cat) return '<span class="world-skill-chip">📘 '+esc(name)+'</span>';
+            const stats = categoryLearningStats(cat);
+            const pct = stats.total ? Math.round(stats.mastered / stats.total * 100) : 0;
+            return '<span class="world-skill-chip '+(pct===100?'mastered':'')+'">'+cat.icon+' '+esc(name)+' <b>'+pct+'%</b></span>';
+        }).join('');
+        const buildings = data.buildings.map(b => buildingVisual(b.slice(b.indexOf(' ')+1), Math.min(100, Math.round(data.skills.reduce((sum,name) => sum + getWorldSkillPercent(name), 0) / Math.max(1, data.skills.length))))).join('');
+        panel.innerHTML='<div class="world-detail-title">'+stage.icon+' '+esc(stage.name)+' <button class="world-close" onclick="toggleWorldStage('+index+')">✕</button></div><div class="world-detail-grid"><div><div class="world-detail-label">📚 LEARNING SKILLS</div><div class="world-skills">'+skills+'</div></div><div><div class="world-detail-label">🏗️ BUILDINGS</div><div class="world-buildings">'+buildings+'</div></div></div>';
+        panel.classList.remove('open'); void panel.offsetWidth; panel.classList.add('open');
+    }
+    function renderWorldProgress(compact = false) {
+        const stars = progress.stars, stage = getWorldStage(stars), next = WORLD_STAGES.find(s => s.threshold > stars);
+        const pct = next ? Math.min(100, Math.round(((stars - stage.threshold) / (next.threshold - stage.threshold)) * 100)) : 100;
+        const nodes = WORLD_STAGES.map((s, i) => {
+            const unlocked = stars >= s.threshold, active = i === stage.index;
+            return '<button type="button" class="world-node '+(unlocked?'unlocked ':'')+(active?'active ':'')+'" '+(unlocked?'onclick="toggleWorldStage('+i+')"':'disabled')+' aria-label="'+esc(s.name)+(unlocked?', open world details':', locked')+'"><div class="world-node-icon">'+(unlocked?s.icon:'🔒')+'</div><div class="world-node-name">'+esc(s.name)+'</div><div class="world-node-threshold">'+s.threshold+' 💎</div></button>';
+        }).join('<div class="world-connector"></div>');
+        return '<div class="world-progress '+(compact?'compact':'')+'"><div class="world-header"><span>🗺️ <strong>My Learning World</strong></span><span>💎 '+stars+(next?' / '+next.threshold:'')+'</span></div><div class="world-map">'+nodes+'</div><div class="world-detail" aria-live="polite"></div><div class="world-track"><div class="world-fill" style="width:'+pct+'%"></div></div><div class="world-text">'+(next?next.icon+' '+esc(next.name)+' is '+(next.threshold-stars)+' diamonds away!':'🌈 Your world is fully unlocked!')+'</div></div>';
+    }
+    function getAccounts(){try{return JSON.parse(localStorage.getItem('kc_accounts_v1')||'{}')}catch(e){return {};}}
+    function getCurrentAccount(){return localStorage.getItem('kc_current_account')||'';}
+    function accountProgressKey(name){return 'kc_account_progress_v1_'+name.toLowerCase();}
+    function closeAccountModal(){const m=document.getElementById('accountModal');if(m)m.style.display='none';}
+    function openAccountModal(mode){const m=document.getElementById('accountModal');if(!m)return;const create=mode==='create';m.style.display='grid';m.innerHTML='<div class="account-box"><h2>⛏️ '+(create?'Create Your BlockQuest Account':'Welcome Back!')+'</h2><p>'+(create?'Create a child profile on this device.':'Log in to switch profiles on this device.')+'</p><input id="accountName" maxlength="24" placeholder="Player name"><input id="accountPin" maxlength="6" inputmode="numeric" type="password" placeholder="4–6 digit PIN"><div class="account-actions"><button id="accountSubmit">'+(create?'Create':'Log In')+'</button><button id="accountCancel">Cancel</button></div><div id="accountStatus" class="account-status"></div><div class="account-switch"><button id="accountSwitch">'+(create?'Already have an account? Log in':'New player? Create an account')+'</button></div></div>';document.getElementById('accountSubmit').onclick=()=>submitAccount(mode);document.getElementById('accountCancel').onclick=closeAccountModal;document.getElementById('accountSwitch').onclick=()=>openAccountModal(create?'login':'create');}
+    function submitAccount(mode){const name=(document.getElementById('accountName')?.value||'').trim(),pin=(document.getElementById('accountPin')?.value||'').trim(),status=document.getElementById('accountStatus');if(!/^[A-Za-z0-9 _-]{2,24}$/.test(name)){status.textContent='Use 2–24 letters, numbers, spaces, _ or -.';return;}if(!/^\\d{4,6}$/.test(pin)){status.textContent='PIN must be 4–6 digits.';return;}const accounts=getAccounts(),key=name.toLowerCase();if(mode==='create'&&accounts[key]){status.textContent='That player name already exists on this device.';return;}if(mode==='login'&&(!accounts[key]||accounts[key].pin!==pin)){status.textContent='Player name or PIN is incorrect.';return;}if(mode==='create'){accounts[key]={name:name,pin:pin};localStorage.setItem('kc_accounts_v1',JSON.stringify(accounts));}localStorage.setItem('kc_current_account',key);closeAccountModal();renderAccountBar();progress=loadProgress(); blipola=window.BlipolaClassroom.create(progress); render();}
+    function logoutAccount(){localStorage.removeItem('kc_current_account');renderAccountBar();progress=loadProgress();blipola=window.BlipolaClassroom.create(progress);render();}
+    function renderAccountBar(){const el=document.getElementById('accountBar');if(!el)return;const key=getCurrentAccount(),acct=getAccounts()[key];if(acct){el.innerHTML='<span class="account-name">👤 '+esc(acct.name)+'</span><button class="account-btn" id="logoutBtn">Log out</button>';document.getElementById('logoutBtn').onclick=logoutAccount;}else{el.innerHTML='<button class="account-btn" id="loginBtn">👤 Log in</button><button class="account-btn" id="createBtn">➕ Create account</button>';document.getElementById('loginBtn').onclick=()=>openAccountModal('login');document.getElementById('createBtn').onclick=()=>openAccountModal('create');}}
+
 
     // ---------- Progress storage ----------
     function loadProgress() {
         try {
-            const raw = localStorage.getItem('kc_progress_v1');
+            const raw = localStorage.getItem(getCurrentAccount() ? accountProgressKey(getCurrentAccount()) : 'kc_progress_v1');
             if (raw) {
                 const p = JSON.parse(raw);
                 // Migrate pre-levels saves: mathCorrect used to be a single
@@ -1477,13 +1637,86 @@
                     p.mastery = {};
                 }
                 if (!p.due || typeof p.due !== 'object') p.due = {};
+                if (!Array.isArray(p.activityLog)) p.activityLog = [];
                 return p;
             }
         } catch (e) {}
-        return { stars: 0, mastery: {}, mathCorrect: {} };
+        return { stars: 0, mastery: {}, due: {}, mathCorrect: {}, activityLog: [] };
     }
-    function saveProgress() { localStorage.setItem('kc_progress_v1', JSON.stringify(progress)); }
+    function logActivity(type, key, itemId, correct, firstTry) { if (!Array.isArray(progress.activityLog)) progress.activityLog = []; progress.activityLog.push({ at: Date.now(), type, key, itemId, correct: !!correct, firstTry: !!firstTry }); if (progress.activityLog.length > 300) progress.activityLog = progress.activityLog.slice(-300); }
+    function getActivitySummary(days = 7) {
+        const cutoff = Date.now() - days * 86400000;
+        const recent = (progress.activityLog || []).filter(x => x.at >= cutoff);
+        const byKey = {};
+        recent.forEach(x => { if (!byKey[x.key]) byKey[x.key] = { key: x.key, attempts: 0, correct: 0, firstTry: 0 }; byKey[x.key].attempts++; if (x.correct) byKey[x.key].correct++; if (x.correct && x.firstTry) byKey[x.key].firstTry++; });
+        return { attempts: recent.length, correct: recent.filter(x => x.correct).length, firstTry: recent.filter(x => x.correct && x.firstTry).length, days: new Set(recent.map(x => new Date(x.at).toLocaleDateString())).size, skills: Object.values(byKey).sort((a,b) => b.correct - a.correct || b.attempts - a.attempts) };
+    }
+    function saveProgress() { localStorage.setItem(getCurrentAccount() ? accountProgressKey(getCurrentAccount()) : 'kc_progress_v1', JSON.stringify(progress)); }
+    function todayKey() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+    function ensureDailyState() {
+        if (!progress.daily || progress.daily.date !== todayKey()) {
+            progress.daily = { date: todayKey(), tasks: {}, completed: false, rewardClaimed: false };
+        }
+        if (!progress.daily.tasks) progress.daily.tasks = {};
+        if (!getDueReviewItems(1).length && !progress.daily.tasks.review) progress.daily.tasks.review = true;
+        return progress.daily;
+    }
+    function recordDailyTask(task) {
+        const d = ensureDailyState();
+        if (d.tasks[task]) return false;
+        d.tasks[task] = true;
+        const done = ['practice','math','review'].every(t => d.tasks[t]);
+        if (done && !d.completed) {
+            d.completed = true;
+            if (!d.rewardClaimed) {
+                d.rewardClaimed = true;
+                progress.stars += 5;
+                progress.dailyReward = { date: d.date, stars: 5 };
+            }
+            updateLearningStreak();
+        }
+        saveProgress();
+        return done;
+    }
+    function updateLearningStreak() {
+        const d = ensureDailyState();
+        if (!d.completed) return;
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yKey = yesterday.toISOString().slice(0, 10);
+        const last = progress.learningStreak || { current: 0, best: 0, lastDate: null };
+        if (last.lastDate === d.date) return;
+        last.current = last.lastDate === yKey ? last.current + 1 : 1;
+        last.best = Math.max(last.best || 0, last.current);
+        last.lastDate = d.date;
+        progress.learningStreak = last;
+    }
+    function getDailyMissionSummary() {
+        const d = ensureDailyState();
+        const done = ['practice','math','review'].filter(t => d.tasks[t]).length;
+        const streak = progress.learningStreak || { current: 0, best: 0 };
+        return { done, total: 3, completed: d.completed, reward: d.rewardClaimed ? 5 : 0, streak: streak.current || 0, best: streak.best || 0 };
+    }
+    function renderDailyMissions() {
+        const m = getDailyMissionSummary();
+        const labels = [
+            ['practice','🎮 Practice'],
+            ['math','➕ Math'],
+            ['review','🔄 Review']
+        ];
+        const tasks = labels.map(([key,label]) => '<span class="review-chip">' + (ensureDailyState().tasks[key] ? '✅ ' : '⬜ ') + label + '</span>').join('');
+        return '<div class="parent-card daily-missions"><div class="parent-header" style="margin:0 0 8px;"><div><div class="parent-kicker">DAILY QUEST</div><h3>⛏️ Today’s Missions</h3></div><div style="font-size:1.4rem;">🔥 ' + m.streak + '</div></div><div class="review-result-chips">' + tasks + '</div><div class="parent-progress-label">' + (m.completed ? '🎉 Complete! +5 💎 earned today.' : m.done + ' of 3 missions complete · Finish all 3 for +5 💎') + '</div></div>';
+    }
+
     let progress = loadProgress();
+    let blipola = window.BlipolaClassroom.create(progress);
+    window.blipolaHint = function () {
+        if (!quiz || !quiz.blipolaContext) return;
+        const message = blipola.hint(quiz.blipolaContext, quiz.wrongAttempts || 0);
+        const el = document.getElementById("blipolaMessage");
+        if (el) el.textContent = "💡 " + message;
+        speak(message);
+    };
 
     // ---------- Spaced repetition (research B) ----------
     // mastery[cat][id] stays a count (backward-compatible). A parallel due[]
@@ -1515,9 +1748,27 @@
     }
     function bumpMastery(cat, id) {
         if (!progress.mastery[cat]) progress.mastery[cat] = {};
-        const count = (progress.mastery[cat][id] || 0) + 1;
+        const before = progress.mastery[cat][id] || 0;
+        const count = before + 1;
         progress.mastery[cat][id] = count;
         scheduleNextReview(cat, id, count);
+        if (count === MASTERY_THRESHOLD && before < MASTERY_THRESHOLD) {
+            mcLevelUpBurst(cat);
+        }
+    }
+    function mcLevelUpBurst(catKey) {
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const cat = CATEGORIES.find(c => c.key === String(catKey).split('_')[0]);
+        const name = cat ? cat.name : 'Skill';
+        const layer = document.createElement('div');
+        layer.className = 'mc-levelup';
+        layer.innerHTML = '<div class="mc-levelup-box"><div class="mc-levelup-icon">⬆️</div><div class="mc-levelup-title">LEVEL UP!</div><div class="mc-levelup-skill">' + esc(name) + ' mastered!</div><div class="mc-levelup-reward">+2 💎</div></div>';
+        document.body.appendChild(layer);
+        progress.stars += 2;
+        saveProgress();
+        setTimeout(() => layer.remove(), 1700);
+        mcRewardBurst('⭐','💎','🧱','✨');
+        speak('Level up! ' + name + ' mastered!');
     }
     function categoryMasteredCount(cat, items) {
         return items.filter(it => getMasteryCount(cat, it.id) >= MASTERY_THRESHOLD).length;
@@ -1525,6 +1776,32 @@
     function categoryDueCount(cat, items) {
         return items.filter(it => getMasteryCount(cat, it.id) >= MASTERY_THRESHOLD && isDue(cat, it.id)).length;
     }
+    function categoryLearningStats(cat) {
+        let mastered = 0, learning = 0, review = 0, total = 0;
+        for (const lv of cat.levels) {
+            const key = `${cat.key}_${lv.id}`;
+            for (const it of lv.items) {
+                const count = getMasteryCount(key, it.id); total++;
+                if (count >= MASTERY_THRESHOLD) { mastered++; if (isDue(key, it.id)) review++; }
+                else if (count > 0) learning++;
+            }
+        }
+        return { mastered, learning, review, total };
+    }
+    function skillStatus(stats) {
+        if (stats.review > 0) return { icon: '🔄', label: `${stats.review} to review` };
+        if (stats.learning > 0) return { icon: '🌱', label: `${stats.learning} learning` };
+        if (stats.mastered === stats.total && stats.total > 0) return { icon: '🏆', label: 'Mastered' };
+        return { icon: '⬜', label: 'Ready to learn' };
+    }
+    function renderSkillMap() {
+        const rows = CATEGORIES.map(cat => {
+            const s = categoryLearningStats(cat), pct = s.total ? Math.round((s.mastered / s.total) * 100) : 0, status = skillStatus(s);
+            return `<div class="skill-row"><div class="skill-top"><span>${cat.icon} <strong>${cat.name}</strong></span><span>${status.icon} ${status.label}</span></div><div class="skill-track"><div class="skill-fill" style="width:${pct}%"></div></div><div class="skill-meta">${s.mastered}/${s.total} mastered${s.learning ? ` · ${s.learning} learning` : ''}</div></div>`;
+        }).join('');
+        return `<div class="skill-map"><h3>🗺️ My Skill Map</h3><p class="skill-intro">See what you know and what is ready for a little more practice.</p>${rows}</div>`;
+    }
+
     function categoryMasteredAllLevels(cat) {
         let mastered = 0, total = 0;
         for (const lv of cat.levels) {
@@ -1676,7 +1953,7 @@
         return shuffle(chosen);
     }
     function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
-    function awardStar() { progress.stars += 1; saveProgress(); }
+    function awardStar() { const before=getWorldStage(); progress.stars += 1; saveProgress(); const after=getWorldStage(); if(after.index>before.index) mcWorldUnlockBurst(after); }
 
     function confettiBurst() {
         const layer = document.createElement('div');
@@ -1695,7 +1972,7 @@
         setTimeout(() => layer.remove(), 1500);
     }
 
-    // ---------- Word media (Minecraft sprite or emoji fallback) ----------
+    // ---------- Word media (original visual or emoji fallback) ----------
     function wordMediaHTML(item, size) {
         size = size || 64;
         if (item.img) return `<img src="${item.img}" alt="${esc(item.id)}" style="width:${size}px;height:${size}px;object-fit:contain;">`;
@@ -1703,58 +1980,94 @@
     }
 
     // ---------- Render: Home ----------
-    function renderHome() {
-        const mathSolved = Object.values(progress.mathCorrect).reduce((a, b) => a + (b || 0), 0);
-        const cards = CATEGORIES.map(c => {
-            const { mastered, total } = categoryMasteredAllLevels(c);
-            let sub = c.key === 'math' ? `${mathSolved} solved` : `${mastered}/${total} mastered`;
-            // Show a review nudge when spaced-repetition items are due.
-            if (c.key !== 'math') {
-                let due = 0;
-                for (const lv of c.levels) due += categoryDueCount(`${c.key}_${lv.id}`, lv.items);
-                if (due > 0) sub = `🔄 ${due} to review`;
+    function getDueReviewItems(limit = 5) {
+        const found = [];
+        for (const c of CATEGORIES) {
+            if (c.key === 'math') continue;
+            for (const lv of c.levels) {
+                const catKey = `${c.key}_${lv.id}`;
+                for (const item of lv.items) if (getMasteryCount(catKey, item.id) >= MASTERY_THRESHOLD && isDue(catKey, item.id)) found.push({ cat: c, level: lv, item, catKey });
             }
-            const action = c.leveled ? `go('level', {key:'${c.key}'})` : `go('category', {key:'${c.key}', level:'L1'})`;
-            return `<div class="card cat-${c.key}" onclick="${action}">
-                <div class="icon">${c.icon}</div>
-                <div class="label">${c.name}</div>
-                <div class="sublabel">${sub}</div>
-            </div>`;
-        }).join('');
-        return `
-        ${topbar(false)}
-        <h1>⛏️ Minecraft Classroom ⛏️</h1>
-        <div class="grid">
-            ${cards}
-            <div class="card cat-freeplay" onclick="go('freeplay')">
-                <div class="icon">🎨</div>
-                <div class="label">Free Play</div>
-                <div class="sublabel">explore & listen</div>
-            </div>
-            <div class="card cat-draw" onclick="go('draw')">
-                <div class="icon">✏️</div>
-                <div class="label">Draw</div>
-                <div class="sublabel">blank canvas</div>
-            </div>
-            <div class="card cat-timed" onclick="startTimedChallenge()">
-                <div class="icon">⏱️</div>
-                <div class="label">Timed Challenge</div>
-                <div class="sublabel">⏱ 60s rapid-fire!</div>
-            </div>
-            <div class="card cat-worksheets" onclick="go('worksheets')">
-                <div class="icon">🖨️</div>
-                <div class="label">Worksheets</div>
-                <div class="sublabel">print & practice</div>
-            </div>
-            <div class="card cat-progress" onclick="go('progress')">
-                <div class="icon">🏆</div>
-                <div class="label">My Progress</div>
-                <div class="sublabel">${progress.stars} diamonds</div>
-            </div>
-        </div>
-        <div class="footer">Tap a card to start learning!</div>`;
+        }
+        return found.slice(0, limit);
+    }
+    function startReview() {
+        const due = getDueReviewItems(8);
+        if (!due.length) return;
+        quiz = { key: 'review', level: 'mixed', items: [], questions: [], idx: 0, correctFirstTry: 0, firstAttempt: true, awaitingNext: false, stars: 0, streak: 0, retryQueue: [], reviewMode: true, reviewItems: due, reviewStats: { attempted: 0, correct: 0, firstTry: 0, skills: {}, needsPractice: [] } };
+        const first = due[0];
+        const items = first.cat.levels.find(lv => lv.id === first.level.id).items;
+        quiz.questions.push(buildQuestion(first.cat.key, items, first.level.id, first.item.id));
+        quiz.questions[0].sourceKey = first.cat.key;
+        quiz.questions[0].sourceLevel = first.level.id;
+        quiz.questions[0].sourceCatKey = first.catKey;
+        go('play', { key: 'review', level: 'mixed' });
+    }
+    function renderTodayReview() {
+        const due = getDueReviewItems(4);
+        if (!due.length) return '<div class="review-card"><div class="review-icon">🌟</div><div><strong>All caught up!</strong><div class="review-sub">No skills need review right now.</div></div></div>';
+        const items = due.map(x => { const label = x.cat.key === 'letters' ? x.item.id : x.cat.key === 'numbers' ? x.item.n : x.item.id; return '<span class="review-chip">' + x.cat.icon + ' ' + label + '</span>'; }).join('');
+        return '<div class="review-card"><div class="review-head"><span>🔄 <strong>Today\'s Review</strong></span><span>' + due.length + ' ready</span></div><div class="review-chips">' + items + '</div><button class="review-btn" onclick="startReview()">START REVIEW ▶</button></div>';
     }
 
+    function getTodayLesson() {
+        // Smart daily recommendation: prioritize due reviews, recent mistakes, learning items, then unseen skills.
+        const recent = (progress.activityLog || []).filter(x => x.at >= Date.now() - 7 * 86400000);
+        const errors = {};
+        recent.filter(x => !x.correct).forEach(x => { errors[x.key] = (errors[x.key] || 0) + 1; });
+        const candidates = [];
+        for (const c of CATEGORIES) for (const lv of c.levels) {
+            const catKey = `${c.key}_${lv.id}`;
+            const due = lv.items.filter(it => getMasteryCount(catKey, it.id) >= MASTERY_THRESHOLD && isDue(catKey, it.id)).length;
+            const learning = lv.items.filter(it => { const n=getMasteryCount(catKey,it.id); return n>0 && n<MASTERY_THRESHOLD; }).length;
+            const unseen = lv.items.filter(it => getMasteryCount(catKey,it.id)===0).length;
+            const recentErrors = errors[catKey] || errors[c.key] || 0;
+            const score = due*6 + recentErrors*5 + learning*2 + Math.min(unseen,3)*1.5;
+            if (score > 0) candidates.push({cat:c,level:lv,score,due,learning,recentErrors});
+        }
+        candidates.sort((a,b) => b.score-a.score);
+        const best=candidates[0];
+        if (best) {
+            const catKey=`${best.cat.key}_${best.level.id}`;
+            const item=best.level.items.find(it => {
+                const n=getMasteryCount(catKey,it.id);
+                return (best.recentErrors && n<MASTERY_THRESHOLD) || (n>=MASTERY_THRESHOLD && isDue(catKey,it.id)) || n===0;
+            }) || null;
+            const reason=best.recentErrors ? 'Let’s practice this one again!' : best.due ? 'Review time!' : best.learning ? 'Keep building your skills!' : 'A new skill awaits!';
+            return {cat:best.cat,level:best.level,item,reason};
+        }
+        const c=CATEGORIES.find(x=>x.key==='math') || CATEGORIES[0];
+        return {cat:c,level:c.levels[0],item:null,reason:'Ready for another adventure?'};
+    }
+    function startTodayAdventure() {
+        const lesson=getTodayLesson();
+        if (lesson.cat.key==='math') return startMath(lesson.level.id);
+        startQuiz(lesson.cat.key, lesson.level.id, lesson.item ? lesson.item.id : null);
+    }
+
+    function renderHome() {
+        const lesson = getTodayLesson();
+        const mathSolved = Object.values(progress.mathCorrect).reduce((a, b) => a + (b || 0), 0);
+        const featured = ['letters', 'numbers', 'words', 'math'].map(key => CATEGORIES.find(c => c.key === key)).filter(Boolean);
+        const cards = featured.map(c => {
+            const { mastered, total } = categoryMasteredAllLevels(c);
+            const sub = c.key === 'math' ? `${mathSolved} solved` : `${mastered}/${total} mastered`;
+            const action = c.leveled ? `go('level', {key:'${c.key}'})` : `go('category', {key:'${c.key}', level:'L1'})`;
+            return `<div class="card cat-${c.key}" onclick="${action}"><div class="icon">${c.icon}</div><div class="label">${c.name}</div><div class="sublabel">${sub}</div></div>`;
+        }).join('');
+        const todayAction = 'startTodayAdventure()';
+        const lessonLabel = lesson.item ? (lesson.cat.key === 'letters' ? lesson.item.id : lesson.cat.key === 'numbers' ? lesson.item.n : lesson.item.id) : lesson.cat.name;
+        return `${topbar(false)}
+        <div class="home-hero"><div class="home-kicker">⛏️ BLOCKQUEST CLASSROOM</div><h1>Ready for an adventure?</h1><p>Learn a little. Play a little. Build your skills!</p></div>
+        ${renderWorldProgress()}
+        ${renderDailyMissions()}
+        ${renderTodayReview()}
+        <div class="today-card" onclick="${todayAction}"><div class="today-icon">⭐</div><div class="today-copy"><div class="today-kicker">TODAY'S ADVENTURE</div><div class="today-title">${lesson.cat.icon} ${lesson.cat.name}</div><div class="today-sub">${lesson.reason}${lesson.item ? ' • ' + lessonLabel : ''}</div></div><button class="big-btn play">START ▶</button></div>
+        <h2 class="home-section-title">🎮 Play & Learn</h2><div class="grid home-featured">${cards}</div>
+        <h2 class="home-section-title">🌎 More Learning</h2>
+        <div class="home-tools"><button class="home-tool" onclick="go('category',{key:'chinese',level:'L1'})">🇨🇳 Chinese</button><button class="home-tool" onclick="go('category',{key:'spanish',level:'L1'})">🇪🇸 Spanish</button><button class="home-tool" onclick="go('freeplay')">🎨 Free Play</button><button class="home-tool" onclick="go('draw')">✏️ Draw</button><button class="home-tool" onclick="go('worksheets')">🖨️ Worksheets</button><button class="home-tool" onclick="startTimedChallenge()">⏱️ Challenge</button><button class="home-tool" onclick="go('progress')">🏆 Progress</button></div>
+        <div class="footer">You have 💎 ${progress.stars} diamonds. Keep learning!</div>`;
+    }
     // ---------- Render: Level picker ----------
     function renderLevelPicker() {
         const key = state.params.key;
@@ -2097,14 +2410,16 @@
 
     // ---------- Quiz engine ----------
     let quiz = null;
-    function startQuiz(key, level) {
+    function startQuiz(key, level, targetId) {
         const items = getCategoryItems(key, level);
-        const questions = [];
-        for (let i = 0; i < ROUND_LENGTH; i++) questions.push(buildQuestion(key, items, level));
-        quiz = { key, level, questions, idx: 0, correctFirstTry: 0, firstAttempt: true, awaitingNext: false, stars: 0, streak: 0 };
+        quiz = { key, level, items, questions: [], idx: 0, correctFirstTry: 0, firstAttempt: true, awaitingNext: false, stars: 0, streak: 0, retryQueue: [], wrongAttempts: 0 };
+        // Generate one question at a time so recent performance can affect the next question.
+        quiz.questions.push(buildQuestion(key, items, level, targetId));
+        quiz.blipolaContext = blipola.startQuestion(quiz.questions[0]);
+        quiz.blipolaRecommendation = blipola.recommend(key, targetId || quiz.questions[0].itemId);
         go('play', { key, level });
     }
-    function buildQuestion(key, items, level) {
+    function buildQuestion(key, items, level, targetId) {
         // Adaptive weighting (research C) + spaced repetition (B):
         // weight each item by how much it needs practice — weak / due items
         // get a higher chance of being selected; already-mastered-and-not-due
@@ -2123,6 +2438,10 @@
         const totalW = weighted.reduce((a, x) => a + x.w, 0);
         let r = Math.random() * totalW, correct = weighted[0].it;
         for (const x of weighted) { r -= x.w; if (r <= 0) { correct = x.it; break; } }
+        if (targetId) {
+            const target = items.find(it => it.id === targetId);
+            if (target) correct = target;
+        }
         if (key === 'letters') {
             if (Math.random() < 0.5) {
                 const choices = pickChoices(items, correct, 4);
@@ -2539,7 +2858,8 @@
         `).join('');
         return `${topbar(true)}
         <div class="center-col">
-            <div style="color:#999;margin-bottom:8px;">Question ${quiz.idx + 1} of ${quiz.questions.length}</div>
+            <div id="blipolaBuddy" style="display:flex;align-items:center;gap:10px;margin:0 auto 10px;max-width:720px;padding:9px 12px;border:2px solid #333;border-radius:14px;background:#fff;font-weight:800;">🤖 <span>Blipola</span><span id="blipolaMessage" style="font-weight:600;opacity:.78;">Think first. You can ask me for a clue.</span><button class="choice-btn" type="button" onclick="blipolaHint()" style="margin-left:auto;padding:7px 10px;">💡 Hint</button><button id="blipolaVoiceBtn" class="choice-btn" type="button" onclick="blipolaVoiceAnswer()" style="padding:7px 10px;">🎤 Speak</button><span id="blipolaVoiceStatus" style="font-size:.78rem;opacity:.7;">Tap Speak and answer out loud.</span></div>
+            <div style="color:#999;margin-bottom:8px;">Question ${quiz.idx + 1} of ${quiz.reviewMode ? ROUND_LENGTH : quiz.questions.length}</div>
             <div id="streakBadge" class="streak-badge"></div>
             <div class="prompt-box">${q.promptHTML}</div>
             <div class="choices">${choicesHTML}</div>
@@ -2548,22 +2868,61 @@
     function afterPlayRender() {
         const q = quiz.questions[quiz.idx];
         if (q.speakText) speak(q.speakText, { lang: q.lang });
+        if (!window.BlipolaVoice || !window.BlipolaVoice.supported()) {
+            const btn = document.getElementById('blipolaVoiceBtn');
+            if (btn) { btn.disabled = true; btn.textContent = '🎤 Voice unavailable'; }
+            const status = document.getElementById('blipolaVoiceStatus');
+            if (status) status.textContent = 'Try Chrome or Edge for voice answers.';
+        }
+    }
+
+    function blipolaVoiceAnswer() {
+        const q = quiz && quiz.questions && quiz.questions[quiz.idx];
+        if (!q || !window.BlipolaVoice) return;
+        stopAllAudio();
+        window.BlipolaVoice.start(q, {
+            onTranscript: function (text, matched) {
+                const el = document.getElementById('blipolaMessage');
+                if (el) el.textContent = matched ? '👂 I heard you!' : '👂 ' + text;
+            },
+            onChoice: function (id) {
+                const buttons = Array.from(document.querySelectorAll('.choice-btn[data-id]'));
+                const btn = buttons.find(b => b.getAttribute('data-id') === String(id));
+                if (btn) handleChoice(id, btn);
+            }
+        });
     }
     function handleChoice(id, btnEl) {
         if (quiz.awaitingNext) return;
         const q = quiz.questions[quiz.idx];
         const correct = id === q.itemId;
+        if (quiz.blipolaContext) {
+            blipola.complete(quiz.blipolaContext, {
+                correct,
+                firstTry: quiz.firstAttempt,
+                attempts: (quiz.wrongAttempts || 0) + 1
+            });
+        }
+        logActivity(quiz.reviewMode ? 'review' : 'quiz', q.sourceKey || quiz.key, q.itemId, correct, quiz.firstAttempt);
+        if (quiz.reviewMode && !quiz.awaitingNext) {
+            quiz.reviewStats.attempted += 1;
+            const skillKey = q.sourceCatKey || quiz.key;
+            if (!quiz.reviewStats.skills[skillKey]) quiz.reviewStats.skills[skillKey] = { key: q.sourceKey || quiz.key, level: q.sourceLevel || quiz.level, correct: 0, wrong: 0, firstTry: 0 };
+        }
         if (correct) {
             btnEl.classList.add('correct');
+            mcRewardBurst('⭐', '💎');
             quiz.awaitingNext = true;
             awardStar();
             quiz.stars += 1;
             if (quiz.firstAttempt) {
-                bumpMastery(`${quiz.key}_${quiz.level}`, q.itemId);
+                bumpMastery(q.sourceCatKey || `${quiz.key}_${quiz.level}`, q.itemId);
                 quiz.correctFirstTry += 1;
+                if (quiz.reviewMode) { const skill = quiz.reviewStats.skills[q.sourceCatKey || quiz.key]; skill.correct += 1; skill.firstTry += 1; quiz.reviewStats.correct += 1; quiz.reviewStats.firstTry += 1; }
             } else {
                 // Research F: reward persistence — celebrate the eventual success too.
                 btnEl.classList.add('persist');
+                if (quiz.reviewMode) { const skill = quiz.reviewStats.skills[q.sourceCatKey || quiz.key]; skill.correct += 1; quiz.reviewStats.correct += 1; }
             }
             // Streak tracking
             quiz.streak = (quiz.streak || 0) + 1;
@@ -2572,15 +2931,26 @@
             else if (quiz.streak >= 3) { progress.stars += 2; speak('🔥 On Fire! Three in a row!'); updateStreakBadge('fire', '🔥 On Fire! +2'); }
             saveProgress();
             confettiBurst();
-            speak(descriptivePraise(quiz.key, q));
+            speak(descriptivePraise(q.sourceKey || quiz.key, q));
             setTimeout(nextQuestion, 900);
         } else {
             btnEl.classList.add('incorrect');
             btnEl.disabled = true;
             quiz.firstAttempt = false;
+            quiz.wrongAttempts = (quiz.wrongAttempts || 0) + 1;
             quiz.streak = 0;
+            if (quiz.blipolaContext) {
+                const message = blipola.hint(quiz.blipolaContext, quiz.wrongAttempts);
+                speak(message);
+            }
+            if (quiz.reviewMode) {
+                const retryKey = q.sourceCatKey || quiz.key;
+                if (!quiz.retryQueue.some(x => x.catKey === retryKey && x.itemId === q.itemId)) quiz.retryQueue.unshift({ catKey: retryKey, itemId: q.itemId });
+            } else if (!quiz.retryQueue.includes(q.itemId)) {
+                quiz.retryQueue.unshift(q.itemId);
+            }
             updateStreakBadge(null, '');
-            speak(descriptiveRetry(quiz.key, q));
+            speak(descriptiveRetry(q.sourceKey || quiz.key, q));
         }
         renderTopbarStarsOnly();
     }
@@ -2598,12 +2968,30 @@
     function nextQuestion() {
         quiz.idx += 1;
         quiz.firstAttempt = true;
+        quiz.wrongAttempts = 0;
         quiz.awaitingNext = false;
-        if (quiz.idx >= quiz.questions.length) {
+        if (quiz.idx >= ROUND_LENGTH) {
             go('roundEnd', { stars: quiz.stars, key: quiz.key, level: quiz.level });
-        } else {
-            render();
+            return;
         }
+        if (quiz.reviewMode) {
+            const retry = quiz.retryQueue.length ? quiz.retryQueue.shift() : null;
+            let target = retry;
+            if (target) target = quiz.reviewItems.find(x => x.catKey === target.catKey && x.item.id === target.itemId) || quiz.reviewItems.find(x => x.item.id === target.itemId);
+            if (!target) target = quiz.reviewItems[quiz.idx % quiz.reviewItems.length];
+            const items = target.cat.levels.find(lv => lv.id === target.level.id).items;
+            quiz.questions[quiz.idx] = buildQuestion(target.cat.key, items, target.level.id, target.item.id);
+            quiz.questions[quiz.idx].sourceKey = target.cat.key;
+            quiz.questions[quiz.idx].sourceLevel = target.level.id;
+            quiz.blipolaContext = blipola.startQuestion(quiz.questions[quiz.idx]);
+            quiz.blipolaRecommendation = blipola.recommend(target.cat.key, target.item.id);
+            quiz.blipolaRecommendation = blipola.recommend(target.cat.key, target.item.id);
+            quiz.questions[quiz.idx].sourceCatKey = target.catKey;
+        } else {
+            const retryId = quiz.retryQueue.length ? quiz.retryQueue.shift() : null;
+            quiz.questions[quiz.idx] = buildQuestion(quiz.key, quiz.items, quiz.level, retryId);
+        }
+        render();
     }
 
     // ---------- Math game ----------
@@ -2922,19 +3310,79 @@
 
     // ---------- Round end / Progress ----------
     function renderRoundEnd() {
+        if (quiz && quiz.reviewMode) recordDailyTask('review');
+        else if (state.params.key === 'math') recordDailyTask('math');
+        else if (state.params.key === 'quiz' || state.params.key !== 'trace') recordDailyTask('practice');
         const { stars, key, level, category } = state.params;
+        if (key === 'review' && quiz && quiz.reviewMode) {
+            const stats = quiz.reviewStats;
+            const skills = Object.values(stats.skills);
+            const skillNames = skills.map(s => {
+                const cat = CATEGORIES.find(c => c.key === s.key);
+                return cat ? cat.icon + ' ' + cat.name : s.key;
+            });
+            const needs = skills.filter(s => s.wrong > 0);
+            return `${topbar(false)}
+            <div class="center-col review-results">
+                <div style="font-size:4rem;">🎉</div>
+                <h2>Review Complete!</h2>
+                <div class="review-score">${stats.correct}/${stats.attempted} correct</div>
+                <p class="review-summary">You practiced ${skillNames.length} skill${skillNames.length === 1 ? '' : 's'} and earned ${stars} 💎</p>
+                <div class="review-result-card">
+                    <strong>🗺️ Skills practiced</strong>
+                    <div class="review-result-chips">${skillNames.map(n => '<span class="review-chip">' + n + '</span>').join('')}</div>
+                </div>
+                <div class="review-result-card">
+                    <strong>${needs.length ? '🌱 Keep practicing' : '🏆 Great job — all skills were answered correctly!'}</strong>
+                    ${needs.length ? '<div class="review-sub">' + needs.map(s => { const cat = CATEGORIES.find(c => c.key === s.key); return (cat ? cat.icon + ' ' + cat.name : s.key) + ' · ' + s.wrong + ' retry' + (s.wrong === 1 ? '' : 'ies'); }).join('<br>') + '</div>' : '<div class="review-sub">You stayed on track today.</div>'}
+                </div>
+                <button class="big-btn again" onclick="startReview()">🔁 Review Again</button>
+                <button class="big-btn home" onclick="goHome()">🏠 Home</button>
+            </div>`;
+        }
         const isTrace = key === 'trace';
         let againAction;
         if (key === 'math') againAction = `startMath('${level}')`;
         else if (isTrace) againAction = `startTrace('${category}', '${level}')`;
+        else if (key === 'review') againAction = 'startReview()';
         else againAction = `startQuiz('${key}', '${level}')`;
         return `${topbar(false)}
         <div class="center-col">
             <div style="font-size:4rem;">🎉</div>
-            <h2>${isTrace ? 'Great Writing!' : 'Round Complete!'}</h2>
+            <h2>${isTrace ? 'Great Writing!' : key === 'review' ? 'Review Complete!' : 'Round Complete!'}</h2>
             <p style="font-size:1.4rem;color:#0e6b7a;font-weight:700;margin-bottom:20px;">You earned ${stars} 💎</p>
             <button class="big-btn again" onclick="${againAction}">🔁 ${isTrace ? 'Write More' : 'Play Again'}</button>
             <button class="big-btn home" onclick="goHome()">🏠 Home</button>
+        </div>`;
+    }
+    function renderParentDashboard() {
+        const stats = CATEGORIES.reduce((acc, cat) => {
+            const s = categoryLearningStats(cat);
+            acc.total += s.total; acc.mastered += s.mastered; acc.learning += s.learning; acc.review += s.review;
+            if (s.learning > 0 || s.review > 0) acc.focus.push({ cat, stats: s });
+            return acc;
+        }, { total: 0, mastered: 0, learning: 0, review: 0, focus: [] });
+        const pct = stats.total ? Math.round(stats.mastered / stats.total * 100) : 0;
+        const activity = getActivitySummary(7);
+        const recentSkills = activity.skills.slice(0, 5).map(s => {
+            const cat = CATEGORIES.find(c => c.key === s.key);
+            const name = cat ? cat.icon + ' ' + cat.name : s.key;
+            const rate = s.attempts ? Math.round(s.correct / s.attempts * 100) : 0;
+            return '<div class="parent-focus-row"><span>' + name + '</span><span>' + rate + '% · ' + s.attempts + ' tries</span></div>';
+        }).join('');
+        const focus = stats.focus.slice(0, 6).map(x => {
+            const status = skillStatus(x.stats);
+            return '<div class="parent-focus-row"><span>' + x.cat.icon + ' <strong>' + x.cat.name + '</strong></span><span>' + status.icon + ' ' + status.label + '</span></div>';
+        }).join('');
+        return `${topbar(true)}
+        <div class="parent-dashboard">
+            <div class="parent-header"><div><div class="parent-kicker">FOR PARENTS</div><h2>📋 Learning Snapshot</h2><div class="parent-date">${new Date().toLocaleDateString()}</div></div><div class="parent-diamond">💎 ${progress.stars}</div></div>
+            <div class="parent-grid"><div class="parent-stat"><div class="parent-stat-number">${pct}%</div><div>Mastered</div></div><div class="parent-stat"><div class="parent-stat-number">${stats.learning}</div><div>Learning</div></div><div class="parent-stat"><div class="parent-stat-number">${stats.review}</div><div>Due for review</div></div></div>
+            <div class="parent-card"><h3>📅 Last 7 days</h3><div class="parent-grid" style="margin:0;"><div class="parent-stat"><div class="parent-stat-number">${activity.attempts}</div><div>Attempts</div></div><div class="parent-stat"><div class="parent-stat-number">${activity.correct}</div><div>Correct</div></div><div class="parent-stat"><div class="parent-stat-number">${activity.firstTry}</div><div>First try</div></div></div><div class="parent-progress-label">Active on ${activity.days} day${activity.days === 1 ? "" : "s"}</div></div><div class="parent-card"><h3>🧭 What to focus on</h3>${focus || '<div class="parent-good">🏆 No immediate learning gaps. Keep exploring!</div>'}</div>
+            <div class="parent-card"><h3>📚 Overall progress</h3><div class="parent-progress"><div class="parent-progress-fill" style="width:${pct}%"></div></div><div class="parent-progress-label">${stats.mastered} of ${stats.total} learning items mastered</div></div>
+            <div class="parent-card"><h3>📈 Skills practiced this week</h3>${recentSkills || '<div class="parent-good">No activity yet this week.</div>'}</div>
+            <div class="parent-card"><h3>💎 Learning rewards</h3><div class="parent-progress-label">${progress.stars} diamonds earned · ${Object.values(progress.mathCorrect).reduce((a,b)=>a+(b||0),0)} math problems solved</div></div>
+            <button class="big-btn home" onclick="go('progress')">← Back to Progress</button>
         </div>`;
     }
     function renderProgress() {
@@ -2958,6 +3406,9 @@
         return `${topbar(true)}
         <h2>🏆 My Progress</h2>
         <div class="star-badge" style="margin:0 auto 20px;width:fit-content;font-size:1.1rem;">💎 ${progress.stars} total diamonds</div>
+        ${renderWorldProgress()}
+        ${renderSkillMap()}
+        <div style="text-align:center;margin:18px 0;"><button class="choice-btn" style="padding:12px 20px;font-size:1rem;" onclick="go('parentDashboard')">👨‍👩‍👧 Parent Dashboard</button></div>
         ${rows}
         <div style="margin-top:10px;font-weight:700;">Math solved: ${Object.values(progress.mathCorrect).reduce((a, b) => a + (b || 0), 0)} total</div>
         <div class="trophy-grid">${trophies}</div>
@@ -3156,7 +3607,7 @@ h2{text-align:center;margin-bottom:16px;font-size:1.1rem;color:#555;}
 .sightword-row .draw-area{width:80px;height:80px;border:2px dashed #ccc;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:0.8rem;}
 @media print{body{padding:12px;}.no-print{display:none;}}
 </style></head><body>
-<h1>⛏️ Minecraft Classroom Worksheet ⛏️</h1>
+<h1>⛏️ BlockQuest Classroom Worksheet ⛏️</h1>
 <h2>${getWorksheetTitle(type)}</h2>
 ${html}
 <div class="no-print" style="text-align:center;margin-top:20px;"><button onclick="window.print()" style="padding:10px 24px;font-size:1.1rem;border:2px solid #333;border-radius:8px;cursor:pointer;">🖨️ Print</button></div>
@@ -3220,7 +3671,36 @@ ${html}
         return html;
     }
 
-    // ---------- Main render ----------
+
+    // ---------- Lightweight feedback animation helpers ----------
+    function mcRewardBurst(...icons) {
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const wrap=document.createElement('div');
+        wrap.className='mc-floaters';
+        const chosen=icons.length ? icons : ['⭐'];
+        for(let i=0;i<7;i++) {
+            const el=document.createElement('span');
+            el.className='mc-floater';
+            el.textContent=chosen[i%chosen.length];
+            el.style.left=(42 + Math.random()*16)+'%';
+            el.style.top=(42 + Math.random()*12)+'%';
+            el.style.setProperty('--dx', ((Math.random()-.5)*150)+'px');
+            el.style.animationDelay=(Math.random()*.12)+'s';
+            wrap.appendChild(el);
+        }
+        document.body.appendChild(wrap);
+        setTimeout(()=>wrap.remove(),1200);
+    }
+
+    
+    function mcWorldUnlockBurst(stage) {
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        mcRewardBurst('🧱','⭐','💎','✨','⛏️','🎉');
+        const el=document.querySelector('.world-progress');
+        if(el){ el.classList.remove('world-unlock'); void el.offsetWidth; el.classList.add('world-unlock'); }
+        if(stage && stage.name) setTimeout(()=>speak('New world unlocked: '+stage.name),180);
+    }
+// ---------- Main render ----------
     function render() {
         const app = document.getElementById('app');
         let html = '';
@@ -3232,6 +3712,7 @@ ${html}
         else if (state.screen === 'mathPlay') html = renderMathPlay();
         else if (state.screen === 'trace') html = renderTrace();
         else if (state.screen === 'roundEnd') html = renderRoundEnd();
+        else if (state.screen === 'parentDashboard') html = renderParentDashboard();
         else if (state.screen === 'freeplay') html = renderFreeplay();
         else if (state.screen === 'draw') html = renderDraw();
         else if (state.screen === 'timed') html = renderTimed();
@@ -3239,6 +3720,10 @@ ${html}
         else if (state.screen === 'worksheets') html = renderWorksheets();
         else if (state.screen === 'progress') html = renderProgress();
         app.innerHTML = html;
+        if (state.screen !== 'home') {
+            const first = app.querySelector('.center-col, h2, .grid, .parent-card');
+            if (first) first.classList.add('mc-animate-in');
+        }
         if (state.screen === 'play') afterPlayRender();
         if (state.screen === 'mathPlay') afterMathPlayRender();
         if (state.screen === 'trace') afterTraceRender();
@@ -3378,7 +3863,7 @@ ${html}
     // ---------- Render: Free Play (research D — autonomy, no-pressure explore) ----------
     function renderFreeplay() {
         // Reuse the EXACT same card visuals as Learn mode so Free Play matches
-        // the rest of the app (real Minecraft PNGs via wordMediaHTML, letters as
+        // the rest of the app (original emoji-based learning visuals via wordMediaHTML, letters as
         // the big glyph, numbers as the digit). No quiz, no mastery check.
         const groups = [];
         for (const c of CATEGORIES) {
@@ -3419,6 +3904,7 @@ ${html}
         <div class="footer">Just explore!</div>`;
     }
 
+    renderAccountBar();
     render();
 
     if ('serviceWorker' in navigator) {

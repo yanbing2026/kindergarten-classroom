@@ -1,13 +1,13 @@
-# Minecraft Classroom
+# BlockQuest Classroom
 
-A single-page supplemental learning app for kindergarten-age kids (built for a 5-year-old), optimized for touchscreens (tablet/phone). Themed around a Minecraft block/mob catalog to make letters, numbers, words, and beginner Chinese & Spanish feel like play.
+A single-page supplemental learning app for kindergarten-age kids (built for a 5-year-old), optimized for touchscreens (tablet/phone). Themed around a BlockQuest block/mob catalog to make letters, numbers, words, and beginner Chinese & Spanish feel like play.
 
 Open `index.html` in a browser — no build step required. For the installable/offline features below, the site needs to be hosted (e.g. GitHub Pages) rather than opened as a local file — browsers require a real `http(s)` origin for service workers and "Add to Home Screen."
 
 ## Features
 
 - **Levels**: Letters and Numbers open directly (no levels). English, Chinese, Spanish, and Math use a 10-level picker (Level 1–10). Difficulty and vocabulary ramp by level: English/Chinese/Spanish levels are grouped by word length (3–4 letters up to 12–15 letters), and Math difficulty scales as your child improves. Progress and mastery are tracked separately per level.
-- **Shared vocabulary (one source of truth)** — English, Chinese (hanzi), and Spanish all come from a single `VOCAB_LEVELS` array in `index.html`. Add one word there and it appears in all three languages automatically, with its Minecraft sprite image.
+- **Shared vocabulary (one source of truth)** — English, Chinese (hanzi), and Spanish all come from a single `VOCAB_LEVELS` array in `index.html`. Add one word there and it appears in all three languages automatically, with its BlockQuest sprite image.
 - **Learn mode** for Letters, Numbers, English, Chinese, and Spanish — tap a card to hear it read aloud (uses the browser's built-in text-to-speech):
   - Letters: letter shown, then "X is for Apple" with the picture word.
   - Numbers: spoken number.
@@ -46,37 +46,52 @@ English, Chinese, and Spanish vocabulary is organized into **10 levels** grouped
 
 ## Data Sources
 
-All vocabulary, images, and translations are sourced from the [Minecraft Wiki](https://minecraft.wiki/).
+All vocabulary, images, and translations are sourced from the [BlockQuest Wiki](https://original learning assets).
 
 ### Vocabulary & Images
 
 The `VOCAB_LEVELS` array in `index.html` contains every word used across English, Chinese, and Spanish sections. Each entry includes:
 
 - `id` — the English word (lowercase)
-- `img` — path to the Minecraft sprite in `images/words/`
+- `img` — path to the BlockQuest sprite in `images/words/`
 - `en` — English display name
 - `zh.hanzi` — Chinese (Simplified) translation
 - `es` — Spanish translation
 
-Sprite images are item/mob PNGs from the Minecraft Wiki. When adding a new vocab entry, pull the corresponding sprite from `https://minecraft.wiki/images/` (search the item or mob page for the sprite file).
+Sprite images are item/mob PNGs from the BlockQuest Wiki. When adding a new vocab entry, pull the corresponding sprite from `https://original learning assets (search the item or mob page for the sprite file).
 
 ### Chinese Translations
 
 Chinese translations use Simplified Chinese hanzi (简体中文). Sources for reference:
 
-- [Minecraft Wiki — Chinese-language pages](https://minecraft.wiki/zh-hans/) (Simplified Chinese wiki)
-- In-game item/mob names as they appear in Minecraft's Simplified Chinese localization
+- [BlockQuest Wiki — Chinese-language pages](https://original learning assets) (Simplified Chinese wiki)
+- In-game item/mob names as they appear in BlockQuest's Simplified Chinese localization
 
 ### Spanish Translations
 
-Spanish translations use the localization names from Minecraft's Spanish language files. Sources for reference:
+Spanish translations use the localization names from BlockQuest's Spanish language files. Sources for reference:
 
-- [Minecraft Wiki — Spanish-language pages](https://minecraft.wiki/es/) (Spanish wiki)
-- Minecraft's `es_es.lang` / `es_mx.lang` translation files for item and mob names
+- [BlockQuest Wiki — Spanish-language pages](https://original learning assets) (Spanish wiki)
+- BlockQuest's `es_es.lang` / `es_mx.lang` translation files for item and mob names
 
 ### Adding New Words
 
-1. Find the item/mob on [minecraft.wiki](https://minecraft.wiki/) and download its sprite PNG.
+1. Find the item/mob on [original learning assets) and download its sprite PNG.
 2. Place the sprite in `images/words/` (lowercase filename, e.g. `diamond.png`).
 3. Add one entry to `VOCAB_LEVELS` in `index.html` with `id`, `img`, `en`, `zh.hanzi`, and `es`.
 4. The word automatically appears in English, Chinese, and Spanish sections.
+
+## Blipola learning buddy
+
+This branch now includes an offline-first Blipola runtime in `js/blipola-runtime.js`. It is connected directly to the existing quiz engine rather than replacing it.
+
+- Observes every real quiz/review question and answer.
+- Tracks per-skill/per-item learning evidence separately under `progress.__blipola`.
+- Provides adaptive recommendation, hint levels, review timing, and Buddy states.
+- Shows a Blipola Buddy bar with a child-friendly hint action during Play mode.
+- Seeds from the existing Classroom `mastery`, `due`, and `activityLog` data without changing the existing progress schema.
+- Keeps the existing Classroom scoring, rewards, navigation, accounts, and question generation authoritative.
+- No external AI API is required; the runtime works offline.
+- The integration is deliberately local so the app remains usable without a network connection after installation.
+
+The standalone Blipola library lives in the separate yanbing2026/Blipola repository. This Classroom branch contains the browser runtime needed for a self-contained offline build.

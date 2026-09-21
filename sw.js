@@ -1,8 +1,10 @@
-const CACHE_NAME = 'kc-shell-v3';
+const CACHE_NAME = 'kc-shell-v5';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.json',
+  './js/blipola-runtime.js',
+  './js/blipola-voice.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/apple-touch-icon.png',

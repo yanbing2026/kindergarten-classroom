@@ -1,0 +1,28 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check JavaScript files
+        run: |
+          node --check js/blipola-runtime.js
+      - name: Check inline JavaScript in index.html
+        run: |
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+          html = Path("index.html").read_text(encoding="utf-8")
+          scripts = re.findall(r"<script(?![^>]*src=)[^>]*>(.*?)</script>", html, re.S | re.I)
+          Path("/tmp/index-inline.js").write_text("\n\n".join(scripts), encoding="utf-8")
+          print(f"Found {len(scripts)} inline script block(s)")
+          PY
+          node --check /tmp/index-inline.js

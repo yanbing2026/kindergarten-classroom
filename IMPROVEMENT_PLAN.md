@@ -1,6 +1,6 @@
 # Classroom App — Engagement Improvement Plan
 
-> Mapped to `main` @ `fe978dd` (Minecraft-themed vocab app, 1407-line `index.html`,
+> Mapped to `main` @ `fe978dd` (BlockQuest-themed vocab app, 1407-line `index.html`,
 > with `letters`, `numbers`, `words` (English), `chinese`, `spanish`, `math`,
 > `trace` categories; leveled vocab; mastery tracking; diamonds/trophies).
 
