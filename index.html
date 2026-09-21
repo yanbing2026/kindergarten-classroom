@@ -157,6 +157,9 @@
         .card.cat-onemoreless { background: #ff6b6b; }
         .card.cat-rhyming { background: #a18cd1; }
         .card.cat-sightwords { background: #fad390; }
+        /* Pre-K to Grade 8 curriculum browser */
+        .grade-tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:18px}.grade-tab{background:var(--mc-wood);border:3px solid var(--mc-ink);border-radius:5px;padding:14px 10px;text-align:center;font-weight:800;cursor:pointer;box-shadow:inset 3px 3px 0 rgba(255,255,255,.3),inset -3px -3px 0 rgba(0,0,0,.2)}.grade-tab.active{background:var(--mc-gold);transform:translateY(2px)}.grade-tab .grade-icon{font-size:1.7rem;display:block;margin-bottom:5px}.grade-tab .grade-name{font-size:.9rem}.grade-subtitle{text-align:center;color:rgba(43,27,14,.65);margin:-8px 0 18px;font-size:.9rem}.course-section{margin-top:18px}.course-section-title{font-family:var(--font-pixel);font-size:.85rem;margin:0 0 10px;color:var(--mc-ink)}.course-card{display:flex;align-items:center;gap:12px;background:#f3e6c8;border:3px solid var(--mc-ink);border-radius:5px;padding:12px;margin-bottom:10px;box-shadow:inset 3px 3px 0 rgba(255,255,255,.35),inset -3px -3px 0 rgba(0,0,0,.18)}.course-card .course-icon{font-size:2rem;flex:0 0 42px;text-align:center}.course-card .course-info{min-width:0;flex:1}.course-card .course-name{font-weight:800;font-size:1rem}.course-card .course-desc{color:rgba(43,27,14,.65);font-size:.78rem;margin-top:3px}.course-card .course-status{font-size:.7rem;font-weight:800;padding:5px 7px;border:2px solid var(--mc-ink);border-radius:4px;white-space:nowrap;background:#bdf2cf}.course-card.planned{opacity:.78;background:#dedede}.course-card.planned .course-status{background:#fff}@media(max-width:520px){.grade-tabs{grid-template-columns:repeat(3,1fr);gap:7px}.grade-tab{padding:10px 5px}.grade-tab .grade-name{font-size:.72rem}.grade-tab .grade-icon{font-size:1.4rem}.course-card{padding:10px;gap:9px}.course-card .course-name{font-size:.9rem}.course-card .course-desc{font-size:.72rem}.course-card .course-status{font-size:.62rem}}
+
         .icon { font-size: 3.2rem; margin-bottom: 8px; }
         .label { font-family: var(--font-clear); font-size: 1.3rem; color: var(--mc-ink); font-weight: 700; }
         .sublabel { font-family: var(--font-clear); font-size: 0.85rem; color: rgba(43,27,14,0.65); margin-top: 4px; }
@@ -2286,7 +2289,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         <div class="today-card" onclick="${todayAction}"><div class="today-icon">⭐</div><div class="today-copy"><div class="today-kicker">TODAY'S ADVENTURE</div><div class="today-title">${lesson.cat.icon} ${lesson.cat.name}</div><div class="today-sub">${lesson.reason}${lesson.item ? ' • ' + lessonLabel : ''}</div></div><button class="big-btn play">START ▶</button></div>
         <h2 class="home-section-title">🎮 Play & Learn</h2><div class="grid home-featured">${cards}</div>
         <h2 class="home-section-title">🌎 More Learning</h2>
-        <div class="home-tools"><button class="home-tool" onclick="go('category',{key:'chinese',level:'L1'})">🇨🇳 Chinese</button><button class="home-tool" onclick="go('category',{key:'spanish',level:'L1'})">🇪🇸 Spanish</button><button class="home-tool" onclick="go('freeplay')">🎨 Free Play</button><button class="home-tool" onclick="go('draw')">✏️ Draw</button><button class="home-tool" onclick="go('worksheets')">🖨️ Worksheets</button><button class="home-tool" onclick="startTimedChallenge()">⏱️ Challenge</button><button class="home-tool" onclick="go('progress')">🏆 Progress</button></div>
+        <div class="home-tools"><button class="home-tool" onclick="go('category',{key:'chinese',level:'L1'})">🇨🇳 Chinese</button><button class="home-tool" onclick="go('category',{key:'spanish',level:'L1'})">🇪🇸 Spanish</button><button class="home-tool" onclick="go('freeplay')">🎨 Free Play</button><button class="home-tool" onclick="go('draw')">✏️ Draw</button><button class="home-tool" onclick="go('worksheets')">🖨️ Worksheets</button><button class="home-tool" onclick="startTimedChallenge()">⏱️ Challenge</button><button class="home-tool" onclick="go('progress')">🏆 Progress</button><button class="home-tool" onclick="go('grades',{grade:'prek'})">📚 Grades Pre-K–8</button></div>
         <div class="footer">You have 💎 ${progress.stars} diamonds. Keep learning!</div>`;
     }
     // ---------- Render: Level picker ----------
@@ -3951,10 +3954,86 @@ ${html}
         if(stage && stage.name) setTimeout(()=>speak('New world unlocked: '+stage.name),180);
     }
 // ---------- Main render ----------
+        // ---------- Render: Pre-K to Grade 8 curriculum ----------
+    const GRADE_CURRICULUM = [
+        {id:'prek',label:'Pre-K',icon:'🌱',subtitle:'Foundations for early learners',courses:[
+            {key:'letters',name:'Letters & Phonics',icon:'🔤',desc:'Alphabet, letter sounds, and early print skills',ready:true},
+            {key:'numbers',name:'Early Math',icon:'🔢',desc:'Counting, numbers, shapes, and early number sense',ready:true},
+            {key:'words',name:'English',icon:'📖',desc:'Early vocabulary and listening language',ready:true},
+            {key:'science',name:'Science',icon:'🔬',desc:'Explore nature, weather, plants, and the world',ready:true},
+            {key:'patterns',name:'Patterns',icon:'🔁',desc:'Recognize and extend simple patterns',ready:true}]},
+        {id:'k',label:'Kindergarten',icon:'🎒',subtitle:'Core kindergarten skills',courses:[
+            {key:'words',name:'English / ELA',icon:'📖',desc:'Vocabulary, sight words, sounds, and early reading',ready:true},
+            {key:'math',name:'Math',icon:'➕',desc:'Number sense, operations, patterns, and problem solving',ready:true},
+            {key:'science',name:'Science',icon:'🔬',desc:'Living things, Earth, space, weather, and observation',ready:true},
+            {key:'chinese',name:'Chinese',icon:'🇨🇳',desc:'Beginner Chinese vocabulary and listening',ready:true},
+            {key:'spanish',name:'Spanish',icon:'🇪🇸',desc:'Beginner Spanish vocabulary and listening',ready:true}]},
+        {id:'g1',label:'Grade 1',icon:'📘',subtitle:'Grade 1 curriculum — course framework ready',courses:[
+            {name:'English Language Arts',icon:'📚',desc:'Reading, phonics, grammar, vocabulary, and writing'},
+            {name:'Mathematics',icon:'➕',desc:'Place value, addition, subtraction, measurement, and geometry'},
+            {name:'Science',icon:'🔬',desc:'Life, Earth, physical science, and scientific observation'},
+            {name:'Social Studies',icon:'🌎',desc:'Community, geography, civics, and history'},
+            {name:'Writing',icon:'✏️',desc:'Sentences, paragraphs, handwriting, and composition'}]},
+        {id:'g2',label:'Grade 2',icon:'📗',subtitle:'Grade 2 curriculum — course framework ready',courses:[
+            {name:'English Language Arts',icon:'📚',desc:'Reading comprehension, vocabulary, grammar, and writing'},
+            {name:'Mathematics',icon:'➗',desc:'Place value, addition, subtraction, multiplication foundations, and geometry'},
+            {name:'Science',icon:'🔬',desc:'Matter, habitats, Earth systems, and engineering'},
+            {name:'Social Studies',icon:'🌎',desc:'Communities, geography, government, and history'},
+            {name:'Writing',icon:'✏️',desc:'Narrative, informative, and opinion writing'}]},
+        {id:'g3',label:'Grade 3',icon:'📕',subtitle:'Grade 3 curriculum — course framework ready',courses:[
+            {name:'English Language Arts',icon:'📚',desc:'Reading analysis, vocabulary, grammar, and writing'},
+            {name:'Mathematics',icon:'✖️',desc:'Multiplication, division, fractions, geometry, and measurement'},
+            {name:'Science',icon:'🔬',desc:'Life cycles, forces, ecosystems, weather, and matter'},
+            {name:'Social Studies',icon:'🗺️',desc:'Geography, communities, civics, and history'},
+            {name:'Research & Writing',icon:'📝',desc:'Evidence, reports, paragraphs, and presentations'}]},
+        {id:'g4',label:'Grade 4',icon:'📙',subtitle:'Grade 4 curriculum — course framework ready',courses:[
+            {name:'English Language Arts',icon:'📚',desc:'Complex texts, vocabulary, grammar, and composition'},
+            {name:'Mathematics',icon:'📐',desc:'Multi-digit operations, fractions, decimals, geometry, and measurement'},
+            {name:'Science',icon:'🔬',desc:'Energy, Earth processes, ecosystems, and physical science'},
+            {name:'Social Studies',icon:'🏛️',desc:'State and U.S. history, geography, civics, and economics'},
+            {name:'Research & Writing',icon:'📝',desc:'Research skills, evidence, reports, and editing'}]},
+        {id:'g5',label:'Grade 5',icon:'📓',subtitle:'Grade 5 curriculum — course framework ready',courses:[
+            {name:'English Language Arts',icon:'📚',desc:'Literature, informational text, vocabulary, and writing'},
+            {name:'Mathematics',icon:'🔢',desc:'Fractions, decimals, volume, expressions, and coordinate geometry'},
+            {name:'Science',icon:'🔭',desc:'Matter, energy, Earth systems, ecosystems, and space'},
+            {name:'Social Studies',icon:'🏛️',desc:'U.S. history, government, geography, and economics'},
+            {name:'Research & Writing',icon:'📝',desc:'Multi-source research and structured writing'}]},
+        {id:'g6',label:'Grade 6',icon:'🎓',subtitle:'Grade 6 curriculum — course framework ready',courses:[
+            {name:'English Language Arts',icon:'📚',desc:'Literature, argument, language, vocabulary, and composition'},
+            {name:'Math',icon:'➗',desc:'Ratios, rates, fractions, expressions, equations, and geometry'},
+            {name:'Science',icon:'🧪',desc:'Life science, Earth science, physical science, and investigation'},
+            {name:'Social Studies',icon:'🏺',desc:'Ancient civilizations, geography, civics, and economics'},
+            {name:'Digital Literacy',icon:'💻',desc:'Research, information literacy, and responsible technology use'}]},
+        {id:'g7',label:'Grade 7',icon:'🎓',subtitle:'Grade 7 curriculum — course framework ready',courses:[
+            {name:'English Language Arts',icon:'📚',desc:'Close reading, argument, grammar, vocabulary, and writing'},
+            {name:'Math',icon:'📐',desc:'Proportions, rational numbers, expressions, equations, and geometry'},
+            {name:'Science',icon:'🧪',desc:'Life, Earth, physical science, and scientific modeling'},
+            {name:'Social Studies',icon:'🌍',desc:'World history, geography, civics, and economics'},
+            {name:'Research & Writing',icon:'📝',desc:'Evidence-based research and multi-paragraph writing'}]},
+        {id:'g8',label:'Grade 8',icon:'🎓',subtitle:'Grade 8 curriculum — course framework ready',courses:[
+            {name:'English Language Arts',icon:'📚',desc:'Literary analysis, argument, research, grammar, and composition'},
+            {name:'Pre-Algebra / Algebra',icon:'📊',desc:'Linear relationships, equations, functions, and algebraic reasoning'},
+            {name:'Science',icon:'⚗️',desc:'Physical science, Earth systems, life science, and investigation'},
+            {name:'Social Studies',icon:'🌎',desc:'U.S. history, civics, geography, and economics'},
+            {name:'Research & Writing',icon:'📝',desc:'Independent research, citations, argument, and presentation'}]}
+    ];
+    function renderGrades() {
+        const selected = state.params.grade || 'prek';
+        const grade = GRADE_CURRICULUM.find(g=>g.id===selected) || GRADE_CURRICULUM[0];
+        const tabs = GRADE_CURRICULUM.map(g=>'<button class="grade-tab'+(g.id===grade.id?' active':'')+'" onclick="go(\'grades\',{grade:\''+g.id+'\'})"><span class="grade-icon">'+g.icon+'</span><span class="grade-name">'+g.label+'</span></button>').join('');
+        const courses = grade.courses.map(c => {
+            const ready = c.ready && c.key && CATEGORIES.some(cat=>cat.key===c.key);
+            const action = ready ? "go('level', {key:'"+c.key+"'})" : '';
+            return '<div class="course-card'+(ready?'':' planned')+'"'+(action?' onclick="'+action+'"':'')+'><div class="course-icon">'+c.icon+'</div><div class="course-info"><div class="course-name">'+c.name+'</div><div class="course-desc">'+c.desc+'</div></div><div class="course-status">'+(ready?'READY ▶':'COMING NEXT')+'</div></div>';
+        }).join('');
+        return topbar(true)+'<h2>📚 Courses by Grade</h2><div class="grade-tabs">'+tabs+'</div><div class="grade-subtitle">'+grade.icon+' '+grade.label+' — '+grade.subtitle+'</div><div class="course-section"><div class="course-section-title">COURSES</div>'+courses+'</div><div class="footer">Pre-K through Grade 8 curriculum is organized here. New grade content can be added without changing the learning engine.</div>';
+    }
+
     function render() {
         const app = document.getElementById('app');
         let html = '';
         if (state.screen === 'home') html = renderHome();
+        else if (state.screen === 'grades') html = renderGrades();
         else if (state.screen === 'level') html = renderLevelPicker();
         else if (state.screen === 'category') html = renderCategory();
         else if (state.screen === 'learn') html = renderLearn();
