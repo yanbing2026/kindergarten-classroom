@@ -679,10 +679,17 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
   .world-node-threshold { font-size: .5rem; }
   .world-connector { min-width: 7px; margin-top: 17px; }
 }
+
+/* ---------- Runtime error diagnostics ---------- */
+.runtime-error-report{position:fixed;right:14px;bottom:14px;z-index:99999;width:min(430px,calc(100vw - 28px));max-height:min(72vh,620px);overflow:auto;background:#fff;border:3px solid #8b2e2e;border-radius:16px;box-shadow:0 14px 40px rgba(0,0,0,.28);padding:16px;color:#2b1b0e;font-family:inherit}
+.runtime-error-report h3{margin:0 0 8px;font-size:1rem}.runtime-error-report p{margin:6px 0;font-size:.82rem;line-height:1.35}.runtime-error-report pre{white-space:pre-wrap;word-break:break-word;background:#f7f3ed;border-radius:10px;padding:10px;font-size:.7rem;line-height:1.35;max-height:260px;overflow:auto}.runtime-error-actions{display:flex;gap:8px;flex-wrap:wrap}.runtime-error-actions button{min-height:42px;padding:8px 12px;border:0;border-radius:10px;font-weight:800;cursor:pointer}.runtime-error-badge{position:fixed;right:12px;bottom:12px;z-index:99998;display:none;min-height:42px;border:0;border-radius:12px;padding:8px 12px;background:#8b2e2e;color:#fff;font-weight:800;box-shadow:0 6px 18px rgba(0,0,0,.22)}
+@media(max-width:600px){.runtime-error-report{right:8px;bottom:8px;width:calc(100vw - 16px);padding:12px}.runtime-error-report pre{max-height:220px}}
 </style>
 </head>
 <body>
 <div id="accountBar" class="account-bar"></div>
+<button id="runtimeErrorBadge" class="runtime-error-badge" type="button" onclick="showRuntimeErrorPanel()" aria-label="Open error report">🐞 Error Report</button>
+
 <button id="globalBlipolaVoice" class="global-blipola-voice" type="button" onclick="blipolaVoiceAction()" aria-label="Blipola voice">🎤<span>Blipola</span></button>
 <div id="accountModal" class="account-modal" style="display:none"></div>
 
@@ -4860,6 +4867,58 @@ GRADE1_INTERACTIVE.writing = GRADE1_INTERACTIVE_WRITING;
         return topbar(true)+'<h2>📚 Courses by Grade</h2><div class="grade-tabs">'+tabs+'</div><div class="grade-subtitle">'+grade.icon+' '+grade.label+' — '+grade.subtitle+'</div><div class="course-section"><div class="course-section-title">COURSES</div>'+courses+'</div><div class="footer">Pre-K through Grade 8 curriculum is organized here. New grade content can be added without changing the learning engine.</div>';
     }
 
+    // ---------- Runtime error diagnostics ----------
+    const RUNTIME_ERROR_KEY = 'kc_runtime_error_v1';
+    function runtimeContext(){
+        const p = (typeof state !== 'undefined' && state) ? state.params : null;
+        return {
+            screen: (typeof state !== 'undefined' && state) ? state.screen : 'unknown',
+            params: p || null,
+            url: location.href,
+            userAgent: navigator.userAgent,
+            time: new Date().toISOString()
+        };
+    }
+    function buildRuntimeErrorReport(message, source, line, column, stack, kind){
+        return {kind:kind||'runtime',message:String(message||'Unknown error'),source:source||'',line:line||0,column:column||0,stack:stack||'',context:runtimeContext()};
+    }
+    function recordRuntimeError(report){
+        window.__BlockQuestLastRuntimeError = report;
+        try { localStorage.setItem(RUNTIME_ERROR_KEY, JSON.stringify(report)); } catch(e) {}
+        const badge=document.getElementById('runtimeErrorBadge');
+        if(badge) badge.style.display='block';
+        console.error('[BlockQuest Runtime Error]', report);
+    }
+    function showRuntimeErrorPanel(){
+        const report=window.__BlockQuestLastRuntimeError || (()=>{try{return JSON.parse(localStorage.getItem(RUNTIME_ERROR_KEY)||'null')}catch(e){return null}})();
+        if(!report) return;
+        let panel=document.getElementById('runtimeErrorReport');
+        if(!panel){panel=document.createElement('div');panel.id='runtimeErrorReport';panel.className='runtime-error-report';document.body.appendChild(panel);}
+        const text=JSON.stringify(report,null,2);
+        panel.innerHTML='<h3>🐞 JavaScript Runtime Error</h3><p><strong>'+String(report.kind||'runtime')+'</strong>: '+String(report.message||'Unknown error').replace(/</g,'&lt;')+'</p><p>Screen: <strong>'+String(report.context?.screen||'unknown')+'</strong></p><pre>'+text.replace(/</g,'&lt;')+'</pre><div class="runtime-error-actions"><button type="button" onclick="copyRuntimeErrorReport()">Copy Report</button><button type="button" onclick="document.getElementById(\'runtimeErrorReport\')?.remove()">Close</button><button type="button" onclick="clearRuntimeErrorReport()">Clear</button></div>';
+    }
+    async function copyRuntimeErrorReport(){
+        const report=window.__BlockQuestLastRuntimeError;
+        if(!report) return;
+        const text=JSON.stringify(report,null,2);
+        try{await navigator.clipboard.writeText(text);alert('Error report copied. Paste it into ChatGPT.');}
+        catch(e){window.prompt('Copy this error report:',text);}
+    }
+    function clearRuntimeErrorReport(){
+        window.__BlockQuestLastRuntimeError=null;
+        try{localStorage.removeItem(RUNTIME_ERROR_KEY);}catch(e){}
+        const panel=document.getElementById('runtimeErrorReport');if(panel)panel.remove();
+        const badge=document.getElementById('runtimeErrorBadge');if(badge)badge.style.display='none';
+    }
+    window.addEventListener('error',function(event){
+        const report=buildRuntimeErrorReport(event.message,event.filename,event.lineno,event.colno,event.error?.stack,'window.error');
+        recordRuntimeError(report);
+    });
+    window.addEventListener('unhandledrejection',function(event){
+        const reason=event.reason;
+        const report=buildRuntimeErrorReport(reason?.message||String(reason),'',0,0,reason?.stack,'unhandledrejection');
+        recordRuntimeError(report);
+    });
     function render() {
         const app = document.getElementById('app');
         let html = '';
