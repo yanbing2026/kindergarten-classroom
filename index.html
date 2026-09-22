@@ -4848,7 +4848,7 @@ GRADE1_INTERACTIVE.writing = GRADE1_INTERACTIVE_WRITING;
         const tabs = GRADE_CURRICULUM.map(g=>'<button class="grade-tab'+(g.id===grade.id?' active':'')+'" onclick="go(\'grades\',{grade:\''+g.id+'\'})"><span class="grade-icon">'+g.icon+'</span><span class="grade-name">'+g.label+'</span></button>').join('');
         const courses = grade.courses.map((c, i) => {
             const legacyReady = c.ready && c.key && CATEGORIES.some(cat=>cat.key===c.key);
-            const interactiveReady = c.ready && !!gradeInteractiveKey(grade.id, i);
+            const interactiveReady = c.ready && !!gradeInteractiveKey(c);
             const ready = legacyReady || interactiveReady;
             const action = legacyReady
                 ? "go('level', {key:'"+c.key+"'})"
