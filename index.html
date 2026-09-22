@@ -1910,11 +1910,20 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         return {data,error};
     }
     async function cloudLogin(name,pin){
-        const {data,error}=await supa.from('players').select('name,pin_hash,pin_salt,progress').eq('name',name).single();
-        if(error||!data||!data.pin_hash||!data.pin_salt)return null;
-        const verifier=await derivePinVerifier(pin,data.pin_salt);
-        if(!constantTimeEqual(verifier,data.pin_hash))return null;
-        return data;
+        const {data,error}=await supa.from('players').select('name,pin,pin_hash,pin_salt,progress').eq('name',name).single();
+        if(error||!data)return null;
+        if(data.pin_hash&&data.pin_salt){
+            const verifier=await derivePinVerifier(pin,data.pin_salt);
+            if(!constantTimeEqual(verifier,data.pin_hash))return null;
+            return data;
+        }
+        // One-time legacy migration for accounts created before PIN protection.
+        // The plaintext legacy PIN is never written back; successful login replaces it with a verifier.
+        if(data.pin!==pin)return null;
+        const pin_salt=makePinSalt(),pin_hash=await derivePinVerifier(pin,pin_salt);
+        const {error:updateError}=await supa.from('players').update({pin:null,pin_hash,pin_salt}).eq('name',name);
+        if(updateError)return null;
+        return {...data,pin:null,pin_hash,pin_salt};
     }
     async function cloudSaveProgress(name,progressObj){
         if(!name)return false;
