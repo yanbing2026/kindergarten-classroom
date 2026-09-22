@@ -680,6 +680,8 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
   .world-connector { min-width: 7px; margin-top: 17px; }
 }
 
+/* ---------- Measurement controls ---------- */
+.grade-measure-object{height:34px;display:flex;align-items:center;justify-content:flex-start;margin:12px auto 18px;width:92%;background:repeating-linear-gradient(90deg,#6b7280 0 10%,transparent 10% 11%);border-radius:8px;overflow:hidden}.grade-measure-object span{font-size:25px;margin-left:4px}.grade-ruler{overflow-x:auto;padding-bottom:5px}.grade-ruler-track{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(42px,1fr);min-width:300px;border-bottom:4px solid #6b7280}.grade-ruler-mark{height:46px;background:linear-gradient(#6b7280,#6b7280) center top/3px 18px no-repeat;border:0;font-weight:800;cursor:pointer}.grade-ruler-mark span{display:block;margin-top:20px}.grade-measure-help{text-align:center;font-weight:700;margin-top:10px}.grade-measure-compare{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}.grade-measure-option{min-width:100px;min-height:82px;border:2px solid #cfc6b8;border-radius:10px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer}.grade-compare-object{height:20px;background:#6b7280;border-radius:5px}.grade-measure-sort{display:flex;flex-direction:column;gap:8px;max-width:340px;margin:0 auto 10px}.grade-measure-sort-item{min-height:48px;border:2px solid #cfc6b8;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;font-weight:800;cursor:pointer}.grade-measure-sort-item.picked{outline:3px solid #6b7280}.grade-interactive-reset{margin-left:8px;min-height:44px;padding:8px 14px;border:2px solid #cfc6b8;border-radius:9px;background:#fff;font-weight:800}@media(max-width:420px){.grade-ruler-track{grid-auto-columns:42px}.grade-measure-option{min-width:92px}}
 /* ---------- Ten-frame and Place Value controls ---------- */
 .grade-tenframe{display:grid;grid-template-columns:repeat(5,44px);grid-template-rows:repeat(2,44px);gap:5px;justify-content:center;margin:12px auto}.grade-tenframe-cell{border:2px solid #9b9185;background:#fff;border-radius:6px;cursor:pointer}.grade-tenframe-cell.filled{background:#6b7280;box-shadow:inset 0 0 0 5px #fff}.grade-tenframe-count{text-align:center;font-weight:800}.grade-place-visual{display:flex;justify-content:center;gap:28px;flex-wrap:wrap}.grade-place-label{text-align:center;font-weight:900;margin-bottom:6px}.grade-ten-groups{display:flex;flex-wrap:wrap;gap:7px;max-width:210px;justify-content:center}.grade-ten-group{display:grid;grid-template-columns:repeat(5,12px);gap:3px;padding:5px;border:2px solid #9b9185;border-radius:7px}.grade-ten-group span{width:12px;height:12px;border-radius:50%;background:#6b7280}.grade-ones{display:flex;flex-wrap:wrap;gap:6px;max-width:120px}.grade-one-dot{width:22px;height:22px;border-radius:50%;background:#6b7280}.grade-place-inputs{display:flex;justify-content:center;gap:12px;margin:14px 0;flex-wrap:wrap}.grade-place-inputs label{font-weight:800}.grade-place-inputs input{width:62px;margin-left:5px;font-size:18px;padding:8px;border:2px solid #cfc6b8;border-radius:8px}@media(max-width:420px){.grade-tenframe{grid-template-columns:repeat(5,40px);grid-template-rows:repeat(2,40px);gap:4px}.grade-tenframe-cell{min-width:40px;min-height:40px}}
 /* ---------- Word Problem interaction controls ---------- */
@@ -4918,6 +4920,15 @@ GRADE1_INTERACTIVE.writing = GRADE1_INTERACTIVE_WRITING;
             else if(i%8===5 && unitIndex===4){const sides=4;q.interaction='shape';q.shapeSides=sides;q.shapeChoices=[...shapePool].sort(()=>Math.random()-.5);}
             else if(i%8===6 && unitIndex===3){const answer=clockTimes[i%clockTimes.length];q.interaction='clock';q.clockAnswer=answer;q.clockChoices=[answer,clockTimes[(i+2)%12],clockTimes[(i+5)%12],clockTimes[(i+8)%12]];}
             else if(i%8===7 && (unitIndex===1||unitIndex===2)){const base=Number(q.answer)||10;q.interaction='sortnumbers';q.sortNumbers=[Math.max(0,base-7),base,base+4,base+9];}
+            else if(unitIndex===3 && i%9===1){
+                const len=4+(i%7);q.interaction='measurement';q.measureMode='measure';q.measureLength=len;q.measureIcon=['▰','●','▲','◆'][i%4];q.prompt='How many units long is the object?';q.answer=String(len);q.hint='Start at 0 and count the equal spaces.';q.explanation='The object is '+len+' units long.';
+            }
+            else if(unitIndex===3 && i%9===2){
+                const a=3+(i%4),b=a+2+(i%3),names=['Pencil','Crayon','Book'];const icons=[{name:names[0],length:a},{name:names[1],length:b},{name:names[2],length:a+1}];q.interaction='measurement';q.measureMode='compare';q.compareIcons=icons;q.measureCorrectIndex=1;q.comparePrompt='Which object is longest?';q.prompt='Compare the object lengths.';q.answer=names[1];q.hint='Look at which bar reaches farthest.';q.explanation=names[1]+' is the longest.';
+            }
+            else if(unitIndex===3 && i%9===3){
+                const vals=[{name:'Pencil',length:2+i%2},{name:'Crayon',length:4+i%2},{name:'Book',length:6+i%2}];q.interaction='measurement';q.measureMode='sort';q.measureOrder=vals;q.prompt='Put these objects in order from shortest to longest.';q.answer='Pencil, Crayon, Book';q.hint='Choose the shortest first.';q.explanation='The lengths increase from Pencil to Crayon to Book.';
+            }
             else if(unitIndex===1 && i%7===0){
                 const count=5+(i%6);q.interaction='tenframe';q.tenFrameMode='frame';q.tenFrameCount=count;q.prompt='Show '+count+' on the ten-frame.';q.answer=String(count);q.hint='Fill one space for each object.';q.explanation='You filled '+count+' spaces.';
             }
@@ -4961,8 +4972,25 @@ GRADE1_INTERACTIVE.writing = GRADE1_INTERACTIVE_WRITING;
         if(q.interaction==='graph')return renderGradeGraph(q);
         if(q.interaction==='wordproblem')return renderWordProblemInteraction(q);
         if(q.interaction==='tenframe')return renderTenFrameInteraction(q);
+        if(q.interaction==='measurement')return renderMeasurementInteraction(q);
         return '';
     }
+    function renderMeasurementInteraction(q){
+        if(q.measureMode==='measure'){
+            const max=Math.max(6,Number(q.measureLength)||8),marks=Array.from({length:max+1},(_,i)=>'<button type="button" class="grade-ruler-mark" onclick="handleMeasureChoice('+i+')"><span>'+i+'</span></button>').join('');
+            return '<div class="grade-interactive-box"><div class="grade-measure-object" style="--measure-length:'+Math.min(92,max*10)+'%"><span>'+ (q.measureIcon||'●') +'</span></div><div class="grade-ruler"><div class="grade-ruler-track">'+marks+'</div></div><div class="grade-measure-help">Tap the number that matches the object length.</div></div>';
+        }
+        if(q.measureMode==='compare'){
+            return '<div class="grade-interactive-box"><div class="grade-measure-compare">'+q.compareIcons.map((x,i)=>'<button type="button" class="grade-measure-option" onclick="handleMeasureCompare('+i+')"><span class="grade-compare-object" style="width:'+x.length*18+'px"></span><b>'+x.name+'</b></button>').join('')+'</div><div class="grade-measure-help">'+q.comparePrompt+'</div></div>';
+        }
+        const order=q.measureOrder||[];
+        return '<div class="grade-interactive-box"><div class="grade-sort-title">Tap from shortest to longest</div><div class="grade-measure-sort">'+order.map((x,i)=>'<button type="button" class="grade-measure-sort-item" onclick="handleMeasureSort('+i+')">'+x.name+' <span style="display:inline-block;width:'+x.length*12+'px;height:18px"></span></button>').join('')+'</div><div id="measureSortCounter" class="grade-tenframe-count">0 selected</div><button type="button" class="grade-interactive-check" onclick="checkMeasureSort()">✓ Check</button><button type="button" class="grade-interactive-reset" onclick="resetMeasureSort()">↺ Reset</button></div>';
+    }
+    function handleMeasureChoice(v){const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];if(!q)return;finishInteractiveAnswer(Number(v)===Number(q.measureLength),'Measure from 0 to the end of the object.');}
+    function handleMeasureCompare(i){const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];if(!q)return;finishInteractiveAnswer(i===Number(q.measureCorrectIndex),'Compare the lengths, not the names.');}
+    function handleMeasureSort(i){if(gradeQuiz?.awaitingNext)return;gradeQuiz.measureSortPicked=gradeQuiz.measureSortPicked||[];if(gradeQuiz.measureSortPicked.includes(i))return;gradeQuiz.measureSortPicked.push(i);const e=document.getElementById('measureSortCounter');if(e)e.textContent=gradeQuiz.measureSortPicked.length+' selected';document.querySelectorAll('.grade-measure-sort-item')[i]?.classList.add('picked');if(gradeQuiz.measureSortPicked.length===(gradeQuiz.unit.lessons[gradeQuiz.idx].measureOrder||[]).length)checkMeasureSort();}
+    function resetMeasureSort(){if(!gradeQuiz)return;gradeQuiz.measureSortPicked=[];document.querySelectorAll('.grade-measure-sort-item').forEach(e=>e.classList.remove('picked'));const e=document.getElementById('measureSortCounter');if(e)e.textContent='0 selected';}
+    function checkMeasureSort(){const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];if(!q)return;const correct=(q.measureOrder||[]).map((_,i)=>i);finishInteractiveAnswer(JSON.stringify(gradeQuiz.measureSortPicked||[])===JSON.stringify(correct),'Start with the shortest object and move to the longest.');}
     function renderTenFrameInteraction(q){
         if(q.tenFrameMode==='tensones'){
             const tens=Number(q.tenAnswer)||0,ones=Number(q.onesAnswer)||0;
