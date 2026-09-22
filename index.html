@@ -1877,43 +1877,55 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
     function accountProgressKey(name){return 'kc_account_progress_v1_'+name.toLowerCase();}
     // ---------- Supabase cloud accounts (name+PIN stored server-side) ----------
     const supa = supabase.createClient('https://sjqhcpbdgaeapljbllhp.supabase.co','sb_publishable_DMSaun0u7qH2pAQzupS8Ww_G780gpm9');
-    async function cloudUpsert(name,pin,progressObj){
+    function getCurrentAccountName(){
+        const key=getCurrentAccount();
+        if(!key)return '';
+        try{const accounts=getAccounts();return accounts[key]?.name || key;}catch(_){return key;}
+    }
+    function cacheAccount(name){
+        const key=name.toLowerCase();
+        try{const accounts=getAccounts();accounts[key]={name:name};localStorage.setItem('kc_accounts_v1',JSON.stringify(accounts));}catch(_){}
+        localStorage.setItem('kc_current_account',key);
+        return key;
+    }
+    async function cloudCreate(name,pin,progressObj){
         const row={name:name,pin:pin,progress:progressObj||{}};
-        const {error}=await supa.from('players').upsert(row,{onConflict:'name'});
-        return !error;
+        const {data,error}=await supa.from('players').insert(row).select('name,pin,progress').single();
+        return {data,error};
     }
     async function cloudLogin(name,pin){
         const {data,error}=await supa.from('players').select('name,pin,progress').eq('name',name).single();
         if(error||!data)return null;
         if(data.pin!==pin)return null;
-        return data; // {name,pin,progress}
+        return data;
     }
     async function cloudSaveProgress(name,progressObj){
+        if(!name)return false;
         const {error}=await supa.from('players').update({progress:progressObj}).eq('name',name);
         return !error;
     }
     function closeAccountModal(){const m=document.getElementById('accountModal');if(m)m.style.display='none';}
-    function openAccountModal(mode){const m=document.getElementById('accountModal');if(!m)return;const create=mode==='create';m.style.display='grid';m.innerHTML='<div class="account-box"><h2>⛏️ '+(create?'Create Your BlockQuest Account':'Welcome Back!')+'</h2><p>'+(create?'Create a child profile on this device.':'Log in to switch profiles on this device.')+'</p><input id="accountName" maxlength="24" placeholder="Player name"><input id="accountPin" maxlength="6" inputmode="numeric" type="password" placeholder="4–6 digit PIN"><div class="account-actions"><button id="accountSubmit">'+(create?'Create':'Log In')+'</button><button id="accountCancel">Cancel</button></div><div id="accountStatus" class="account-status"></div><div class="account-switch"><button id="accountSwitch">'+(create?'Already have an account? Log in':'New player? Create an account')+'</button></div></div>';document.getElementById('accountSubmit').onclick=()=>submitAccount(mode);document.getElementById('accountCancel').onclick=closeAccountModal;document.getElementById('accountSwitch').onclick=()=>openAccountModal(create?'login':'create');}
+    function openAccountModal(mode){const m=document.getElementById('accountModal');if(!m)return;const create=mode==='create';m.style.display='grid';m.innerHTML='<div class="account-box"><h2>⛏️ '+(create?'Create Your BlockQuest Account':'Welcome Back!')+'</h2><p>'+(create?'Create a child profile in the cloud.':'Log in to load this profile from the cloud.')+'</p><input id="accountName" maxlength="24" placeholder="Player name"><input id="accountPin" maxlength="6" inputmode="numeric" type="password" placeholder="4–6 digit PIN"><div class="account-actions"><button id="accountSubmit">'+(create?'Create':'Log In')+'</button><button id="accountCancel">Cancel</button></div><div id="accountStatus" class="account-status"></div><div class="account-switch"><button id="accountSwitch">'+(create?'Already have an account? Log in':'New player? Create an account')+'</button></div></div>';document.getElementById('accountSubmit').onclick=()=>submitAccount(mode);document.getElementById('accountCancel').onclick=closeAccountModal;document.getElementById('accountSwitch').onclick=()=>openAccountModal(create?'login':'create');}
     function submitAccount(mode){const name=(document.getElementById('accountName')?.value||'').trim(),pin=(document.getElementById('accountPin')?.value||'').trim(),status=document.getElementById('accountStatus'),btn=document.getElementById('accountSubmit');if(!/^[A-Za-z0-9 _-]{2,24}$/.test(name)){status.textContent='Use 2–24 letters, numbers, spaces, _ or -.';return;}if(!/^\d{4,6}$/.test(pin)){status.textContent='PIN must be 4–6 digits.';return;}btn.disabled=true;status.textContent='Checking…';
     (async()=>{
         const key=name.toLowerCase();
-        let ok=false;
         if(mode==='create'){
-            // name unique in DB is the source of truth for "already exists" across devices
-            ok=await cloudUpsert(name,pin,{});
-            if(!ok){status.textContent='Network error, try again.';btn.disabled=false;return;}
-            const landed=await cloudLogin(name,pin);
-            if(landed===null){status.textContent='That player name already exists (on any device).';btn.disabled=false;return;}
-            localStorage.setItem('kc_current_account',key);
+            const result=await cloudCreate(name,pin,{});
+            if(result.error){
+                const duplicate=result.error.code==='23505' || /duplicate|unique/i.test(result.error.message||'');
+                status.textContent=duplicate?'That player name already exists on another device.':'Network error, try again.';
+                btn.disabled=false;return;
+            }
+            cacheAccount(result.data?.name||name);
+            try{localStorage.setItem(accountProgressKey(key),JSON.stringify(result.data?.progress||{}));}catch(_){}
         }else{
             const acct=await cloudLogin(name,pin);
             if(acct===null){status.textContent='Player name or PIN is incorrect.';btn.disabled=false;return;}
-            localStorage.setItem('kc_current_account',key);
-            // seed local cache from cloud so offline-first load path still shows data immediately
+            cacheAccount(acct.name||name);
             try{localStorage.setItem(accountProgressKey(key),JSON.stringify(acct.progress||{}));}catch(_){}
         }
         btn.disabled=false;
-        closeAccountModal();renderAccountBar();progress=loadProgress(); blipola=window.BlipolaClassroom.create(progress); render();
+        closeAccountModal();renderAccountBar();progress=loadProgress();blipola=window.BlipolaClassroom.create(progress);render();
     })();
     }
     function logoutAccount(){localStorage.removeItem('kc_current_account');renderAccountBar();progress=loadProgress();blipola=window.BlipolaClassroom.create(progress);render();}
@@ -1958,7 +1970,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         recent.forEach(x => { if (!byKey[x.key]) byKey[x.key] = { key: x.key, attempts: 0, correct: 0, firstTry: 0 }; byKey[x.key].attempts++; if (x.correct) byKey[x.key].correct++; if (x.correct && x.firstTry) byKey[x.key].firstTry++; });
         return { attempts: recent.length, correct: recent.filter(x => x.correct).length, firstTry: recent.filter(x => x.correct && x.firstTry).length, days: new Set(recent.map(x => new Date(x.at).toLocaleDateString())).size, skills: Object.values(byKey).sort((a,b) => b.correct - a.correct || b.attempts - a.attempts) };
     }
-    function saveProgress() { localStorage.setItem(getCurrentAccount() ? accountProgressKey(getCurrentAccount()) : 'kc_progress_v1', JSON.stringify(progress)); if(getCurrentAccount()&&typeof cloudSaveProgress==='function') cloudSaveProgress(getCurrentAccount(),progress); }
+    function saveProgress() { localStorage.setItem(getCurrentAccount() ? accountProgressKey(getCurrentAccount()) : 'kc_progress_v1', JSON.stringify(progress)); if(getCurrentAccount()&&typeof cloudSaveProgress==='function') cloudSaveProgress(getCurrentAccountName(),progress); }
     function todayKey() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
     function ensureDailyState() {
         if (!progress.daily || progress.daily.date !== todayKey()) {
