@@ -736,6 +736,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
     <script src="data/grade-2/writing.js"></script>
     <script src="data/grade-2/science.js"></script>
     <script src="data/kindergarten/core.js"></script>
+    <script src="data/grade-2/core.js"></script>
 <script src="data/grade-1/science.js"></script>
 <script src="data/grade-1/social-studies.js"></script>
 <script src="data/grade-1/writing.js"></script>
@@ -4513,14 +4514,7 @@ GRADE1_INTERACTIVE.writing = window.KC_G1_WRITING;
     GRADE1_INTERACTIVE.social = GRADE1_CORE_BANKS.social;
     GRADE1_INTERACTIVE.writing = GRADE1_CORE_BANKS.writing;
 
-    // ---------- Grade 2 interactive banks ----------
-    function buildGrade2Bank(subject){
-        const banks={math:window.KC_G2_MATH,ela:window.KC_G2_ELA,science:window.KC_G2_SCIENCE,social:window.KC_G2_SOCIAL,writing:window.KC_G2_WRITING};
-        const defs=banks[subject]||banks.ela;
-        return defs.map(d=>({unit:d[0],lessons:Array.from({length:30},(_,n)=>{const s=d[1][n%d[1].length];return {title:s[0],prompt:s[0],choices:s[1],answer:s[2],hint:'Use the clues and think about the skill in this unit.',explanation:'The correct answer is '+s[2]+'.'};})}));
-    }
-    const GRADE2_INTERACTIVE={math:buildGrade2Bank().math,ela:buildGrade2Bank().ela,science:buildGrade2Bank().science,social:buildGrade2Bank().social,writing:buildGrade2Bank().writing};
-
+    const GRADE2_INTERACTIVE = window.KC_G2_INTERACTIVE || {math:[],ela:[],science:[],social:[],writing:[]};
     const KINDERGARTEN_INTERACTIVE = window.KC_KINDERGARTEN_INTERACTIVE || {math:[],ela:[],science:[],social:[],writing:[]};
     function courseSubjectType(name){const n=name.toLowerCase();if(n.includes('english')||n.includes('ela'))return'ela';if(n.includes('math')||n.includes('algebra'))return'math';if(n.includes('science'))return'science';if(n.includes('social'))return'social';return'writing';}
     function gradeInteractiveKey(course){const type=courseSubjectType(course.name);return ['ela','math','science','social','writing'].includes(type)?type:null;}
