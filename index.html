@@ -1888,15 +1888,32 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         localStorage.setItem('kc_current_account',key);
         return key;
     }
+    // PIN protection: the PIN is never stored in localStorage or sent to Supabase as plaintext.
+    const PIN_HASH_ITERATIONS=120000;
+    function bytesToBase64(bytes){let s='';for(let i=0;i<bytes.length;i+=0x8000)s+=String.fromCharCode(...bytes.subarray(i,i+0x8000));return btoa(s);}
+    function base64ToBytes(value){const s=atob(value),out=new Uint8Array(s.length);for(let i=0;i<s.length;i++)out[i]=s.charCodeAt(i);return out;}
+    function constantTimeEqual(a,b){if(!a||!b||a.length!==b.length)return false;let x=0;for(let i=0;i<a.length;i++)x|=a.charCodeAt(i)^b.charCodeAt(i);return x===0;}
+    async function derivePinVerifier(pin,saltB64){
+        const salt=base64ToBytes(saltB64);
+        const material=await crypto.subtle.importKey('raw',new TextEncoder().encode(pin),'PBKDF2',false,['deriveBits']);
+        const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt,iterations:PIN_HASH_ITERATIONS,hash:'SHA-256'},material,256);
+        return bytesToBase64(new Uint8Array(bits));
+    }
+    function makePinSalt(){
+        const salt=new Uint8Array(16);crypto.getRandomValues(salt);return bytesToBase64(salt);
+    }
     async function cloudCreate(name,pin,progressObj){
-        const row={name:name,pin:pin,progress:progressObj||{}};
-        const {data,error}=await supa.from('players').insert(row).select('name,pin,progress').single();
+        const pin_salt=makePinSalt();
+        const pin_hash=await derivePinVerifier(pin,pin_salt);
+        const row={name:name,pin_hash:pin_hash,pin_salt:pin_salt,progress:progressObj||{}};
+        const {data,error}=await supa.from('players').insert(row).select('name,pin_hash,pin_salt,progress').single();
         return {data,error};
     }
     async function cloudLogin(name,pin){
-        const {data,error}=await supa.from('players').select('name,pin,progress').eq('name',name).single();
-        if(error||!data)return null;
-        if(data.pin!==pin)return null;
+        const {data,error}=await supa.from('players').select('name,pin_hash,pin_salt,progress').eq('name',name).single();
+        if(error||!data||!data.pin_hash||!data.pin_salt)return null;
+        const verifier=await derivePinVerifier(pin,data.pin_salt);
+        if(!constantTimeEqual(verifier,data.pin_hash))return null;
         return data;
     }
     async function cloudSaveProgress(name,progressObj){
