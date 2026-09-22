@@ -4844,10 +4844,16 @@ GRADE1_INTERACTIVE.writing = GRADE1_INTERACTIVE_WRITING;
         const selected = state.params.grade || 'prek';
         const grade = GRADE_CURRICULUM.find(g=>g.id===selected) || GRADE_CURRICULUM[0];
         const tabs = GRADE_CURRICULUM.map(g=>'<button class="grade-tab'+(g.id===grade.id?' active':'')+'" onclick="go(\'grades\',{grade:\''+g.id+'\'})"><span class="grade-icon">'+g.icon+'</span><span class="grade-name">'+g.label+'</span></button>').join('');
-        const courses = grade.courses.map(c => {
-            const ready = c.ready && c.key && CATEGORIES.some(cat=>cat.key===c.key);
-            const action = ready ? "go('level', {key:'"+c.key+"'})" : "go('gradeCourse',{grade:'"+grade.id+"',courseIndex:"+grade.courses.indexOf(c)+"})";
-            return '<div class="course-card'+(ready?'':' planned')+'"'+(action?' onclick="'+action+'"':'')+'><div class="course-icon">'+c.icon+'</div><div class="course-info"><div class="course-name">'+c.name+'</div><div class="course-desc">'+c.desc+'</div></div><div class="course-status">'+(ready?'READY ▶':'COMING NEXT')+'</div></div>';
+        const courses = grade.courses.map((c, i) => {
+            const legacyReady = c.ready && c.key && CATEGORIES.some(cat=>cat.key===c.key);
+            const interactiveReady = c.ready && !!gradeInteractiveKey(grade.id, i);
+            const ready = legacyReady || interactiveReady;
+            const action = legacyReady
+                ? "go('level', {key:'"+c.key+"'})"
+                : interactiveReady
+                    ? "go('gradeCourse',{grade:'"+grade.id+"',courseIndex:"+i+"})"
+                    : "go('gradeCourse',{grade:'"+grade.id+"',courseIndex:"+i+"})";
+            return '<div class="course-card'+(ready?'':' planned')+'" onclick="'+action+'"><div class="course-icon">'+c.icon+'</div><div class="course-info"><div class="course-name">'+c.name+'</div><div class="course-desc">'+c.desc+'</div></div><div class="course-status">'+(ready?'READY ▶':'COMING NEXT')+'</div></div>';
         }).join('');
         return topbar(true)+'<h2>📚 Courses by Grade</h2><div class="grade-tabs">'+tabs+'</div><div class="grade-subtitle">'+grade.icon+' '+grade.label+' — '+grade.subtitle+'</div><div class="course-section"><div class="course-section-title">COURSES</div>'+courses+'</div><div class="footer">Pre-K through Grade 8 curriculum is organized here. New grade content can be added without changing the learning engine.</div>';
     }
