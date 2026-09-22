@@ -704,6 +704,31 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
 .runtime-error-report h3{margin:0 0 8px;font-size:1rem}.runtime-error-report p{margin:6px 0;font-size:.82rem;line-height:1.35}.runtime-error-report pre{white-space:pre-wrap;word-break:break-word;background:#f7f3ed;border-radius:10px;padding:10px;font-size:.7rem;line-height:1.35;max-height:260px;overflow:auto}.runtime-error-actions{display:flex;gap:8px;flex-wrap:wrap}.runtime-error-actions button{min-height:42px;padding:8px 12px;border:0;border-radius:10px;font-weight:800;cursor:pointer}.runtime-error-badge{position:fixed;right:12px;bottom:12px;z-index:99998;display:none;min-height:42px;border:0;border-radius:12px;padding:8px 12px;background:#8b2e2e;color:#fff;font-weight:800;box-shadow:0 6px 18px rgba(0,0,0,.22)}
 @media(max-width:600px){.runtime-error-report{right:8px;bottom:8px;width:calc(100vw - 16px);padding:12px}.runtime-error-report pre{max-height:220px}}
 </style>
+
+<script>
+/* ---------- Boot safety: never leave a blank page on startup failure ---------- */
+(function(){
+  const BOOT_KEY='kc_boot_error_v1';
+  function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function report(kind,message,source,line,column,stack){
+    const data={kind:kind||'startup',message:String(message||'Unknown error'),source:source||'',line:line||0,column:column||0,stack:stack||'',url:location.href,time:new Date().toISOString()};
+    window.__KC_BOOT_ERROR=data;
+    try{localStorage.setItem(BOOT_KEY,JSON.stringify(data));}catch(_){}
+    let box=document.getElementById('kcBootError');
+    if(!box){box=document.createElement('div');box.id='kcBootError';box.style.cssText='position:fixed;inset:0;z-index:100000;background:#f4ead7;color:#2b1b0e;padding:18px;font-family:system-ui,sans-serif;overflow:auto;display:flex;align-items:center;justify-content:center;';document.body.appendChild(box);}
+    box.innerHTML='<div style="width:min(760px,100%);background:#fff;border:4px solid #8b2e2e;border-radius:14px;padding:18px;box-shadow:0 12px 30px rgba(0,0,0,.22)"><h2 style="margin:0 0 10px">🐞 BlockQuest could not start</h2><p style="margin:6px 0"><strong>'+esc(data.kind)+'</strong>: '+esc(data.message)+'</p><p style="margin:6px 0;font-size:.85rem">This report contains the exact error so it can be fixed without guessing.</p><pre style="white-space:pre-wrap;word-break:break-word;background:#f7f3ed;padding:10px;border-radius:8px;font-size:.72rem;max-height:42vh;overflow:auto">'+esc(JSON.stringify(data,null,2))+'</pre><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" onclick="navigator.clipboard?.writeText(JSON.stringify(window.__KC_BOOT_ERROR,null,2)).then(()=>alert('Report copied.'))" style="padding:10px 14px;border:2px solid #333;border-radius:8px;font-weight:800">Copy Report</button><button type="button" onclick="location.reload()" style="padding:10px 14px;border:2px solid #333;border-radius:8px;font-weight:800">Reload</button></div></div>';
+  }
+  window.__KC_REPORT_BOOT_ERROR=report;
+  window.addEventListener('error',function(e){report('window.error',e.message,e.filename,e.lineno,e.colno,e.error&&e.error.stack);});
+  window.addEventListener('unhandledrejection',function(e){const r=e.reason;report('unhandledrejection',r&&r.message||String(r),'',0,0,r&&r.stack);});
+  window.setTimeout(function(){
+    const app=document.getElementById('app');
+    if(app && !app.innerHTML.trim() && !window.__KC_BOOT_ERROR){
+      report('empty-app','Application initialization completed without rendering a screen.','','','', '');
+    }
+  },5000);
+})();
+</script>
 </head>
 <body>
 <div id="accountBar" class="account-bar"></div>
@@ -5581,8 +5606,15 @@ GRADE1_INTERACTIVE.writing = GRADE1_INTERACTIVE_WRITING;
         <div class="footer">Just explore!</div>`;
     }
 
-    renderAccountBar();
-    render();
+    try {
+        renderAccountBar();
+        render();
+    } catch (error) {
+        const report = buildRuntimeErrorReport(error?.message || String(error), '', 0, 0, error?.stack, 'startup-render');
+        recordRuntimeError(report);
+        if (window.__KC_REPORT_BOOT_ERROR) window.__KC_REPORT_BOOT_ERROR(report.kind, report.message, report.source, report.line, report.column, report.stack);
+        else showRuntimeErrorPanel();
+    }
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
