@@ -680,6 +680,8 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
   .world-connector { min-width: 7px; margin-top: 17px; }
 }
 
+/* ---------- Data & Graphs interaction controls ---------- */
+.grade-graph-title{font-weight:900;text-align:center;margin-bottom:8px}.grade-graph-area{height:175px;display:flex;align-items:flex-end;justify-content:space-around;gap:8px;border-left:2px solid #8d8479;border-bottom:2px solid #8d8479;padding:8px 6px 0 22px;position:relative}.grade-graph-bar-wrap{border:0;background:transparent;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;min-width:48px;height:100%;cursor:pointer;font:inherit}.grade-graph-bar{display:block;width:34px;background:#6b7280;border-radius:7px 7px 0 0;min-height:18px}.grade-graph-count{font-size:.8rem;font-weight:900}.grade-graph-label{font-size:.72rem;font-weight:800;white-space:nowrap}.grade-graph-y{position:absolute;display:flex;flex-direction:column;justify-content:space-between;height:160px;font-size:.68rem;color:#766c60}.grade-graph-help{text-align:center;font-size:.78rem;color:#766c60;margin-top:8px}@media(max-width:420px){.grade-graph-label{font-size:.62rem}.grade-graph-bar{width:27px}.grade-graph-bar-wrap{min-width:40px}}
 /* ---------- Additional Math interaction controls ---------- */
 .grade-shape-grid,.grade-clock-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-width:440px;margin:auto}.grade-shape-card,.grade-clock-card{min-height:88px;border:2px solid #cfc6b8;border-radius:12px;background:#fff;font:inherit;font-weight:800;cursor:pointer;padding:8px}.grade-shape-card:hover,.grade-clock-card:hover{transform:translateY(-1px)}.shape-symbol{display:block;font-size:2.2rem;line-height:1.1}.clock-svg{width:62px;height:62px;display:block;margin:auto}.grade-sort-selected{min-height:46px;margin-bottom:10px;padding:8px;border-radius:10px;background:#f7f3ed;display:flex;gap:6px;justify-content:center;align-items:center;flex-wrap:wrap}.grade-sort-empty{color:#766c60;font-size:.82rem}@media(max-width:420px){.grade-shape-grid,.grade-clock-grid{grid-template-columns:1fr 1fr;gap:7px}.grade-shape-card,.grade-clock-card{min-height:78px}}
 /* ---------- Interactive Math controls ---------- */
@@ -4897,15 +4899,22 @@ GRADE1_INTERACTIVE.writing = GRADE1_INTERACTIVE_WRITING;
     function diversifyGrade1MathBank(bank){
         const shapePool=[{name:'triangle',symbol:'△'},{name:'square',symbol:'□'},{name:'rectangle',symbol:'▭'},{name:'hexagon',symbol:'⬡'}];
         const clockTimes=['1:00','2:00','3:00','4:00','5:00','6:00','7:00','8:00','9:00','10:00','11:00','12:00'];
+        const graphSets=[
+            {title:'Favorite fruit',labels:['Apples','Bananas','Grapes','Oranges'],values:[6,4,8,5]},
+            {title:'Books read',labels:['Ana','Ben','Kai','Mia'],values:[3,7,5,4]},
+            {title:'Pets at home',labels:['Cats','Dogs','Fish','Birds'],values:[5,8,3,6]},
+            {title:'Sunny days',labels:['Mon','Tue','Wed','Thu'],values:[4,7,6,3]}
+        ];
         bank.forEach((unit,unitIndex)=>unit.lessons.forEach((q,i)=>{
             q.type='choice';
             if(i%8===1 && /^-?\\d+(?:\\.\\d+)?$/.test(String(q.answer))){q.type='number';q.placeholder='Type the number';q.numeric=true;}
             else if(i%8===2 && /^\\d+$/.test(String(q.answer))){q.interaction='numberline';}
-            else if(i%8===3 && /^\\d+$/.test(String(q.answer))){q.interaction='count';q.count=Math.max(2,Math.min(10,Number(q.answer)));}
+            else if(i%8===3 && /^\\d+$/.test(String(q.answer)) && Number(q.answer)<=10){q.interaction='count';q.count=Math.max(2,Number(q.answer));}
             else if(i%8===4 && /^\\d+$/.test(String(q.answer))){q.interaction='compare';q.compareA=Math.max(0,Number(q.answer)-2);q.compareB=Number(q.answer);}
-            else if(i%8===5){const sides=unitIndex===4?(Number(q.answer)||4):4;q.interaction='shape';q.shapeSides=sides;q.shapeChoices=[...shapePool].sort(()=>Math.random()-.5);}
+            else if(i%8===5 && unitIndex===4){const sides=4;q.interaction='shape';q.shapeSides=sides;q.shapeChoices=[...shapePool].sort(()=>Math.random()-.5);}
             else if(i%8===6 && unitIndex===3){const answer=clockTimes[i%clockTimes.length];q.interaction='clock';q.clockAnswer=answer;q.clockChoices=[answer,clockTimes[(i+2)%12],clockTimes[(i+5)%12],clockTimes[(i+8)%12]];}
             else if(i%8===7 && (unitIndex===1||unitIndex===2)){const base=Number(q.answer)||10;q.interaction='sortnumbers';q.sortNumbers=[Math.max(0,base-7),base,base+4,base+9];}
+            else if(unitIndex===3 && i%6===0){const g=graphSets[i%graphSets.length];q.interaction='graph';q.graphTitle=g.title;q.graphLabels=g.labels;q.graphValues=g.values;q.graphAnswerIndex=g.values.indexOf(Math.max(...g.values));q.prompt='Which category has the most?';q.answer=g.labels[q.graphAnswerIndex];q.hint='Look for the tallest bar.';q.explanation='The tallest bar shows the greatest number.';}
         }));
         return bank;
     }
@@ -4930,10 +4939,15 @@ GRADE1_INTERACTIVE.writing = GRADE1_INTERACTIVE_WRITING;
             return '<div class="grade-interactive-box"><div class="grade-interactive-label">Tap each object to count</div><div class="grade-count-objects">'+dots+'</div><button class="grade-interactive-check" type="button" onclick="checkCountInteraction()">✓ Check count</button></div>';
         }
         if(q.interaction==='compare')return '<div class="grade-interactive-box"><div class="grade-interactive-label">Which number is greater?</div><div class="grade-compare-buttons"><button type="button" onclick="handleCompareChoice('+q.compareA+')">'+q.compareA+'</button><button type="button" onclick="handleCompareChoice('+q.compareB+')">'+q.compareB+'</button></div></div>';
-        if(q.interaction==='shape')return '<div class="grade-interactive-box"><div class="grade-interactive-label">Tap the shape with '+q.shapeSides+' sides</div><div class="grade-shape-grid">'+q.shapeChoices.map((shape,i)=>'<button type="button" class="grade-shape-card" onclick="handleShapeChoice(\''+shape.name+'\')"><span class="shape-symbol">'+shape.symbol+'</span><span>'+shape.name+'</span></button>').join('')+'</div></div>';
-        if(q.interaction==='clock')return '<div class="grade-interactive-box"><div class="grade-interactive-label">Tap the clock that shows '+q.clockAnswer+'</div><div class="grade-clock-grid">'+q.clockChoices.map((time)=>'<button type="button" class="grade-clock-card" onclick="handleClockChoice(\''+time+'\')"><span class="clock-face">'+clockFace(time)+'</span><span>'+time+'</span></button>').join('')+'</div></div>';
+        if(q.interaction==='shape')return '<div class="grade-interactive-box"><div class="grade-interactive-label">Tap the shape with '+q.shapeSides+' sides</div><div class="grade-shape-grid">'+q.shapeChoices.map(shape=>'<button type="button" class="grade-shape-card" onclick="handleShapeChoice(\''+shape.name+'\')"><span class="shape-symbol">'+shape.symbol+'</span><span>'+shape.name+'</span></button>').join('')+'</div></div>';
+        if(q.interaction==='clock')return '<div class="grade-interactive-box"><div class="grade-interactive-label">Tap the clock that shows '+q.clockAnswer+'</div><div class="grade-clock-grid">'+q.clockChoices.map(time=>'<button type="button" class="grade-clock-card" onclick="handleClockChoice(\''+time+'\')"><span class="clock-face">'+clockFace(time)+'</span><span>'+time+'</span></button>').join('')+'</div></div>';
         if(q.interaction==='sortnumbers')return '<div class="grade-interactive-box"><div class="grade-interactive-label">Tap numbers from smallest to largest</div><div class="grade-sort-selected" id="numberSortSelected"><span class="grade-sort-empty">Your order will appear here.</span></div><div class="grade-sort-words">'+q.sortNumbers.map(n=>'<button class="grade-choice grade-sort-word" type="button" onclick="handleNumberSortChoice('+n+')">'+n+'</button>').join('')+'</div><button class="grade-sort-reset" type="button" onclick="resetNumberSort()">↺ Reset order</button><button class="grade-interactive-check" type="button" onclick="checkNumberSort()">✓ Check order</button></div>';
+        if(q.interaction==='graph')return renderGradeGraph(q);
         return '';
+    }
+    function renderGradeGraph(q){
+        const max=Math.max(...q.graphValues), bars=q.graphLabels.map((label,i)=>'<button type="button" class="grade-graph-bar-wrap" onclick="handleGraphChoice('+i+')" aria-label="'+label+': '+q.graphValues[i]+'"><span class="grade-graph-count">'+q.graphValues[i]+'</span><span class="grade-graph-bar" style="height:'+Math.max(18,Math.round((q.graphValues[i]/max)*130))+'px"></span><span class="grade-graph-label">'+label+'</span></button>').join('');
+        return '<div class="grade-interactive-box"><div class="grade-graph-title">'+q.graphTitle+'</div><div class="grade-graph-y"><span>'+max+'</span><span>'+(Math.ceil(max/2))+'</span><span>0</span></div><div class="grade-graph-area">'+bars+'</div><div class="grade-graph-help">Tap a bar to answer.</div></div>';
     }
     function clockFace(time){const parts=String(time).split(':').map(Number),h=parts[0]%12,m=parts[1]||0,ha=(h*30)+(m*0.5),ma=m*6;return '<svg viewBox="0 0 100 100" class="clock-svg" aria-hidden="true"><circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="3"/><line x1="50" y1="50" x2="'+(50+24*Math.sin(ha*Math.PI/180))+'" y2="'+(50-24*Math.cos(ha*Math.PI/180))+'" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><line x1="50" y1="50" x2="'+(50+34*Math.sin(ma*Math.PI/180))+'" y2="'+(50-34*Math.cos(ma*Math.PI/180))+'" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="50" r="3" fill="currentColor"/></svg>';
     }
@@ -4941,6 +4955,7 @@ GRADE1_INTERACTIVE.writing = GRADE1_INTERACTIVE_WRITING;
         if(!gradeQuiz||gradeQuiz.awaitingNext)return;
         const feedback=document.getElementById('gradeFeedback');
         if(correct){gradeQuiz.awaitingNext=true;if(gradeQuiz.firstAttempt)gradeQuiz.correctFirstTry++;gradeQuiz.stars++;awardStar();const key=gradeQuiz.gradeId+'_'+gradeQuiz.courseIndex+'_'+gradeQuiz.unitIndex;progress.gradeMastery=progress.gradeMastery||{};progress.gradeMastery[key]=(progress.gradeMastery[key]||0)+(gradeQuiz.firstAttempt?1:0);saveProgress();logActivity('grade',gradeQuiz.gradeId+'_'+gradeQuiz.courseIndex,gradeQuiz.unit?.unit||'Math',true,gradeQuiz.firstAttempt);if(feedback)feedback.textContent='✓ Correct! '+feedbackText;speak('Correct! '+feedbackText);confettiBurst();scheduleNavigation(nextGradeQuestion,900);}else{gradeQuiz.firstAttempt=false;gradeQuiz.wrongAttempts++;if(feedback)feedback.textContent='Try again. '+(gradeQuiz.unit.lessons[gradeQuiz.idx].hint||'Think carefully.');}}
+    function handleGraphChoice(index){const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];if(!q)return;const label=q.graphLabels[index];finishInteractiveAnswer(index===q.graphAnswerIndex,'The tallest bar has the most.');}
     let gradeNumberSort=[];
     function handleShapeChoice(value){const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];if(!q)return;finishInteractiveAnswer(String(value)===String(q.answer),q.explanation||'Count the sides of the shape.');}
     function handleClockChoice(value){const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];if(!q)return;finishInteractiveAnswer(String(value)===String(q.clockAnswer),q.explanation||'Look at where the hour and minute hands point.');}
