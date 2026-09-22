@@ -4890,7 +4890,7 @@ GRADE1_INTERACTIVE.writing = GRADE1_INTERACTIVE_WRITING;
     }
     function diversifyGrade1MathBank(bank){
         bank.forEach((unit,unitIndex)=>unit.lessons.forEach((q,i)=>{
-            if(i%6===1){q.type='number';q.placeholder='Type the number';q.numeric=true;}
+            if(i%6===1 && /^-?\d+(?:\.\d+)?$/.test(String(q.answer))){q.type='number';q.placeholder='Type the number';q.numeric=true;}
             else if(i%6===2){q.type='choice';q.visual='numberline';}
             else if(i%6===3){q.type='choice';q.visual='objects';}
             else if(i%6===4){q.type='choice';q.visual='compare';}
