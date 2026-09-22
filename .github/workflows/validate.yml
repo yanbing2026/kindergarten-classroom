@@ -7,22 +7,78 @@ on:
 jobs:
   syntax:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Check JavaScript files
+
+      - name: Validate JavaScript and publish readable diagnostics
+        shell: bash
         run: |
-          node --check js/blipola-runtime.js
-      - name: Check inline JavaScript in index.html
-        run: |
+          set +e
+          mkdir -p validation-report
+          echo "## Validation report" | tee validation-report/summary.md
+          echo "Commit: $GITHUB_SHA" | tee -a validation-report/summary.md
+          echo "Run: $GITHUB_RUN_ID" | tee -a validation-report/summary.md
+          overall=0
+          echo "### External JavaScript" | tee -a validation-report/summary.md
+          if [ -f js/blipola-runtime.js ]; then
+            node --check js/blipola-runtime.js >validation-report/runtime.out 2>&1
+            status=$?
+            cat validation-report/runtime.out
+            if [ $status -ne 0 ]; then
+              overall=1
+              echo "- ❌ js/blipola-runtime.js" | tee -a validation-report/summary.md
+              echo '```text' >> validation-report/summary.md
+              cat validation-report/runtime.out >> validation-report/summary.md
+              echo '```' >> validation-report/summary.md
+            else
+              echo "- ✅ js/blipola-runtime.js" | tee -a validation-report/summary.md
+            fi
+          fi
           python3 - <<'PY'
           import re
           from pathlib import Path
           html = Path("index.html").read_text(encoding="utf-8")
           scripts = re.findall(r"<script(?![^>]*src=)[^>]*>(.*?)</script>", html, re.S | re.I)
           Path("/tmp/index-inline.js").write_text("\n\n".join(scripts), encoding="utf-8")
+          Path("validation-report/index-inline.js").write_text("\n\n".join(scripts), encoding="utf-8")
           print(f"Found {len(scripts)} inline script block(s)")
           PY
-          node --check /tmp/index-inline.js
+          echo "### Inline JavaScript in index.html" | tee -a validation-report/summary.md
+          node --check /tmp/index-inline.js >validation-report/index-inline.out 2>&1
+          status=$?
+          cat validation-report/index-inline.out
+          if [ $status -ne 0 ]; then
+            overall=1
+            echo "- ❌ index.html inline JavaScript" | tee -a validation-report/summary.md
+            echo '```text' >> validation-report/summary.md
+            cat validation-report/index-inline.out >> validation-report/summary.md
+            echo '```' >> validation-report/summary.md
+            echo "#### Extracted source with line numbers" >> validation-report/summary.md
+            echo '```text' >> validation-report/summary.md
+            nl -ba validation-report/index-inline.js | sed -n '1,160p' >> validation-report/summary.md
+            echo '```' >> validation-report/summary.md
+          else
+            echo "- ✅ index.html inline JavaScript" | tee -a validation-report/summary.md
+          fi
+          if [ $overall -eq 0 ]; then
+            echo "### Result: PASS" | tee -a validation-report/summary.md
+          else
+            echo "### Result: FAIL" | tee -a validation-report/summary.md
+            echo "See the step summary and validation-report artifact for exact errors and source." | tee -a validation-report/summary.md
+          fi
+          cat validation-report/summary.md >> "$GITHUB_STEP_SUMMARY"
+          exit $overall
+
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-report-${{ github.run_id }}
+          path: validation-report/
+          if-no-files-found: warn
+          retention-days: 14
