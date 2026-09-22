@@ -5057,7 +5057,7 @@ GRADE1_INTERACTIVE.writing = GRADE1_INTERACTIVE_WRITING;
         ).join('');
         let controls='<div class="grade-graph-help">'+(q.graphHelp||'Tap a bar to answer.')+'</div>';
         if(q.graphMode==='total'){
-            controls+='<div class="grade-graph-answer-choices">'+(q.graphTotalChoices||[]).map(v=>'<button type="button" class="grade-choice" onclick="handleGraphTotalChoice(\\''+v+'\\')">'+v+'</button>').join('')+'</div>';
+            controls+='<div class="grade-graph-answer-choices">'+(q.graphTotalChoices||[]).map(v=>'<button type="button" class="grade-choice" onclick="handleGraphTotalChoice(\''+v+'\')">'+v+'</button>').join('')+'</div>';
         }
         return '<div class="grade-interactive-box"><div class="grade-graph-title">'+q.graphTitle+'</div><div class="grade-graph-y"><span>'+max+'</span><span>'+Math.ceil(max/2)+'</span><span>0</span></div><div class="grade-graph-area">'+bars+'</div>'+controls+'</div>';
     }
