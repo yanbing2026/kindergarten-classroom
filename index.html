@@ -680,6 +680,8 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
   .world-connector { min-width: 7px; margin-top: 17px; }
 }
 
+/* ---------- Ten-frame and Place Value controls ---------- */
+.grade-tenframe{display:grid;grid-template-columns:repeat(5,44px);grid-template-rows:repeat(2,44px);gap:5px;justify-content:center;margin:12px auto}.grade-tenframe-cell{border:2px solid #9b9185;background:#fff;border-radius:6px;cursor:pointer}.grade-tenframe-cell.filled{background:#6b7280;box-shadow:inset 0 0 0 5px #fff}.grade-tenframe-count{text-align:center;font-weight:800}.grade-place-visual{display:flex;justify-content:center;gap:28px;flex-wrap:wrap}.grade-place-label{text-align:center;font-weight:900;margin-bottom:6px}.grade-ten-groups{display:flex;flex-wrap:wrap;gap:7px;max-width:210px;justify-content:center}.grade-ten-group{display:grid;grid-template-columns:repeat(5,12px);gap:3px;padding:5px;border:2px solid #9b9185;border-radius:7px}.grade-ten-group span{width:12px;height:12px;border-radius:50%;background:#6b7280}.grade-ones{display:flex;flex-wrap:wrap;gap:6px;max-width:120px}.grade-one-dot{width:22px;height:22px;border-radius:50%;background:#6b7280}.grade-place-inputs{display:flex;justify-content:center;gap:12px;margin:14px 0;flex-wrap:wrap}.grade-place-inputs label{font-weight:800}.grade-place-inputs input{width:62px;margin-left:5px;font-size:18px;padding:8px;border:2px solid #cfc6b8;border-radius:8px}@media(max-width:420px){.grade-tenframe{grid-template-columns:repeat(5,40px);grid-template-rows:repeat(2,40px);gap:4px}.grade-tenframe-cell{min-width:40px;min-height:40px}}
 /* ---------- Word Problem interaction controls ---------- */
 .grade-word-story-icon{text-align:center;font-size:2rem;margin-bottom:4px}.grade-word-objects{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;max-width:360px;margin:10px auto}.grade-word-object{width:42px;height:42px;border:2px solid #cfc6b8;border-radius:50%;background:#fff;font-size:1.35rem;cursor:pointer;line-height:1}.grade-word-object.selected{transform:scale(1.08);outline:3px solid #6b7280;background:#f1f1f1}.grade-word-counter{text-align:center;font-weight:800;margin:6px}.grade-word-actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
 /* ---------- Data & Graphs interaction controls ---------- */
@@ -4916,6 +4918,12 @@ GRADE1_INTERACTIVE.writing = GRADE1_INTERACTIVE_WRITING;
             else if(i%8===5 && unitIndex===4){const sides=4;q.interaction='shape';q.shapeSides=sides;q.shapeChoices=[...shapePool].sort(()=>Math.random()-.5);}
             else if(i%8===6 && unitIndex===3){const answer=clockTimes[i%clockTimes.length];q.interaction='clock';q.clockAnswer=answer;q.clockChoices=[answer,clockTimes[(i+2)%12],clockTimes[(i+5)%12],clockTimes[(i+8)%12]];}
             else if(i%8===7 && (unitIndex===1||unitIndex===2)){const base=Number(q.answer)||10;q.interaction='sortnumbers';q.sortNumbers=[Math.max(0,base-7),base,base+4,base+9];}
+            else if(unitIndex===1 && i%7===0){
+                const count=5+(i%6);q.interaction='tenframe';q.tenFrameMode='frame';q.tenFrameCount=count;q.prompt='Show '+count+' on the ten-frame.';q.answer=String(count);q.hint='Fill one space for each object.';q.explanation='You filled '+count+' spaces.';
+            }
+            else if(unitIndex===2 && i%5===0){
+                const value=21+(i%8)*10+(i%5);q.interaction='tenframe';q.tenFrameMode='tensones';q.tensAnswer=Math.floor(value/10);q.onesAnswer=value%10;q.prompt='How many tens and ones make '+value+'?';q.answer=String(value);q.hint='A ten is a group of 10.';q.explanation=value+' has '+q.tensAnswer+' tens and '+q.onesAnswer+' ones.';
+            }
             else if(unitIndex===5 && i%6===0){
                 const a=2+(i%5),b=1+(i%4),add=i%2===0,answer=add?a+b:Math.max(0,a-b);
                 q.interaction='wordproblem';q.wordTotal=add?answer+2:a+2;q.wordAnswer=answer;q.wordIcon=add?'🍎':'🚗';
@@ -4952,8 +4960,22 @@ GRADE1_INTERACTIVE.writing = GRADE1_INTERACTIVE_WRITING;
         if(q.interaction==='sortnumbers')return '<div class="grade-interactive-box"><div class="grade-interactive-label">Tap numbers from smallest to largest</div><div class="grade-sort-selected" id="numberSortSelected"><span class="grade-sort-empty">Your order will appear here.</span></div><div class="grade-sort-words">'+q.sortNumbers.map(n=>'<button class="grade-choice grade-sort-word" type="button" onclick="handleNumberSortChoice('+n+')">'+n+'</button>').join('')+'</div><button class="grade-sort-reset" type="button" onclick="resetNumberSort()">↺ Reset order</button><button class="grade-interactive-check" type="button" onclick="checkNumberSort()">✓ Check order</button></div>';
         if(q.interaction==='graph')return renderGradeGraph(q);
         if(q.interaction==='wordproblem')return renderWordProblemInteraction(q);
+        if(q.interaction==='tenframe')return renderTenFrameInteraction(q);
         return '';
     }
+    function renderTenFrameInteraction(q){
+        if(q.tenFrameMode==='tensones'){
+            const tens=Number(q.tenAnswer)||0,ones=Number(q.onesAnswer)||0;
+            const groups=Array.from({length:tens},(_,i)=>'<div class="grade-ten-group" aria-label="one group of ten">'+Array.from({length:10},()=>'<span></span>').join('')+'</div>').join('');
+            const oneDots=Array.from({length:ones},()=>'<span class="grade-one-dot"></span>').join('');
+            return '<div class="grade-interactive-box"><div class="grade-place-visual"><div><div class="grade-place-label">Tens</div><div class="grade-ten-groups">'+groups+'</div></div><div><div class="grade-place-label">Ones</div><div class="grade-ones">'+oneDots+'</div></div></div><div class="grade-place-inputs"><label>Tens <input id="gradeTensAnswer" inputmode="numeric" maxlength="2" /></label><label>Ones <input id="gradeOnesAnswer" inputmode="numeric" maxlength="2" /></label></div><button type="button" class="grade-interactive-check" onclick="checkTensOnes()">✓ Check</button></div>';
+        }
+        const count=Number(q.tenFrameCount)||5,dots=Array.from({length:10},(_,i)=>'<button type="button" class="grade-tenframe-cell '+(i<count?'filled':'')+'" onclick="toggleTenFrameCell(this)" aria-label="ten frame space '+(i+1)+'"></button>').join('');
+        return '<div class="grade-interactive-box"><div class="grade-interactive-label">Fill the ten-frame to show '+count+'</div><div class="grade-tenframe">'+dots+'</div><div class="grade-tenframe-count" id="tenFrameCounter">0 filled</div><button type="button" class="grade-interactive-check" onclick="checkTenFrame()">✓ Check</button></div>';
+    }
+    function toggleTenFrameCell(el){if(gradeQuiz?.awaitingNext)return;el.classList.toggle('filled');const c=document.querySelectorAll('.grade-tenframe-cell.filled').length,e=document.getElementById('tenFrameCounter');if(e)e.textContent=c+' filled';}
+    function checkTenFrame(){const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];if(!q)return;const c=document.querySelectorAll('.grade-tenframe-cell.filled').length;finishInteractiveAnswer(c===Number(q.tenFrameCount),'A ten-frame helps you see how many objects there are.');}
+    function checkTensOnes(){const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];if(!q)return;const t=document.getElementById('gradeTensAnswer'),o=document.getElementById('gradeOnesAnswer');if(!t||!o)return;const correct=Number(t.value)===Number(q.tensAnswer)&&Number(o.value)===Number(q.onesAnswer);finishInteractiveAnswer(correct,'The tens tell how many groups of ten. The ones tell how many are left.');}
     function renderWordProblemInteraction(q){
         const total=Math.max(1,Math.min(12,Number(q.wordTotal)||8));
         const objects=Array.from({length:total},(_,i)=>'<button type="button" class="grade-word-object" onclick="toggleWordObject(this)" aria-label="object '+(i+1)+'">●</button>').join('');
