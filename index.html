@@ -680,6 +680,8 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
   .world-connector { min-width: 7px; margin-top: 17px; }
 }
 
+/* ---------- Word Problem interaction controls ---------- */
+.grade-word-story-icon{text-align:center;font-size:2rem;margin-bottom:4px}.grade-word-objects{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;max-width:360px;margin:10px auto}.grade-word-object{width:42px;height:42px;border:2px solid #cfc6b8;border-radius:50%;background:#fff;font-size:1.35rem;cursor:pointer;line-height:1}.grade-word-object.selected{transform:scale(1.08);outline:3px solid #6b7280;background:#f1f1f1}.grade-word-counter{text-align:center;font-weight:800;margin:6px}.grade-word-actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
 /* ---------- Data & Graphs interaction controls ---------- */
 .grade-graph-title{font-weight:900;text-align:center;margin-bottom:8px}.grade-graph-area{height:175px;display:flex;align-items:flex-end;justify-content:space-around;gap:8px;border-left:2px solid #8d8479;border-bottom:2px solid #8d8479;padding:8px 6px 0 22px;position:relative}.grade-graph-bar-wrap{border:0;background:transparent;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;min-width:48px;height:100%;cursor:pointer;font:inherit}.grade-graph-bar{display:block;width:34px;background:#6b7280;border-radius:7px 7px 0 0;min-height:18px}.grade-graph-count{font-size:.8rem;font-weight:900}.grade-graph-label{font-size:.72rem;font-weight:800;white-space:nowrap}.grade-graph-y{position:absolute;display:flex;flex-direction:column;justify-content:space-between;height:160px;font-size:.68rem;color:#766c60}.grade-graph-help{text-align:center;font-size:.78rem;color:#766c60;margin-top:8px}@media(max-width:420px){.grade-graph-label{font-size:.62rem}.grade-graph-bar{width:27px}.grade-graph-bar-wrap{min-width:40px}}
 /* ---------- Additional Math interaction controls ---------- */
@@ -4914,6 +4916,12 @@ GRADE1_INTERACTIVE.writing = GRADE1_INTERACTIVE_WRITING;
             else if(i%8===5 && unitIndex===4){const sides=4;q.interaction='shape';q.shapeSides=sides;q.shapeChoices=[...shapePool].sort(()=>Math.random()-.5);}
             else if(i%8===6 && unitIndex===3){const answer=clockTimes[i%clockTimes.length];q.interaction='clock';q.clockAnswer=answer;q.clockChoices=[answer,clockTimes[(i+2)%12],clockTimes[(i+5)%12],clockTimes[(i+8)%12]];}
             else if(i%8===7 && (unitIndex===1||unitIndex===2)){const base=Number(q.answer)||10;q.interaction='sortnumbers';q.sortNumbers=[Math.max(0,base-7),base,base+4,base+9];}
+            else if(unitIndex===5 && i%6===0){
+                const a=2+(i%5),b=1+(i%4),add=i%2===0,answer=add?a+b:Math.max(0,a-b);
+                q.interaction='wordproblem';q.wordTotal=add?answer+2:a+2;q.wordAnswer=answer;q.wordIcon=add?'🍎':'🚗';
+                q.prompt=add?'There are '+a+' apples. '+b+' more apples are added. How many apples are there now?':'There are '+a+' cars. '+b+' cars leave. How many cars are left?';
+                q.answer=String(answer);q.hint=add?'Count all the apples after adding more.':'Take away the cars that leave.';q.explanation=add?'Adding '+a+' and '+b+' gives '+answer+'.':'Subtracting '+b+' from '+a+' leaves '+answer+'.';
+            }
             else if(unitIndex===3 && i%6===0){const g=graphSets[i%graphSets.length];q.interaction='graph';q.graphTitle=g.title;q.graphLabels=g.labels;q.graphValues=g.values;q.graphAnswerIndex=g.values.indexOf(Math.max(...g.values));q.prompt='Which category has the most?';q.answer=g.labels[q.graphAnswerIndex];q.hint='Look for the tallest bar.';q.explanation='The tallest bar shows the greatest number.';}
         }));
         return bank;
@@ -4943,8 +4951,17 @@ GRADE1_INTERACTIVE.writing = GRADE1_INTERACTIVE_WRITING;
         if(q.interaction==='clock')return '<div class="grade-interactive-box"><div class="grade-interactive-label">Tap the clock that shows '+q.clockAnswer+'</div><div class="grade-clock-grid">'+q.clockChoices.map(time=>'<button type="button" class="grade-clock-card" onclick="handleClockChoice(\''+time+'\')"><span class="clock-face">'+clockFace(time)+'</span><span>'+time+'</span></button>').join('')+'</div></div>';
         if(q.interaction==='sortnumbers')return '<div class="grade-interactive-box"><div class="grade-interactive-label">Tap numbers from smallest to largest</div><div class="grade-sort-selected" id="numberSortSelected"><span class="grade-sort-empty">Your order will appear here.</span></div><div class="grade-sort-words">'+q.sortNumbers.map(n=>'<button class="grade-choice grade-sort-word" type="button" onclick="handleNumberSortChoice('+n+')">'+n+'</button>').join('')+'</div><button class="grade-sort-reset" type="button" onclick="resetNumberSort()">↺ Reset order</button><button class="grade-interactive-check" type="button" onclick="checkNumberSort()">✓ Check order</button></div>';
         if(q.interaction==='graph')return renderGradeGraph(q);
+        if(q.interaction==='wordproblem')return renderWordProblemInteraction(q);
         return '';
     }
+    function renderWordProblemInteraction(q){
+        const total=Math.max(1,Math.min(12,Number(q.wordTotal)||8));
+        const objects=Array.from({length:total},(_,i)=>'<button type="button" class="grade-word-object" onclick="toggleWordObject(this)" aria-label="object '+(i+1)+'">●</button>').join('');
+        return '<div class="grade-interactive-box"><div class="grade-word-story-icon">'+(q.wordIcon||'⭐')+'</div><div class="grade-word-objects" id="wordProblemObjects">'+objects+'</div><div class="grade-word-counter" id="wordProblemCounter">0 selected</div><div class="grade-word-actions"><button type="button" class="grade-interactive-check" onclick="checkWordProblem()">✓ Check</button><button type="button" class="grade-sort-reset" onclick="resetWordProblem()">↺ Reset</button></div></div>';
+    }
+    function toggleWordObject(el){if(gradeQuiz?.awaitingNext)return;el.classList.toggle('selected');const box=document.getElementById('wordProblemObjects'),counter=document.getElementById('wordProblemCounter');if(box&&counter)counter.textContent=box.querySelectorAll('.selected').length+' selected';}
+    function resetWordProblem(){document.querySelectorAll('#wordProblemObjects .selected').forEach(el=>el.classList.remove('selected'));const counter=document.getElementById('wordProblemCounter');if(counter)counter.textContent='0 selected';}
+    function checkWordProblem(){const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx],box=document.getElementById('wordProblemObjects');if(!q||!box)return;const selected=box.querySelectorAll('.selected').length;finishInteractiveAnswer(selected===Number(q.wordAnswer),q.explanation||'Use the story to decide whether to add or subtract.');}
     function renderGradeGraph(q){
         const max=Math.max(...q.graphValues), bars=q.graphLabels.map((label,i)=>'<button type="button" class="grade-graph-bar-wrap" onclick="handleGraphChoice('+i+')" aria-label="'+label+': '+q.graphValues[i]+'"><span class="grade-graph-count">'+q.graphValues[i]+'</span><span class="grade-graph-bar" style="height:'+Math.max(18,Math.round((q.graphValues[i]/max)*130))+'px"></span><span class="grade-graph-label">'+label+'</span></button>').join('');
         return '<div class="grade-interactive-box"><div class="grade-graph-title">'+q.graphTitle+'</div><div class="grade-graph-y"><span>'+max+'</span><span>'+(Math.ceil(max/2))+'</span><span>0</span></div><div class="grade-graph-area">'+bars+'</div><div class="grade-graph-help">Tap a bar to answer.</div></div>';
