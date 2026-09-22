@@ -4531,7 +4531,7 @@ GRADE1_INTERACTIVE.writing = window.KC_G1_WRITING;
         }));
         return bank;
     }
-    const GRADE1_MATH_BANK = diversifyGrade1MathBank(buildGrade1MathBank());
+    const GRADE1_MATH_BANK = window.KC_G1_MATH || [];
     GRADE1_INTERACTIVE.math = GRADE1_MATH_BANK;
 
     // ---------- Grade 1 core-subject interactive banks ----------
