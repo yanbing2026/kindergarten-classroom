@@ -4905,7 +4905,7 @@ GRADE1_INTERACTIVE.writing = GRADE1_INTERACTIVE_WRITING;
         return [u1,u2,u3,u4,u5,u6].map((lessons,i)=>({unit: GRADE1_INTERACTIVE.math[i].unit,lessons}));
     }
     function diversifyGrade1MathBank(bank){
-        const shapePool=[{name:'triangle',symbol:'△'},{name:'square',symbol:'□'},{name:'rectangle',symbol:'▭'},{name:'hexagon',symbol:'⬡'}];
+        const shapePool=[{name:'triangle',symbol:'△',sides:3},{name:'square',symbol:'□',sides:4},{name:'rectangle',symbol:'▭',sides:4},{name:'hexagon',symbol:'⬡',sides:6}];
         const clockTimes=['1:00','2:00','3:00','4:00','5:00','6:00','7:00','8:00','9:00','10:00','11:00','12:00'];
         const graphSets=[
             {title:'Favorite fruit',labels:['Apples','Bananas','Grapes','Oranges'],values:[6,4,8,5]},
@@ -4915,49 +4915,71 @@ GRADE1_INTERACTIVE.writing = GRADE1_INTERACTIVE_WRITING;
         ];
         bank.forEach((unit,unitIndex)=>unit.lessons.forEach((q,i)=>{
             q.type='choice';
-            if(i%8===1 && /^-?\\d+(?:\\.\\d+)?$/.test(String(q.answer))){q.type='number';q.placeholder='Type the number';q.numeric=true;}
-            else if(i%8===2 && /^\\d+$/.test(String(q.answer))){q.interaction='numberline';}
-            else if(i%8===3 && /^\\d+$/.test(String(q.answer)) && Number(q.answer)<=10){q.interaction='count';q.count=Math.max(2,Number(q.answer));}
-            else if(i%8===4 && /^\\d+$/.test(String(q.answer))){q.interaction='compare';q.compareA=Math.max(0,Number(q.answer)-2);q.compareB=Number(q.answer);}
-            else if(i%8===5 && unitIndex===4){const sides=4;q.interaction='shape';q.shapeSides=sides;q.shapeChoices=[...shapePool].sort(()=>Math.random()-.5);}
-            else if(i%8===6 && unitIndex===3){const answer=clockTimes[i%clockTimes.length];q.interaction='clock';q.clockAnswer=answer;q.clockChoices=[answer,clockTimes[(i+2)%12],clockTimes[(i+5)%12],clockTimes[(i+8)%12]];}
-            else if(i%8===7 && (unitIndex===1||unitIndex===2)){const base=Number(q.answer)||10;q.interaction='sortnumbers';q.sortNumbers=[Math.max(0,base-7),base,base+4,base+9];}
-            else if(unitIndex===3 && i%9===1){
-                const len=4+(i%7);q.interaction='measurement';q.measureMode='measure';q.measureLength=len;q.measureIcon=['▰','●','▲','◆'][i%4];q.prompt='How many units long is the object?';q.answer=String(len);q.hint='Start at 0 and count the equal spaces.';q.explanation='The object is '+len+' units long.';
-            }
-            else if(unitIndex===3 && i%9===2){
-                const a=3+(i%4),b=a+2+(i%3),names=['Pencil','Crayon','Book'];const icons=[{name:names[0],length:a},{name:names[1],length:b},{name:names[2],length:a+1}];q.interaction='measurement';q.measureMode='compare';q.compareIcons=icons;q.measureCorrectIndex=1;q.comparePrompt='Which object is longest?';q.prompt='Compare the object lengths.';q.answer=names[1];q.hint='Look at which bar reaches farthest.';q.explanation=names[1]+' is the longest.';
-            }
-            else if(unitIndex===3 && i%9===3){
-                const vals=[{name:'Pencil',length:2+i%2},{name:'Crayon',length:4+i%2},{name:'Book',length:6+i%2}];q.interaction='measurement';q.measureMode='sort';q.measureOrder=vals;q.prompt='Put these objects in order from shortest to longest.';q.answer='Pencil, Crayon, Book';q.hint='Choose the shortest first.';q.explanation='The lengths increase from Pencil to Crayon to Book.';
-            }
-            else if(unitIndex===1 && i%7===0){
-                const count=5+(i%6);q.interaction='tenframe';q.tenFrameMode='frame';q.tenFrameCount=count;q.prompt='Show '+count+' on the ten-frame.';q.answer=String(count);q.hint='Fill one space for each object.';q.explanation='You filled '+count+' spaces.';
-            }
-            else if(unitIndex===2 && i%5===0){
-                const value=21+(i%8)*10+(i%5);q.interaction='tenframe';q.tenFrameMode='tensones';q.tensAnswer=Math.floor(value/10);q.onesAnswer=value%10;q.prompt='How many tens and ones make '+value+'?';q.answer=String(value);q.hint='A ten is a group of 10.';q.explanation=value+' has '+q.tensAnswer+' tens and '+q.onesAnswer+' ones.';
-            }
-            else if(unitIndex===5 && i%6===0){
+            const answerNum=Number(q.answer);
+            if(i%8===1 && /^-?\d+(?:\.\d+)?$/.test(String(q.answer))){
+                q.type='number';q.placeholder='Type the number';q.numeric=true;
+            }else if(i%8===2 && unitIndex===0 && /^\d+$/.test(String(q.answer))){
+                q.interaction='numberline';
+            }else if(i%8===3 && unitIndex===0 && /^\d+$/.test(String(q.answer)) && answerNum<=10){
+                q.interaction='count';q.count=Math.max(2,answerNum);
+            }else if(i%8===4 && unitIndex===0 && /^\d+$/.test(String(q.answer))){
+                q.interaction='compare';q.compareA=Math.max(0,answerNum-2);q.compareB=answerNum;
+            }else if(i%8===5 && unitIndex===4){
+                const sides=[3,4,4,6][i%4];
+                q.interaction='shape';q.shapeSides=sides;q.shapeAnswer=shapePool.find(x=>x.sides===sides).name;q.shapeChoices=[...shapePool].sort(()=>Math.random()-.5);
+            }else if(i%8===6 && unitIndex===3){
+                const answer=clockTimes[i%clockTimes.length];
+                q.interaction='clock';q.clockAnswer=answer;q.clockChoices=[answer,clockTimes[(i+2)%12],clockTimes[(i+5)%12],clockTimes[(i+8)%12]];
+            }else if(i%8===7 && (unitIndex===1||unitIndex===2)){
+                const base=Math.max(0,Math.min(120,answerNum||10));
+                q.interaction='sortnumbers';q.sortNumbers=[Math.max(0,base-7),base,Math.min(120,base+4),Math.min(120,base+9)];
+            }else if(unitIndex===3 && i%9===1){
+                const len=4+(i%7);
+                q.interaction='measurement';q.measureMode='measure';q.measureLength=len;q.measureIcon=['▰','●','▲','◆'][i%4];
+                q.prompt='How many units long is the object?';q.answer=String(len);q.hint='Start at 0 and count the equal spaces.';q.explanation='The object is '+len+' units long.';
+            }else if(unitIndex===3 && i%9===2){
+                const a=3+(i%4),b=a+2+(i%3),names=['Pencil','Crayon','Book'];
+                q.interaction='measurement';q.measureMode='compare';
+                q.compareIcons=[{name:names[0],length:a},{name:names[1],length:b},{name:names[2],length:a+1}];
+                q.measureCorrectIndex=1;q.comparePrompt='Which object is longest?';q.prompt='Compare the object lengths.';q.answer=names[1];
+                q.hint='Look at which bar reaches farthest.';q.explanation=names[1]+' is the longest.';
+            }else if(unitIndex===3 && i%9===3){
+                const vals=[{name:'Pencil',length:2+i%2},{name:'Crayon',length:4+i%2},{name:'Book',length:6+i%2}];
+                q.interaction='measurement';q.measureMode='sort';q.measureOrder=vals;q.prompt='Put these objects in order from shortest to longest.';
+                q.answer='Pencil, Crayon, Book';q.hint='Choose the shortest first.';q.explanation='The lengths increase from Pencil to Crayon to Book.';
+            }else if(unitIndex===1 && i%7===0){
+                const count=5+(i%6);q.interaction='tenframe';q.tenFrameMode='frame';q.tenFrameCount=count;
+                q.prompt='Show '+count+' on the ten-frame.';q.answer=String(count);q.hint='Fill one space for each object.';q.explanation='You filled '+count+' spaces.';
+            }else if(unitIndex===2 && i%5===0){
+                const value=21+(i%8)*10+(i%5);q.interaction='tenframe';q.tenFrameMode='tensones';
+                q.tensAnswer=Math.floor(value/10);q.onesAnswer=value%10;q.prompt='How many tens and ones make '+value+'?';q.answer=String(value);
+                q.hint='A ten is a group of 10.';q.explanation=value+' has '+q.tensAnswer+' tens and '+q.onesAnswer+' ones.';
+            }else if(unitIndex===5 && i%6===0){
                 const a=2+(i%5),b=1+(i%4),add=i%2===0,answer=add?a+b:Math.max(0,a-b);
                 q.interaction='wordproblem';q.wordTotal=add?answer+2:a+2;q.wordAnswer=answer;q.wordIcon=add?'🍎':'🚗';
                 q.prompt=add?'There are '+a+' apples. '+b+' more apples are added. How many apples are there now?':'There are '+a+' cars. '+b+' cars leave. How many cars are left?';
-                q.answer=String(answer);q.hint=add?'Count all the apples after adding more.':'Take away the cars that leave.';q.explanation=add?'Adding '+a+' and '+b+' gives '+answer+'.':'Subtracting '+b+' from '+a+' leaves '+answer+'.';
-            }
-            else if(unitIndex===3 && i%6===0){
-                const sets=[
-                    {title:'Favorite fruit',labels:['Apples','Bananas','Grapes','Oranges'],values:[6,4,8,5]},
-                    {title:'Books read',labels:['Ana','Ben','Kai','Mia'],values:[3,7,5,4]},
-                    {title:'Pets at home',labels:['Cats','Dogs','Fish','Birds'],values:[5,8,3,6]},
-                    {title:'Sunny days',labels:['Mon','Tue','Wed','Thu'],values:[4,7,6,3]}
-                ];
-                const g=sets[(i/6|0)%sets.length], mode=(i/6)%4, max=Math.max(...g.values),min=Math.min(...g.values);
+                q.answer=String(answer);q.hint=add?'Count all the apples after adding more.':'Take away the cars that leave.';
+                q.explanation=add?'Adding '+a+' and '+b+' gives '+answer+'.':'Subtracting '+b+' from '+a+' leaves '+answer+'.';
+            }else if(unitIndex===3 && i%6===0){
+                const g=graphSets[(i/6|0)%graphSets.length],mode=(i/6)%4,max=Math.max(...g.values),min=Math.min(...g.values),total=g.values.reduce((a,b)=>a+b,0);
                 q.interaction='graph';q.graphLabels=g.labels;q.graphValues=g.values;q.graphTitle=g.title;
-                if(mode===0){q.graphMode='most';q.prompt='Which category has the most?';q.answer=g.labels[g.values.indexOf(max)];q.graphHelp='Tap the tallest bar.';q.hint='Look for the tallest bar.';q.explanation=q.answer+' has '+max+'.';}
-                else if(mode===1){q.graphMode='least';q.prompt='Which category has the least?';q.answer=g.labels[g.values.indexOf(min)];q.graphHelp='Tap the shortest bar.';q.hint='Look for the shortest bar.';q.explanation=q.answer+' has '+min+'.';}
-                else if(mode===2){let hi=g.values.indexOf(max),lo=g.values.indexOf(min);q.graphMode='difference';q.graphCompare=[hi,lo];q.prompt='How many more are there in '+g.labels[hi]+' than '+g.labels[lo]+'?';q.answer=String(max-min);q.graphHelp='Tap the taller bar, then the shorter bar.';q.hint='Subtract the smaller amount from the larger amount.';q.explanation=max+' − '+min+' = '+(max-min)+'.';}
-                else {q.graphMode='total';q.prompt='How many are there altogether?';q.answer=String(g.values.reduce((a,b)=>a+b,0));q.graphHelp='Tap any bar to answer with the total.';q.hint='Add all the bars together.';q.explanation=g.values.join(' + ')+' = '+q.answer+'.';}
+                if(mode===0){
+                    q.graphMode='most';q.prompt='Which category has the most?';q.answer=g.labels[g.values.indexOf(max)];
+                    q.graphHelp='Tap the tallest bar.';q.hint='Look for the tallest bar.';q.explanation=q.answer+' has '+max+'.';
+                }else if(mode===1){
+                    q.graphMode='least';q.prompt='Which category has the least?';q.answer=g.labels[g.values.indexOf(min)];
+                    q.graphHelp='Tap the shortest bar.';q.hint='Look for the shortest bar.';q.explanation=q.answer+' has '+min+'.';
+                }else if(mode===2){
+                    const hi=g.values.indexOf(max),lo=g.values.indexOf(min);
+                    q.graphMode='difference';q.graphCompare=[hi,lo];q.prompt='How many more are there in '+g.labels[hi]+' than '+g.labels[lo]+'?';
+                    q.answer=String(max-min);q.graphHelp='Tap the taller bar first, then the shorter bar.';q.hint='Subtract the smaller amount from the larger amount.';
+                    q.explanation=max+' − '+min+' = '+(max-min)+'.';
+                }else{
+                    q.graphMode='total';q.prompt='How many are there altogether?';q.answer=String(total);
+                    q.graphTotalChoices=[String(total),String(total-2),String(total+2),String(total+4)];
+                    q.graphHelp='Add all four bars. Then choose the total.';q.hint='Add every bar together.';q.explanation=g.values.join(' + ')+' = '+total+'.';
+                }
             }
-const g=graphSets[i%graphSets.length];q.interaction='graph';q.graphTitle=g.title;q.graphLabels=g.labels;q.graphValues=g.values;q.graphAnswerIndex=g.values.indexOf(Math.max(...g.values));q.prompt='Which category has the most?';q.answer=g.labels[q.graphAnswerIndex];q.hint='Look for the tallest bar.';q.explanation='The tallest bar shows the greatest number.';}
         }));
         return bank;
     }
@@ -5029,11 +5051,15 @@ const g=graphSets[i%graphSets.length];q.interaction='graph';q.graphTitle=g.title
     function resetWordProblem(){document.querySelectorAll('#wordProblemObjects .selected').forEach(el=>el.classList.remove('selected'));const counter=document.getElementById('wordProblemCounter');if(counter)counter.textContent='0 selected';}
     function checkWordProblem(){const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx],box=document.getElementById('wordProblemObjects');if(!q||!box)return;const selected=box.querySelectorAll('.selected').length;finishInteractiveAnswer(selected===Number(q.wordAnswer),q.explanation||'Use the story to decide whether to add or subtract.');}
     function renderGradeGraph(q){
-        const max=Math.max(...q.graphValues), min=Math.min(...q.graphValues);
+        const max=Math.max(...q.graphValues);
         const bars=q.graphLabels.map((label,i)=>
           '<button type="button" class="grade-graph-bar-wrap" onclick="handleGraphChoice('+i+')" aria-label="'+label+': '+q.graphValues[i]+'"><span class="grade-graph-count">'+q.graphValues[i]+'</span><span class="grade-graph-bar" style="height:'+Math.max(18,Math.round((q.graphValues[i]/Math.max(1,max))*130))+'px"></span><span class="grade-graph-label">'+label+'</span></button>'
         ).join('');
-        return '<div class="grade-interactive-box"><div class="grade-graph-title">'+q.graphTitle+'</div><div class="grade-graph-y"><span>'+max+'</span><span>'+Math.ceil(max/2)+'</span><span>0</span></div><div class="grade-graph-area">'+bars+'</div><div class="grade-graph-help">'+(q.graphHelp||'Tap a bar to answer.')+'</div></div>';
+        let controls='<div class="grade-graph-help">'+(q.graphHelp||'Tap a bar to answer.')+'</div>';
+        if(q.graphMode==='total'){
+            controls+='<div class="grade-graph-answer-choices">'+(q.graphTotalChoices||[]).map(v=>'<button type="button" class="grade-choice" onclick="handleGraphTotalChoice(\\''+v+'\\')">'+v+'</button>').join('')+'</div>';
+        }
+        return '<div class="grade-interactive-box"><div class="grade-graph-title">'+q.graphTitle+'</div><div class="grade-graph-y"><span>'+max+'</span><span>'+Math.ceil(max/2)+'</span><span>0</span></div><div class="grade-graph-area">'+bars+'</div>'+controls+'</div>';
     }
     function clockFace(time){const parts=String(time).split(':').map(Number),h=parts[0]%12,m=parts[1]||0,ha=(h*30)+(m*0.5),ma=m*6;return '<svg viewBox="0 0 100 100" class="clock-svg" aria-hidden="true"><circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="3"/><line x1="50" y1="50" x2="'+(50+24*Math.sin(ha*Math.PI/180))+'" y2="'+(50-24*Math.cos(ha*Math.PI/180))+'" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><line x1="50" y1="50" x2="'+(50+34*Math.sin(ma*Math.PI/180))+'" y2="'+(50-34*Math.cos(ma*Math.PI/180))+'" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="50" r="3" fill="currentColor"/></svg>';
     }
@@ -5042,24 +5068,24 @@ const g=graphSets[i%graphSets.length];q.interaction='graph';q.graphTitle=g.title
         const feedback=document.getElementById('gradeFeedback');
         if(correct){gradeQuiz.awaitingNext=true;if(gradeQuiz.firstAttempt)gradeQuiz.correctFirstTry++;gradeQuiz.stars++;awardStar();const key=gradeQuiz.gradeId+'_'+gradeQuiz.courseIndex+'_'+gradeQuiz.unitIndex;progress.gradeMastery=progress.gradeMastery||{};progress.gradeMastery[key]=(progress.gradeMastery[key]||0)+(gradeQuiz.firstAttempt?1:0);saveProgress();logActivity('grade',gradeQuiz.gradeId+'_'+gradeQuiz.courseIndex,gradeQuiz.unit?.unit||'Math',true,gradeQuiz.firstAttempt);if(feedback)feedback.textContent='✓ Correct! '+feedbackText;speak('Correct! '+feedbackText);confettiBurst();scheduleNavigation(nextGradeQuestion,900);}else{gradeQuiz.firstAttempt=false;gradeQuiz.wrongAttempts++;if(feedback)feedback.textContent='Try again. '+(gradeQuiz.unit.lessons[gradeQuiz.idx].hint||'Think carefully.');}}
     function handleGraphChoice(i){
-        const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];if(!q)return;
+        const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];if(!q||gradeQuiz.awaitingNext)return;
         if(q.graphMode==='difference'){
             gradeQuiz.graphPicked=gradeQuiz.graphPicked||[];
             if(gradeQuiz.graphPicked.includes(i))return;
             gradeQuiz.graphPicked.push(i);
-            const bars=document.querySelectorAll('.grade-graph-bar-wrap');bars[i]?.classList.add('picked');
+            document.querySelectorAll('.grade-graph-bar-wrap')[i]?.classList.add('picked');
             if(gradeQuiz.graphPicked.length===2){
                 const ok=gradeQuiz.graphPicked[0]===q.graphCompare[0]&&gradeQuiz.graphPicked[1]===q.graphCompare[1];
                 finishInteractiveAnswer(ok,'Choose the taller bar first, then the shorter bar.');
             }
             return;
         }
-        if(q.graphMode==='total'){
-            const input=prompt('Type the total number:');
-            if(input!==null)finishInteractiveAnswer(String(input).trim()===String(q.answer),'Add every bar together.');
-            return;
-        }
+        if(q.graphMode==='total')return;
         finishInteractiveAnswer(q.answer===q.graphLabels[i],'Compare the bar heights carefully.');
+    }
+    function handleGraphTotalChoice(value){
+        const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];if(!q||gradeQuiz.awaitingNext)return;
+        finishInteractiveAnswer(String(value)===String(q.answer),'Add every bar together.');
     }
     function handleShapeChoice(value){const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];if(!q)return;finishInteractiveAnswer(String(value)===String(q.answer),q.explanation||'Count the sides of the shape.');}
     function handleClockChoice(value){const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];if(!q)return;finishInteractiveAnswer(String(value)===String(q.clockAnswer),q.explanation||'Look at where the hour and minute hands point.');}
@@ -5078,7 +5104,7 @@ const g=graphSets[i%graphSets.length];q.interaction='graph';q.graphTitle=g.title
     function resetGradeSort(){if(!gradeQuiz||gradeQuiz.awaitingNext)return;gradeQuiz.sortPicked=[];render();}
     function handleGradeNumberSubmit(){if(!gradeQuiz||gradeQuiz.awaitingNext)return;const q=gradeQuiz.unit.lessons[gradeQuiz.idx],el=document.getElementById('gradeNumberAnswer'),feedback=document.getElementById('gradeFeedback');if(!el)return;const value=String(el.value).trim().replace(/,/g,'');const correct=value===String(q.answer);if(correct){gradeQuiz.awaitingNext=true;if(gradeQuiz.firstAttempt)gradeQuiz.correctFirstTry++;gradeQuiz.stars++;awardStar();const key=gradeQuiz.gradeId+'_'+gradeQuiz.courseIndex+'_'+gradeQuiz.unitIndex;progress.gradeMastery=progress.gradeMastery||{};progress.gradeMastery[key]=(progress.gradeMastery[key]||0)+(gradeQuiz.firstAttempt?1:0);saveProgress();logActivity('grade',gradeQuiz.gradeId+'_'+gradeQuiz.courseIndex,q.title,true,gradeQuiz.firstAttempt);feedback.textContent='✓ Correct! '+q.explanation;speak('Correct! '+q.explanation);confettiBurst();scheduleNavigation(nextGradeQuestion,900);}else{el.classList.add('incorrect');gradeQuiz.firstAttempt=false;gradeQuiz.wrongAttempts++;feedback.textContent='Try again. '+q.hint;speak('Try again. '+q.hint);}}
     function handleGradeTextSubmit(){if(!gradeQuiz||gradeQuiz.awaitingNext)return;const q=gradeQuiz.unit.lessons[gradeQuiz.idx],el=document.getElementById('gradeTextAnswer'),feedback=document.getElementById('gradeFeedback');if(!el)return;const result=gradeWritingScore(el.value,q);if(!result.good){gradeQuiz.firstAttempt=false;gradeQuiz.wrongAttempts++;feedback.textContent='Keep going. '+q.hint+' Score '+result.score+'/'+result.max+'. '+result.wordCount+' words.';speak('Keep going. '+q.hint);return;}gradeQuiz.awaitingNext=true;if(gradeQuiz.firstAttempt)gradeQuiz.correctFirstTry++;gradeQuiz.stars++;awardStar();const key=gradeQuiz.gradeId+'_'+gradeQuiz.courseIndex+'_'+gradeQuiz.unitIndex;progress.gradeMastery=progress.gradeMastery||{};progress.gradeMastery[key]=(progress.gradeMastery[key]||0)+(gradeQuiz.firstAttempt?1:0);saveProgress();logActivity('grade',gradeQuiz.gradeId+'_'+gradeQuiz.courseIndex,q.title,true,gradeQuiz.firstAttempt);feedback.textContent='✓ Writing check: '+result.score+'/'+result.max+'. '+q.explanation;speak('Nice writing! '+q.explanation);confettiBurst();scheduleNavigation(nextGradeQuestion,1200);}
-    function nextGradeQuestion(){gradeQuiz.idx++;gradeQuiz.firstAttempt=true;gradeQuiz.wrongAttempts=0;gradeQuiz.awaitingNext=false;gradeQuiz.sortPicked=[];if(gradeQuiz.idx>=gradeQuiz.unit.lessons.length){go('gradeUnitEnd',{grade:gradeQuiz.gradeId,courseIndex:gradeQuiz.courseIndex,unitIndex:gradeQuiz.unitIndex});}else render();}
+    function nextGradeQuestion(){gradeQuiz.idx++;gradeQuiz.firstAttempt=true;gradeQuiz.wrongAttempts=0;gradeQuiz.awaitingNext=false;gradeQuiz.sortPicked=[];gradeQuiz.graphPicked=[];if(gradeQuiz.idx>=gradeQuiz.unit.lessons.length){go('gradeUnitEnd',{grade:gradeQuiz.gradeId,courseIndex:gradeQuiz.courseIndex,unitIndex:gradeQuiz.unitIndex});}else render();}
     function renderGradeUnitEnd(){const grade=GRADE_CURRICULUM.find(g=>g.id===gradeQuiz.gradeId),course=grade.courses[gradeQuiz.courseIndex],unit=gradeQuiz.unit;return topbar(true)+'<div class="center-col"><div class="grade-end"><div style="font-size:4rem;">🏆</div><h2>Unit Complete!</h2><div class="grade-score">'+gradeQuiz.correctFirstTry+'/'+unit.lessons.length+' first-try correct</div><div class="grade-end-stat">💎 +'+gradeQuiz.stars+' diamonds</div><div class="grade-end-stat">📚 '+grade.label+' · '+course.name+'</div><div class="grade-end-stat">UNIT '+(gradeQuiz.unitIndex+1)+' · '+unit.unit+'</div><div class="grade-end-actions"><button onclick="startGradeUnit(\''+gradeQuiz.gradeId+'\','+gradeQuiz.courseIndex+','+gradeQuiz.unitIndex+')">↻ Try Again</button><button onclick="go(\'gradeCourse\',{grade:\''+gradeQuiz.gradeId+'\',courseIndex:'+gradeQuiz.courseIndex+'})">📚 Back to Course</button></div></div></div>';}
 
 
