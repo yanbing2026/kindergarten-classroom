@@ -2111,7 +2111,9 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         blipolaVoiceSession += 1;
         navigationTimers.forEach(timer => clearTimeout(timer));
         navigationTimers.clear();
-        if (timedInterval) {
+        // Guard optional timer state so navigation never fails if the timer
+        // variable has not been initialized yet on a fresh page load.
+        if (typeof timedInterval !== 'undefined' && timedInterval) {
             clearInterval(timedInterval);
             timedInterval = null;
         }
