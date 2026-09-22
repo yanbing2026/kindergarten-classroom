@@ -387,7 +387,7 @@
     /* ---------- Home dashboard ---------- */
     .home-hero{text-align:center;padding:8px 12px 16px}.home-kicker{font-weight:900;letter-spacing:.12em;font-size:.78rem;opacity:.7}.home-hero h1{margin:6px 0 4px}.home-hero p{margin:0;color:#777}
     .today-card{display:flex;align-items:center;gap:14px;max-width:760px;margin:0 auto 20px;padding:18px;border:3px solid #d9b44a;border-radius:22px;background:linear-gradient(135deg,#fff9d8,#fff);box-shadow:0 6px 0 rgba(0,0,0,.08);cursor:pointer}.today-icon{font-size:2.5rem}.today-copy{flex:1;min-width:0;text-align:left}.today-kicker{font-size:.75rem;font-weight:900;letter-spacing:.1em;color:#9b7410}.today-title{font-size:1.35rem;font-weight:900;margin-top:2px}.today-sub{color:#777;margin-top:3px}.today-card .big-btn{width:auto;min-width:110px;margin:0}
-    .home-section-title{max-width:760px;margin:18px auto 10px;padding:0 4px}.home-featured{max-width:760px;margin:0 auto}.home-tools{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px}.home-tool{border:2px solid rgba(43,27,14,.12);border-radius:16px;padding:13px 10px;background:#fff;font:inherit;font-weight:800;cursor:pointer;min-height:52px}.home-tool:active,.today-card:active{transform:translateY(1px)}
+    .home-section-title{max-width:760px;margin:18px auto 10px;padding:0 4px}.home-featured{max-width:760px;margin:0 auto}.home-grade-menu{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 18px}.home-grade-card{min-height:92px;padding:12px 8px;background:#f3e6c8;border:3px solid var(--mc-ink);border-radius:6px;box-shadow:inset 2px 2px 0 rgba(255,255,255,.35),inset -2px -2px 0 rgba(0,0,0,.16);cursor:pointer;text-align:center}.home-grade-card:active{transform:translateY(2px)}.home-grade-icon{font-size:1.8rem;line-height:1.2}.home-grade-label{font-family:var(--font-pixel);font-size:.72rem;margin-top:5px}.home-grade-sub{font-size:.65rem;opacity:.65;margin-top:4px}.home-grade-card.active-grade{background:#d9f1df}.home-grade-card.planned-grade{opacity:.82}@media(max-width:600px){.home-grade-menu{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.home-grade-card{min-height:78px;padding:9px 6px}.home-grade-icon{font-size:1.5rem}.home-grade-label{font-size:.62rem}.home-grade-sub{font-size:.58rem}}@media(max-width:360px){.home-grade-menu{gap:6px}.home-grade-card{min-height:72px}.home-grade-icon{font-size:1.35rem}}.home-tools{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px}.home-tool{border:2px solid rgba(43,27,14,.12);border-radius:16px;padding:13px 10px;background:#fff;font:inherit;font-weight:800;cursor:pointer;min-height:52px}.home-tool:active,.today-card:active{transform:translateY(1px)}
     @media(max-width:560px){.today-card{flex-wrap:wrap}.today-card .big-btn{width:100%}.home-hero h1{font-size:1.65rem}}
 
         /* ---------- BlockQuest Classroom Animation System ---------- */
@@ -2275,25 +2275,23 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
     function renderHome() {
         const lesson = getTodayLesson();
         const mathSolved = Object.values(progress.mathCorrect).reduce((a, b) => a + (b || 0), 0);
-        const featured = ['letters', 'numbers', 'words', 'math'].map(key => CATEGORIES.find(c => c.key === key)).filter(Boolean);
-        const cards = featured.map(c => {
-            const { mastered, total } = categoryMasteredAllLevels(c);
-            const sub = c.key === 'math' ? `${mathSolved} solved` : `${mastered}/${total} mastered`;
-            const action = c.leveled ? `go('level', {key:'${c.key}'})` : `go('category', {key:'${c.key}', level:'L1'})`;
-            return `<div class="card cat-${c.key}" onclick="${action}"><div class="icon">${c.icon}</div><div class="label">${c.name}</div><div class="sublabel">${sub}</div></div>`;
-        }).join('');
         const todayAction = 'startTodayAdventure()';
         const lessonLabel = lesson.item ? (lesson.cat.key === 'letters' ? lesson.item.id : lesson.cat.key === 'numbers' ? lesson.item.n : lesson.item.id) : lesson.cat.name;
-        return `${topbar(false)}
-        <div class="home-hero"><div class="home-kicker">⛏️ BLOCKQUEST CLASSROOM</div><h1>Ready for an adventure?</h1><p>Learn a little. Play a little. Build your skills!</p></div>
-        ${renderDailyMissions()}
-        ${renderTodayReview()}
-        <div class="today-card" onclick="${todayAction}"><div class="today-icon">⭐</div><div class="today-copy"><div class="today-kicker">TODAY'S ADVENTURE</div><div class="today-title">${lesson.cat.icon} ${lesson.cat.name}</div><div class="today-sub">${lesson.reason}${lesson.item ? ' • ' + lessonLabel : ''}</div></div><button class="big-btn play">START ▶</button></div>
-        <h2 class="home-section-title">🎮 Play & Learn</h2><div class="grid home-featured">${cards}</div>
-        <h2 class="home-section-title">🌎 More Learning</h2>
-        <div class="home-tools"><button class="home-tool" onclick="go('category',{key:'chinese',level:'L1'})">🇨🇳 Chinese</button><button class="home-tool" onclick="go('category',{key:'spanish',level:'L1'})">🇪🇸 Spanish</button><button class="home-tool" onclick="go('freeplay')">🎨 Free Play</button><button class="home-tool" onclick="go('draw')">✏️ Draw</button><button class="home-tool" onclick="go('worksheets')">🖨️ Worksheets</button><button class="home-tool" onclick="startTimedChallenge()">⏱️ Challenge</button><button class="home-tool" onclick="go('progress')">🏆 Progress</button><button class="home-tool" onclick="go('grades',{grade:'prek'})">📚 Grades Pre-K–8</button></div>
-        <div class="footer">You have 💎 ${progress.stars} diamonds. Keep learning!</div>`;
+        const gradeCards = GRADE_CURRICULUM.map(g => {
+            const ready = g.courses.some(c => c.ready);
+            const courseCount = g.courses.length;
+            return '<button class="home-grade-card '+(ready?'active-grade':'planned-grade')+'" onclick="go(\'grades\',{grade:\''+g.id+'\'})"><div class="home-grade-icon">'+g.icon+'</div><div class="home-grade-label">'+g.label+'</div><div class="home-grade-sub">'+courseCount+' courses · '+(ready?'PLAY NOW':'BUILDING')+'</div></button>';
+        }).join('');
+        return topbar(false)+
+        '<div class="home-hero"><div class="home-kicker">⛏️ BLOCKQUEST CLASSROOM</div><h1>Choose your grade</h1><p>Your learning journey starts here.</p></div>'+
+        renderDailyMissions()+
+        renderTodayReview()+
+        '<div class="today-card" onclick="'+todayAction+'"><div class="today-icon">⭐</div><div class="today-copy"><div class="today-kicker">TODAY\'S ADVENTURE</div><div class="today-title">'+lesson.cat.icon+' '+lesson.cat.name+'</div><div class="today-sub">'+lesson.reason+(lesson.item ? ' • '+lessonLabel : '')+'</div></div><button class="big-btn play">START ▶</button></div>'+
+        '<h2 class="home-section-title">📚 Grades Pre-K–8</h2><div class="home-grade-menu">'+gradeCards+'</div>'+
+        '<h2 class="home-section-title">🎮 More Learning</h2><div class="home-tools"><button class="home-tool" onclick="go(\'category\',{key:\'chinese\',level:\'L1\'})">🇨🇳 Chinese</button><button class="home-tool" onclick="go(\'category\',{key:\'spanish\',level:\'L1\'})">🇪🇸 Spanish</button><button class="home-tool" onclick="go(\'freeplay\')">🎨 Free Play</button><button class="home-tool" onclick="go(\'draw\')">✏️ Draw</button><button class="home-tool" onclick="go(\'worksheets\')">🖨️ Worksheets</button><button class="home-tool" onclick="startTimedChallenge()">⏱️ Challenge</button><button class="home-tool" onclick="go(\'progress\')">🏆 Progress</button></div>'+
+        '<div class="footer">💎 '+progress.stars+' diamonds · Pick a grade to explore its courses.</div>';
     }
+
     // ---------- Render: Level picker ----------
     function renderLevelPicker() {
         const key = state.params.key;
