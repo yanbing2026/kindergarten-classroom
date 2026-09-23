@@ -3850,21 +3850,69 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         if(!window.KCData||!window.KCData.playerId()) return '<div class="parent-card" id="cloudParentProgress"><h3>☁️ Cloud learning report</h3><div class="parent-progress-label">Cloud sync is not linked yet.</div></div>';
         return '<div class="parent-card" id="cloudParentProgress"><h3>☁️ Cloud learning report</h3><div class="parent-progress-label">Loading your saved learning progress…</div></div>';
     }
+    function cloudEscape(value){
+        return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+    function cloudUnitKey(value){
+        return String(value||'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,80);
+    }
+    function cloudGradeData(id){
+        return GRADE_CURRICULUM.find(g=>g.id===id||(
+            id==='grade-1'&&g.id==='g1')||(id==='grade-2'&&g.id==='g2')||
+            (id==='kindergarten'&&g.id==='k')||(id==='pre-k'&&g.id==='prek'));
+    }
+    function cloudSubjectForCourse(course){
+        return gradeInteractiveKey(course)||courseSubjectType(course?.name||'');
+    }
+    function cloudCourseUnits(grade,course){
+        const subject=cloudSubjectForCourse(course);
+        const bank=grade?.id==='k'?KINDERGARTEN_INTERACTIVE:grade?.id==='g2'?GRADE2_INTERACTIVE:GRADE1_INTERACTIVE;
+        const interactive=bank&&bank[subject];
+        if(interactive&&interactive.length) return interactive.map(u=>u.unit);
+        return (GRADE_SUBJECT_UNITS[subject]||[]).slice();
+    }
+    function cloudTrackedMap(rows){
+        const map={};
+        (rows||[]).forEach(r=>{
+            const key=[r.grade_level,r.subject_key,r.unit_key].join('|');
+            map[key]=r;
+        });
+        return map;
+    }
+    function cloudTreeUnitRow(gradeId,subjectKey,unitTitle,tracked){
+        const key=[gradeId,subjectKey,cloudUnitKey(unitTitle)].join('|');
+        const r=tracked[key];
+        const mastery=r?Math.max(0,Math.min(100,Math.round(Number(r.mastery||0)))):0;
+        const status=cloudReportStatus(mastery,r?.attempts||0);
+        const label=r?status.label:'Not started';
+        return '<div class="cloud-tree-unit"><div class="cloud-tree-unit-main"><span>'+cloudEscape(unitTitle)+'</span><span>'+status.icon+' '+label+'</span></div><div class="parent-progress" style="height:9px;margin:5px 0"><div class="parent-progress-fill" style="width:'+mastery+'%"></div></div><div class="parent-progress-label">'+(r?mastery+'% mastery · '+Number(r.attempts||0)+' attempts · '+Number(r.correct||0)+' correct':'No attempts yet')+'</div></div>';
+    }
     function renderCloudParentProgressRows(rows){
         const filtered=rows.filter(r=>(cloudReportGrade==='all'||r.grade_level===cloudReportGrade)&&(cloudReportSubject==='all'||r.subject_key===cloudReportSubject));
-        if(!filtered.length) return '<div class="parent-good">No cloud progress matches this selection yet.</div>';
-        const byGrade={};
-        filtered.forEach(r=>{const g=r.grade_level||'unknown';(byGrade[g]||(byGrade[g]=[])).push(r);});
-        return Object.keys(byGrade).sort().map(g=>{
-            const items=byGrade[g];
-            const avg=Math.round(items.reduce((a,r)=>a+Number(r.mastery||0),0)/items.length);
-            const details=items.slice().sort((a,b)=>Number(b.mastery||0)-Number(a.mastery||0)).map(r=>{
-                const mastery=Math.max(0,Math.min(100,Math.round(Number(r.mastery||0))));
-                const status=cloudReportStatus(mastery,r.attempts);
-                return '<div style="padding:10px 0;border-top:1px solid #ddd"><div class="parent-focus-row" style="border:0;padding:0"><span><strong>'+String(cloudSubjectLabel(r.subject_key||'subject')+' · '+(r.unit_key||'unit')).replace(/</g,'&lt;')+'</strong></span><span>'+status.icon+' '+status.label+'</span></div><div class="parent-progress" style="margin:6px 0 4px;height:12px"><div class="parent-progress-fill" style="width:'+mastery+'%"></div></div><div class="parent-progress-label">'+mastery+'% mastery · '+Number(r.attempts||0)+' attempts · '+Number(r.correct||0)+' correct · '+Number(r.first_try_correct||0)+' first try</div></div>';
+        const tracked=cloudTrackedMap(rows);
+        const grades=(cloudReportGrade==='all'?GRADE_CURRICULUM.filter(g=>g.id!=='prek'||true):GRADE_CURRICULUM.filter(g=>cloudGradeLabel(g.id=== 'g1'?'grade-1':g.id=== 'g2'?'grade-2':g.id==='k'?'kindergarten':g.id==='prek'?'pre-k':g.id)===cloudGradeLabel(cloudReportGrade)||g.id===cloudReportGrade));
+        if(!grades.length && filtered.length===0) return '<div class="parent-good">No cloud progress matches this selection yet.</div>';
+        const html=grades.map(grade=>{
+            const gradeId=grade.id==='g1'?'grade-1':grade.id==='g2'?'grade-2':grade.id==='k'?'kindergarten':grade.id==='prek'?'pre-k':grade.id;
+            const courses=grade.courses.filter(course=>{
+                const subject=cloudSubjectForCourse(course);
+                return cloudReportSubject==='all'||subject===cloudReportSubject;
+            });
+            if(!courses.length) return '';
+            const gradeRows=filtered.filter(r=>r.grade_level===gradeId);
+            const gradeAvg=gradeRows.length?Math.round(gradeRows.reduce((a,r)=>a+Number(r.mastery||0),0)/gradeRows.length):0;
+            const courseHtml=courses.map(course=>{
+                const subject=cloudSubjectForCourse(course);
+                const units=cloudCourseUnits(grade,course);
+                const subjectRows=gradeRows.filter(r=>r.subject_key===subject);
+                const subjectAvg=subjectRows.length?Math.round(subjectRows.reduce((a,r)=>a+Number(r.mastery||0),0)/subjectRows.length):0;
+                const unitHtml=units.map(u=>cloudTreeUnitRow(gradeId,subject,u,tracked)).join('');
+                return '<details class="cloud-tree-subject"><summary><span>'+cloudEscape(course.icon||'📚')+' '+cloudEscape(course.name)+'</span><span>'+subjectAvg+'%</span></summary><div class="cloud-tree-units">'+unitHtml+'</div></details>';
             }).join('');
-            return '<div style="margin-bottom:18px"><div style="display:flex;justify-content:space-between;font-weight:900"><span>'+cloudGradeLabel(g)+'</span><span>'+avg+'% average</span></div><div class="parent-progress" style="margin:7px 0 4px"><div class="parent-progress-fill" style="width:'+avg+'%"></div></div>'+details+'</div>';
+            return '<details class="cloud-tree-grade" '+(cloudReportGrade!=='all'?'open':'')+'><summary><span>'+cloudEscape(grade.icon||'📘')+' '+cloudEscape(grade.label)+'</span><span>'+gradeAvg+'%</span></summary><div class="cloud-tree-subjects">'+courseHtml+'</div></details>';
         }).join('');
+        if(!html && filtered.length) return '<div class="parent-good">Cloud progress exists, but its curriculum labels are not mapped yet.</div>';
+        return '<div class="cloud-tree-note">Expand a grade, subject, and unit to see detailed progress.</div>'+html;
     }
     function renderCloudTrend(activity){
         const byDay={};
