@@ -144,6 +144,31 @@
     return { ok:true, sent, remaining:loadQueue().length };
   }
 
+  async function fetchNormalizedProgress() {
+    const id = playerId();
+    if (!id || !window.supa) return { ok:false, rows:[], reason:'normalized auth not linked' };
+    const { data, error } = await window.supa
+      .from('player_progress')
+      .select('grade_level,subject_key,unit_key,mastery,stars,attempts,correct,first_try_correct,metadata,updated_at')
+      .eq('player_id', id)
+      .order('updated_at', { ascending:false });
+    return error ? { ok:false, rows:[], error:error.message } : { ok:true, rows:data || [] };
+  }
+
+  async function fetchRecentActivity(days) {
+    const id = playerId();
+    if (!id || !window.supa) return { ok:false, rows:[], reason:'normalized auth not linked' };
+    const since = new Date(Date.now() - Math.max(1, Number(days) || 7) * 86400000).toISOString();
+    const { data, error } = await window.supa
+      .from('activity_events')
+      .select('grade_level,subject_key,unit_key,event_type,correct,first_try,score,duration_ms,metadata,created_at')
+      .eq('player_id', id)
+      .gte('created_at', since)
+      .order('created_at', { ascending:false })
+      .limit(500);
+    return error ? { ok:false, rows:[], error:error.message } : { ok:true, rows:data || [] };
+  }
+
   function status() {
     const account = currentAccount();
     return {
@@ -174,6 +199,8 @@
     recordDailyGoal,
     flush,
     flushNormalized,
+    fetchNormalizedProgress,
+    fetchRecentActivity,
     setPlayerId,
     playerId,
     status,
