@@ -3976,6 +3976,43 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         }).join('');
     }
 
+    function renderCloudRecoveryTimeline(rows){
+        const groups={};
+        (rows||[]).forEach(function(x){
+            const type=String(x.event_type||x.eventType||'').toLowerCase();
+            if(type!=='remediation'&&type!=='transfer') return;
+            const meta=x.metadata&&typeof x.metadata==='object'?x.metadata:{};
+            const skillId=meta.skillId||meta.skill?.skillId||x.subject_key||x.subjectKey;
+            if(!skillId) return;
+            const k=String(skillId);
+            const g=groups[k]||(groups[k]={events:[],lastAt:0});
+            const at=x.created_at||x.createdAt||'';
+            const ts=Date.parse(at)||0;
+            const step=meta.stepType||meta.step||'';
+            const misconception=meta.misconception||'';
+            const title=type==='transfer'?(x.correct===true?'Transfer check passed':'Transfer check attempted'):(meta.stepCompleted?'Recovery practice completed':(step?recoveryStepLabel(step):'Recovery practice attempted'));
+            const detail=[];
+            if(at) detail.push(recoveryDate(at));
+            if(meta.attempt) detail.push('attempt '+Number(meta.attempt));
+            if(meta.transferAttempts) detail.push('transfer '+Number(meta.transferAttempts));
+            if(misconception) detail.push(String(misconception).replace(/-/g,' '));
+            if(x.correct===true) detail.push('correct');
+            const key=String(ts)+'|'+type+'|'+String(step)+'|'+String(meta.attempt||'')+'|'+String(x.correct);
+            if(!g.events.some(function(e){return e.key===key;})) g.events.push({key:key,ts:ts,html:'<span class="parent-timeline-dot">'+(x.correct===true?'✓':'•')+'</span><div><strong>'+cloudEscape(title)+'</strong><div class="parent-progress-label">'+cloudEscape(detail.join(' · '))+'</div></div>'});
+            g.lastAt=Math.max(g.lastAt,ts);
+        });
+        const out=Object.entries(groups).map(function(pair){
+            const g=pair[1];
+            g.events.sort(function(a,b){return a.ts-b.ts;});
+            return {skillId:pair[0],events:g.events.slice(-12),lastAt:g.lastAt};
+        }).sort(function(a,b){return b.lastAt-a.lastAt;});
+        if(!out.length) return '<div class="parent-progress-label">No cloud recovery activity for this filter yet.</div>';
+        return out.slice(0,6).map(function(g){
+            const name=cloudEscape(String(g.skillId).replace(/^[^.]+\./,'').replace(/-/g,' '));
+            return '<div class="parent-recovery-timeline"><div class="parent-recovery-title"><strong>'+name+'</strong><span>Cloud history</span></div>'+g.events.map(function(e){return '<div class="parent-timeline-item">'+e.html+'</div>';}).join('')+'</div>';
+        }).join('');
+    }
+
     function refreshCloudParentReport(){
         const box=document.getElementById('cloudParentProgress');
         if(!box) return;
@@ -3990,6 +4027,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         const correct=cloudReportActivity.filter(x=>x.correct===true).length;
         const firstTry=cloudReportActivity.filter(x=>x.first_try===true).length;
         const days=new Set(cloudReportActivity.map(x=>String(x.created_at||'').slice(0,10)).filter(Boolean)).size;
+        const cloudSkillActivityForView=cloudReportSkillActivity.filter(x=>(cloudReportGrade==='all'||x.grade_level===cloudReportGrade)&&(cloudReportSubject==='all'||x.subject_key===cloudReportSubject));
         const skillMap={};
         cloudSkillActivityForView.forEach(x=>{
             const meta=x.metadata&&typeof x.metadata==='object'?x.metadata:{};
@@ -4001,7 +4039,6 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             const mm=meta.misconception||meta.skill?.lastMisconception;
             if(mm)s.misconception=mm;
         });
-        const cloudSkillActivityForView=cloudReportSkillActivity.filter(x=>(cloudReportGrade==='all'||x.grade_level===cloudReportGrade)&&(cloudReportSubject==='all'||x.subject_key===cloudReportSubject));
         const cloudSkills=Object.entries(skillMap).map(([skillId,s])=>{
             const mastery=s.attempts?Math.round(s.correct/s.attempts*100):0;
             const due=s.last && (Date.now()-new Date(s.last).getTime())>=7*86400000;
@@ -4010,7 +4047,8 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         }).sort((a,b)=>a.mastery-b.mastery).slice(0,8);
         const cloudSkillHtml=cloudSkills.length?'<div class="parent-card" style="margin:12px 0 0;background:#fafafa"><h3>🧠 Cloud skill history · 30 days</h3>'+cloudSkills.map(s=>'<div class="parent-focus-row"><span><strong>'+cloudEscape(String(s.skillId).replace(/^[^.]+\./,'').replace(/-/g,' '))+'</strong><br><span class="parent-progress-label">'+s.attempts+' attempts · '+s.firstTry+' first try'+(s.misconception?' · common error: '+cloudEscape(String(s.misconception).replace(/-/g,' ')):'')+'</span></span><span>'+s.status+' · '+s.mastery+'%</span></div>').join('')+'</div>':'<div class="parent-card" style="margin:12px 0 0;background:#fafafa"><h3>🧠 Cloud skill history</h3><div class="parent-progress-label">No skill-level cloud activity yet.</div></div>';
         const cloudTimelineHtml='<div class="parent-card" style="margin:12px 0 0;background:#fafafa"><h3>📈 Skill progress · 30 days</h3>'+renderCloudSkillTimeline(cloudReportSkillActivity)+'</div>';
-        box.innerHTML='<h3>☁️ Cloud learning report</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px"><select aria-label="Grade filter" onchange="cloudReportGrade=this.value;refreshCloudParentReport()">'+gradeOptions.replace('value="all">','value="all"'+(cloudReportGrade==='all'?' selected':'')+'>').replace('value="'+cloudReportGrade+'">','value="'+cloudReportGrade+'" selected>')+'</select><select aria-label="Subject filter" onchange="cloudReportSubject=this.value;refreshCloudParentReport()">'+subjectOptions.replace('value="all">','value="all"'+(cloudReportSubject==='all'?' selected':'')+'>').replace('value="'+cloudReportSubject+'">','value="'+cloudReportSubject+'" selected>')+'</select></div><div class="parent-grid" style="margin:0 0 12px"><div class="parent-stat"><div class="parent-stat-number">'+avg+'%</div><div>Avg mastery</div></div><div class="parent-stat"><div class="parent-stat-number">'+filtered.length+'</div><div>Units tracked</div></div><div class="parent-stat"><div class="parent-stat-number">'+needs+'</div><div>Needs practice</div></div></div>'+renderCloudParentProgressRows(filtered)+'<div class="parent-card" style="margin:12px 0 0;background:#fafafa"><h3>📈 Recent trend</h3>'+renderCloudTrend(cloudReportActivity)+'</div>'+cloudSkillHtml+cloudTimelineHtml+'<div class="parent-progress-label" style="margin-top:10px">Last 7 days: '+attempts+' attempts · '+correct+' correct · '+firstTry+' first try · active '+days+' day'+(days===1?'':'s')+'</div>';
+        const cloudRecoveryHtml='<div class="parent-card" style="margin:12px 0 0;background:#fafafa"><h3>🕒 Cloud recovery timeline</h3><div class="parent-progress-label">Recovery practice and transfer checks follow the learner across devices.</div>'+renderCloudRecoveryTimeline(cloudSkillActivityForView)+'</div>';
+        box.innerHTML='<h3>☁️ Cloud learning report</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px"><select aria-label="Grade filter" onchange="cloudReportGrade=this.value;refreshCloudParentReport()">'+gradeOptions.replace('value="all">','value="all"'+(cloudReportGrade==='all'?' selected':'')+'>').replace('value="'+cloudReportGrade+'">','value="'+cloudReportGrade+'" selected>')+'</select><select aria-label="Subject filter" onchange="cloudReportSubject=this.value;refreshCloudParentReport()">'+subjectOptions.replace('value="all">','value="all"'+(cloudReportSubject==='all'?' selected':'')+'>').replace('value="'+cloudReportSubject+'">','value="'+cloudReportSubject+'" selected>')+'</select></div><div class="parent-grid" style="margin:0 0 12px"><div class="parent-stat"><div class="parent-stat-number">'+avg+'%</div><div>Avg mastery</div></div><div class="parent-stat"><div class="parent-stat-number">'+filtered.length+'</div><div>Units tracked</div></div><div class="parent-stat"><div class="parent-stat-number">'+needs+'</div><div>Needs practice</div></div></div>'+renderCloudParentProgressRows(filtered)+'<div class="parent-card" style="margin:12px 0 0;background:#fafafa"><h3>📈 Recent trend</h3>'+renderCloudTrend(cloudReportActivity)+'</div>'+cloudSkillHtml+cloudTimelineHtml+cloudRecoveryHtml+'<div class="parent-progress-label" style="margin-top:10px">Last 7 days: '+attempts+' attempts · '+correct+' correct · '+firstTry+' first try · active '+days+' day'+(days===1?'':'s')+'</div>';
         const gs=box.querySelector('select[aria-label="Grade filter"]'), ss=box.querySelector('select[aria-label="Subject filter"]');
         if(gs) gs.value=cloudReportGrade; if(ss) ss.value=cloudReportSubject;
     }
