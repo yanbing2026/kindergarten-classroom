@@ -4048,12 +4048,22 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             return '<div class="parent-focus-row"><span>' + x.cat.icon + ' <strong>' + x.cat.name + '</strong></span><span>' + status.icon + ' ' + status.label + '</span></div>';
         }).join('');        const adaptiveStats=progress.skillStats&&typeof progress.skillStats==='object'?progress.skillStats:{};
         const skillRows=Object.entries(adaptiveStats).map(([skillId,s])=>({skillId,s})).sort((a,b)=>(Number(a.s.mastery||0)-Number(b.s.mastery||0))).slice(0,8).map(({skillId,s})=>{const mastery=Math.max(0,Math.min(100,Math.round(Number(s.mastery||0))));const due=s.nextReviewAt&&Date.now()>=Number(s.nextReviewAt);const status=due?'🔄 Review due':mastery>=85?'🏆 Strong':mastery>=60?'🌱 Developing':'🎯 Needs practice';const misconception=s.lastMisconception?'<div class="parent-progress-label">Common error: '+cloudEscape(String(s.lastMisconception).replace(/-/g,' '))+'</div>':'';return '<div class="parent-focus-row"><span><strong>'+cloudEscape(String(skillId).replace(/^[^.]+\./,'').replace(/-/g,' '))+'</strong><br><span class="parent-progress-label">'+Number(s.attempts||0)+' attempts · '+Number(s.firstTryCorrect||0)+' first try</span></span><span>'+status+' · '+mastery+'%</span></div>'+misconception;}).join('');
-        return `${topbar(true)}
+                const recoveryStats=Object.entries(adaptiveStats).map(([skillId,s])=>({skillId,s,rem:s.remediation||null})).filter(x=>x.rem && Number(x.rem.attempts||0)>0).sort((a,b)=>Number(b.rem.lastAt?Date.parse(b.rem.lastAt):0)-Number(a.rem.lastAt?Date.parse(a.rem.lastAt):0)).slice(0,8);
+        const recoveryRows=recoveryStats.map(({skillId,s,rem})=>{
+            const name=cloudEscape(String(skillId).replace(/^[^.]+\./,'').replace(/-/g,' '));
+            const attempts=Number(rem.attempts||0), correct=Number(rem.correct||0), steps=Number(rem.stepsCompleted||0), transfers=Number(rem.transfers||0), passed=Number(rem.transferPassed||0);
+            const transfer=transfers?(passed?'✓ Transfer passed':'↻ Transfer in progress'):'Practice steps';
+            const review=s.nextReviewAt?new Date(s.nextReviewAt).toLocaleDateString():'';
+            return '<div class="parent-focus-row" style="display:block"><div style="display:flex;justify-content:space-between;gap:8px"><strong>'+name+'</strong><span>'+transfer+'</span></div><div class="parent-progress-label">'+steps+' steps completed · '+correct+'/'+attempts+' correct · '+(rem.lastMisconception?cloudEscape(String(rem.lastMisconception).replace(/-/g,' ')):'guided practice')+(review?' · Review '+cloudEscape(review):'')+'</div></div>';
+        }).join('');
+        const recoveryCard=recoveryRows?'<div class="parent-card"><h3>🛠️ Skill recovery</h3><div class="parent-progress-label">These skills needed extra practice. Transfer checks help confirm the idea works in a new problem.</div>'+recoveryRows+'</div>':'';
+return `${topbar(true)}
         <div class="parent-dashboard">
             <div class="parent-header"><div><div class="parent-kicker">FOR PARENTS</div><h2>📋 Learning Snapshot</h2><div class="parent-date">${new Date().toLocaleDateString()}</div></div><div class="parent-diamond">💎 ${progress.stars}</div></div>
             <div class="parent-grid"><div class="parent-stat"><div class="parent-stat-number">${pct}%</div><div>Mastered</div></div><div class="parent-stat"><div class="parent-stat-number">${stats.learning}</div><div>Learning</div></div><div class="parent-stat"><div class="parent-stat-number">${stats.review}</div><div>Due for review</div></div></div>
             <div class="parent-card"><h3>📅 Last 7 days</h3><div class="parent-grid" style="margin:0;"><div class="parent-stat"><div class="parent-stat-number">${activity.attempts}</div><div>Attempts</div></div><div class="parent-stat"><div class="parent-stat-number">${activity.correct}</div><div>Correct</div></div><div class="parent-stat"><div class="parent-stat-number">${activity.firstTry}</div><div>First try</div></div></div><div class="parent-progress-label">Active on ${activity.days} day${activity.days === 1 ? "" : "s"}</div></div><div class="parent-card"><h3>🧭 What to focus on</h3>${focus || '<div class="parent-good">🏆 No immediate learning gaps. Keep exploring!</div>'}</div>
             <div class="parent-card"><h3>🧠 Adaptive skill report</h3>${skillRows}</div>
+            ${recoveryCard}
             <div class="parent-card"><h3>📚 Overall progress</h3><div class="parent-progress"><div class="parent-progress-fill" style="width:${pct}%"></div></div><div class="parent-progress-label">${stats.mastered} of ${stats.total} learning items mastered</div></div>
             <div class="parent-card"><h3>📈 Skills practiced this week</h3>${recentSkills || '<div class="parent-good">No activity yet this week.</div>'}</div>
             ${renderCloudParentProgress()}
@@ -4100,6 +4110,8 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             mastery: progress.mastery,
             due: progress.due,
             mathCorrect: progress.mathCorrect,
+            skillStats: progress.skillStats || {},
+            remediationHistory: progress.remediationHistory || [],
             version: 'kc_progress_v1'
         }, null, 2);
         const blob = new Blob([data], { type: 'application/json' });
