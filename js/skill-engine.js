@@ -136,8 +136,12 @@
     const explicit = q.skillId || q.skill || q.skillKey;
     const inferredG1 = (grade === '1' || grade === 'g1' || grade === 'grade-1' || grade === 'grade1')
       ? inferG1Skill(subject, q.title) : null;
-    const inferredWord = (subject === 'math' && interaction === 'wordproblem')
-      ? inferWordProblemSkill(q) : null;
+    const titleText = String(q.title || '').toLowerCase();
+    const looksLikeWordProblem = subject === 'math' && (
+      interaction === 'wordproblem' ||
+      /word problem|math story|solve a story|choose an operation|two-step thinking|story/.test(titleText)
+    );
+    const inferredWord = looksLikeWordProblem ? inferWordProblemSkill(q) : null;
     const skillId = explicit
       ? slug(explicit)
       : inferredWord
@@ -182,6 +186,11 @@
     if(title==='ones place' && selected && selected===String(Math.floor(Number(q.prompt?.match(/\\d+/)?.[0]||0)/10))) return 'tens-ones-confusion';
     if(title==='expanded form' && selected && /\\+/.test(selected)) return 'expanded-form-decomposition';
     if(title==='compare numbers' && selected) return 'place-value-comparison';
+    if(/word problem|math story|solve a story|choose an operation|two-step thinking|story/.test(title)){
+      if(/\b(subtract|minus|left|remain|away|fewer|lost|used|spent)\b/.test(String(q.prompt||'').toLowerCase())) return 'operation-selection-subtraction';
+      if(/\b(add|plus|more|altogether|total|in all|gets?)\b/.test(String(q.prompt||'').toLowerCase())) return 'operation-selection-addition';
+      return 'operation-selection';
+    }
     if(title==='number after' && selected && Number(selected)===Number(answer)-1) return 'counting-direction';
     if(title==='number before' && selected && Number(selected)===Number(answer)+1) return 'counting-direction';
     if(title==='word problem'){
