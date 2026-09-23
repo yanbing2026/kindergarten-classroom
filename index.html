@@ -4136,7 +4136,9 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             const review=s.nextReviewAt?new Date(s.nextReviewAt).toLocaleDateString():'';
             return '<div class="parent-focus-row" style="display:block"><div style="display:flex;justify-content:space-between;gap:8px"><strong>'+name+'</strong><span>'+transfer+'</span></div><div class="parent-progress-label">'+steps+' steps completed · '+correct+'/'+attempts+' correct · '+(rem.lastMisconception?cloudEscape(String(rem.lastMisconception).replace(/-/g,' ')):'guided practice')+(review?' · Review '+cloudEscape(review):'')+'</div></div>';
         }).join('');
-        const recoveryCard=recoveryRows?'<div class="parent-card"><h3>🛠️ Skill recovery</h3><div class="parent-progress-label">These skills needed extra practice. Transfer checks help confirm the idea works in a new problem.</div>'+recoveryRows+'</div>':'';\n        const recoveryTimeline=renderSkillRecoveryTimeline(recoveryStats);\n        const recoveryTimelineCard=recoveryTimeline?'<div class="parent-card"><h3>🕒 Recovery timeline</h3><div class="parent-progress-label">A simple view of how each skill moved from a mistake to practice, transfer, and review.</div>'+recoveryTimeline+'</div>':'';
+        const recoveryCard=recoveryRows?'<div class="parent-card"><h3>🛠️ Skill recovery</h3><div class="parent-progress-label">These skills needed extra practice. Transfer checks help confirm the idea works in a new problem.</div>'+recoveryRows+'</div>':'';
+        const recoveryTimeline=renderSkillRecoveryTimeline(recoveryStats);
+        const recoveryTimelineCard=recoveryTimeline?'<div class="parent-card"><h3>🕒 Recovery timeline</h3><div class="parent-progress-label">A simple view of how each skill moved from a mistake to practice, transfer, and review.</div>'+recoveryTimeline+'</div>':'';
 return `${topbar(true)}
         <div class="parent-dashboard">
             <div class="parent-header"><div><div class="parent-kicker">FOR PARENTS</div><h2>📋 Learning Snapshot</h2><div class="parent-date">${new Date().toLocaleDateString()}</div></div><div class="parent-diamond">💎 ${progress.stars}</div></div>
