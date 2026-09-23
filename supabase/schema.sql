@@ -49,6 +49,8 @@
 -- Event-level learning telemetry
 -- public.activity_events
 -- id bigint PK
+-- client_event_id uuid NOT NULL
+-- UNIQUE(player_id, client_event_id)
 -- player_id uuid -> players(id)
 -- grade_level text
 -- subject_key text
