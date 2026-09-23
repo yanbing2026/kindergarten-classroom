@@ -62,7 +62,8 @@
       return { ok:false, skipped:true, reason:'legacy cloud bridge unavailable' };
     }
     try {
-      const result = await window.cloudSaveProgress(progress);
+      const account = currentAccount();
+      const result = account?.name ? await window.cloudSaveProgress(account.name, progress) : false;
       return { ok:result !== false, legacy:true };
     } catch (error) {
       enqueue('legacy-progress-sync', { message:error?.message || String(error) });
