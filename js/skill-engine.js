@@ -33,7 +33,7 @@
       'expanded form':'tens-and-ones','build a number':'tens-and-ones',
       'measure length':'measure-length','compare length':'measure-length','tell time':'tell-time-hour',
       'read data':'data-counting','name a shape':'shape-attributes','count sides':'shape-attributes',
-      'equal sides':'shape-attributes','shape parts':'shape-attributes','word problem':'addition-word-problems'
+      'equal sides':'shape-attributes','shape parts':'shape-attributes','word problem':'word-problem-structures'
     },
     ela: {
       'short vowel sounds':'phonics-short-long-vowels','consonant blends':'phonics-blends','long vowel patterns':'phonics-short-long-vowels','decode a word':'phonics-short-long-vowels',
@@ -52,6 +52,15 @@
       'solid or liquid?':'matter-materials','materials':'matter-materials','push or pull':'matter-materials','choose a material':'matter-materials'
     }
   };
+
+  function inferWordProblemSkill(q){
+    const text=String((q&&q.prompt)||'').toLowerCase();
+    if(/\b(fly away|gave away|gives away|left|remain|remaining|lost|spent|used|take away|removed|fewer)\b/.test(text))
+      return 'subtraction-word-problems';
+    if(/\b(gets? more|got more|adds?|added|buys? more|find altogether|altogether|in all|total|join)\b/.test(text))
+      return 'addition-word-problems';
+    return 'word-problem-structures';
+  }
 
   function inferG1Skill(subject, title){
     const table=G1_TITLE_SKILLS[subject];
@@ -127,11 +136,15 @@
     const explicit = q.skillId || q.skill || q.skillKey;
     const inferredG1 = (grade === '1' || grade === 'g1' || grade === 'grade-1' || grade === 'grade1')
       ? inferG1Skill(subject, q.title) : null;
+    const inferredWord = (subject === 'math' && interaction === 'wordproblem')
+      ? inferWordProblemSkill(q) : null;
     const skillId = explicit
       ? slug(explicit)
-      : inferredG1
-        ? 'grade1.' + subject + '.' + inferredG1
-        : grade + '.' + subject + '.' + unit + '.' + slug(mapped.concept);
+      : inferredWord
+        ? 'grade1.math.' + inferredWord
+        : inferredG1
+          ? 'grade1.' + subject + '.' + inferredG1
+          : grade + '.' + subject + '.' + unit + '.' + slug(mapped.concept);
 
     const difficulty = Math.max(1, Math.min(5,
       Number(q.difficulty) || Number(context.difficulty) || (
