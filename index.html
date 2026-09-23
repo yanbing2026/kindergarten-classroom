@@ -4949,7 +4949,7 @@ function gradeStageFor(index,total){if(index===0)return {name:'LESSON',copy:'Lea
             }
         });
     }
-    function gradeHint(){const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];if(!q)return;const el=document.getElementById('gradeBlipolaMessage');if(el)el.textContent='💡 '+q.hint;speak(q.hint);}
+    function gradeHint(){const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];if(!q)return;let message=q.hint||'Think about the clue.';if(window.KCSkillEngine){const gradeId=gradeQuiz.gradeId==='g1'?'grade-1':gradeQuiz.gradeId==='g2'?'grade-2':gradeQuiz.gradeId==='k'?'kindergarten':gradeQuiz.gradeId;const course=GRADE_CURRICULUM.find(g=>g.id===gradeQuiz.gradeId)?.courses?.[gradeQuiz.courseIndex];const subjectKey=gradeInteractiveKey(course)||courseSubjectType(course?.name||'');const unitKey=String(gradeQuiz.unit?.unit||('unit-'+(gradeQuiz.unitIndex+1))).toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,80)||('unit-'+(gradeQuiz.unitIndex+1));const rec=window.KCSkillEngine.tutorRecommendation(progress,q,{gradeId,subjectKey,unitKey,unitTitle:gradeQuiz.unit?.unit||null,difficulty:q.difficulty});if(rec?.message)message=rec.message;}const el=document.getElementById('gradeBlipolaMessage');if(el)el.textContent='💡 '+message;speak(message);}
     function gradeInteractiveVisual(q){
         if(!q)return '';
         if(q.interaction==='numberline'){
