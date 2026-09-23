@@ -174,6 +174,50 @@
     return prev;
   }
 
+  function getSkillState(progress, meta){
+    return progress?.skillStats?.[meta?.skillId] || null;
+  }
+
+  function adaptiveScore(q, context){
+    const progress=context?.progress || {};
+    const meta=describeQuestion(q, context);
+    const skill=getSkillState(progress, meta);
+    if(!skill) return 50 + Math.random()*20;
+    const mastery=Number(skill.mastery)||0;
+    let score=(100-mastery);
+    const last=skill.recent?.[skill.recent.length-1];
+    if(last && !last.correct) score += 28;
+    if(skill.lastMisconception) score += 12;
+    if((skill.attempts||0)===0) score += 18;
+    const desired=nextDifficulty(skill);
+    const delta=Math.abs((meta.difficulty||1)-desired);
+    score -= delta*10;
+    return score + Math.random()*18;
+  }
+
+  function selectAdaptiveLessons(lessons, context, count){
+    const pool=[...(lessons||[])];
+    const target=Math.min(Number(count)||4,pool.length);
+    if(!target) return [];
+    const scored=pool.map(q=>({q,score:adaptiveScore(q,context)}))
+      .sort((a,b)=>b.score-a.score);
+    const chosen=[];
+    const seenSkills=new Set();
+    // First pass: cover different weak/unseen skills when possible.
+    for(const item of scored){
+      const meta=describeQuestion(item.q,context);
+      if(!seenSkills.has(meta.skillId)){
+        chosen.push(item.q); seenSkills.add(meta.skillId);
+        if(chosen.length===target) return chosen;
+      }
+    }
+    for(const item of scored){
+      if(chosen.length===target) break;
+      if(!chosen.includes(item.q)) chosen.push(item.q);
+    }
+    return chosen;
+  }
+
   function nextDifficulty(skill){
     if (!skill) return 2;
     if (skill.mastery >= 85 && skill.attempts >= 4) return Math.min(5, (skill.lastDifficulty || 2) + 1);
@@ -186,6 +230,8 @@
     describeQuestion,
     updateSkillEvidence,
     nextDifficulty,
+    adaptiveScore,
+    selectAdaptiveLessons,
     classifyMisconception,
     _slug: slug
   };
