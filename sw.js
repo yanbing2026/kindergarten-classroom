@@ -1,8 +1,9 @@
-const CACHE_NAME = 'kc-shell-v7';
+const CACHE_NAME = 'kc-shell-v8';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.json',
+  './js/data-layer.js',
   './js/blipola-runtime.js',
   './js/blipola-voice.js',
   './icons/icon-192.png',
