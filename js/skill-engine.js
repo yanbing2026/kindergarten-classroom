@@ -315,7 +315,9 @@
       'hour-minute-confusion':['analog-clock-model','hand-identification','guided-time-reading','original-question','transfer-question'],
       'measurement-unit-confusion':['measurement-tool-model','same-unit-comparison','guided-measurement','original-question','transfer-question']
     };
-    const steps=paths[misconception]||['concrete-representation','visual-representation','guided-practice','original-question','transfer-question'];
+    const steps=misconception && paths[misconception]
+      ? paths[misconception]
+      : ['concrete-representation','visual-representation','guided-practice','original-question','transfer-question'];
     return {
       skillId:base, misconception:misconception||null,
       trigger:result&&result.correct===false?'wrong-answer':'review',
