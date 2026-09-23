@@ -5015,6 +5015,14 @@ function gradeStageFor(index,total){if(index===0)return {name:'LESSON',copy:'Lea
                 correct:false,
                 selectedAnswer:answerContext?.selectedAnswer
             },{gradeId,subjectKey,unitKey,unitTitle:gradeQuiz.unit?.unit||null,difficulty:q.difficulty});
+            remediation.question={
+                id:String(q.id||q.lessonId||''),
+                title:q.title||'',
+                prompt:q.prompt||'',
+                answer:q.answer??q.correctAnswer??null,
+                interaction:q.interaction||q.type||'',
+                clockAnswer:q.clockAnswer||null
+            };
             progress.activeRemediation=remediation;
             progress.remediationHistory=Array.isArray(progress.remediationHistory)?progress.remediationHistory:[];
             progress.remediationHistory.unshift({...remediation,createdAt:new Date().toISOString()});
@@ -5044,21 +5052,23 @@ function gradeStageFor(index,total){if(index===0)return {name:'LESSON',copy:'Lea
         });        const daily=ensureDailyState(); const prior=Math.min(3,Number(daily.adaptiveCompletedQuestions)||0); if(prior<3) syncAdaptiveDailyGoal(prior+1);
     }
     function remediationMiniQuestion(rem){
-        const m=rem?.misconception||'';
+        const m=rem?.misconception||'', q=rem?.question||{};
+        const nums=(String(q.prompt||'').match(/\d+/g)||[]).map(Number);
+        const n=nums[0]||34, tens=Math.floor(n/10), ones=n%10;
         const map={
-          'tens-ones-confusion':['In 34, how many tens are there?',['2','3','4'],'3'],
-          'digit-vs-value-confusion':['In 52, what is the value of the 5?',['5','50','2'],'50'],
-          'expanded-form-decomposition':['Which is 47 in expanded form?',['4+7','40+7','47+0'],'40+7'],
-          'place-value-comparison':['Which number is greater?',['38','83','Both'],'83'],
-          'counting-direction':['What comes after 29?',['28','30','39'],'30'],
-          'operation-selection-addition':['You have 4 apples and get 2 more. What should you do?',['Add','Subtract','Count backward'],'Add'],
-          'operation-selection-subtraction':['You have 7 apples and give away 2. What should you do?',['Add','Subtract','Count backward'],'Subtract'],
-          'data-totaling':['A graph shows 3 and 2. What does the total mean?',['Add both amounts','Pick the taller bar','Ignore one bar'],'Add both amounts'],
+          'tens-ones-confusion':['In '+n+', how many tens are there?',[String(Math.max(0,tens-1)),String(tens),String(ones)],String(tens)],
+          'digit-vs-value-confusion':['In '+n+', what is the value of the tens digit?',[String(tens),String(tens*10),String(ones)],String(tens*10)],
+          'expanded-form-decomposition':['Which is '+n+' in expanded form?',[tens+' + '+ones,tens*10+' + '+ones,n+' + 0],tens*10+' + '+ones],
+          'place-value-comparison':['Which number has more tens: '+n+' or '+(n>=50?n-20:n+20)+'?',[String(n),String(n>=50?n-20:n+20),'They are equal'],String(n>=50?n:n+20)],
+          'counting-direction':['What comes after '+n+'?',[String(n-1),String(n+1),String(n+2)],String(n+1)],
+          'operation-selection-addition':['The story says: "gets '+(nums[1]||2)+' more." Which operation fits?',['Add','Subtract','Neither'],'Add'],
+          'operation-selection-subtraction':['The story says: "gives away '+(nums[1]||2)+'." Which operation fits?',['Add','Subtract','Neither'],'Subtract'],
+          'data-totaling':['The graph values are '+(nums[0]||3)+' and '+(nums[1]||2)+'. What does the total mean?',['Add both amounts','Pick one bar','Ignore the graph'],'Add both amounts'],
           'shape-attribute-confusion':['Which shape has 4 equal sides?',['Triangle','Square','Circle'],'Square'],
-          'hour-minute-confusion':['For 3:00, which hand points to 3?',['Hour hand','Minute hand','Both'],'Hour hand'],
-          'measurement-unit-confusion':['When measuring two objects, what should stay the same?',['The unit','The object','The answer'],'The unit']
+          'hour-minute-confusion':['For '+(q.clockAnswer||'3:00')+', which hand tells the hour?',['Hour hand','Minute hand','Both'],'Hour hand'],
+          'measurement-unit-confusion':['When comparing measurements, what should stay the same?',['The unit','The object','The answer'],'The unit']
         };
-        const x=map[m]||['Which strategy can help you solve a tricky question?',['Draw a picture','Guess quickly','Skip it'],'Draw a picture'];
+        const x=map[m]||['Which strategy can help with this question?',['Draw a model','Guess quickly','Skip it'],'Draw a model'];
         return {prompt:x[0],choices:x[1],answer:x[2]};
     }
     function showRemediationStep(){
