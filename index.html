@@ -2155,7 +2155,20 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             ['review','🔄 Review']
         ];
         const tasks = labels.map(([key,label]) => '<span class="review-chip">' + (ensureDailyState().tasks[key] ? '✅ ' : '⬜ ') + label + '</span>').join('');
-        return '<div class="parent-card daily-missions"><div class="parent-header" style="margin:0 0 8px;"><div><div class="parent-kicker">DAILY QUEST</div><h3>⛏️ Today’s Missions</h3></div><div style="font-size:1.4rem;">🔥 ' + m.streak + '</div></div><div class="review-result-chips">' + tasks + '</div><div class="parent-progress-label">' + (m.completed ? '🎉 Complete! +5 💎 earned today.' : m.done + ' of 3 missions complete · Finish all 3 for +5 💎') + '</div></div>';
+        let adaptive = '';
+        if (window.KCSkillEngine) {
+            const mission = window.KCSkillEngine.buildDailyMission(progress,{limit:3});
+            if (mission?.skills?.length) {
+                const focus = mission.skills.map(s => {
+                    const short = String(s.skillId||'').split('.').pop().replace(/-/g,' ');
+                    return '<span class="review-chip">🎯 ' + esc(short) + ' · ' + Math.round(s.mastery) + '%</span>';
+                }).join('');
+                adaptive = '<div class="parent-progress-label" style="margin-top:8px;"><strong>Smart focus:</strong> ' + focus + '</div>';
+            } else {
+                adaptive = '<div class="parent-progress-label" style="margin-top:8px;">🎯 Smart focus: build a new skill today.</div>';
+            }
+        }
+        return '<div class="parent-card daily-missions"><div class="parent-header" style="margin:0 0 8px;"><div><div class="parent-kicker">DAILY QUEST</div><h3>⛏️ Today’s Missions</h3></div><div style="font-size:1.4rem;">🔥 ' + m.streak + '</div></div><div class="review-result-chips">' + tasks + '</div><div class="parent-progress-label">' + (m.completed ? '🎉 Complete! +5 💎 earned today.' : m.done + ' of 3 missions complete · Finish all 3 for +5 💎') + '</div>' + adaptive + '</div>';
     }
 
     let progress = loadProgress();
