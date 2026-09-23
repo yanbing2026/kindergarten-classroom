@@ -1905,6 +1905,20 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
     // Cloud account API: direct players-table reads are blocked by RLS.
     // The browser sends only a PBKDF2 verifier to the RPCs, never the PIN itself.
     let currentPinVerifier='';
+    const LOGIN_MAX_ATTEMPTS=5,LOGIN_LOCKOUT_MS=30000;
+    const loginAttemptState={};
+    function canAttemptLogin(key){
+        const s=loginAttemptState[key]||{count:0,until:0};
+        if(Date.now()<s.until)return false;
+        return true;
+    }
+    function recordLoginFailure(key){
+        const s=loginAttemptState[key]||{count:0,until:0};
+        s.count++;
+        if(s.count>=LOGIN_MAX_ATTEMPTS){s.until=Date.now()+LOGIN_LOCKOUT_MS;s.count=0;}
+        loginAttemptState[key]=s;
+    }
+    function clearLoginFailures(key){delete loginAttemptState[key];}
     async function cloudCreate(name,pin,progressObj){
         const pin_salt=makePinSalt();
         const pin_hash=await derivePinVerifier(pin,pin_salt);
@@ -1985,10 +1999,26 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             cacheAccount(result.data?.name||name);
             try{localStorage.setItem(accountProgressKey(key),JSON.stringify(result.data?.progress||{}));}catch(_){}
         }else{
-            const acct=await cloudLogin(name,pin);
-            if(acct===null){status.textContent='Player name or PIN is incorrect.';btn.disabled=false;return;}
-            cacheAccount(acct.name||name);
-            try{localStorage.setItem(accountProgressKey(key),JSON.stringify(acct.progress||{}));}catch(_){}
+            const attemptKey=name.toLowerCase();
+            if(!canAttemptLogin(attemptKey)){
+                status.textContent='Too many attempts. Please wait 30 seconds.';
+                btn.disabled=false;return;
+            }
+            try{
+                const acct=await cloudLogin(name,pin);
+                if(acct===null){
+                    recordLoginFailure(attemptKey);
+                    status.textContent='Player name or PIN is incorrect.';
+                    btn.disabled=false;return;
+                }
+                clearLoginFailures(attemptKey);
+                cacheAccount(acct.name||name);
+                try{localStorage.setItem(accountProgressKey(key),JSON.stringify(acct.progress||{}));}catch(_){}
+            }catch(_){
+                status.textContent='Player name or PIN is incorrect.';
+                recordLoginFailure(attemptKey);
+                btn.disabled=false;return;
+            }
         }
         btn.disabled=false;
         closeAccountModal();renderAccountBar();progress=loadProgress();blipola=window.BlipolaClassroom.create(progress);render();
