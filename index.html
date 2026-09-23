@@ -5123,6 +5123,16 @@ function gradeStageFor(index,total){if(index===0)return {name:'LESSON',copy:'Lea
             activeStep.correct = activeStep.correct || 0;
         }
         var stepCorrect = String(value) === String(mini.answer);
+        if(window.KCSkillEngine && typeof window.KCSkillEngine.recordRemediationEvidence === 'function'){
+            window.KCSkillEngine.recordRemediationEvidence(progress,{
+                skillId:rem.skillId,
+                misconception:rem.misconception||null,
+                stepType:stepDef.type||null,
+                correct:stepCorrect,
+                attempt:index>=0 ? steps[index].attempts : 1,
+                stepCompleted:stepCorrect
+            });
+        }
         if(!stepCorrect){
             if(index >= 0) steps[index].correct = Number(steps[index].correct || 0);
             var hint = "Look for the important clue in the question.";
@@ -5187,6 +5197,16 @@ function gradeStageFor(index,total){if(index===0)return {name:'LESSON',copy:'Lea
         const transfer=rem.transfer;
         if(transfer.type==='number') value=document.getElementById('remTransferAnswer')?.value?.trim();
         const correct=String(value)===String(transfer.answer),el=document.getElementById('gradeFeedback');
+        if(window.KCSkillEngine && typeof window.KCSkillEngine.recordRemediationEvidence === 'function'){
+          window.KCSkillEngine.recordRemediationEvidence(progress,{
+            skillId:rem.skillId,
+            misconception:rem.misconception||null,
+            stepType:'transfer-question',
+            correct,
+            attempt:(rem.transferAttempts||0)+1,
+            transfer:true
+          });
+        }
         if(rem.transferStatus==='passed') return;
         rem.transferAttempts=(rem.transferAttempts||0)+1;
         rem.transferStatus=correct?'passed':'retry';
