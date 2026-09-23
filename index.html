@@ -3937,6 +3937,45 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         if(!days.length) return '<div class="parent-progress-label">No activity recorded in the last 7 days.</div>';
         return days.map(d=>{const x=byDay[d],rate=x.attempts?Math.round(x.correct/x.attempts*100):0;return '<div class="parent-focus-row"><span>'+d+'</span><span>'+x.attempts+' attempts · '+rate+'% correct</span></div>';}).join('');
     }
+    function cloudSkillTimelineForView(rows){
+        const grade=cloudReportGrade, subject=cloudReportSubject;
+        const filtered=(rows||[]).filter(x=>(grade==='all'||x.grade_level===grade)&&(subject==='all'||x.subject_key===subject));
+        const map={};
+        filtered.forEach(x=>{
+            const meta=x.metadata&&typeof x.metadata==='object'?x.metadata:{};
+            const skillId=meta.skillId||meta.skill?.skillId;
+            if(!skillId)return;
+            const day=String(x.created_at||'').slice(0,10);
+            if(!day)return;
+            const k=String(skillId);
+            const d=map[k]||(map[k]={days:{}});
+            const bucket=d.days[day]||(d.days[day]={attempts:0,correct:0});
+            bucket.attempts++;
+            if(x.correct===true)bucket.correct++;
+        });
+        return Object.entries(map).map(([skillId,d])=>{
+            const points=Object.entries(d.days).sort((a,b)=>a[0].localeCompare(b[0])).map(([date,v])=>({date,mastery:Math.round(v.correct/v.attempts*100),attempts:v.attempts}));
+            let runningAttempts=0,runningCorrect=0;
+            const cumulative=Object.entries(d.days).sort((a,b)=>a[0].localeCompare(b[0])).map(([date,v])=>{
+                runningAttempts+=v.attempts; runningCorrect+=v.correct;
+                return {date,mastery:Math.round(runningCorrect/runningAttempts*100),attempts:v.attempts};
+            });
+            return {skillId,points,cumulative};
+        }).sort((a,b)=>(b.cumulative.length?b.cumulative[b.cumulative.length-1].mastery:0)-(a.cumulative.length?a.cumulative[a.cumulative.length-1].mastery:0));
+    }
+    function renderCloudSkillTimeline(rows){
+        const tracks=cloudSkillTimelineForView(rows);
+        if(!tracks.length)return '<div class="parent-progress-label">No skill timeline data for this filter yet.</div>';
+        return tracks.slice(0,8).map(t=>{
+            const name=cloudEscape(String(t.skillId).replace(/^[^.]+\\./,'').replace(/-/g,' '));
+            const c=t.cumulative, first=c[0], last=c[c.length-1];
+            const change=c.length>1?last.mastery-first.mastery:0;
+            const points=c.slice(-8).map(p=>p.mastery+'%').join(' → ');
+            const bars=c.slice(-8).map(p=>'<span title="'+p.date+': '+p.mastery+'% · '+p.attempts+' attempts" style="display:inline-block;width:calc('+Math.max(6,Math.round(100/Math.max(1,Math.min(8,c.length))))+'% - 3px);margin-right:3px;height:'+Math.max(8,Math.round(p.mastery/10))+'px;background:currentColor;opacity:.65;vertical-align:bottom"></span>').join('');
+            return '<div class="parent-focus-row" style="display:block"><div style="display:flex;justify-content:space-between;gap:8px"><strong>'+name+'</strong><span>'+last.mastery+'%'+(change>0?' ↑ '+change+' pts':change<0?' ↓ '+Math.abs(change)+' pts':'')+'</span></div><div style="height:42px;margin:6px 0 3px;display:flex;align-items:flex-end">'+bars+'</div><div class="parent-progress-label">'+points+(c.length>1?' · cumulative':'')+'</div></div>';
+        }).join('');
+    }
+
     function refreshCloudParentReport(){
         const box=document.getElementById('cloudParentProgress');
         if(!box) return;
@@ -3952,7 +3991,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         const firstTry=cloudReportActivity.filter(x=>x.first_try===true).length;
         const days=new Set(cloudReportActivity.map(x=>String(x.created_at||'').slice(0,10)).filter(Boolean)).size;
         const skillMap={};
-        cloudReportSkillActivity.forEach(x=>{
+        cloudSkillActivityForView.forEach(x=>{
             const meta=x.metadata&&typeof x.metadata==='object'?x.metadata:{};
             const skillId=meta.skillId||meta.skill?.skillId;
             if(!skillId)return;
@@ -3962,6 +4001,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             const mm=meta.misconception||meta.skill?.lastMisconception;
             if(mm)s.misconception=mm;
         });
+        const cloudSkillActivityForView=cloudReportSkillActivity.filter(x=>(cloudReportGrade==='all'||x.grade_level===cloudReportGrade)&&(cloudReportSubject==='all'||x.subject_key===cloudReportSubject));
         const cloudSkills=Object.entries(skillMap).map(([skillId,s])=>{
             const mastery=s.attempts?Math.round(s.correct/s.attempts*100):0;
             const due=s.last && (Date.now()-new Date(s.last).getTime())>=7*86400000;
@@ -3969,7 +4009,8 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             return {skillId,...s,mastery,status};
         }).sort((a,b)=>a.mastery-b.mastery).slice(0,8);
         const cloudSkillHtml=cloudSkills.length?'<div class="parent-card" style="margin:12px 0 0;background:#fafafa"><h3>🧠 Cloud skill history · 30 days</h3>'+cloudSkills.map(s=>'<div class="parent-focus-row"><span><strong>'+cloudEscape(String(s.skillId).replace(/^[^.]+\./,'').replace(/-/g,' '))+'</strong><br><span class="parent-progress-label">'+s.attempts+' attempts · '+s.firstTry+' first try'+(s.misconception?' · common error: '+cloudEscape(String(s.misconception).replace(/-/g,' ')):'')+'</span></span><span>'+s.status+' · '+s.mastery+'%</span></div>').join('')+'</div>':'<div class="parent-card" style="margin:12px 0 0;background:#fafafa"><h3>🧠 Cloud skill history</h3><div class="parent-progress-label">No skill-level cloud activity yet.</div></div>';
-        box.innerHTML='<h3>☁️ Cloud learning report</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px"><select aria-label="Grade filter" onchange="cloudReportGrade=this.value;refreshCloudParentReport()">'+gradeOptions.replace('value="all">','value="all"'+(cloudReportGrade==='all'?' selected':'')+'>').replace('value="'+cloudReportGrade+'">','value="'+cloudReportGrade+'" selected>')+'</select><select aria-label="Subject filter" onchange="cloudReportSubject=this.value;refreshCloudParentReport()">'+subjectOptions.replace('value="all">','value="all"'+(cloudReportSubject==='all'?' selected':'')+'>').replace('value="'+cloudReportSubject+'">','value="'+cloudReportSubject+'" selected>')+'</select></div><div class="parent-grid" style="margin:0 0 12px"><div class="parent-stat"><div class="parent-stat-number">'+avg+'%</div><div>Avg mastery</div></div><div class="parent-stat"><div class="parent-stat-number">'+filtered.length+'</div><div>Units tracked</div></div><div class="parent-stat"><div class="parent-stat-number">'+needs+'</div><div>Needs practice</div></div></div>'+renderCloudParentProgressRows(filtered)+'<div class="parent-card" style="margin:12px 0 0;background:#fafafa"><h3>📈 Recent trend</h3>'+renderCloudTrend(cloudReportActivity)+'</div>'+cloudSkillHtml+'<div class="parent-progress-label" style="margin-top:10px">Last 7 days: '+attempts+' attempts · '+correct+' correct · '+firstTry+' first try · active '+days+' day'+(days===1?'':'s')+'</div>';
+        const cloudTimelineHtml='<div class="parent-card" style="margin:12px 0 0;background:#fafafa"><h3>📈 Skill progress · 30 days</h3>'+renderCloudSkillTimeline(cloudReportSkillActivity)+'</div>';
+        box.innerHTML='<h3>☁️ Cloud learning report</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px"><select aria-label="Grade filter" onchange="cloudReportGrade=this.value;refreshCloudParentReport()">'+gradeOptions.replace('value="all">','value="all"'+(cloudReportGrade==='all'?' selected':'')+'>').replace('value="'+cloudReportGrade+'">','value="'+cloudReportGrade+'" selected>')+'</select><select aria-label="Subject filter" onchange="cloudReportSubject=this.value;refreshCloudParentReport()">'+subjectOptions.replace('value="all">','value="all"'+(cloudReportSubject==='all'?' selected':'')+'>').replace('value="'+cloudReportSubject+'">','value="'+cloudReportSubject+'" selected>')+'</select></div><div class="parent-grid" style="margin:0 0 12px"><div class="parent-stat"><div class="parent-stat-number">'+avg+'%</div><div>Avg mastery</div></div><div class="parent-stat"><div class="parent-stat-number">'+filtered.length+'</div><div>Units tracked</div></div><div class="parent-stat"><div class="parent-stat-number">'+needs+'</div><div>Needs practice</div></div></div>'+renderCloudParentProgressRows(filtered)+'<div class="parent-card" style="margin:12px 0 0;background:#fafafa"><h3>📈 Recent trend</h3>'+renderCloudTrend(cloudReportActivity)+'</div>'+cloudSkillHtml+cloudTimelineHtml+'<div class="parent-progress-label" style="margin-top:10px">Last 7 days: '+attempts+' attempts · '+correct+' correct · '+firstTry+' first try · active '+days+' day'+(days===1?'':'s')+'</div>';
         const gs=box.querySelector('select[aria-label="Grade filter"]'), ss=box.querySelector('select[aria-label="Subject filter"]');
         if(gs) gs.value=cloudReportGrade; if(ss) ss.value=cloudReportSubject;
     }
