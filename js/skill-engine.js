@@ -187,8 +187,9 @@
     if(title==='expanded form' && selected && /\\+/.test(selected)) return 'expanded-form-decomposition';
     if(title==='compare numbers' && selected) return 'place-value-comparison';
     if(/word problem|math story|solve a story|choose an operation|two-step thinking|story/.test(title)){
-      if(/\b(subtract|minus|left|remain|away|fewer|lost|used|spent)\b/.test(String(q.prompt||'').toLowerCase())) return 'operation-selection-subtraction';
-      if(/\b(add|plus|more|altogether|total|in all|gets?)\b/.test(String(q.prompt||'').toLowerCase())) return 'operation-selection-addition';
+      const p=String(q.prompt||'').toLowerCase();
+      if(/\b(subtract|minus|left|remain|away|fewer|lost|used|spent|fly away|gives away)\b/.test(p)) return 'operation-selection-subtraction';
+      if(/\b(add|plus|more|altogether|total|in all|gets?|gets more|join)\b/.test(p)) return 'operation-selection-addition';
       return 'operation-selection';
     }
     if(title==='number after' && selected && Number(selected)===Number(answer)-1) return 'counting-direction';
