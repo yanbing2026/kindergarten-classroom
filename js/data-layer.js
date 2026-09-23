@@ -42,6 +42,7 @@
       id: makeQueueId(),
       type,
       payload,
+      accountKey: String(currentAccount()?.name || '').trim().toLowerCase(),
       createdAt: new Date().toISOString(),
       version: VERSION
     });
@@ -136,9 +137,13 @@
     const id = playerId();
     if (!id || !window.supa) return { ok:false, skipped:true, reason:'normalized auth not linked' };
     const queue = loadQueue();
-    const activity = queue.filter(x => x.type === 'activity');
-    const progressRows = queue.filter(x => x.type === 'progress');
-    const goals = queue.filter(x => x.type === 'daily-goal');
+    const accountKey = String(currentAccount()?.name || '').trim().toLowerCase();
+    // Normalized events are account-scoped. Legacy queue entries without an
+    // accountKey are intentionally not attributed to the current account.
+    const scopedQueue = queue.filter(x => x.accountKey === accountKey && accountKey);
+    const activity = scopedQueue.filter(x => x.type === 'activity');
+    const progressRows = scopedQueue.filter(x => x.type === 'progress');
+    const goals = scopedQueue.filter(x => x.type === 'daily-goal');
     let sent = 0;
     if (activity.length) {
       const rows = activity.map(x => ({
@@ -164,7 +169,10 @@
       if (error) return { ok:false, error:error.message, sent };
       sent += goals.length;
     }
-    if (sent) saveQueue(queue.filter(x => !['activity','progress','daily-goal'].includes(x.type)));
+    if (sent) {
+      const sentIds = new Set(scopedQueue.filter(x => ['activity','progress','daily-goal'].includes(x.type)).map(x => x.id));
+      saveQueue(queue.filter(x => !sentIds.has(x.id)));
+    }
     return { ok:true, sent, remaining:loadQueue().length };
   }
 
