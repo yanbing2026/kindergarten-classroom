@@ -298,6 +298,32 @@
     };
   }
 
+  function buildRemediationPath(progress, q, result, context){
+    const meta=describeQuestion(q,context);
+    const misconception=classifyMisconception(q,result)||getSkillState(progress,meta)?.lastMisconception||null;
+    const base=meta.skillId;
+    const paths={
+      'tens-ones-confusion':['concrete-ten-frame','visual-place-value','guided-place-value','original-question','transfer-question'],
+      'digit-vs-value-confusion':['digit-vs-value-model','expanded-form-visual','guided-place-value','original-question','transfer-question'],
+      'expanded-form-decomposition':['base-ten-model','expanded-form-visual','guided-decomposition','original-question','transfer-question'],
+      'place-value-comparison':['base-ten-comparison','number-line-comparison','guided-comparison','original-question','transfer-question'],
+      'counting-direction':['number-line','guided-counting','original-question','transfer-question'],
+      'operation-selection-addition':['join-story-model','addition-equation-model','guided-addition-story','original-question','transfer-question'],
+      'operation-selection-subtraction':['separate-story-model','subtraction-equation-model','guided-subtraction-story','original-question','transfer-question'],
+      'data-totaling':['concrete-data-count','bar-graph-visual','guided-data-addition','original-question','transfer-question'],
+      'shape-attribute-confusion':['shape-sort-visual','attribute-highlight','guided-shape-classification','original-question','transfer-question'],
+      'hour-minute-confusion':['analog-clock-model','hand-identification','guided-time-reading','original-question','transfer-question'],
+      'measurement-unit-confusion':['measurement-tool-model','same-unit-comparison','guided-measurement','original-question','transfer-question']
+    };
+    const steps=paths[misconception]||['concrete-representation','visual-representation','guided-practice','original-question','transfer-question'];
+    return {
+      skillId:base, misconception:misconception||null,
+      trigger:result&&result.correct===false?'wrong-answer':'review',
+      steps:steps.map((type,index)=>({index:index+1,type,status:index===0?'ready':'locked'})),
+      nextAction:steps[0]
+    };
+  }
+
   function tutorRecommendation(progress, q, context){
     const meta=describeQuestion(q,context);
     const skill=getSkillState(progress,meta);
@@ -429,6 +455,7 @@
     selectNextAdaptiveLesson,
     tutorRecommendation,
     buildDailyMission,
+    buildRemediationPath,
     classifyMisconception,
     _slug: slug
   };
