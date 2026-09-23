@@ -5122,14 +5122,33 @@ function gradeStageFor(index,total){if(index===0)return {name:'LESSON',copy:'Lea
         const transfer=rem.transfer;
         if(transfer.type==='number') value=document.getElementById('remTransferAnswer')?.value?.trim();
         const correct=String(value)===String(transfer.answer),el=document.getElementById('gradeFeedback');
-        rem.transferStatus=correct?'passed':'retry';
+        if(rem.transferStatus==='passed') return;
         rem.transferAttempts=(rem.transferAttempts||0)+1;
+        rem.transferStatus=correct?'passed':'retry';
+        rem.transferHistory=Array.isArray(rem.transferHistory)?rem.transferHistory:[];
+        rem.transferHistory.push({at:new Date().toISOString(),correct,attempt:rem.transferAttempts});
+        if(rem.transferHistory.length>10) rem.transferHistory=rem.transferHistory.slice(-10);
+        progress.transferStats=progress.transferStats||{};
+        const ts=progress.transferStats[rem.skillId]||{attempts:0,passed:0,lastAt:null};
+        ts.attempts+=1;
+        if(correct) ts.passed+=1;
+        ts.lastAt=new Date().toISOString();
+        progress.transferStats[rem.skillId]=ts;
+        if(window.KCData) window.KCData.recordActivity({
+          eventType:'transfer',
+          lessonKey:String(transfer.title||'transfer'),
+          subjectKey:String(rem.skillId||''),
+          correct,
+          firstTry:rem.transferAttempts===1,
+          metadata:{source:'remediation-transfer',skillId:rem.skillId||null,misconception:rem.misconception||null,transferAttempts:rem.transferAttempts}
+        });
         if(correct){
           rem.transferPassedAt=new Date().toISOString();
           rem.status='completed';
           saveProgress();
           if(el)el.innerHTML='<div class="grade-remediation"><strong>✓ Skill transferred.</strong><div>You solved a new problem using the same idea.</div><button type="button" class="grade-text-submit" onclick="retryOriginalAfterRemediation()">↩ Try the original question</button></div>';
         }else if(el){
+          saveProgress();
           el.innerHTML='<div class="grade-remediation"><strong>Try again.</strong><div>Use the strategy from the practice steps.</div><button type="button" class="grade-hint" onclick="showTransferQuestion()">↺ Try transfer again</button></div>';
         }
     }
