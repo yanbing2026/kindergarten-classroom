@@ -1948,6 +1948,8 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             }
             const {data,error}=await supa.rpc('claim_player_auth',{p_name:name,p_pin_hash:currentPinVerifier});
             if(error||!data)return {ok:false,reason:error?.message||'claim failed'};
+            if(window.KCData) window.KCData.setPlayerId(data);
+            if(window.KCData) await window.KCData.flushNormalized();
             return {ok:true,playerId:data};
         }catch(error){ return {ok:false,reason:error?.message||String(error)}; }
     }
@@ -2095,7 +2097,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
     }
     function saveProgress() {
         localStorage.setItem(getCurrentAccount() ? accountProgressKey(getCurrentAccount()) : 'kc_progress_v1', JSON.stringify(progress));
-        if (window.KCData) window.KCData.localSnapshot(progress);
+        if (window.KCData) { window.KCData.localSnapshot(progress); window.KCData.flushNormalized().catch(()=>{}); }
         if(getCurrentAccount()&&typeof cloudSaveProgress==='function') scheduleCloudProgressSync();
     }
     function todayKey() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
