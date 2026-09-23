@@ -196,6 +196,41 @@
     return prev;
   }
 
+  function tutorRecommendation(progress, q, context){
+    const meta=describeQuestion(q,context);
+    const skill=getSkillState(progress,meta);
+    const attempts=skill?.attempts||0;
+    const mastery=Number(skill?.mastery)||0;
+    const misconception=skill?.lastMisconception||null;
+    const wrong=(skill?.recent||[]).filter(x=>!x.correct).length;
+    const labels={
+      'tens-ones-confusion':'Remember: the tens digit tells how many groups of ten. The ones digit tells how many ones.',
+      'digit-vs-value-confusion':'Look at the place: a digit can show a value of ones or tens.',
+      'expanded-form-decomposition':'Break the number into tens and ones, then write the two values separately.',
+      'place-value-comparison':'Compare the tens first. If the tens are equal, compare the ones.',
+      'counting-direction':'Check whether the question asks for the number before or after.',
+      'operation-selection-addition':'Look for clues such as more, gets, total, or altogether.',
+      'operation-selection-subtraction':'Look for clues such as left, gave away, fewer, or how many remain.',
+      'data-totaling':'Read each bar or count carefully before adding the data.',
+      'shape-attribute-confusion':'Count the sides and look at the shape attributes instead of its name.',
+      'hour-minute-confusion':'For an hour time, focus on the short hour hand.',
+      'measurement-unit-confusion':'Compare the object and the measuring marks using the same unit.'
+    };
+    let mode='prompt', message='What clue can you use to solve this?';
+    if(!skill || attempts===0){
+      mode='model'; message='Let’s try one small step together.';
+    } else if(misconception && labels[misconception]){
+      mode='misconception'; message=labels[misconception];
+    } else if(wrong>=2 || mastery<60){
+      mode='scaffold'; message='Let’s slow down. Find one important clue, then solve one step.';
+    } else if(mastery>=85){
+      mode='challenge'; message='You know this skill. Explain how you found the answer.';
+    } else if(skill.nextReviewAt && Date.parse(skill.nextReviewAt)<=Date.now()){
+      mode='review'; message='This is a good time to remember this skill. What do you remember?';
+    }
+    return {mode,message,skillId:meta.skillId,mastery,misconception,attempts};
+  }
+
   function getSkillState(progress, meta){
     return progress?.skillStats?.[meta?.skillId] || null;
   }
@@ -259,6 +294,7 @@
     nextDifficulty,
     adaptiveScore,
     selectAdaptiveLessons,
+    tutorRecommendation,
     classifyMisconception,
     _slug: slug
   };
