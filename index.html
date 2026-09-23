@@ -5084,13 +5084,56 @@ function gradeStageFor(index,total){if(index===0)return {name:'LESSON',copy:'Lea
         const idx=(rem.steps||[]).findIndex(s=>s.status==='ready');
         if(idx>=0)rem.steps[idx].status='completed';
         const next=rem.steps.findIndex(s=>s.status==='locked');
-        if(next>=0){rem.steps[next].status='ready';rem.nextAction=rem.steps[next].type;}else rem.nextAction='retry-original';
+        if(next>=0){rem.steps[next].status='ready';rem.nextAction=rem.steps[next].type;}else rem.nextAction='transfer-question';
         saveProgress();
         if(el){
           if(next>=0) el.innerHTML='<div class="grade-remediation"><strong>✓ Good thinking.</strong><div>Ready for the next practice step.</div><button type="button" class="grade-text-submit" onclick="showRemediationStep()">→ Next practice step</button></div>';
-          else el.innerHTML='<div class="grade-remediation"><strong>✓ You are ready.</strong><div>Now use the strategy on the original question.</div><button type="button" class="grade-text-submit" onclick="retryOriginalAfterRemediation()">↩ Try the original question</button></div>';
+          else el.innerHTML='<div class="grade-remediation"><strong>✓ You are ready.</strong><div>Now show that you can use the idea in a new problem.</div><button type="button" class="grade-text-submit" onclick="showTransferQuestion()">🔄 Try a new problem</button></div>';
         }
     }
+    function buildTransferQuestion(q,rem){
+        const m=rem?.misconception||'', nums=(String(q?.prompt||'').match(/\d+/g)||[]).map(Number);
+        const n=(nums[0]||34)+3, tens=Math.floor(n/10), ones=n%10;
+        if(m==='tens-ones-confusion') return {type:'number',title:'Transfer · Tens and Ones',prompt:'In '+n+', how many tens are there?',answer:String(tens),placeholder:'Type the number'};
+        if(m==='digit-vs-value-confusion') return {type:'number',title:'Transfer · Place Value',prompt:'In '+n+', what is the value of the tens digit?',answer:String(tens*10),placeholder:'Type the value'};
+        if(m==='expanded-form-decomposition') return {type:'choice',title:'Transfer · Expanded Form',prompt:'Which is '+n+' in expanded form?',choices:[tens*10+' + '+ones,tens+' + '+ones,n+' + 0'],answer:tens*10+' + '+ones};
+        if(m==='place-value-comparison') return {type:'choice',title:'Transfer · Compare',prompt:'Which number is greater?',choices:[String(n),String(n+20),'They are equal'],answer:String(n+20)};
+        if(m==='counting-direction') return {type:'choice',title:'Transfer · Counting',prompt:'What comes after '+n+'?',choices:[String(n-1),String(n+1),String(n+2)],answer:String(n+1)};
+        if(m==='operation-selection-addition') return {type:'choice',title:'Transfer · Story Problem',prompt:'Lina has 5 stickers and gets 3 more. Which operation should she use?',choices:['Add','Subtract','Neither'],answer:'Add'};
+        if(m==='operation-selection-subtraction') return {type:'choice',title:'Transfer · Story Problem',prompt:'Lina has 8 stickers and gives away 3. Which operation should she use?',choices:['Add','Subtract','Neither'],answer:'Subtract'};
+        if(m==='data-totaling') return {type:'choice',title:'Transfer · Data',prompt:'A graph has 4 apples and 3 bananas. What is the total?',choices:['6','7','8'],answer:'7'};
+        if(m==='shape-attribute-confusion') return {type:'choice',title:'Transfer · Shapes',prompt:'Which shape has 4 equal sides?',choices:['Triangle','Square','Circle'],answer:'Square'};
+        if(m==='hour-minute-confusion') return {type:'choice',title:'Transfer · Time',prompt:'At 5:00, which hand tells the hour?',choices:['Hour hand','Minute hand','Both'],answer:'Hour hand'};
+        if(m==='measurement-unit-confusion') return {type:'choice',title:'Transfer · Measurement',prompt:'When comparing two lengths, what should stay the same?',choices:['The unit','The answer','The object'],answer:'The unit'};
+        return null;
+    }
+    function showTransferQuestion(){
+        const rem=progress.activeRemediation,q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];if(!rem||!q)return;
+        const transfer=buildTransferQuestion(q,rem);if(!transfer){retryOriginalAfterRemediation();return;}
+        rem.transfer=transfer;rem.transferStatus='ready';saveProgress();
+        const el=document.getElementById('gradeFeedback');if(!el)return;
+        const interaction=transfer.type==='number'
+          ? '<input id="remTransferAnswer" class="grade-text-answer" inputmode="numeric" placeholder="'+esc(transfer.placeholder||'Type your answer')+'"><button type="button" class="grade-text-submit" onclick="answerTransferQuestion()">✓ Check transfer</button>'
+          : '<div class="grade-remediation-choices">'+transfer.choices.map(v=>'<button type="button" class="grade-choice" onclick="answerTransferQuestion(this,''+esc(v).replace(/'/g,"\\'")+'')">'+esc(v)+'</button>').join('')+'</div>';
+        el.innerHTML='<div class="grade-remediation"><strong>🔄 Transfer</strong><div class="grade-remediation-step">'+esc(transfer.prompt)+'</div>'+interaction+'</div>';
+    }
+    function answerTransferQuestion(btn,value){
+        const rem=progress.activeRemediation;if(!rem?.transfer)return;
+        const transfer=rem.transfer;
+        if(transfer.type==='number') value=document.getElementById('remTransferAnswer')?.value?.trim();
+        const correct=String(value)===String(transfer.answer),el=document.getElementById('gradeFeedback');
+        rem.transferStatus=correct?'passed':'retry';
+        rem.transferAttempts=(rem.transferAttempts||0)+1;
+        if(correct){
+          rem.transferPassedAt=new Date().toISOString();
+          rem.status='completed';
+          saveProgress();
+          if(el)el.innerHTML='<div class="grade-remediation"><strong>✓ Skill transferred.</strong><div>You solved a new problem using the same idea.</div><button type="button" class="grade-text-submit" onclick="retryOriginalAfterRemediation()">↩ Try the original question</button></div>';
+        }else if(el){
+          el.innerHTML='<div class="grade-remediation"><strong>Try again.</strong><div>Use the strategy from the practice steps.</div><button type="button" class="grade-hint" onclick="showTransferQuestion()">↺ Try transfer again</button></div>';
+        }
+    }
+
     function retryOriginalAfterRemediation(){
         gradeQuiz.awaitingNext=false;
         const el=document.getElementById('gradeFeedback');if(el)el.textContent='Use the strategy you just practiced, then try the original question.';
