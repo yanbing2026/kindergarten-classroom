@@ -285,15 +285,24 @@
     const pool=[...(lessons||[])];
     const target=Math.min(Number(count)||4,pool.length);
     if(!target) return [];
-    const scored=pool.map(q=>({q,score:adaptiveScore(q,context)}))
-      .sort((a,b)=>b.score-a.score);
-    const chosen=[];
-    const seenSkills=new Set();
-    // First pass: cover different weak/unseen skills when possible.
+    const recentIds=new Set((context?.recentQuestionIds||[]).map(String));
+    const recentSkills=new Set((context?.recentSkillIds||[]).map(String));
+    const scored=pool.map(q=>{
+      const meta=describeQuestion(q,context);
+      let score=adaptiveScore(q,context);
+      if(recentIds.has(String(q.id||q.lessonId||''))) score-=55;
+      if(recentSkills.has(String(meta.skillId))) score-=8;
+      // Prefer a small amount of repetition when the skill is weak or due.
+      const st=getSkillState(context?.progress||{},meta);
+      if(st && Number(st.mastery||0)<60) score+=8;
+      if(st && st.nextReviewAt && Date.parse(st.nextReviewAt)<=Date.now()) score+=12;
+      return {q,meta,score};
+    }).sort((a,b)=>b.score-a.score);
+    const chosen=[],seenSkills=new Set();
+    // First pass: different skills, prioritizing weak/due/unseen skills.
     for(const item of scored){
-      const meta=describeQuestion(item.q,context);
-      if(!seenSkills.has(meta.skillId)){
-        chosen.push(item.q); seenSkills.add(meta.skillId);
+      if(!seenSkills.has(item.meta.skillId)){
+        chosen.push(item.q); seenSkills.add(item.meta.skillId);
         if(chosen.length===target) return chosen;
       }
     }
@@ -302,6 +311,24 @@
       if(!chosen.includes(item.q)) chosen.push(item.q);
     }
     return chosen;
+  }
+
+  function selectNextAdaptiveLesson(lessons, context){
+    const pool=[...(lessons||[])];
+    if(!pool.length)return null;
+    const ranked=pool.map(q=>{
+      const meta=describeQuestion(q,context);
+      let score=adaptiveScore(q,context);
+      const recentIds=new Set((context?.recentQuestionIds||[]).map(String));
+      const recentSkills=new Set((context?.recentSkillIds||[]).map(String));
+      if(recentIds.has(String(q.id||q.lessonId||''))) score-=70;
+      if(recentSkills.has(String(meta.skillId))) score-=10;
+      const st=getSkillState(context?.progress||{},meta);
+      if(st && Number(st.mastery||0)<60) score+=10;
+      if(st && st.nextReviewAt && Date.parse(st.nextReviewAt)<=Date.now()) score+=15;
+      return {q,score};
+    }).sort((a,b)=>b.score-a.score);
+    return ranked[0]?.q || pool[0];
   }
 
   function nextDifficulty(skill){
@@ -318,6 +345,7 @@
     nextDifficulty,
     adaptiveScore,
     selectAdaptiveLessons,
+    selectNextAdaptiveLesson,
     tutorRecommendation,
     buildDailyMission,
     classifyMisconception,
