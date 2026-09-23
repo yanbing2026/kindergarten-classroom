@@ -5180,6 +5180,8 @@ function gradeStageFor(index,total){if(index===0)return {name:'LESSON',copy:'Lea
   const report=[];
   const banks=[
     ['g1',typeof GRADE1_INTERACTIVE!=='undefined'?GRADE1_INTERACTIVE:null],
+    ['g1',typeof GRADE1_CORE_BANKS!=='undefined'?GRADE1_CORE_BANKS:null],
+    ['g1',typeof GRADE1_MATH_BANK!=='undefined'?GRADE1_MATH_BANK:null],
     ['g2',typeof GRADE2_INTERACTIVE!=='undefined'?GRADE2_INTERACTIVE:null],
     ['k',typeof KINDERGARTEN_INTERACTIVE!=='undefined'?KINDERGARTEN_INTERACTIVE:null]
   ];
