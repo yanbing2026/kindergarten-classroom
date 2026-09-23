@@ -5218,6 +5218,23 @@ function gradeStageFor(index,total){if(index===0)return {name:'LESSON',copy:'Lea
             activeStep.correct = activeStep.correct || 0;
         }
         var stepCorrect = String(value) === String(mini.answer);
+        if(window.KCData && typeof window.KCData.recordActivity === 'function'){
+            window.KCData.recordActivity({
+                eventType:'remediation',
+                lessonKey:String(rem.skillId||stepDef.type||'remediation'),
+                subjectKey:String(rem.skillId||''),
+                correct:stepCorrect,
+                firstTry:Number(index>=0 ? steps[index].attempts : 1)===1,
+                metadata:{
+                    source:'remediation',
+                    skillId:rem.skillId||null,
+                    misconception:rem.misconception||null,
+                    stepType:stepDef.type||null,
+                    attempt:index>=0 ? steps[index].attempts : 1,
+                    stepCompleted:stepCorrect
+                }
+            });
+        }
         if(window.KCSkillEngine && typeof window.KCSkillEngine.recordRemediationEvidence === 'function'){
             window.KCSkillEngine.recordRemediationEvidence(progress,{
                 skillId:rem.skillId,
