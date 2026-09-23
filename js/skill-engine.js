@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  const VERSION = 1;
+  const VERSION = 2;
 
   function slug(value, fallback){
     const s = String(value || '').toLowerCase().trim()
@@ -57,6 +57,61 @@
     const table=G1_TITLE_SKILLS[subject];
     if(!table) return null;
     return table[String(title||'').toLowerCase().trim()] || null;
+  }
+
+  function normalizeQuestionMetadata(q, context){
+    q = q || {};
+    context = context || {};
+    const meta = describeQuestion(q, context);
+    return {
+      schemaVersion: 1,
+      id: String(q.id || q.lessonId || ''),
+      skillId: meta.skillId,
+      difficulty: meta.difficulty,
+      cognitiveLevel: q.cognitiveLevel || meta.cognitive || 'understand',
+      representation: q.representation || (meta.interaction === 'numberline' ? 'number-line' : meta.interaction === 'tenframe' ? 'concrete-visual' : meta.interaction === 'graph' ? 'data-display' : 'symbolic'),
+      interaction: meta.interaction,
+      prerequisiteSkills: Array.isArray(q.prerequisiteSkills) ? q.prerequisiteSkills.map(slug).filter(Boolean) : [],
+      misconceptionTargets: Array.isArray(q.misconceptionTargets) ? q.misconceptionTargets.map(slug).filter(Boolean) : [],
+      transfer: q.transfer === true,
+      ageBand: q.ageBand || null,
+      readingLoad: q.readingLoad || null,
+      explanation: q.explanation || q.explain || null,
+      hintLevels: {
+        level1: q.hintLevel1 || q.hint || null,
+        level2: q.hintLevel2 || null,
+        level3: q.hintLevel3 || null
+      }
+    };
+  }
+
+  function validateQuestion(q, context){
+    q = q || {};
+    const issues = [], warnings = [];
+    const meta = normalizeQuestionMetadata(q, context);
+    if(!meta.id) issues.push('missing-id');
+    if(!meta.skillId) issues.push('missing-skill');
+    if(!(Number(meta.difficulty)>=1 && Number(meta.difficulty)<=5)) issues.push('invalid-difficulty');
+    if(!q.prompt && !q.question && !q.text && !q.title) issues.push('missing-prompt');
+    if(q.answer === undefined && q.correctAnswer === undefined && !Array.isArray(q.options)) warnings.push('missing-answer');
+    if(Array.isArray(q.options)){
+      if(q.options.length<2) issues.push('too-few-options');
+      if(q.answer !== undefined && !q.options.map(String).includes(String(q.answer))) warnings.push('answer-not-in-options');
+    }
+    if(meta.misconceptionTargets.length && !meta.explanation) warnings.push('misconception-without-explanation');
+    if(meta.transfer && !meta.prerequisiteSkills.length) warnings.push('transfer-without-prerequisite');
+    if(q.difficulty == null) warnings.push('difficulty-inferred');
+    if(!q.skillId && !q.skill && !q.skillKey) warnings.push('skill-inferred');
+    return {ok:issues.length===0, issues, warnings, metadata:meta};
+  }
+
+  function auditQuestionBank(lessons, context){
+    const results=(lessons||[]).map(q=>{
+      const v=validateQuestion(q,context);
+      return {id:v.metadata.id||null,title:q.title||null,skillId:v.metadata.skillId,ok:v.ok,issues:v.issues,warnings:v.warnings};
+    });
+    const summary={total:results.length,valid:results.filter(x=>x.ok).length,invalid:results.filter(x=>!x.ok).length,warnings:results.reduce((n,x)=>n+x.warnings.length,0)};
+    return {summary,results};
   }
 
   function describeQuestion(q, context){
@@ -344,6 +399,9 @@
     updateSkillEvidence,
     nextDifficulty,
     adaptiveScore,
+    normalizeQuestionMetadata,
+    validateQuestion,
+    auditQuestionBank,
     selectAdaptiveLessons,
     selectNextAdaptiveLesson,
     tutorRecommendation,
