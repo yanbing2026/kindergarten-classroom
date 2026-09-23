@@ -70,7 +70,7 @@
 
     // Explicit metadata wins, then Grade 1 title taxonomy, then legacy fallback.
     const explicit = q.skillId || q.skill || q.skillKey;
-    const inferredG1 = (grade === '1' || grade === 'grade-1' || grade === 'grade1')
+    const inferredG1 = (grade === '1' || grade === 'g1' || grade === 'grade-1' || grade === 'grade1')
       ? inferG1Skill(subject, q.title) : null;
     const skillId = explicit
       ? slug(explicit)
