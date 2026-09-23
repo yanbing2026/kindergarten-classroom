@@ -4028,6 +4028,86 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             box.innerHTML='<h3>☁️ Cloud learning report</h3><div class="parent-progress-label">Cloud data could not be loaded. Local progress is still available.</div>';
         }
     }
+    function recoveryStepLabel(type){
+        const labels={
+            'concrete-ten-frame':'Used a counting model',
+            'visual-place-value':'Practiced tens and ones',
+            'guided-place-value':'Practiced place value',
+            'digit-vs-value-model':'Compared digit and value',
+            'expanded-form-visual':'Built expanded form',
+            'guided-decomposition':'Split tens and ones',
+            'base-ten-model':'Built a base-ten model',
+            'guided-comparison':'Compared numbers',
+            'number-line':'Used a number line',
+            'guided-counting':'Practiced counting',
+            'join-story-model':'Modeled an addition story',
+            'addition-equation-model':'Connected story to addition',
+            'guided-addition-story':'Practiced addition stories',
+            'separate-story-model':'Modeled a subtraction story',
+            'subtraction-equation-model':'Connected story to subtraction',
+            'guided-subtraction-story':'Practiced subtraction stories',
+            'concrete-data-count':'Counted a data set',
+            'bar-graph-visual':'Read a bar graph',
+            'guided-data-addition':'Compared data amounts',
+            'shape-sort-visual':'Sorted shapes',
+            'attribute-highlight':'Identified shape attributes',
+            'guided-shape-classification':'Classified shapes',
+            'analog-clock-model':'Read an analog clock',
+            'hand-identification':'Identified clock hands',
+            'guided-time-reading':'Practiced telling time',
+            'measurement-tool-model':'Used a measurement model',
+            'same-unit-comparison':'Compared with the same unit',
+            'guided-measurement':'Practiced measurement',
+            'original-question':'Retried the original problem',
+            'transfer-question':'Completed a transfer check'
+        };
+        return labels[type] || 'Practiced the skill';
+    }
+    function recoveryDate(value){
+        const t=Date.parse(value||'');
+        return Number.isFinite(t)?new Date(t).toLocaleDateString():'';
+    }
+    function renderSkillRecoveryTimeline(recoveryStats){
+        const entries=[];
+        recoveryStats.slice(0,6).forEach(function(item){
+            const skillId=item.skillId,s=item.s||{},rem=item.rem||{};
+            const name=cloudEscape(String(skillId).replace(/^[^.]+\\./,'').replace(/-/g,' '));
+            const history=Array.isArray(rem.history)?rem.history:[];
+            const records=history.length?history:[rem];
+            const events=[];
+            records.forEach(function(r){
+                if(!r) return;
+                const created=recoveryDate(r.createdAt||r.startedAt||r.lastAt);
+                if(created) events.push({at:Date.parse(r.createdAt||r.startedAt||r.lastAt)||0,html:'<span class="parent-timeline-dot">●</span><div><strong>Started recovery</strong><div class="parent-progress-label">'+created+' · '+(r.lastMisconception?cloudEscape(String(r.lastMisconception).replace(/-/g,' ')):'extra practice was needed')+'</div></div>'});
+                (r.steps||[]).forEach(function(step){
+                    const attempts=Number(step.attempts||0),correct=Number(step.correct||0),done=step.completedAt||step.status==='completed';
+                    if(attempts||done){
+                        const d=recoveryDate(step.completedAt||step.lastAttemptAt||r.createdAt);
+                        events.push({at:Date.parse(step.completedAt||step.lastAttemptAt||r.createdAt)||0,html:'<span class="parent-timeline-dot">'+(done?'✓':'•')+'</span><div><strong>'+cloudEscape(recoveryStepLabel(step.type))+'</strong><div class="parent-progress-label">'+(d?d+' · ':'')+(attempts?correct+'/'+attempts+' correct':'practice started')+(done?' · completed':'')+'</div></div>'});
+                    }
+                });
+                (r.transferHistory||[]).forEach(function(t){
+                    const d=recoveryDate(t.at);
+                    events.push({at:Date.parse(t.at)||0,html:'<span class="parent-timeline-dot">'+(t.correct?'✓':'↻')+'</span><div><strong>Transfer check '+(t.correct?'passed':'attempted')+'</strong><div class="parent-progress-label">'+(d?d+' · ':'')+'attempt '+Number(t.attempt||1)+'</div></div>'});
+                });
+                if(r.transferPassedAt){
+                    const d=recoveryDate(r.transferPassedAt);
+                    events.push({at:Date.parse(r.transferPassedAt)||0,html:'<span class="parent-timeline-dot">★</span><div><strong>Skill transferred</strong><div class="parent-progress-label">'+(d||'')+' · ready for review</div></div>'});
+                }
+            });
+            if(s.nextReviewAt){
+                const d=recoveryDate(s.nextReviewAt);
+                events.push({at:Date.parse(s.nextReviewAt)||0,html:'<span class="parent-timeline-dot">↗</span><div><strong>Next review</strong><div class="parent-progress-label">'+cloudEscape(d)+'</div></div>'});
+            }
+            events.sort(function(a,b){return a.at-b.at;});
+            const unique=[],seen={};
+            events.forEach(function(e){const key=e.at+'|'+e.html;if(!seen[key]){seen[key]=1;unique.push(e);}});
+            if(unique.length){
+                entries.push('<div class="parent-recovery-timeline"><div class="parent-recovery-title"><strong>'+name+'</strong><span>'+Number(s.mastery||0)+'% current mastery</span></div>'+unique.slice(-12).map(function(e){return '<div class="parent-timeline-event">'+e.html+'</div>';}).join('')+'</div>');
+            }
+        });
+        return entries.join('');
+    }
     function renderParentDashboard() {
         const stats = CATEGORIES.reduce((acc, cat) => {
             const s = categoryLearningStats(cat);
@@ -4056,7 +4136,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             const review=s.nextReviewAt?new Date(s.nextReviewAt).toLocaleDateString():'';
             return '<div class="parent-focus-row" style="display:block"><div style="display:flex;justify-content:space-between;gap:8px"><strong>'+name+'</strong><span>'+transfer+'</span></div><div class="parent-progress-label">'+steps+' steps completed · '+correct+'/'+attempts+' correct · '+(rem.lastMisconception?cloudEscape(String(rem.lastMisconception).replace(/-/g,' ')):'guided practice')+(review?' · Review '+cloudEscape(review):'')+'</div></div>';
         }).join('');
-        const recoveryCard=recoveryRows?'<div class="parent-card"><h3>🛠️ Skill recovery</h3><div class="parent-progress-label">These skills needed extra practice. Transfer checks help confirm the idea works in a new problem.</div>'+recoveryRows+'</div>':'';
+        const recoveryCard=recoveryRows?'<div class="parent-card"><h3>🛠️ Skill recovery</h3><div class="parent-progress-label">These skills needed extra practice. Transfer checks help confirm the idea works in a new problem.</div>'+recoveryRows+'</div>':'';\n        const recoveryTimeline=renderSkillRecoveryTimeline(recoveryStats);\n        const recoveryTimelineCard=recoveryTimeline?'<div class="parent-card"><h3>🕒 Recovery timeline</h3><div class="parent-progress-label">A simple view of how each skill moved from a mistake to practice, transfer, and review.</div>'+recoveryTimeline+'</div>':'';
 return `${topbar(true)}
         <div class="parent-dashboard">
             <div class="parent-header"><div><div class="parent-kicker">FOR PARENTS</div><h2>📋 Learning Snapshot</h2><div class="parent-date">${new Date().toLocaleDateString()}</div></div><div class="parent-diamond">💎 ${progress.stars}</div></div>
@@ -4064,6 +4144,7 @@ return `${topbar(true)}
             <div class="parent-card"><h3>📅 Last 7 days</h3><div class="parent-grid" style="margin:0;"><div class="parent-stat"><div class="parent-stat-number">${activity.attempts}</div><div>Attempts</div></div><div class="parent-stat"><div class="parent-stat-number">${activity.correct}</div><div>Correct</div></div><div class="parent-stat"><div class="parent-stat-number">${activity.firstTry}</div><div>First try</div></div></div><div class="parent-progress-label">Active on ${activity.days} day${activity.days === 1 ? "" : "s"}</div></div><div class="parent-card"><h3>🧭 What to focus on</h3>${focus || '<div class="parent-good">🏆 No immediate learning gaps. Keep exploring!</div>'}</div>
             <div class="parent-card"><h3>🧠 Adaptive skill report</h3>${skillRows}</div>
             ${recoveryCard}
+            ${recoveryTimelineCard}
             <div class="parent-card"><h3>📚 Overall progress</h3><div class="parent-progress"><div class="parent-progress-fill" style="width:${pct}%"></div></div><div class="parent-progress-label">${stats.mastered} of ${stats.total} learning items mastered</div></div>
             <div class="parent-card"><h3>📈 Skills practiced this week</h3>${recentSkills || '<div class="parent-good">No activity yet this week.</div>'}</div>
             ${renderCloudParentProgress()}
