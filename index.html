@@ -5076,7 +5076,10 @@ function gradeStageFor(index,total){if(index===0)return {name:'LESSON',copy:'Lea
         const next=rem.steps.findIndex(s=>s.status==='locked');
         if(next>=0){rem.steps[next].status='ready';rem.nextAction=rem.steps[next].type;}else rem.nextAction='retry-original';
         saveProgress();
-        if(el)el.innerHTML='<div class="grade-remediation"><strong>✓ Good thinking.</strong><div>Now use that idea on the original question.</div><button type="button" class="grade-text-submit" onclick="retryOriginalAfterRemediation()">↩ Try the original question</button></div>';
+        if(el){
+          if(next>=0) el.innerHTML='<div class="grade-remediation"><strong>✓ Good thinking.</strong><div>Ready for the next practice step.</div><button type="button" class="grade-text-submit" onclick="showRemediationStep()">→ Next practice step</button></div>';
+          else el.innerHTML='<div class="grade-remediation"><strong>✓ You are ready.</strong><div>Now use the strategy on the original question.</div><button type="button" class="grade-text-submit" onclick="retryOriginalAfterRemediation()">↩ Try the original question</button></div>';
+        }
     }
     function retryOriginalAfterRemediation(){
         gradeQuiz.awaitingNext=false;
