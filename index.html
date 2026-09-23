@@ -4646,7 +4646,14 @@ GRADE1_INTERACTIVE.writing = window.KC_G1_WRITING;
         }));
         return bank;
     }
-    const GRADE1_MATH_BANK = window.KC_G1_MATH || [];
+    // Backward-compatible Grade 1 math bank builder.
+    // Older cached builds referenced this name; keep it available so a stale
+    // page cannot crash before the current interactive bank is initialized.
+    function buildGrade1MathBank() {
+        const bank = window.KC_G1_MATH || [];
+        return diversifyGrade1MathBank(bank);
+    }
+    const GRADE1_MATH_BANK = buildGrade1MathBank();
     GRADE1_INTERACTIVE.math = GRADE1_MATH_BANK;
 
     // ---------- Grade 1 core-subject interactive banks ----------
