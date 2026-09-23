@@ -9,6 +9,7 @@
   const QUEUE_KEY = 'kc_data_queue_v1';
   const SNAPSHOT_KEY = 'kc_data_snapshot_v1';
   const ACCOUNT_KEY = 'kc_current_account';
+  const PLAYER_ID_KEY = 'kc_normalized_player_id_v1';
 
   const safeJson = (value, fallback) => {
     try { return JSON.parse(value); } catch (_) { return fallback; }
@@ -110,6 +111,39 @@
     });
   }
 
+  function setPlayerId(id) { try { if (id) localStorage.setItem(PLAYER_ID_KEY, id); } catch (_) {} return id; }
+  function playerId() { try { return localStorage.getItem(PLAYER_ID_KEY) || null; } catch (_) { return null; } }
+
+  async function flushNormalized() {
+    const id = playerId();
+    if (!id || !window.supa) return { ok:false, skipped:true, reason:'normalized auth not linked' };
+    const queue = loadQueue();
+    const activity = queue.filter(x => x.type === 'activity');
+    const progressRows = queue.filter(x => x.type === 'progress');
+    const goals = queue.filter(x => x.type === 'daily-goal');
+    let sent = 0;
+    if (activity.length) {
+      const rows = activity.map(x => ({ player_id:id, ...x.payload }));
+      const { error } = await window.supa.from('activity_events').insert(rows);
+      if (error) return { ok:false, error:error.message, sent };
+      sent += activity.length;
+    }
+    if (progressRows.length) {
+      const rows = progressRows.map(x => ({ player_id:id, ...x.payload }));
+      const { error } = await window.supa.from('player_progress').upsert(rows, { onConflict:'player_id,grade_level,subject_key,unit_key' });
+      if (error) return { ok:false, error:error.message, sent };
+      sent += progressRows.length;
+    }
+    if (goals.length) {
+      const rows = goals.map(x => ({ player_id:id, ...x.payload }));
+      const { error } = await window.supa.from('daily_goals').upsert(rows, { onConflict:'player_id,goal_date' });
+      if (error) return { ok:false, error:error.message, sent };
+      sent += goals.length;
+    }
+    if (sent) saveQueue(queue.filter(x => !['activity','progress','daily-goal'].includes(x.type)));
+    return { ok:true, sent, remaining:loadQueue().length };
+  }
+
   function status() {
     const account = currentAccount();
     return {
@@ -139,6 +173,9 @@
     recordProgress,
     recordDailyGoal,
     flush,
+    flushNormalized,
+    setPlayerId,
+    playerId,
     status,
     _loadQueue: loadQueue
   };
