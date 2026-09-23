@@ -24,6 +24,41 @@
     text: {concept:'written response', cognitive:'communication'}
   };
 
+  // Explicit Grade 1 taxonomy for adaptive learning.
+  const G1_TITLE_SKILLS = {
+    math: {
+      'add within 20':'addition-within-20','subtract within 20':'subtraction-within-20','math story':'addition-within-20',
+      'number after':'counting-to-120','number before':'counting-to-120','number between':'counting-to-120',
+      'compare numbers':'compare-order-numbers','tens and ones':'tens-and-ones','ones place':'tens-and-ones',
+      'expanded form':'tens-and-ones','build a number':'tens-and-ones',
+      'measure length':'measure-length','compare length':'measure-length','tell time':'tell-time-hour',
+      'read data':'data-counting','name a shape':'shape-attributes','count sides':'shape-attributes',
+      'equal sides':'shape-attributes','shape parts':'shape-attributes','word problem':'addition-word-problems'
+    },
+    ela: {
+      'short vowel sounds':'phonics-short-long-vowels','consonant blends':'phonics-blends','long vowel patterns':'phonics-short-long-vowels','decode a word':'phonics-short-long-vowels',
+      'main idea':'main-idea','key details':'key-details','sequence':'sequence','inference':'inference',
+      'synonyms':'synonyms-antonyms','antonyms':'synonyms-antonyms','context clues':'context-clues','word categories':'word-categories',
+      'nouns and verbs':'nouns-verbs','capitalization':'capitalization','punctuation':'punctuation','pronouns':'pronouns',
+      'complete sentence':'complete-sentence','add details':'add-details','story sequence':'story-sequence','revise a sentence':'revision-details',
+      'ask a research question':'research-question','find a useful source':'source-selection','fact or opinion':'fact-opinion','share evidence':'evidence'
+    },
+    science: {
+      'testable question':'testable-question','fair test':'fair-test','observation':'observation','improve a design':'engineering-revision',
+      'living or nonliving?':'living-things','plant needs':'living-things','animal body parts':'plants-animals','offspring':'plants-animals',
+      'plant parts':'plants-animals','animal homes':'plants-animals','animal movement':'plants-animals','life cycles':'plants-animals',
+      'temperature':'weather-seasons','rain':'weather-seasons','seasons':'weather-seasons','weather choice':'weather-seasons',
+      'light source':'light-sound','shadows':'light-sound','sound':'light-sound','loud and soft':'light-sound',
+      'solid or liquid?':'matter-materials','materials':'matter-materials','push or pull':'matter-materials','choose a material':'matter-materials'
+    }
+  };
+
+  function inferG1Skill(subject, title){
+    const table=G1_TITLE_SKILLS[subject];
+    if(!table) return null;
+    return table[String(title||'').toLowerCase().trim()] || null;
+  }
+
   function describeQuestion(q, context){
     q = q || {};
     context = context || {};
@@ -33,11 +68,15 @@
     const interaction = slug(q.interaction || q.type || 'choice','choice');
     const mapped = TYPE_MAP[interaction] || TYPE_MAP.choice;
 
-    // Explicit skill metadata wins. Existing question banks remain compatible.
+    // Explicit metadata wins, then Grade 1 title taxonomy, then legacy fallback.
     const explicit = q.skillId || q.skill || q.skillKey;
+    const inferredG1 = (grade === '1' || grade === 'grade-1' || grade === 'grade1')
+      ? inferG1Skill(subject, q.title) : null;
     const skillId = explicit
       ? slug(explicit)
-      : grade + '.' + subject + '.' + unit + '.' + slug(mapped.concept);
+      : inferredG1
+        ? 'grade1.' + subject + '.' + inferredG1
+        : grade + '.' + subject + '.' + unit + '.' + slug(mapped.concept);
 
     const difficulty = Math.max(1, Math.min(5,
       Number(q.difficulty) || Number(context.difficulty) || (
@@ -49,7 +88,7 @@
     return {
       version: VERSION,
       skillId,
-      concept: q.skillName || mapped.concept,
+      concept: q.skillName || inferredG1 || mapped.concept,
       interaction,
       difficulty,
       cognitiveLevel: q.cognitiveLevel || mapped.cognitive,
