@@ -1,0 +1,84 @@
+-- Kindergarten Classroom / Blipola learning platform foundation
+-- Canonical reference for the Supabase project.
+-- Runtime schema already exists in Supabase; keep this file synchronized with migrations.
+
+-- Core student account
+-- public.players
+-- id uuid PK
+-- name text UNIQUE
+-- pin_hash text
+-- pin_salt text
+-- auth_user_id uuid -> auth.users(id)
+-- grade_level text
+-- avatar_key text
+-- settings jsonb
+-- progress jsonb (legacy compatibility)
+-- created_at timestamptz
+-- last_seen_at timestamptz
+
+-- Curriculum
+-- public.curriculum_units
+-- id uuid PK
+-- grade_level text
+-- subject_key text
+-- unit_key text
+-- title text
+-- sort_order integer
+-- description text
+-- active boolean
+-- metadata jsonb
+-- created_at timestamptz
+-- updated_at timestamptz
+
+-- Normalized learning progress
+-- public.player_progress
+-- id uuid PK
+-- player_id uuid -> players(id)
+-- grade_level text
+-- subject_key text
+-- unit_key text
+-- mastery numeric 0..100
+-- stars integer
+-- attempts integer
+-- correct integer
+-- first_try_correct integer
+-- metadata jsonb
+-- updated_at timestamptz
+-- UNIQUE(player_id, grade_level, subject_key, unit_key)
+
+-- Event-level learning telemetry
+-- public.activity_events
+-- id bigint PK
+-- player_id uuid -> players(id)
+-- grade_level text
+-- subject_key text
+-- unit_key text
+-- lesson_key text
+-- event_type text
+-- correct boolean
+-- first_try boolean
+-- score numeric
+-- duration_ms integer
+-- metadata jsonb
+-- created_at timestamptz
+
+-- Daily learning goals
+-- public.daily_goals
+-- id uuid PK
+-- player_id uuid -> players(id)
+-- goal_date date
+-- target_questions integer
+-- completed_questions integer
+-- completed boolean
+-- metadata jsonb
+-- updated_at timestamptz
+-- UNIQUE(player_id, goal_date)
+
+-- Security model
+-- 1. All user-data tables have RLS enabled.
+-- 2. Normalized progress/activity/goal rows are owned through
+--    players.auth_user_id = auth.uid().
+-- 3. curriculum_units is public-read only for active curriculum.
+-- 4. The legacy players table is not directly exposed to public clients.
+-- 5. Existing account RPCs are the compatibility layer for the
+--    current name + PIN browser account system.
