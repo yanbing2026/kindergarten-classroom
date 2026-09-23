@@ -5116,11 +5116,37 @@ function gradeStageFor(index,total){if(index===0)return {name:'LESSON',copy:'Lea
         var stepDef = steps[index >= 0 ? index : 0] || {};
         var mini = remediationStepQuestion(rem, stepDef);
         var el = document.getElementById("gradeFeedback");
-        if(String(value) !== String(mini.answer)){
-            if(el) el.innerHTML = '<div class="grade-remediation"><strong>Try one more time.</strong><div>Look for the important clue in the question.</div><button type="button" class="grade-hint" onclick="showRemediationStep()">↺ Try again</button></div>';
+        if(index >= 0){
+            var activeStep = steps[index];
+            activeStep.attempts = Number(activeStep.attempts || 0) + 1;
+            activeStep.lastAttemptAt = new Date().toISOString();
+            activeStep.correct = activeStep.correct || 0;
+        }
+        var stepCorrect = String(value) === String(mini.answer);
+        if(!stepCorrect){
+            if(index >= 0) steps[index].correct = Number(steps[index].correct || 0);
+            var hint = "Look for the important clue in the question.";
+            if(stepDef.type === "concrete-ten-frame" || stepDef.type === "visual-place-value" || stepDef.type === "guided-place-value" || stepDef.type === "digit-vs-value-model" || stepDef.type === "base-ten-model"){
+                hint = "Remember: a tens digit tells how many groups of ten.";
+            } else if(stepDef.type === "expanded-form-visual" || stepDef.type === "guided-decomposition"){
+                hint = "Split the number into tens and ones. For example, 34 = 30 + 4.";
+            } else if(stepDef.type.indexOf("addition") >= 0 || stepDef.type === "join-story-model"){
+                hint = "If the amount gets bigger or something is added, think ADD.";
+            } else if(stepDef.type.indexOf("subtraction") >= 0 || stepDef.type === "separate-story-model"){
+                hint = "If something is given away or the amount gets smaller, think SUBTRACT.";
+            } else if(stepDef.type.indexOf("measurement") >= 0 || stepDef.type === "measurement-tool-model"){
+                hint = "Compare measurements using the same unit.";
+            }
+            if(activeStep && activeStep.attempts >= 2) hint = "Here is a clue: " + hint;
+            saveProgress();
+            if(el) el.innerHTML = '<div class="grade-remediation"><strong>Try one more time.</strong><div>' + esc(hint) + '</div><button type="button" class="grade-hint" onclick="showRemediationStep()">↺ Try again</button></div>';
             return;
         }
-        if(index >= 0) steps[index].status = "completed";
+        if(index >= 0){
+            steps[index].correct = Number(steps[index].correct || 0) + 1;
+            steps[index].status = "completed";
+            steps[index].completedAt = new Date().toISOString();
+        }
         var next = steps.findIndex(function(s){ return s.status === "locked"; });
         if(next >= 0){ steps[next].status = "ready"; rem.nextAction = steps[next].type; }
         else rem.nextAction = "transfer-question";
