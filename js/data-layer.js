@@ -193,6 +193,21 @@
     return error ? { ok:false, rows:[], error:error.message } : { ok:true, rows:data || [] };
   }
 
+  async function fetchSkillActivity(days) {
+    const id = playerId();
+    if (!id || !window.supa) return { ok:false, rows:[], reason:'normalized auth not linked' };
+    const since = new Date(Date.now() - Math.max(1, Number(days) || 30) * 86400000).toISOString();
+    const { data, error } = await window.supa
+      .from('activity_events')
+      .select('client_event_id,grade_level,subject_key,unit_key,event_type,correct,first_try,score,metadata,created_at')
+      .eq('player_id', id)
+      .gte('created_at', since)
+      .not('metadata->>skillId','is',null)
+      .order('created_at', { ascending:true })
+      .limit(2000);
+    return error ? { ok:false, rows:[], error:error.message } : { ok:true, rows:data || [] };
+  }
+
   function status() {
     const account = currentAccount();
     return {
@@ -225,6 +240,7 @@
     flushNormalized,
     fetchNormalizedProgress,
     fetchRecentActivity,
+    fetchSkillActivity,
     setPlayerId,
     playerId,
     status,
