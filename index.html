@@ -3977,7 +3977,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         const box=document.getElementById('cloudParentProgress');
         if(!box||!window.KCData) return;
         try{
-            const [p,a,s]=await Promise.all([window.KCData.fetchNormalizedProgress(),window.KCData.fetchRecentActivity(7),window.KCData.fetchRecentActivity(30)]);
+            const [p,a,s]=await Promise.all([window.KCData.fetchNormalizedProgress(),window.KCData.fetchRecentActivity(7),window.KCData.fetchSkillActivity(30)]);
             if(!p.ok){box.innerHTML='<h3>☁️ Cloud learning report</h3><div class="parent-progress-label">Cloud data unavailable right now. Local progress is still available.</div>';return;}
             cloudReportRows=p.rows||[];
             cloudReportActivity=a.ok?(a.rows||[]):[];
