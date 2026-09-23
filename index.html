@@ -3841,6 +3841,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
     }
     let cloudReportRows = [];
     let cloudReportActivity = [];
+    let cloudReportSkillActivity = [];
     let cloudReportGrade = 'all';
     let cloudReportSubject = 'all';
     function cloudGradeLabel(id){
@@ -3950,7 +3951,25 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         const correct=cloudReportActivity.filter(x=>x.correct===true).length;
         const firstTry=cloudReportActivity.filter(x=>x.first_try===true).length;
         const days=new Set(cloudReportActivity.map(x=>String(x.created_at||'').slice(0,10)).filter(Boolean)).size;
-        box.innerHTML='<h3>☁️ Cloud learning report</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px"><select aria-label="Grade filter" onchange="cloudReportGrade=this.value;refreshCloudParentReport()">'+gradeOptions.replace('value="all">','value="all"'+(cloudReportGrade==='all'?' selected':'')+'>').replace('value="'+cloudReportGrade+'">','value="'+cloudReportGrade+'" selected>')+'</select><select aria-label="Subject filter" onchange="cloudReportSubject=this.value;refreshCloudParentReport()">'+subjectOptions.replace('value="all">','value="all"'+(cloudReportSubject==='all'?' selected':'')+'>').replace('value="'+cloudReportSubject+'">','value="'+cloudReportSubject+'" selected>')+'</select></div><div class="parent-grid" style="margin:0 0 12px"><div class="parent-stat"><div class="parent-stat-number">'+avg+'%</div><div>Avg mastery</div></div><div class="parent-stat"><div class="parent-stat-number">'+filtered.length+'</div><div>Units tracked</div></div><div class="parent-stat"><div class="parent-stat-number">'+needs+'</div><div>Needs practice</div></div></div>'+renderCloudParentProgressRows(filtered)+'<div class="parent-card" style="margin:12px 0 0;background:#fafafa"><h3>📈 Recent trend</h3>'+renderCloudTrend(cloudReportActivity)+'</div><div class="parent-progress-label" style="margin-top:10px">Last 7 days: '+attempts+' attempts · '+correct+' correct · '+firstTry+' first try · active '+days+' day'+(days===1?'':'s')+'</div>';
+        const skillMap={};
+        cloudReportSkillActivity.forEach(x=>{
+            const meta=x.metadata&&typeof x.metadata==='object'?x.metadata:{};
+            const skillId=meta.skillId||meta.skill?.skillId;
+            if(!skillId)return;
+            const k=String(skillId), s=skillMap[k]||(skillMap[k]={attempts:0,correct:0,firstTry:0,last:null,misconception:null});
+            s.attempts++; if(x.correct===true)s.correct++; if(x.first_try===true)s.firstTry++;
+            if(!s.last||String(x.created_at)>String(s.last))s.last=x.created_at;
+            const mm=meta.misconception||meta.skill?.lastMisconception;
+            if(mm)s.misconception=mm;
+        });
+        const cloudSkills=Object.entries(skillMap).map(([skillId,s])=>{
+            const mastery=s.attempts?Math.round(s.correct/s.attempts*100):0;
+            const due=s.last && (Date.now()-new Date(s.last).getTime())>=7*86400000;
+            const status=due?'🔄 Review due':mastery>=85?'🏆 Strong':mastery>=60?'🌱 Developing':'🎯 Needs practice';
+            return {skillId,...s,mastery,status};
+        }).sort((a,b)=>a.mastery-b.mastery).slice(0,8);
+        const cloudSkillHtml=cloudSkills.length?'<div class="parent-card" style="margin:12px 0 0;background:#fafafa"><h3>🧠 Cloud skill history · 30 days</h3>'+cloudSkills.map(s=>'<div class="parent-focus-row"><span><strong>'+cloudEscape(String(s.skillId).replace(/^[^.]+\./,'').replace(/-/g,' '))+'</strong><br><span class="parent-progress-label">'+s.attempts+' attempts · '+s.firstTry+' first try'+(s.misconception?' · common error: '+cloudEscape(String(s.misconception).replace(/-/g,' ')):'')+'</span></span><span>'+s.status+' · '+s.mastery+'%</span></div>').join('')+'</div>':'<div class="parent-card" style="margin:12px 0 0;background:#fafafa"><h3>🧠 Cloud skill history</h3><div class="parent-progress-label">No skill-level cloud activity yet.</div></div>';
+        box.innerHTML='<h3>☁️ Cloud learning report</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px"><select aria-label="Grade filter" onchange="cloudReportGrade=this.value;refreshCloudParentReport()">'+gradeOptions.replace('value="all">','value="all"'+(cloudReportGrade==='all'?' selected':'')+'>').replace('value="'+cloudReportGrade+'">','value="'+cloudReportGrade+'" selected>')+'</select><select aria-label="Subject filter" onchange="cloudReportSubject=this.value;refreshCloudParentReport()">'+subjectOptions.replace('value="all">','value="all"'+(cloudReportSubject==='all'?' selected':'')+'>').replace('value="'+cloudReportSubject+'">','value="'+cloudReportSubject+'" selected>')+'</select></div><div class="parent-grid" style="margin:0 0 12px"><div class="parent-stat"><div class="parent-stat-number">'+avg+'%</div><div>Avg mastery</div></div><div class="parent-stat"><div class="parent-stat-number">'+filtered.length+'</div><div>Units tracked</div></div><div class="parent-stat"><div class="parent-stat-number">'+needs+'</div><div>Needs practice</div></div></div>'+renderCloudParentProgressRows(filtered)+'<div class="parent-card" style="margin:12px 0 0;background:#fafafa"><h3>📈 Recent trend</h3>'+renderCloudTrend(cloudReportActivity)+'</div>'+cloudSkillHtml+'<div class="parent-progress-label" style="margin-top:10px">Last 7 days: '+attempts+' attempts · '+correct+' correct · '+firstTry+' first try · active '+days+' day'+(days===1?'':'s')+'</div>';
         const gs=box.querySelector('select[aria-label="Grade filter"]'), ss=box.querySelector('select[aria-label="Subject filter"]');
         if(gs) gs.value=cloudReportGrade; if(ss) ss.value=cloudReportSubject;
     }
@@ -3958,10 +3977,11 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         const box=document.getElementById('cloudParentProgress');
         if(!box||!window.KCData) return;
         try{
-            const [p,a]=await Promise.all([window.KCData.fetchNormalizedProgress(),window.KCData.fetchRecentActivity(7)]);
+            const [p,a,s]=await Promise.all([window.KCData.fetchNormalizedProgress(),window.KCData.fetchRecentActivity(7),window.KCData.fetchRecentActivity(30)]);
             if(!p.ok){box.innerHTML='<h3>☁️ Cloud learning report</h3><div class="parent-progress-label">Cloud data unavailable right now. Local progress is still available.</div>';return;}
             cloudReportRows=p.rows||[];
             cloudReportActivity=a.ok?(a.rows||[]):[];
+            cloudReportSkillActivity=s.ok?(s.rows||[]):[];
             refreshCloudParentReport();
         }catch(e){
             box.innerHTML='<h3>☁️ Cloud learning report</h3><div class="parent-progress-label">Cloud data could not be loaded. Local progress is still available.</div>';
