@@ -5176,7 +5176,30 @@ function gradeStageFor(index,total){if(index===0)return {name:'LESSON',copy:'Lea
     function buildRuntimeErrorReport(message, source, line, column, stack, kind){
         return {kind:kind||'runtime',message:String(message||'Unknown error'),source:source||'',line:line||0,column:column||0,stack:stack||'',context:runtimeContext()};
     }
-    function recordRuntimeError(report){
+    function auditCurrentQuestionBank(){
+  const report=[];
+  const banks=[
+    ['g1',typeof GRADE1_INTERACTIVE!=='undefined'?GRADE1_INTERACTIVE:null],
+    ['g2',typeof GRADE2_INTERACTIVE!=='undefined'?GRADE2_INTERACTIVE:null],
+    ['k',typeof KINDERGARTEN_INTERACTIVE!=='undefined'?KINDERGARTEN_INTERACTIVE:null]
+  ];
+  banks.forEach(([gradeId,bank])=>{
+    if(!bank)return;
+    Object.keys(bank).forEach(subjectKey=>{
+      (bank[subjectKey]||[]).forEach((unit,unitIndex)=>{
+        const lessons=unit&&Array.isArray(unit.lessons)?unit.lessons:[];
+        if(window.KCSkillEngine){
+          const audit=window.KCSkillEngine.auditQuestionBank(lessons,{gradeId,subjectKey,unitKey:unit?.unit,unitTitle:unit?.unit});
+          report.push({gradeId,subjectKey,unitIndex,unit:unit?.unit,summary:audit.summary,results:audit.results});
+        }
+      });
+    });
+  });
+  const summary=report.reduce((a,x)=>{a.total+=x.summary.total;a.valid+=x.summary.valid;a.invalid+=x.summary.invalid;a.warnings+=x.summary.warnings;return a;},{total:0,valid:0,invalid:0,warnings:0});
+  window.KCQuestionAudit={summary,units:report,createdAt:new Date().toISOString()};
+  return window.KCQuestionAudit;
+}
+function recordRuntimeError(report){
         window.__BlockQuestLastRuntimeError = report;
         try { localStorage.setItem(RUNTIME_ERROR_KEY, JSON.stringify(report)); } catch(e) {}
         const badge=document.getElementById('runtimeErrorBadge');
