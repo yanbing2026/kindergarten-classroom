@@ -5075,7 +5075,7 @@ function gradeStageFor(index,total){if(index===0)return {name:'LESSON',copy:'Lea
         const rem=progress.activeRemediation;if(!rem)return;
         const stepIndex=(rem.steps||[]).findIndex(s=>s.status==='ready');
         const step=Math.max(0,stepIndex),mini=remediationMiniQuestion(rem),el=document.getElementById('gradeFeedback');if(!el)return;
-        el.innerHTML='<div class="grade-remediation"><strong>🧩 Let’s practice this skill.</strong><div class="grade-remediation-step">Step '+(step+1)+' · '+esc(mini.prompt)+'</div><div class="grade-remediation-choices">'+mini.choices.map(v=>'<button type="button" class="grade-choice" onclick="answerRemediationStep(this,''+esc(v).replace(/'/g,"\\'")+'')">'+esc(v)+'</button>').join('')+'</div></div>';
+        el.innerHTML='<div class="grade-remediation"><strong>🧩 Let’s practice this skill.</strong><div class="grade-remediation-step">Step '+(step+1)+' · '+esc(mini.prompt)+'</div><div class="grade-remediation-choices">'+mini.choices.map(v=>'<button type="button" class="grade-choice" data-value="'+esc(v)+'" onclick="answerRemediationStep(this,this.dataset.value)">'+esc(v)+'</button>').join('')+'</div></div>';
     }
     function answerRemediationStep(btn,value){
         const rem=progress.activeRemediation;if(!rem)return;
@@ -5114,7 +5114,7 @@ function gradeStageFor(index,total){if(index===0)return {name:'LESSON',copy:'Lea
         const el=document.getElementById('gradeFeedback');if(!el)return;
         const interaction=transfer.type==='number'
           ? '<input id="remTransferAnswer" class="grade-text-answer" inputmode="numeric" placeholder="'+esc(transfer.placeholder||'Type your answer')+'"><button type="button" class="grade-text-submit" onclick="answerTransferQuestion()">✓ Check transfer</button>'
-          : '<div class="grade-remediation-choices">'+transfer.choices.map(v=>'<button type="button" class="grade-choice" onclick="answerTransferQuestion(this,''+esc(v).replace(/'/g,"\\'")+'')">'+esc(v)+'</button>').join('')+'</div>';
+          : '<div class="grade-remediation-choices">'+transfer.choices.map(v=>'<button type="button" class="grade-choice" data-value="'+esc(v)+'" onclick="answerTransferQuestion(this,this.dataset.value)">'+esc(v)+'</button>').join('')+'</div>';
         el.innerHTML='<div class="grade-remediation"><strong>🔄 Transfer</strong><div class="grade-remediation-step">'+esc(transfer.prompt)+'</div>'+interaction+'</div>';
     }
     function answerTransferQuestion(btn,value){
