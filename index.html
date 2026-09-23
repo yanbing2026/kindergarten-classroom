@@ -755,6 +755,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./js/data-layer.js"></script>
+    <script src="./js/skill-engine.js"></script>
     <script src="./js/blipola-runtime.js"></script>
     <script>
 
@@ -4913,11 +4914,37 @@ GRADE1_INTERACTIVE.writing = window.KC_G1_WRITING;
         const prev = progress.gradeStats[statsKey] || {attempts:0,correct:0,firstTryCorrect:0,stars:0};
         const next = {attempts:prev.attempts+1,correct:prev.correct+(correct?1:0),firstTryCorrect:prev.firstTryCorrect+(correct&&firstTry?1:0),stars:prev.stars+(correct?1:0)};
         progress.gradeStats[statsKey]=next;
+
+        const skill = window.KCSkillEngine
+            ? window.KCSkillEngine.describeQuestion(q, {
+                gradeId, subjectKey, unitKey,
+                unitTitle:gradeQuiz.unit?.unit || null,
+                difficulty:q.difficulty
+              })
+            : null;
+        const skillEvidence = skill && window.KCSkillEngine
+            ? window.KCSkillEngine.updateSkillEvidence(progress, skill, {
+                correct:!!correct, firstTry:!!firstTry,
+                misconception:q.misconception || null
+              })
+            : null;
+        if (skillEvidence) {
+            skillEvidence.lastDifficulty = skill.difficulty;
+        }
+
         window.KCData.recordProgress({
             gradeLevel:gradeId,subjectKey,unitKey,
             mastery:next.attempts?Math.round(next.correct/next.attempts*100):0,
             stars:next.stars,attempts:next.attempts,correct:next.correct,firstTryCorrect:next.firstTryCorrect,
-            metadata:{source:'grade-engine',gradeId,courseIndex:gradeQuiz.courseIndex,unitIndex:gradeQuiz.unitIndex,unitTitle:gradeQuiz.unit?.unit||null}
+            metadata:{
+                source:'grade-engine',
+                gradeId,courseIndex:gradeQuiz.courseIndex,unitIndex:gradeQuiz.unitIndex,
+                unitTitle:gradeQuiz.unit?.unit||null,
+                skillId:skill?.skillId || null,
+                skill:skill || null,
+                skillMastery:skillEvidence?.mastery ?? null,
+                misconception:q.misconception || null
+            }
         });
     }
     function gradeHint(){const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];if(!q)return;const el=document.getElementById('gradeBlipolaMessage');if(el)el.textContent='💡 '+q.hint;speak(q.hint);}
