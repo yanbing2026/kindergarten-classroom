@@ -98,6 +98,53 @@
     };
   }
 
+  function classifyMisconception(q, result){
+    if(!q || !result || result.correct) return null;
+    const title=String(q.title||'').toLowerCase();
+    const selected=String(result.selectedAnswer ?? '').trim();
+    const answer=String(q.answer ?? '').trim();
+    if(title==='tens and ones' && selected && answer){
+      const n=Number(q.prompt?.match(/\\d+/)?.[0]);
+      if(Number.isFinite(n)){
+        const tens=Math.floor(n/10), ones=n%10;
+        if(selected===String(ones)) return 'tens-ones-confusion';
+        if(selected===String(tens*10)) return 'digit-vs-value-confusion';
+      }
+    }
+    if(title==='ones place' && selected && selected===String(Math.floor(Number(q.prompt?.match(/\\d+/)?.[0]||0)/10))) return 'tens-ones-confusion';
+    if(title==='expanded form' && selected && /\\+/.test(selected)) return 'expanded-form-decomposition';
+    if(title==='compare numbers' && selected) return 'place-value-comparison';
+    if(title==='number after' && selected && Number(selected)===Number(answer)-1) return 'counting-direction';
+    if(title==='number before' && selected && Number(selected)===Number(answer)+1) return 'counting-direction';
+    if(title==='word problem'){
+      const prompt=String(q.prompt||'').toLowerCase();
+      if(/gets|more|total|altogether/.test(prompt)) return 'operation-selection-addition';
+      if(/left|eats|gave away|fewer/.test(prompt)) return 'operation-selection-subtraction';
+    }
+    if(title==='read data') return 'data-totaling';
+    if(title==='name a shape'||title==='count sides'||title==='equal sides'||title==='shape parts') return 'shape-attribute-confusion';
+    if(title==='tell time') return 'hour-minute-confusion';
+    if(title==='measure length'||title==='compare length') return 'measurement-unit-confusion';
+    if(title==='main idea') return 'main-idea-vs-detail';
+    if(title==='key details') return 'detail-location';
+    if(title==='sequence'||title==='story sequence') return 'event-order';
+    if(title==='inference') return 'inference-from-evidence';
+    if(title==='synonyms'||title==='antonyms') return 'word-meaning-confusion';
+    if(title==='context clues') return 'context-clue-use';
+    if(title==='nouns and verbs') return 'part-of-speech-confusion';
+    if(title==='capitalization') return 'capitalization-rule';
+    if(title==='punctuation') return 'punctuation-choice';
+    if(title==='testable question') return 'testability-confusion';
+    if(title==='fair test') return 'controlled-variable-confusion';
+    if(title==='observation') return 'observation-vs-guess';
+    if(title==='living or nonliving?'||title==='plant needs') return 'living-needs-confusion';
+    if(title==='temperature') return 'measurement-tool-confusion';
+    if(title==='seasons') return 'season-order-confusion';
+    if(title==='light source'||title==='shadows'||title==='sound') return 'light-sound-concept-confusion';
+    if(title==='solid or liquid?'||title==='materials') return 'matter-property-confusion';
+    return 'concept-misunderstanding';
+  }
+
   function updateSkillEvidence(progress, meta, result){
     if (!progress || !meta) return null;
     progress.skillStats = progress.skillStats || {};
@@ -112,13 +159,17 @@
     // Bayesian-style smoothing prevents one lucky answer from claiming mastery.
     prev.mastery = Math.round(((prev.correct + 1) / (prev.attempts + 2)) * 100);
     prev.lastAttemptAt = new Date().toISOString();
+    const misconception = result.misconception || meta.misconception || classifyMisconception(result.question, result);
+    prev.misconceptions = prev.misconceptions || {};
+    if (misconception) prev.misconceptions[misconception] = (prev.misconceptions[misconception] || 0) + 1;
     prev.recent = (prev.recent || []).concat([{
       at: prev.lastAttemptAt,
       correct: !!result.correct,
       firstTry: !!result.firstTry,
       difficulty: meta.difficulty,
-      misconception: result.misconception || meta.misconception || null
+      misconception
     }]).slice(-12);
+    if (misconception) prev.lastMisconception = misconception;
     progress.skillStats[meta.skillId] = prev;
     return prev;
   }
@@ -135,6 +186,7 @@
     describeQuestion,
     updateSkillEvidence,
     nextDifficulty,
+    classifyMisconception,
     _slug: slug
   };
 })();
