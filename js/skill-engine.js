@@ -274,6 +274,43 @@
     return prev;
   }
 
+  function recordRemediationEvidence(progress, data){
+    if(!progress || !data || !data.skillId) return null;
+    progress.skillStats = progress.skillStats || {};
+    const now = new Date().toISOString();
+    const prev = progress.skillStats[data.skillId] || {
+      skillId:data.skillId, attempts:0, correct:0, firstTryCorrect:0,
+      mastery:0, lastAttemptAt:null, recent:[]
+    };
+    prev.remediation = prev.remediation || {attempts:0,correct:0,stepsCompleted:0,transfers:0,transferPassed:0,lastAt:null,lastMisconception:null,history:[]};
+    const rem = prev.remediation, correct = !!data.correct, isTransfer = !!data.transfer;
+    rem.attempts += 1;
+    if(correct) rem.correct += 1;
+    if(data.stepCompleted) rem.stepsCompleted += 1;
+    if(isTransfer) rem.transfers += 1;
+    if(isTransfer && correct) rem.transferPassed += 1;
+    rem.lastAt = now;
+    if(data.misconception) rem.lastMisconception = data.misconception;
+    rem.history = (rem.history || []).concat([{at:now,type:isTransfer?'transfer':'step',stepType:data.stepType||null,correct,attempt:Number(data.attempt||1),misconception:data.misconception||null}]).slice(-20);
+    // Remediation is supporting evidence, not first-try mastery evidence.
+    if(correct && isTransfer){
+      prev.mastery = Math.max(Number(prev.mastery)||0, Math.min(89,(Number(prev.mastery)||0)+6));
+      prev.reviewStreak = Math.max(1,Number(prev.reviewStreak||0));
+      prev.reviewIntervalDays = 1;
+      prev.nextReviewAt = new Date(Date.now()+86400000).toISOString();
+    } else if(!correct){
+      prev.mastery = Math.min(Number(prev.mastery)||0,59);
+      prev.reviewStreak = 0;
+      prev.reviewIntervalDays = 0;
+      prev.nextReviewAt = now;
+    }
+    prev.lastAttemptAt = now;
+    prev.recent = (prev.recent || []).concat([{at:now,correct,firstTry:false,difficulty:null,misconception:data.misconception||null,source:'remediation',stepType:data.stepType||null,transfer:isTransfer}]).slice(-12);
+    if(data.misconception) prev.lastMisconception = data.misconception;
+    progress.skillStats[data.skillId] = prev;
+    return prev;
+  }
+
   function buildDailyMission(progress, options){
     options=options||{};
     const limit=Math.max(1,Math.min(8,Number(options.limit)||4));
