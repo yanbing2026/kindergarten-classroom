@@ -1936,6 +1936,21 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         currentPinVerifier=pin_hash;
         return data[0];
     }
+    async function ensureNormalizedAuth(name){
+        if(!window.supa||!currentPinVerifier)return {ok:false,reason:'missing credentials'};
+        try{
+            const sessionResult=await supa.auth.getSession();
+            let session=sessionResult.data?.session||null;
+            if(session?.user && !session.user.is_anonymous){ await supa.auth.signOut(); session=null; }
+            if(!session){
+                const anon=await supa.auth.signInAnonymously();
+                if(anon.error||!anon.data?.session)return {ok:false,reason:anon.error?.message||'anonymous auth unavailable'};
+            }
+            const {data,error}=await supa.rpc('claim_player_auth',{p_name:name,p_pin_hash:currentPinVerifier});
+            if(error||!data)return {ok:false,reason:error?.message||'claim failed'};
+            return {ok:true,playerId:data};
+        }catch(error){ return {ok:false,reason:error?.message||String(error)}; }
+    }
     async function getPinSaltForLogin(name){
         const {data,error}=await supa.rpc('get_player_salt',{p_name:name});
         if(error||!data||!data[0]||!data[0].pin_salt)throw new Error('Account not found');
@@ -1998,6 +2013,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
                 btn.disabled=false;return;
             }
             cacheAccount(result.data?.name||name);
+            await ensureNormalizedAuth(result.data?.name||name);
             try{localStorage.setItem(accountProgressKey(key),JSON.stringify(result.data?.progress||{}));}catch(_){}
         }else{
             const attemptKey=name.toLowerCase();
@@ -2014,6 +2030,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
                 }
                 clearLoginFailures(attemptKey);
                 cacheAccount(acct.name||name);
+                await ensureNormalizedAuth(acct.name||name);
                 try{localStorage.setItem(accountProgressKey(key),JSON.stringify(acct.progress||{}));}catch(_){}
             }catch(_){
                 status.textContent='Player name or PIN is incorrect.';
