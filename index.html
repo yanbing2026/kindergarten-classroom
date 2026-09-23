@@ -5052,80 +5052,82 @@ function gradeStageFor(index,total){if(index===0)return {name:'LESSON',copy:'Lea
         });        const daily=ensureDailyState(); const prior=Math.min(3,Number(daily.adaptiveCompletedQuestions)||0); if(prior<3) syncAdaptiveDailyGoal(prior+1);
     }
     function remediationStepQuestion(rem, step){
-        const m=rem?.misconception||"", q=rem?.question||{};
-        const nums=(String(q.prompt||"").match(/\\d+/g)||[]).map(Number);
-        const n=nums[0]||34, tens=Math.floor(n/10), ones=n%10;
-        const type=step?.type||"";
-        const second=n>=50?n-20:n+20;
-        const templates={
-          "concrete-ten-frame":["Build "+n+" with tens and ones. How many tens?",[String(Math.max(0,tens-1)),String(tens),String(ones)],String(tens)],
-          "visual-place-value":["Look at "+n+". What does the tens digit show?",[String(tens),String(tens*10),String(ones)],String(tens*10)],
-          "guided-place-value":["Finish the place-value sentence: "+n+" = "+tens+" tens + ___ ones.",[String(ones),String(tens),String(n)],String(ones)],
-          "digit-vs-value-model":["The tens digit in "+n+" is "+tens+". What is its value?",[String(tens),String(tens*10),String(ones)],String(tens*10)],
-          "expanded-form-visual":["Which model shows "+n+" correctly?",[tens*10+" + "+ones,tens+" + "+ones,n+" + 0],tens*10+" + "+ones],
-          "guided-decomposition":["Break "+n+" into tens and ones.",[tens*10+" + "+ones,tens+" + "+ones,n+" + 0],tens*10+" + "+ones],
-          "base-ten-model":["Which base-ten description matches "+n+"?",[tens+" tens and "+ones+" ones",ones+" tens and "+tens+" ones",n+" tens"],tens+" tens and "+ones+" ones"],
-          "guided-comparison":["Which number has more tens: "+n+" or "+second+"?",[String(n),String(second),"They are equal"],String(n>=50?n:second)],
-          "number-line":["On a number line, what comes after "+n+"?",[String(n-1),String(n+1),String(n+2)],String(n+1)],
-          "guided-counting":["Count forward one step from "+n+".", [String(n-1),String(n+1),String(n+2)],String(n+1)],
-          "join-story-model":["A child has 5 blocks and gets 3 more. What should we do?",["Add","Subtract","Neither"],"Add"],
-          "addition-equation-model":["Which equation matches getting 3 more?",["5 + 3 = 8","5 - 3 = 2","3 - 5 = 2"],"5 + 3 = 8"],
-          "guided-addition-story":["The word gets means the amount becomes bigger. Which operation?",["Add","Subtract","Neither"],"Add"],
-          "separate-story-model":["A child has 8 blocks and gives away 3. What should we do?",["Add","Subtract","Neither"],"Subtract"],
-          "subtraction-equation-model":["Which equation matches giving away 3?",["8 + 3 = 11","8 - 3 = 5","3 - 8 = 5"],"8 - 3 = 5"],
-          "guided-subtraction-story":["The words gives away mean the amount becomes smaller. Which operation?",["Add","Subtract","Neither"],"Subtract"],
-          "concrete-data-count":["A graph shows 3 apples and 2 bananas. What is the total?",["4","5","6"],"5"],
-          "bar-graph-visual":["Which statement matches 4 apples and 3 bananas?",["Apples are greater","Bananas are greater","They are equal"],"Apples are greater"],
-          "guided-data-addition":["To find a graph total, what should you do?",["Add the values","Pick one value","Ignore the graph"],"Add the values"],
-          "shape-sort-visual":["Which shape has 4 equal sides?",["Triangle","Square","Circle"],"Square"],
-          "attribute-highlight":["Which shape has 4 equal sides?",["Triangle","Square","Circle"],"Square"],
-          "guided-shape-classification":["A square has four equal sides. Which shape is it?",["Triangle","Square","Circle"],"Square"],
-          "analog-clock-model":["At "+(q.clockAnswer||"3:00")+", which hand tells the hour?",["Hour hand","Minute hand","Both"],"Hour hand"],
-          "hand-identification":["Which hand tells the hour on an analog clock?",["Hour hand","Minute hand","Both"],"Hour hand"],
-          "guided-time-reading":["At 5:00, which hand points to 5?",["Hour hand","Minute hand","Both"],"Hour hand"],
-          "measurement-tool-model":["When comparing lengths, what should stay the same?",["The unit","The answer","The object"],"The unit"],
-          "same-unit-comparison":["Which comparison is fair?",["2 inches vs 5 inches","2 inches vs 5 feet","A short object vs a long unit"],"2 inches vs 5 inches"],
-          "guided-measurement":["Before comparing measurements, what should you check?",["The unit","The answer","The color"],"The unit"]
+        var q = rem && rem.question ? rem.question : {};
+        var text = String(q.prompt || "");
+        var match = text.match(/[0-9]+/);
+        var n = match ? Number(match[0]) : 34;
+        var tens = Math.floor(n / 10);
+        var ones = n % 10;
+        var type = step && step.type ? step.type : "";
+        var second = n >= 50 ? n - 20 : n + 20;
+        var templates = {
+          "concrete-ten-frame": ["Build " + n + " with tens and ones. How many tens?", [String(tens - 1), String(tens), String(ones)], String(tens)],
+          "visual-place-value": ["What is the value of the tens digit in " + n + "?", [String(tens), String(tens * 10), String(ones)], String(tens * 10)],
+          "guided-place-value": [n + " = " + tens + " tens + ___ ones. What is missing?", [String(ones), String(tens), String(n)], String(ones)],
+          "digit-vs-value-model": ["The tens digit in " + n + " is " + tens + ". What is its value?", [String(tens), String(tens * 10), String(ones)], String(tens * 10)],
+          "expanded-form-visual": ["Which shows " + n + " in expanded form?", [tens * 10 + " + " + ones, tens + " + " + ones, n + " + 0"], tens * 10 + " + " + ones],
+          "guided-decomposition": ["Break " + n + " into tens and ones.", [tens * 10 + " + " + ones, tens + " + " + ones, n + " + 0"], tens * 10 + " + " + ones],
+          "base-ten-model": ["Which matches " + n + "?", [tens + " tens and " + ones + " ones", ones + " tens and " + tens + " ones", n + " tens"], tens + " tens and " + ones + " ones"],
+          "guided-comparison": ["Which has more tens: " + n + " or " + second + "?", [String(n), String(second), "They are equal"], String(n >= 50 ? n : second)],
+          "number-line": ["What comes after " + n + "?", [String(n - 1), String(n + 1), String(n + 2)], String(n + 1)],
+          "guided-counting": ["Count forward one step from " + n + ".", [String(n - 1), String(n + 1), String(n + 2)], String(n + 1)],
+          "join-story-model": ["A child has 5 blocks and gets 3 more. Which operation?", ["Add", "Subtract", "Neither"], "Add"],
+          "addition-equation-model": ["Which equation matches getting 3 more?", ["5 + 3 = 8", "5 - 3 = 2", "3 - 5 = 2"], "5 + 3 = 8"],
+          "guided-addition-story": ["The amount gets bigger. Which operation?", ["Add", "Subtract", "Neither"], "Add"],
+          "separate-story-model": ["A child has 8 blocks and gives away 3. Which operation?", ["Add", "Subtract", "Neither"], "Subtract"],
+          "subtraction-equation-model": ["Which equation matches giving away 3?", ["8 + 3 = 11", "8 - 3 = 5", "3 - 8 = 5"], "8 - 3 = 5"],
+          "guided-subtraction-story": ["The amount gets smaller. Which operation?", ["Add", "Subtract", "Neither"], "Subtract"],
+          "concrete-data-count": ["A graph shows 3 apples and 2 bananas. What is the total?", ["4", "5", "6"], "5"],
+          "bar-graph-visual": ["Which is greater: 4 apples or 3 bananas?", ["Apples", "Bananas", "They are equal"], "Apples"],
+          "guided-data-addition": ["How do you find a graph total?", ["Add the values", "Pick one value", "Ignore the graph"], "Add the values"],
+          "shape-sort-visual": ["Which shape has 4 equal sides?", ["Triangle", "Square", "Circle"], "Square"],
+          "attribute-highlight": ["Which shape has 4 equal sides?", ["Triangle", "Square", "Circle"], "Square"],
+          "guided-shape-classification": ["Which shape has four equal sides?", ["Triangle", "Square", "Circle"], "Square"],
+          "analog-clock-model": ["Which hand tells the hour?", ["Hour hand", "Minute hand", "Both"], "Hour hand"],
+          "hand-identification": ["Which hand tells the hour?", ["Hour hand", "Minute hand", "Both"], "Hour hand"],
+          "guided-time-reading": ["At 5:00, which hand points to 5?", ["Hour hand", "Minute hand", "Both"], "Hour hand"],
+          "measurement-tool-model": ["What should stay the same when comparing lengths?", ["The unit", "The answer", "The object"], "The unit"],
+          "same-unit-comparison": ["Which comparison is fair?", ["2 inches vs 5 inches", "2 inches vs 5 feet", "Different units"], "2 inches vs 5 inches"],
+          "guided-measurement": ["What should you check before comparing measurements?", ["The unit", "The answer", "The color"], "The unit"]
         };
-        const x=templates[type];
-        if(x)return {prompt:x[0],choices:x[1],answer:x[2]};
-        const fallback={
-          "tens-ones-confusion":["In "+n+", how many tens are there?",[String(Math.max(0,tens-1)),String(tens),String(ones)],String(tens)],
-          "digit-vs-value-confusion":["In "+n+", what is the value of the tens digit?",[String(tens),String(tens*10),String(ones)],String(tens*10)],
-          "expanded-form-decomposition":["Which is "+n+" in expanded form?",[tens*10+" + "+ones,tens+" + "+ones,n+" + 0],tens*10+" + "+ones],
-          "place-value-comparison":["Which number has more tens: "+n+" or "+second+"?",[String(n),String(second),"They are equal"],String(n>=50?n:second)],
-          "counting-direction":["What comes after "+n+"?",[String(n-1),String(n+1),String(n+2)],String(n+1)],
-          "operation-selection-addition":["The story says gets more. Which operation fits?",["Add","Subtract","Neither"],"Add"],
-          "operation-selection-subtraction":["The story says gives away. Which operation fits?",["Add","Subtract","Neither"],"Subtract"],
-          "data-totaling":["What should you do to find the graph total?",["Add both amounts","Pick one bar","Ignore the graph"],"Add both amounts"],
-          "shape-attribute-confusion":["Which shape has 4 equal sides?",["Triangle","Square","Circle"],"Square"],
-          "hour-minute-confusion":["Which hand tells the hour?",["Hour hand","Minute hand","Both"],"Hour hand"],
-          "measurement-unit-confusion":["When comparing measurements, what should stay the same?",["The unit","The object","The answer"],"The unit"]
-        };
-        const x2=fallback[m]||["Which strategy can help?",["Draw a model","Guess quickly","Skip it"],"Draw a model"];
-        return {prompt:x2[0],choices:x2[1],answer:x2[2]};
+        var fallback = ["Which strategy can help?", ["Draw a model", "Guess quickly", "Skip it"], "Draw a model"];
+        var x = templates[type] || fallback;
+        return {prompt: x[0], choices: x[1], answer: x[2]};
     }
     function showRemediationStep(){
-        const rem=progress.activeRemediation;if(!rem)return;
-        const stepIndex=(rem.steps||[]).findIndex(s=>s.status==="ready");
-        const step=Math.max(0,stepIndex), stepDef=(rem.steps||[])[step]||{};
-        if(stepDef.type==="original-question"){retryOriginalAfterRemediation();return;}
-        if(stepDef.type==="transfer-question"){showTransferQuestion();return;}
-        const mini=remediationStepQuestion(rem,stepDef),el=document.getElementById("gradeFeedback");if(!el)return;
-        el.innerHTML='<div class="grade-remediation"><strong>🧩 Let’s practice this skill.</strong><div class="grade-remediation-step">Step '+(step+1)+' · '+esc(mini.prompt)+'</div><div class="grade-remediation-choices">'+mini.choices.map(v=>'<button type="button" class="grade-choice" data-value="'+esc(v)+'" onclick="answerRemediationStep(this,this.dataset.value)">'+esc(v)+'</button>').join("")+'</div></div>';
+        var rem = progress.activeRemediation;
+        if(!rem) return;
+        var steps = rem.steps || [];
+        var index = steps.findIndex(function(s){ return s.status === "ready"; });
+        var step = index >= 0 ? index : 0;
+        var stepDef = steps[step] || {};
+        if(stepDef.type === "original-question"){ retryOriginalAfterRemediation(); return; }
+        if(stepDef.type === "transfer-question"){ showTransferQuestion(); return; }
+        var mini = remediationStepQuestion(rem, stepDef);
+        var el = document.getElementById("gradeFeedback");
+        if(!el) return;
+        el.innerHTML = '<div class="grade-remediation"><strong>🧩 Let’s practice this skill.</strong><div class="grade-remediation-step">Step ' + (step + 1) + ' · ' + esc(mini.prompt) + '</div><div class="grade-remediation-choices">' + mini.choices.map(function(v){ return '<button type="button" class="grade-choice" data-value="' + esc(v) + '" onclick="answerRemediationStep(this,this.dataset.value)">' + esc(v) + '</button>'; }).join("") + '</div></div>';
     }
-    function answerRemediationStep(btn,value){
-        const rem=progress.activeRemediation;if(!rem)return;
-        const idx=(rem.steps||[]).findIndex(s=>s.status==="ready"), stepDef=(rem.steps||[])[idx]||{};
-        const mini=remediationStepQuestion(rem,stepDef),el=document.getElementById("gradeFeedback");
-        if(String(value)!==String(mini.answer)){if(el)el.innerHTML='<div class="grade-remediation"><strong>Try one more time.</strong><div>Look for the important clue in the question.</div><button type="button" class="grade-hint" onclick="showRemediationStep()">↺ Try again</button></div>';return;}
-        if(idx>=0)rem.steps[idx].status="completed";
-        const next=rem.steps.findIndex(s=>s.status==="locked");
-        if(next>=0){rem.steps[next].status="ready";rem.nextAction=rem.steps[next].type;}else rem.nextAction="transfer-question";
+    function answerRemediationStep(btn, value){
+        var rem = progress.activeRemediation;
+        if(!rem) return;
+        var steps = rem.steps || [];
+        var index = steps.findIndex(function(s){ return s.status === "ready"; });
+        var stepDef = steps[index >= 0 ? index : 0] || {};
+        var mini = remediationStepQuestion(rem, stepDef);
+        var el = document.getElementById("gradeFeedback");
+        if(String(value) !== String(mini.answer)){
+            if(el) el.innerHTML = '<div class="grade-remediation"><strong>Try one more time.</strong><div>Look for the important clue in the question.</div><button type="button" class="grade-hint" onclick="showRemediationStep()">↺ Try again</button></div>';
+            return;
+        }
+        if(index >= 0) steps[index].status = "completed";
+        var next = steps.findIndex(function(s){ return s.status === "locked"; });
+        if(next >= 0){ steps[next].status = "ready"; rem.nextAction = steps[next].type; }
+        else rem.nextAction = "transfer-question";
         saveProgress();
         if(el){
-          if(next>=0)el.innerHTML='<div class="grade-remediation"><strong>✓ Good thinking.</strong><div>Ready for the next practice step.</div><button type="button" class="grade-text-submit" onclick="showRemediationStep()">→ Next practice step</button></div>';
-          else el.innerHTML='<div class="grade-remediation"><strong>✓ You are ready.</strong><div>Now show that you can use the idea in a new problem.</div><button type="button" class="grade-text-submit" onclick="showTransferQuestion()">🔄 Try a new problem</button></div>';
+            if(next >= 0) el.innerHTML = '<div class="grade-remediation"><strong>✓ Good thinking.</strong><div>Ready for the next practice step.</div><button type="button" class="grade-text-submit" onclick="showRemediationStep()">→ Next practice step</button></div>';
+            else el.innerHTML = '<div class="grade-remediation"><strong>✓ You are ready.</strong><div>Now show that you can use the idea in a new problem.</div><button type="button" class="grade-text-submit" onclick="showTransferQuestion()">🔄 Try a new problem</button></div>';
         }
     }
     function buildTransferQuestion(q,rem){
