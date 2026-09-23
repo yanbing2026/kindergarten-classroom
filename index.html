@@ -2059,7 +2059,16 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         } catch (e) {}
         return { stars: 0, mastery: {}, due: {}, mathCorrect: {}, activityLog: [], gradeMastery: {} };
     }
-    function logActivity(type, key, itemId, correct, firstTry) { if (!Array.isArray(progress.activityLog)) progress.activityLog = []; progress.activityLog.push({ at: Date.now(), type, key, itemId, correct: !!correct, firstTry: !!firstTry }); if (progress.activityLog.length > 300) progress.activityLog = progress.activityLog.slice(-300); }
+    function logActivity(type, key, itemId, correct, firstTry) {
+        if (!Array.isArray(progress.activityLog)) progress.activityLog = [];
+        progress.activityLog.push({ at: Date.now(), type, key, itemId, correct: !!correct, firstTry: !!firstTry });
+        if (progress.activityLog.length > 300) progress.activityLog = progress.activityLog.slice(-300);
+        if (window.KCData) window.KCData.recordActivity({
+            eventType: type || 'question', lessonKey: itemId || null,
+            subjectKey: key || null, correct: !!correct, firstTry: !!firstTry,
+            metadata: { source: 'legacy-logActivity' }
+        });
+    }
     function getActivitySummary(days = 7) {
         const cutoff = Date.now() - days * 86400000;
         const recent = (progress.activityLog || []).filter(x => x.at >= cutoff);
@@ -2067,7 +2076,11 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         recent.forEach(x => { if (!byKey[x.key]) byKey[x.key] = { key: x.key, attempts: 0, correct: 0, firstTry: 0 }; byKey[x.key].attempts++; if (x.correct) byKey[x.key].correct++; if (x.correct && x.firstTry) byKey[x.key].firstTry++; });
         return { attempts: recent.length, correct: recent.filter(x => x.correct).length, firstTry: recent.filter(x => x.correct && x.firstTry).length, days: new Set(recent.map(x => new Date(x.at).toLocaleDateString())).size, skills: Object.values(byKey).sort((a,b) => b.correct - a.correct || b.attempts - a.attempts) };
     }
-    function saveProgress() { localStorage.setItem(getCurrentAccount() ? accountProgressKey(getCurrentAccount()) : 'kc_progress_v1', JSON.stringify(progress)); if(getCurrentAccount()&&typeof cloudSaveProgress==='function') scheduleCloudProgressSync(); }
+    function saveProgress() {
+        localStorage.setItem(getCurrentAccount() ? accountProgressKey(getCurrentAccount()) : 'kc_progress_v1', JSON.stringify(progress));
+        if (window.KCData) window.KCData.localSnapshot(progress);
+        if(getCurrentAccount()&&typeof cloudSaveProgress==='function') scheduleCloudProgressSync();
+    }
     function todayKey() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
     function ensureDailyState() {
         if (!progress.daily || progress.daily.date !== todayKey()) {
