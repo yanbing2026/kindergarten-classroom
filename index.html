@@ -3824,6 +3824,9 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             <button class="big-btn home" onclick="goHome()">🏠 Home</button>
         </div>`;
     }
+    function renderCloudParentProgress(){if(!window.KCData||!window.KCData.playerId())return '<div class="parent-card" id="cloudParentProgress"><h3>☁️ Cloud learning data</h3><div class="parent-progress-label">Cloud sync is not linked yet.</div></div>';return '<div class="parent-card" id="cloudParentProgress"><h3>☁️ Cloud learning data</h3><div class="parent-progress-label">Loading your saved learning progress…</div></div>';}
+    function renderCloudParentProgressRows(rows){if(!rows.length)return '<div class="parent-good">No normalized cloud progress yet. Complete a lesson to start building the report.</div>';const byGrade={};rows.forEach(r=>{const g=r.grade_level||'unknown';(byGrade[g]||(byGrade[g]=[])).push(r);});return Object.keys(byGrade).map(g=>{const items=byGrade[g],avg=Math.round(items.reduce((a,r)=>a+Number(r.mastery||0),0)/items.length);const details=items.slice(0,8).map(r=>'<div class="parent-focus-row"><span>'+String((r.subject_key||'subject')+' · '+(r.unit_key||'unit')).replace(/</g,'&lt;')+'</span><span>'+Math.round(Number(r.mastery||0))+'% · '+Number(r.attempts||0)+' tries</span></div>').join('');return '<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-weight:900"><span>'+g+'</span><span>'+avg+'% avg mastery</span></div><div class="parent-progress" style="margin:7px 0 8px"><div class="parent-progress-fill" style="width:'+avg+'%"></div></div>'+details+'</div>';}).join('');}
+    async function loadCloudParentDashboard(){const box=document.getElementById('cloudParentProgress');if(!box||!window.KCData)return;try{const [p,a]=await Promise.all([window.KCData.fetchNormalizedProgress(),window.KCData.fetchRecentActivity(7)]);if(!p.ok){box.innerHTML='<h3>☁️ Cloud learning data</h3><div class="parent-progress-label">Cloud data unavailable right now. Local progress is still available.</div>';return;}const rows=p.rows||[],activity=a.ok?(a.rows||[]):[],attempts=activity.length,correct=activity.filter(x=>x.correct===true).length,firstTry=activity.filter(x=>x.first_try===true).length,days=new Set(activity.map(x=>String(x.created_at||'').slice(0,10)).filter(Boolean)).size;box.innerHTML='<h3>☁️ Cloud learning data</h3>'+renderCloudParentProgressRows(rows)+'<div class="parent-progress-label">Last 7 days: '+attempts+' attempts · '+correct+' correct · '+firstTry+' first try · active '+days+' day'+(days===1?'':'s')+'</div>';}catch(e){box.innerHTML='<h3>☁️ Cloud learning data</h3><div class="parent-progress-label">Cloud data could not be loaded. Local progress is still available.</div>';}}
     function renderParentDashboard() {
         const stats = CATEGORIES.reduce((acc, cat) => {
             const s = categoryLearningStats(cat);
@@ -3850,6 +3853,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             <div class="parent-card"><h3>📅 Last 7 days</h3><div class="parent-grid" style="margin:0;"><div class="parent-stat"><div class="parent-stat-number">${activity.attempts}</div><div>Attempts</div></div><div class="parent-stat"><div class="parent-stat-number">${activity.correct}</div><div>Correct</div></div><div class="parent-stat"><div class="parent-stat-number">${activity.firstTry}</div><div>First try</div></div></div><div class="parent-progress-label">Active on ${activity.days} day${activity.days === 1 ? "" : "s"}</div></div><div class="parent-card"><h3>🧭 What to focus on</h3>${focus || '<div class="parent-good">🏆 No immediate learning gaps. Keep exploring!</div>'}</div>
             <div class="parent-card"><h3>📚 Overall progress</h3><div class="parent-progress"><div class="parent-progress-fill" style="width:${pct}%"></div></div><div class="parent-progress-label">${stats.mastered} of ${stats.total} learning items mastered</div></div>
             <div class="parent-card"><h3>📈 Skills practiced this week</h3>${recentSkills || '<div class="parent-good">No activity yet this week.</div>'}</div>
+            ${renderCloudParentProgress()}
             <div class="parent-card"><h3>💎 Learning rewards</h3><div class="parent-progress-label">${progress.stars} diamonds earned · ${Object.values(progress.mathCorrect).reduce((a,b)=>a+(b||0),0)} math problems solved</div></div>
             <button class="big-btn home" onclick="go('progress')">← Back to Progress</button>
         </div>`;
@@ -5009,6 +5013,7 @@ GRADE1_INTERACTIVE.writing = window.KC_G1_WRITING;
         if (state.screen === 'trace') afterTraceRender();
         if (state.screen === 'draw') afterDrawRender();
         if (state.screen === 'timed') afterTimedRender();
+        if (state.screen === 'parentDashboard') loadCloudParentDashboard();
     }
 
     // ---------- Render: Draw (blank canvas) ----------
