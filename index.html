@@ -3836,6 +3836,16 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         const map={ela:'ELA',math:'Math',science:'Science',social:'Social Studies',writing:'Writing'};
         return map[id] || id;
     }
+    function cloudReportStatus(mastery,attempts){
+        const m=Number(mastery||0), a=Number(attempts||0);
+        if(!a) return {label:'Not started',icon:'⚪'};
+        if(m>=80) return {label:'Strong',icon:'🟢'};
+        if(m>=60) return {label:'Developing',icon:'🟡'};
+        return {label:'Needs practice',icon:'🔵'};
+    }
+    function cloudReportRowsForView(){
+        return cloudReportRows.filter(r=>(cloudReportGrade==='all'||r.grade_level===cloudReportGrade)&&(cloudReportSubject==='all'||r.subject_key===cloudReportSubject));
+    }
     function renderCloudParentProgress(){
         if(!window.KCData||!window.KCData.playerId()) return '<div class="parent-card" id="cloudParentProgress"><h3>☁️ Cloud learning report</h3><div class="parent-progress-label">Cloud sync is not linked yet.</div></div>';
         return '<div class="parent-card" id="cloudParentProgress"><h3>☁️ Cloud learning report</h3><div class="parent-progress-label">Loading your saved learning progress…</div></div>';
@@ -3848,25 +3858,38 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         return Object.keys(byGrade).sort().map(g=>{
             const items=byGrade[g];
             const avg=Math.round(items.reduce((a,r)=>a+Number(r.mastery||0),0)/items.length);
-            const details=items.slice().sort((a,b)=>Number(b.mastery||0)-Number(a.mastery||0)).slice(0,12).map(r=>{
+            const details=items.slice().sort((a,b)=>Number(b.mastery||0)-Number(a.mastery||0)).map(r=>{
                 const mastery=Math.max(0,Math.min(100,Math.round(Number(r.mastery||0))));
-                return '<div class="parent-focus-row"><span>'+String(cloudSubjectLabel(r.subject_key||'subject')+' · '+(r.unit_key||'unit')).replace(/</g,'&lt;')+'</span><span>'+mastery+'% · '+Number(r.attempts||0)+' tries</span></div>';
+                const status=cloudReportStatus(mastery,r.attempts);
+                return '<div style="padding:10px 0;border-top:1px solid #ddd"><div class="parent-focus-row" style="border:0;padding:0"><span><strong>'+String(cloudSubjectLabel(r.subject_key||'subject')+' · '+(r.unit_key||'unit')).replace(/</g,'&lt;')+'</strong></span><span>'+status.icon+' '+status.label+'</span></div><div class="parent-progress" style="margin:6px 0 4px;height:12px"><div class="parent-progress-fill" style="width:'+mastery+'%"></div></div><div class="parent-progress-label">'+mastery+'% mastery · '+Number(r.attempts||0)+' attempts · '+Number(r.correct||0)+' correct · '+Number(r.first_try_correct||0)+' first try</div></div>';
             }).join('');
-            return '<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-weight:900"><span>'+cloudGradeLabel(g)+'</span><span>'+avg+'% avg mastery</span></div><div class="parent-progress" style="margin:7px 0 8px"><div class="parent-progress-fill" style="width:'+avg+'%"></div></div>'+details+'</div>';
+            return '<div style="margin-bottom:18px"><div style="display:flex;justify-content:space-between;font-weight:900"><span>'+cloudGradeLabel(g)+'</span><span>'+avg+'% average</span></div><div class="parent-progress" style="margin:7px 0 4px"><div class="parent-progress-fill" style="width:'+avg+'%"></div></div>'+details+'</div>';
         }).join('');
+    }
+    function renderCloudTrend(activity){
+        const byDay={};
+        activity.forEach(x=>{const d=String(x.created_at||'').slice(0,10);if(d)(byDay[d]||(byDay[d]={attempts:0,correct:0})).attempts++,byDay[d].correct+=x.correct===true?1:0;});
+        const days=Object.keys(byDay).sort();
+        if(!days.length) return '<div class="parent-progress-label">No activity recorded in the last 7 days.</div>';
+        return days.map(d=>{const x=byDay[d],rate=x.attempts?Math.round(x.correct/x.attempts*100):0;return '<div class="parent-focus-row"><span>'+d+'</span><span>'+x.attempts+' attempts · '+rate+'% correct</span></div>';}).join('');
     }
     function refreshCloudParentReport(){
         const box=document.getElementById('cloudParentProgress');
         if(!box) return;
         const grades=[...new Set(cloudReportRows.map(r=>r.grade_level).filter(Boolean))].sort();
         const subjects=[...new Set(cloudReportRows.map(r=>r.subject_key).filter(Boolean))].sort();
-        const gradeOptions='<option value="all"'+(cloudReportGrade==='all'?' selected':'')+'>All grades</option>'+grades.map(g=>'<option value="'+g+'"'+(cloudReportGrade===g?' selected':'')+'>'+cloudGradeLabel(g)+'</option>').join('');
-        const subjectOptions='<option value="all"'+(cloudReportSubject==='all'?' selected':'')+'>All subjects</option>'+subjects.map(s=>'<option value="'+s+'"'+(cloudReportSubject===s?' selected':'')+'>'+cloudSubjectLabel(s)+'</option>').join('');
+        const filtered=cloudReportRowsForView();
+        const avg=filtered.length?Math.round(filtered.reduce((a,r)=>a+Number(r.mastery||0),0)/filtered.length):0;
+        const needs=filtered.filter(r=>Number(r.attempts||0)>0&&Number(r.mastery||0)<60).length;
+        const gradeOptions='<option value="all">All grades</option>'+grades.map(g=>'<option value="'+g+'">'+cloudGradeLabel(g)+'</option>').join('');
+        const subjectOptions='<option value="all">All subjects</option>'+subjects.map(s=>'<option value="'+s+'">'+cloudSubjectLabel(s)+'</option>').join('');
         const attempts=cloudReportActivity.length;
         const correct=cloudReportActivity.filter(x=>x.correct===true).length;
         const firstTry=cloudReportActivity.filter(x=>x.first_try===true).length;
         const days=new Set(cloudReportActivity.map(x=>String(x.created_at||'').slice(0,10)).filter(Boolean)).size;
-        box.innerHTML='<h3>☁️ Cloud learning report</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px"><select aria-label="Grade filter" onchange="cloudReportGrade=this.value;refreshCloudParentReport()"><option value="all"'+(cloudReportGrade==='all'?' selected':'')+'>All grades</option>'+grades.map(g=>'<option value="'+g+'"'+(cloudReportGrade===g?' selected':'')+'>'+cloudGradeLabel(g)+'</option>').join('')+'</select><select aria-label="Subject filter" onchange="cloudReportSubject=this.value;refreshCloudParentReport()">'+subjectOptions+'</select></div>'+renderCloudParentProgressRows(cloudReportRows)+'<div class="parent-progress-label">Last 7 days: '+attempts+' attempts · '+correct+' correct · '+firstTry+' first try · active '+days+' day'+(days===1?'':'s')+'</div>';
+        box.innerHTML='<h3>☁️ Cloud learning report</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px"><select aria-label="Grade filter" onchange="cloudReportGrade=this.value;refreshCloudParentReport()">'+gradeOptions.replace('value="all">','value="all"'+(cloudReportGrade==='all'?' selected':'')+'>').replace('value="'+cloudReportGrade+'">','value="'+cloudReportGrade+'" selected>')+'</select><select aria-label="Subject filter" onchange="cloudReportSubject=this.value;refreshCloudParentReport()">'+subjectOptions.replace('value="all">','value="all"'+(cloudReportSubject==='all'?' selected':'')+'>').replace('value="'+cloudReportSubject+'">','value="'+cloudReportSubject+'" selected>')+'</select></div><div class="parent-grid" style="margin:0 0 12px"><div class="parent-stat"><div class="parent-stat-number">'+avg+'%</div><div>Avg mastery</div></div><div class="parent-stat"><div class="parent-stat-number">'+filtered.length+'</div><div>Units tracked</div></div><div class="parent-stat"><div class="parent-stat-number">'+needs+'</div><div>Needs practice</div></div></div>'+renderCloudParentProgressRows(filtered)+'<div class="parent-card" style="margin:12px 0 0;background:#fafafa"><h3>📈 Recent trend</h3>'+renderCloudTrend(cloudReportActivity)+'</div><div class="parent-progress-label" style="margin-top:10px">Last 7 days: '+attempts+' attempts · '+correct+' correct · '+firstTry+' first try · active '+days+' day'+(days===1?'':'s')+'</div>';
+        const gs=box.querySelector('select[aria-label="Grade filter"]'), ss=box.querySelector('select[aria-label="Subject filter"]');
+        if(gs) gs.value=cloudReportGrade; if(ss) ss.value=cloudReportSubject;
     }
     async function loadCloudParentDashboard(){
         const box=document.getElementById('cloudParentProgress');
