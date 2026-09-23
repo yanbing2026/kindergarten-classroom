@@ -27,10 +27,19 @@
     try { localStorage.setItem(QUEUE_KEY, JSON.stringify(queue.slice(-100))); } catch (_) {}
   }
 
+  function makeQueueId() {
+    try {
+      if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+        return window.crypto.randomUUID();
+      }
+    } catch (_) {}
+    return 'evt-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+  }
+
   function enqueue(type, payload) {
     const queue = loadQueue();
     queue.push({
-      id: (crypto.randomUUID ? crypto.randomUUID() : Date.now() + '-' + Math.random()),
+      id: makeQueueId(),
       type,
       payload,
       createdAt: new Date().toISOString(),
@@ -114,6 +123,15 @@
   function setPlayerId(id) { try { if (id) localStorage.setItem(PLAYER_ID_KEY, id); } catch (_) {} return id; }
   function playerId() { try { return localStorage.getItem(PLAYER_ID_KEY) || null; } catch (_) { return null; } }
 
+  function isUuid(value) {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ''));
+  }
+
+  function uuidFromLegacyQueueId(value) {
+    const raw = String(value || '').replace(/[^0-9a-f]/gi, '').padEnd(32, '0').slice(0, 32);
+    return raw.slice(0,8)+'-'+raw.slice(8,12)+'-4'+raw.slice(13,16)+'-8'+raw.slice(17,20)+'-'+raw.slice(20,32);
+  }
+
   async function flushNormalized() {
     const id = playerId();
     if (!id || !window.supa) return { ok:false, skipped:true, reason:'normalized auth not linked' };
@@ -123,8 +141,14 @@
     const goals = queue.filter(x => x.type === 'daily-goal');
     let sent = 0;
     if (activity.length) {
-      const rows = activity.map(x => ({ player_id:id, ...x.payload }));
-      const { error } = await window.supa.from('activity_events').insert(rows);
+      const rows = activity.map(x => ({
+        player_id:id,
+        client_event_id: isUuid(x.id) ? x.id : uuidFromLegacyQueueId(x.id),
+        ...x.payload
+      }));
+      const { error } = await window.supa
+        .from('activity_events')
+        .upsert(rows, { onConflict:'player_id,client_event_id', ignoreDuplicates:true });
       if (error) return { ok:false, error:error.message, sent };
       sent += activity.length;
     }
@@ -161,7 +185,7 @@
     const since = new Date(Date.now() - Math.max(1, Number(days) || 7) * 86400000).toISOString();
     const { data, error } = await window.supa
       .from('activity_events')
-      .select('grade_level,subject_key,unit_key,event_type,correct,first_try,score,duration_ms,metadata,created_at')
+      .select('client_event_id,grade_level,subject_key,unit_key,event_type,correct,first_try,score,duration_ms,metadata,created_at')
       .eq('player_id', id)
       .gte('created_at', since)
       .order('created_at', { ascending:false })
