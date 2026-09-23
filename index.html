@@ -5043,6 +5043,46 @@ function gradeStageFor(index,total){if(index===0)return {name:'LESSON',copy:'Lea
             }
         });        const daily=ensureDailyState(); const prior=Math.min(3,Number(daily.adaptiveCompletedQuestions)||0); if(prior<3) syncAdaptiveDailyGoal(prior+1);
     }
+    function remediationMiniQuestion(rem){
+        const m=rem?.misconception||'';
+        const map={
+          'tens-ones-confusion':['In 34, how many tens are there?',['2','3','4'],'3'],
+          'digit-vs-value-confusion':['In 52, what is the value of the 5?',['5','50','2'],'50'],
+          'expanded-form-decomposition':['Which is 47 in expanded form?',['4+7','40+7','47+0'],'40+7'],
+          'place-value-comparison':['Which number is greater?',['38','83','Both'],'83'],
+          'counting-direction':['What comes after 29?',['28','30','39'],'30'],
+          'operation-selection-addition':['You have 4 apples and get 2 more. What should you do?',['Add','Subtract','Count backward'],'Add'],
+          'operation-selection-subtraction':['You have 7 apples and give away 2. What should you do?',['Add','Subtract','Count backward'],'Subtract'],
+          'data-totaling':['A graph shows 3 and 2. What does the total mean?',['Add both amounts','Pick the taller bar','Ignore one bar'],'Add both amounts'],
+          'shape-attribute-confusion':['Which shape has 4 equal sides?',['Triangle','Square','Circle'],'Square'],
+          'hour-minute-confusion':['For 3:00, which hand points to 3?',['Hour hand','Minute hand','Both'],'Hour hand'],
+          'measurement-unit-confusion':['When measuring two objects, what should stay the same?',['The unit','The object','The answer'],'The unit']
+        };
+        const x=map[m]||['Which strategy can help you solve a tricky question?',['Draw a picture','Guess quickly','Skip it'],'Draw a picture'];
+        return {prompt:x[0],choices:x[1],answer:x[2]};
+    }
+    function showRemediationStep(){
+        const rem=progress.activeRemediation;if(!rem)return;
+        const stepIndex=(rem.steps||[]).findIndex(s=>s.status==='ready');
+        const step=Math.max(0,stepIndex),mini=remediationMiniQuestion(rem),el=document.getElementById('gradeFeedback');if(!el)return;
+        el.innerHTML='<div class="grade-remediation"><strong>🧩 Let’s practice this skill.</strong><div class="grade-remediation-step">Step '+(step+1)+' · '+esc(mini.prompt)+'</div><div class="grade-remediation-choices">'+mini.choices.map(v=>'<button type="button" class="grade-choice" onclick="answerRemediationStep(this,''+esc(v).replace(/'/g,"\\'")+'')">'+esc(v)+'</button>').join('')+'</div></div>';
+    }
+    function answerRemediationStep(btn,value){
+        const rem=progress.activeRemediation;if(!rem)return;
+        const mini=remediationMiniQuestion(rem),el=document.getElementById('gradeFeedback');
+        if(value!==mini.answer){if(el)el.innerHTML='<div class="grade-remediation"><strong>Try one more time.</strong><div>Look for the important clue in the question.</div><button type="button" class="grade-hint" onclick="showRemediationStep()">↺ Try again</button></div>';return;}
+        const idx=(rem.steps||[]).findIndex(s=>s.status==='ready');
+        if(idx>=0)rem.steps[idx].status='completed';
+        const next=rem.steps.findIndex(s=>s.status==='locked');
+        if(next>=0){rem.steps[next].status='ready';rem.nextAction=rem.steps[next].type;}else rem.nextAction='retry-original';
+        saveProgress();
+        if(el)el.innerHTML='<div class="grade-remediation"><strong>✓ Good thinking.</strong><div>Now use that idea on the original question.</div><button type="button" class="grade-text-submit" onclick="retryOriginalAfterRemediation()">↩ Try the original question</button></div>';
+    }
+    function retryOriginalAfterRemediation(){
+        gradeQuiz.awaitingNext=false;
+        const el=document.getElementById('gradeFeedback');if(el)el.textContent='Use the strategy you just practiced, then try the original question.';
+    }
+
     function gradeHint(){const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];if(!q)return;let message=q.hint||'Think about the clue.';if(window.KCSkillEngine){const gradeId=gradeQuiz.gradeId==='g1'?'grade-1':gradeQuiz.gradeId==='g2'?'grade-2':gradeQuiz.gradeId==='k'?'kindergarten':gradeQuiz.gradeId;const course=GRADE_CURRICULUM.find(g=>g.id===gradeQuiz.gradeId)?.courses?.[gradeQuiz.courseIndex];const subjectKey=gradeInteractiveKey(course)||courseSubjectType(course?.name||'');const unitKey=String(gradeQuiz.unit?.unit||('unit-'+(gradeQuiz.unitIndex+1))).toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,80)||('unit-'+(gradeQuiz.unitIndex+1));const rec=window.KCSkillEngine.tutorRecommendation(progress,q,{gradeId,subjectKey,unitKey,unitTitle:gradeQuiz.unit?.unit||null,difficulty:q.difficulty});if(rec?.message)message=rec.message;}const el=document.getElementById('gradeBlipolaMessage');if(el)el.textContent='💡 '+message;speak(message);}
     function gradeInteractiveVisual(q){
         if(!q)return '';
@@ -5118,7 +5158,7 @@ function gradeStageFor(index,total){if(index===0)return {name:'LESSON',copy:'Lea
         if(!gradeQuiz||gradeQuiz.awaitingNext)return;
         recordNormalizedGradeAnswer(correct,gradeQuiz.firstAttempt,gradeQuiz.unit?.lessons?.[gradeQuiz.idx]);
         const feedback=document.getElementById('gradeFeedback');
-        if(correct){gradeQuiz.awaitingNext=true;if(gradeQuiz.firstAttempt)gradeQuiz.correctFirstTry++;gradeQuiz.stars++;awardStar();const key=gradeQuiz.gradeId+'_'+gradeQuiz.courseIndex+'_'+gradeQuiz.unitIndex;progress.gradeMastery=progress.gradeMastery||{};progress.gradeMastery[key]=(progress.gradeMastery[key]||0)+(gradeQuiz.firstAttempt?1:0);saveProgress();logActivity('grade',gradeQuiz.gradeId+'_'+gradeQuiz.courseIndex,gradeQuiz.unit?.unit||'Math',true,gradeQuiz.firstAttempt);if(feedback)feedback.textContent='✓ Correct! '+feedbackText;speak('Correct! '+feedbackText);confettiBurst();scheduleNavigation(nextGradeQuestion,900);}else{gradeQuiz.firstAttempt=false;gradeQuiz.wrongAttempts++;if(feedback)feedback.textContent='Try again. '+(gradeQuiz.unit.lessons[gradeQuiz.idx].hint||'Think carefully.');}}
+        if(correct){gradeQuiz.awaitingNext=true;if(gradeQuiz.firstAttempt)gradeQuiz.correctFirstTry++;gradeQuiz.stars++;awardStar();const key=gradeQuiz.gradeId+'_'+gradeQuiz.courseIndex+'_'+gradeQuiz.unitIndex;progress.gradeMastery=progress.gradeMastery||{};progress.gradeMastery[key]=(progress.gradeMastery[key]||0)+(gradeQuiz.firstAttempt?1:0);saveProgress();logActivity('grade',gradeQuiz.gradeId+'_'+gradeQuiz.courseIndex,gradeQuiz.unit?.unit||'Math',true,gradeQuiz.firstAttempt);if(feedback)feedback.textContent='✓ Correct! '+feedbackText;speak('Correct! '+feedbackText);confettiBurst();scheduleNavigation(nextGradeQuestion,900);}else{gradeQuiz.firstAttempt=false;gradeQuiz.wrongAttempts++;if(feedback){feedback.textContent='Try again. '+(gradeQuiz.unit.lessons[gradeQuiz.idx].hint||'Think carefully.');showRemediationStep();}}}
     function handleGraphChoice(i){
         const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];if(!q||gradeQuiz.awaitingNext)return;
         if(q.graphMode==='difference'){
