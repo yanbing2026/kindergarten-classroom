@@ -196,6 +196,30 @@
     return prev;
   }
 
+  function buildDailyMission(progress, options){
+    options=options||{};
+    const limit=Math.max(1,Math.min(8,Number(options.limit)||4));
+    const stats=progress?.skillStats||{};
+    const candidates=Object.values(stats);
+    const now=Date.now();
+    const due=candidates.filter(s=>s?.nextReviewAt && Date.parse(s.nextReviewAt)<=now);
+    const weak=candidates.filter(s=>Number(s?.mastery||0)<60);
+    const review=due.sort((a,b)=>(Number(a.mastery)||0)-(Number(b.mastery)||0));
+    const focus=review.concat(weak.filter(s=>!review.includes(s)));
+    const skills=focus.slice(0,limit).map(s=>({
+      skillId:s.skillId, mastery:Number(s.mastery)||0,
+      misconception:s.lastMisconception||null,
+      action:(s.nextReviewAt && Date.parse(s.nextReviewAt)<=now)?'review':'practice'
+    }));
+    return {
+      date:new Date().toISOString().slice(0,10),
+      target:limit,
+      skills,
+      completed:0,
+      reason:skills.length?'Focus on skills that need review or more practice.':'Build momentum with a new skill.'
+    };
+  }
+
   function tutorRecommendation(progress, q, context){
     const meta=describeQuestion(q,context);
     const skill=getSkillState(progress,meta);
@@ -295,6 +319,7 @@
     adaptiveScore,
     selectAdaptiveLessons,
     tutorRecommendation,
+    buildDailyMission,
     classifyMisconception,
     _slug: slug
   };
