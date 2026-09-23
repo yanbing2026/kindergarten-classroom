@@ -5010,6 +5010,23 @@ function gradeStageFor(index,total){if(index===0)return {name:'LESSON',copy:'Lea
         if (skillEvidence) {
             skillEvidence.lastDifficulty = skill.difficulty;
         }
+        if(skill && window.KCSkillEngine && !correct){
+            const remediation=window.KCSkillEngine.buildRemediationPath(progress,q,{
+                correct:false,
+                selectedAnswer:answerContext?.selectedAnswer
+            },{gradeId,subjectKey,unitKey,unitTitle:gradeQuiz.unit?.unit||null,difficulty:q.difficulty});
+            progress.activeRemediation=remediation;
+            progress.remediationHistory=Array.isArray(progress.remediationHistory)?progress.remediationHistory:[];
+            progress.remediationHistory.unshift({...remediation,createdAt:new Date().toISOString()});
+            progress.remediationHistory=progress.remediationHistory.slice(0,20);
+        } else if(correct && progress.activeRemediation){
+            progress.activeRemediation={
+                ...progress.activeRemediation,
+                steps:(progress.activeRemediation.steps||[]).map(s=>({...s,status:s.status==='ready'?'completed':s.status})),
+                nextAction:'transfer-question',
+                resolvedAt:new Date().toISOString()
+            };
+        }
 
         window.KCData.recordProgress({
             gradeLevel:gradeId,subjectKey,unitKey,
