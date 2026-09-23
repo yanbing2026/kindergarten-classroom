@@ -64,6 +64,23 @@
 -- metadata jsonb
 -- created_at timestamptz
 
+-- Curriculum skills / atomic learning targets
+-- public.curriculum_skills
+-- id uuid PK
+-- grade_level text
+-- subject_key text
+-- unit_key text
+-- skill_key text
+-- title text
+-- description text
+-- prerequisite_skill_key text nullable
+-- sort_order integer
+-- active boolean
+-- metadata jsonb
+-- created_at timestamptz
+-- updated_at timestamptz
+-- UNIQUE(grade_level, subject_key, unit_key, skill_key)
+
 -- Daily learning goals
 -- public.daily_goals
 -- id uuid PK
