@@ -135,7 +135,7 @@
       sent += progressRows.length;
     }
     if (goals.length) {
-      const rows = goals.map(x => ({ player_id:id, ...x.payload }));
+      const rows = goals.map(x => ({ player_id:id, goal_date:x.payload.goalDate, target_questions:x.payload.targetQuestions, completed_questions:x.payload.completedQuestions, completed:x.payload.completed, metadata:x.payload.metadata || {} }));
       const { error } = await window.supa.from('daily_goals').upsert(rows, { onConflict:'player_id,goal_date' });
       if (error) return { ok:false, error:error.message, sent };
       sent += goals.length;
