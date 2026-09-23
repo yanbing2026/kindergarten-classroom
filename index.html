@@ -1888,6 +1888,8 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
     function cacheAccount(name){
         const key=name.toLowerCase();
         try{const accounts=getAccounts();accounts[key]={name:name};localStorage.setItem('kc_accounts_v1',JSON.stringify(accounts));}catch(_){}
+        const previous=localStorage.getItem('kc_current_account')||'';
+        if(previous!==key&&window.KCData) window.KCData.setPlayerId('');
         localStorage.setItem('kc_current_account',key);
         return key;
     }
@@ -2046,7 +2048,14 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         closeAccountModal();renderAccountBar();progress=loadProgress();blipola=window.BlipolaClassroom.create(progress);render();
     })();
     }
-    function logoutAccount(){localStorage.removeItem('kc_current_account');renderAccountBar();progress=loadProgress();blipola=window.BlipolaClassroom.create(progress);render();}
+    function logoutAccount(){
+        localStorage.removeItem('kc_current_account');
+        if(window.KCData) window.KCData.setPlayerId('');
+        renderAccountBar();
+        progress=loadProgress();
+        blipola=window.BlipolaClassroom.create(progress);
+        render();
+    }
     function renderAccountBar(){const el=document.getElementById('accountBar');if(!el)return;const key=getCurrentAccount(),acct=key?(getAccounts()[key]||{name:key}):null;if(acct){el.innerHTML='<span class="account-name">👤 '+esc(acct.name)+'</span><span class="account-sync" id="accountSyncStatus" aria-live="polite">☁️ Saved</span><button class="account-btn" id="logoutBtn">Log out</button>';document.getElementById('logoutBtn').onclick=logoutAccount;setCloudSyncStatus('saved');}else{el.innerHTML='<button class="account-btn" id="loginBtn">👤 Log in</button><button class="account-btn" id="createBtn">➕ Create account</button>';document.getElementById('loginBtn').onclick=()=>openAccountModal('login');document.getElementById('createBtn').onclick=()=>openAccountModal('create');}}
 
 
