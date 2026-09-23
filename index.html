@@ -4651,7 +4651,70 @@ GRADE1_INTERACTIVE.writing = window.KC_G1_WRITING;
     // page cannot crash before the current interactive bank is initialized.
     function buildGrade1MathBank() {
         const bank = window.KC_G1_MATH || [];
-        return diversifyGrade1MathBank(bank);
+        const diversified = diversifyGrade1MathBank(bank);
+        // Keep Data & Graphs as its own Grade 1 math unit instead of
+        // mixing graph tasks into Measurement. This gives the course browser
+        // a clear progression and makes the graph interaction independently testable.
+        if (!diversified.some(unit => unit.unit === 'Data & Graphs')) {
+            const sets = [
+                {title:'Favorite fruit', labels:['Apples','Bananas','Grapes','Oranges'], values:[6,4,8,5]},
+                {title:'Books read', labels:['Ana','Ben','Kai','Mia'], values:[3,7,5,4]},
+                {title:'Pets at home', labels:['Cats','Dogs','Fish','Birds'], values:[5,8,3,6]},
+                {title:'Sunny days', labels:['Mon','Tue','Wed','Thu'], values:[4,7,6,3]},
+                {title:'Blocks built', labels:['Red','Blue','Green','Yellow'], values:[7,5,9,4]},
+                {title:'Class votes', labels:['Pizza','Tacos','Rice','Soup'], values:[8,6,3,7]},
+                {title:'Garden plants', labels:['Beans','Corn','Peas','Carrots'], values:[5,9,4,7]},
+                {title:'Toy choices', labels:['Cars','Balls','Dolls','Puzzles'], values:[6,3,8,5]}
+            ];
+            const modes = ['most','least','difference','total'];
+            const lessons = [];
+            sets.forEach((g, setIndex) => {
+                const max = Math.max(...g.values), min = Math.min(...g.values);
+                const hi = g.values.indexOf(max), lo = g.values.indexOf(min);
+                const total = g.values.reduce((a,b)=>a+b,0);
+                modes.forEach((mode, modeIndex) => {
+                    const q = {
+                        title: mode === 'most' ? 'Read the graph: most'
+                            : mode === 'least' ? 'Read the graph: least'
+                            : mode === 'difference' ? 'Compare two bars'
+                            : 'Find the total',
+                        prompt: mode === 'most' ? 'Which category has the most?'
+                            : mode === 'least' ? 'Which category has the least?'
+                            : mode === 'difference' ? 'How many more are there in '+g.labels[hi]+' than '+g.labels[lo]+'?'
+                            : 'How many are there altogether?',
+                        answer: mode === 'most' ? g.labels[hi]
+                            : mode === 'least' ? g.labels[lo]
+                            : mode === 'difference' ? String(max-min)
+                            : String(total),
+                        hint: mode === 'most' ? 'Look for the tallest bar.'
+                            : mode === 'least' ? 'Look for the shortest bar.'
+                            : mode === 'difference' ? 'Subtract the shorter bar from the taller bar.'
+                            : 'Add all four bars together.',
+                        explanation: mode === 'most' ? g.labels[hi]+' has '+max+'.'
+                            : mode === 'least' ? g.labels[lo]+' has '+min+'.'
+                            : mode === 'difference' ? max+' − '+min+' = '+(max-min)+'.'
+                            : g.values.join(' + ')+' = '+total+'.',
+                        type:'choice',
+                        interaction:'graph',
+                        graphTitle:g.title,
+                        graphLabels:g.labels,
+                        graphValues:g.values,
+                        graphMode:mode,
+                        graphCompare:[hi,lo],
+                        graphTotalChoices:[String(total),String(total-2),String(total+2),String(total+4)],
+                        graphHelp: mode === 'difference' ? 'Tap the taller bar first, then the shorter bar.'
+                            : mode === 'total' ? 'Add every bar, then choose the total.'
+                            : 'Tap the bar that answers the question.'
+                    };
+                    lessons.push(q);
+                });
+            });
+            diversified.push({
+                unit:'Data & Graphs',
+                lessons:lessons.slice(0,32)
+            });
+        }
+        return diversified;
     }
     const GRADE1_MATH_BANK = buildGrade1MathBank();
     GRADE1_INTERACTIVE.math = GRADE1_MATH_BANK;
