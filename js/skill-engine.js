@@ -170,6 +170,28 @@
       misconception
     }]).slice(-12);
     if (misconception) prev.lastMisconception = misconception;
+
+    // Spaced-review schedule: weak/error skills return quickly; stable skills spread out.
+    const priorStreak = Number(prev.reviewStreak || 0);
+    let reviewStreak = priorStreak;
+    let reviewDays;
+    if (!result.correct) {
+      reviewStreak = 0;
+      reviewDays = 0;
+    } else if (!result.firstTry) {
+      reviewStreak = Math.max(0, priorStreak);
+      reviewDays = 1;
+    } else {
+      reviewStreak = priorStreak + 1;
+      const intervals = [0, 1, 3, 7, 14, 30];
+      reviewDays = intervals[Math.min(reviewStreak, intervals.length - 1)];
+    }
+    if (misconception && result.correct) reviewDays = Math.min(reviewDays, 1);
+    const reviewAt = new Date(Date.now() + reviewDays * 86400000);
+    prev.reviewStreak = reviewStreak;
+    prev.reviewIntervalDays = reviewDays;
+    prev.nextReviewAt = reviewAt.toISOString();
+
     progress.skillStats[meta.skillId] = prev;
     return prev;
   }
@@ -189,6 +211,11 @@
     if(last && !last.correct) score += 28;
     if(skill.lastMisconception) score += 12;
     if((skill.attempts||0)===0) score += 18;
+    if(skill.nextReviewAt){
+      const due=Date.parse(skill.nextReviewAt) <= Date.now();
+      if(due) score += 42;
+      else score -= 10;
+    }
     const desired=nextDifficulty(skill);
     const delta=Math.abs((meta.difficulty||1)-desired);
     score -= delta*10;
