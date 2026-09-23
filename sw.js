@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kc-shell-v6';
+const CACHE_NAME = 'kc-shell-v7';
 const APP_SHELL = [
   './',
   './index.html',
