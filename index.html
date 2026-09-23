@@ -4863,6 +4863,7 @@ GRADE1_INTERACTIVE.writing = window.KC_G1_WRITING;
     }
     function finishInteractiveAnswer(correct,feedbackText){
         if(!gradeQuiz||gradeQuiz.awaitingNext)return;
+        recordNormalizedGradeAnswer(correct,gradeQuiz.firstAttempt,gradeQuiz.unit?.lessons?.[gradeQuiz.idx]);
         const feedback=document.getElementById('gradeFeedback');
         if(correct){gradeQuiz.awaitingNext=true;if(gradeQuiz.firstAttempt)gradeQuiz.correctFirstTry++;gradeQuiz.stars++;awardStar();const key=gradeQuiz.gradeId+'_'+gradeQuiz.courseIndex+'_'+gradeQuiz.unitIndex;progress.gradeMastery=progress.gradeMastery||{};progress.gradeMastery[key]=(progress.gradeMastery[key]||0)+(gradeQuiz.firstAttempt?1:0);saveProgress();logActivity('grade',gradeQuiz.gradeId+'_'+gradeQuiz.courseIndex,gradeQuiz.unit?.unit||'Math',true,gradeQuiz.firstAttempt);if(feedback)feedback.textContent='✓ Correct! '+feedbackText;speak('Correct! '+feedbackText);confettiBurst();scheduleNavigation(nextGradeQuestion,900);}else{gradeQuiz.firstAttempt=false;gradeQuiz.wrongAttempts++;if(feedback)feedback.textContent='Try again. '+(gradeQuiz.unit.lessons[gradeQuiz.idx].hint||'Think carefully.');}}
     function handleGraphChoice(i){
