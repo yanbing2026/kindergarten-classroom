@@ -3848,7 +3848,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         return Object.keys(byGrade).sort().map(g=>{
             const items=byGrade[g];
             const avg=Math.round(items.reduce((a,r)=>a+Number(r.mastery||0),0)/items.length);
-            const details=items.slice().sort((a,b)=>Number(b.mastery||0)-Number(a.mastery||0).localeCompare?.(Number(a.mastery||0))).slice(0,12).map(r=>{
+            const details=items.slice().sort((a,b)=>Number(b.mastery||0)-Number(a.mastery||0)).slice(0,12).map(r=>{
                 const mastery=Math.max(0,Math.min(100,Math.round(Number(r.mastery||0))));
                 return '<div class="parent-focus-row"><span>'+String(cloudSubjectLabel(r.subject_key||'subject')+' · '+(r.unit_key||'unit')).replace(/</g,'&lt;')+'</span><span>'+mastery+'% · '+Number(r.attempts||0)+' tries</span></div>';
             }).join('');
