@@ -1970,6 +1970,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
     function accountProgressKey(name){return 'kc_account_progress_v1_'+name.toLowerCase();}
     // ---------- Supabase cloud accounts (name+PIN stored server-side) ----------
     const supa = window.supabase ? supabase.createClient('https://sjqhcpbdgaeapljbllhp.supabase.co','sb_publishable_DMSaun0u7qH2pAQzupS8Ww_G780gpm9') : null;
+    window.supa = supa;
     function getCurrentAccountName(){
         const key=getCurrentAccount();
         if(!key)return '';
@@ -2031,7 +2032,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         return data[0];
     }
     async function ensureNormalizedAuth(name){
-        if(!window.supa||!currentPinVerifier)return {ok:false,reason:'missing credentials'};
+        if(!supa||!currentPinVerifier)return {ok:false,reason:'missing credentials'};
         try{
             const sessionResult=await supa.auth.getSession();
             let session=sessionResult.data?.session||null;
