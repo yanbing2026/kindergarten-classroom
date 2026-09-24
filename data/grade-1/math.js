@@ -1,4 +1,6 @@
 // Grade 1 Math question bank — isolated generation module.
+// Self-contained: unit names are defined here because this file loads
+// before the main page script and must not reference its globals.
 function mathChoices(answer, spread){
         const a=Number(answer), step=spread||1, vals=[a,a+step,a-step,a+2*step,a-2*step,a+3*step];
         const out=[]; for(const v of vals){if(v>=0&&!out.includes(v))out.push(v);if(out.length===4)break;}
@@ -7,7 +9,7 @@ function mathChoices(answer, spread){
     function mathMC(title,prompt,answer,hint,explanation,choices){
         const opts=(choices||mathChoices(answer)).map(String); return {title,prompt,choices:opts,answer:String(answer),hint,explanation};
     }
-    function buildGrade1MathBank(){
+    function buildGrade1MathDataBank(){
         const u1=[],u2=[],u3=[],u4=[],u5=[],u6=[];
         for(let a=2;a<=19&&u1.length<18;a+=1){const b=(a*3)% (21-a); if(b>0&&a+b<=20)u1.push(mathMC('Add within 20','What is '+a+' + '+b+'?',a+b,'Count on from the larger number.',''+a+' plus '+b+' equals '+(a+b)+'.'));}
         for(let a=20;a>=2&&u1.length<36;a--){const b=(a*2)%a+1;if(b<a)u1.push(mathMC('Subtract within 20','What is '+a+' − '+b+'?',a-b,'Count back '+b+' from '+a+'.',''+a+' minus '+b+' equals '+(a-b)+'.'));}
@@ -47,5 +49,7 @@ function mathChoices(answer, spread){
             if(add)u6.push(mathMC('Word problem','Ava has '+a+' stickers and gets '+b+' more. How many stickers does she have?',ans,'Gets more means add.',''+a+' + '+b+' = '+ans+'.'));
             else u6.push(mathMC('Word problem','Noah has '+a+' apples and eats '+b+'. How many apples are left?',ans,'Eating some means subtract.',''+a+' − '+b+' = '+ans+'.'));
         }
-        return [u1,u2,u3,u4,u5,u6].map((lessons,i)=>({unit: GRADE1_INTERACTIVE.math[i].unit,lessons}));
-window.KC_G1_MATH = buildGrade1MathBank();
+        const unitNames=['Addition & Subtraction Within 20','Numbers to 120','Place Value: Tens & Ones','Measurement, Time & Data','Geometry','Word Problems & Problem Solving'];
+        return [u1,u2,u3,u4,u5,u6].map((lessons,i)=>({unit:unitNames[i],lessons}));
+    }
+    window.KC_G1_MATH = buildGrade1MathDataBank();
