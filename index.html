@@ -2319,6 +2319,18 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             mcLevelUpBurst(cat);
         }
     }
+    // A mistake during review knocks mastery back a step instead of leaving
+    // it frozen, modeling forgetting in spaced-repetition practice.
+    // (Cherry-picked from PR #2; that PR's dashboard/adventure/review-session
+    // features already exist on main in newer forms.)
+    function decayMastery(cat, id) {
+        if (!progress.mastery[cat]) return;
+        const count = progress.mastery[cat][id] || 0;
+        if (count <= 0) return;
+        const decayed = count - 1;
+        progress.mastery[cat][id] = decayed;
+        scheduleNextReview(cat, id, Math.max(1, decayed));
+    }
     function mcLevelUpBurst(catKey) {
         if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         const cat = CATEGORIES.find(c => c.key === String(catKey).split('_')[0]);
@@ -3512,6 +3524,15 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         } else {
             btnEl.classList.add('incorrect');
             btnEl.disabled = true;
+            // A first-attempt mistake on an item that was already partway
+            // mastered and due for review models real forgetting: pull its
+            // mastery back a step instead of leaving it frozen.
+            if (quiz.firstAttempt) {
+                const dcKey = q.sourceCatKey || `${quiz.key}_${quiz.level}`;
+                if (getMasteryCount(dcKey, q.itemId) >= 1 && isDue(dcKey, q.itemId)) {
+                    decayMastery(dcKey, q.itemId);
+                }
+            }
             quiz.firstAttempt = false;
             quiz.wrongAttempts = (quiz.wrongAttempts || 0) + 1;
             quiz.streak = 0;
