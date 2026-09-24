@@ -2242,6 +2242,173 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         last.lastDate = d.date;
         progress.learningStreak = last;
     }
+
+    // ---------- Daily free-time limit & membership ----------
+    // Free tier: DAILY_FREE_SECONDS of play per calendar day, per device.
+    // Members: unlimited. Usage is tracked per device per day (screen-time
+    // style), not per account, so switching profiles doesn't grant extra time.
+    const DAILY_FREE_SECONDS = 600; // 10 minutes
+    // Set this to a Stripe Payment Link (https://buy.stripe.com/...) when ready
+    // to take real payments. Empty = show "ask the app owner" instead.
+    const MEMBERSHIP_PAYMENT_URL = '';
+    // Manual activation codes (placeholder). Real validation should be
+    // server-side, e.g. Stripe webhook -> Supabase player record ->
+    // fetchCloudMembership() below.
+    const MEMBERSHIP_CODES = [];
+
+    function usageStorageKey() { return 'kc_usage_v1_' + todayKey(); }
+    function getUsageSeconds() { try { return Math.max(0, parseInt(localStorage.getItem(usageStorageKey()) || '0', 10) || 0); } catch (e) { return 0; } }
+    function setUsageSeconds(s) { try { localStorage.setItem(usageStorageKey(), String(Math.max(0, Math.floor(s)))); } catch (e) {} }
+    function addUsageSeconds(n) { if (n > 0) setUsageSeconds(getUsageSeconds() + n); }
+    function dailyFreeSeconds() { return DAILY_FREE_SECONDS; }
+    function usageRemainingSeconds() { return Math.max(0, dailyFreeSeconds() - getUsageSeconds()); }
+    function fmtUsage(s) { s = Math.max(0, Math.floor(s)); const m = Math.floor(s / 60); return m + ':' + String(s % 60).padStart(2, '0'); }
+
+    // Membership state: local flag + hook for cloud (Supabase) membership.
+    function getMembership() { try { return JSON.parse(localStorage.getItem('kc_membership_v1') || 'null'); } catch (e) { return null; } }
+    function isMember() { const m = getMembership(); return !!(m && m.active); }
+    // Cloud hook: return true/false when wired up (e.g. an `is_member` flag on
+    // the player record set by a Stripe webhook). Return null when not
+    // configured — the caller then falls back to the local flag.
+    async function fetchCloudMembership() { return null; }
+    async function refreshMembership() {
+        try {
+            const cloud = await fetchCloudMembership();
+            if (cloud === true) {
+                try { localStorage.setItem('kc_membership_v1', JSON.stringify({ active: true, source: 'cloud', at: Date.now() })); } catch (e) {}
+                return true;
+            }
+            // cloud === false: keep local as-is (offline grace period).
+        } catch (e) {}
+        return isMember();
+    }
+    function activateMembership(source) {
+        try { localStorage.setItem('kc_membership_v1', JSON.stringify({ active: true, source: source || 'manual', at: Date.now() })); } catch (e) {}
+    }
+    function deactivateMembership() { try { localStorage.removeItem('kc_membership_v1'); } catch (e) {} }
+
+    function isTimeUp() { return !isMember() && getUsageSeconds() >= dailyFreeSeconds(); }
+    function isExemptScreen(s) { return s === 'timeUp' || s === 'membership' || s === 'parentDashboard'; }
+    function isLockExemptScreen() { return isExemptScreen(state.screen); }
+    function showTimeUp() {
+        if (state.screen === 'timeUp') return;
+        cancelNavigationTasks();
+        state.stack = [];
+        state.screen = 'timeUp'; state.params = null;
+        render();
+        try { speak("Time's up for today! Great work. Come back tomorrow for more fun."); } catch (e) {}
+    }
+
+    // Parent gate: a quick grown-up math check before membership options.
+    const parentGate = { verified: false, a: 0, b: 0 };
+    function newParentChallenge() {
+        parentGate.a = 12 + Math.floor(Math.random() * 9);
+        parentGate.b = 7 + Math.floor(Math.random() * 8);
+        parentGate.verified = false;
+    }
+    function verifyParentGate() {
+        const input = document.getElementById('pgAnswer');
+        const err = document.getElementById('pgError');
+        const v = parseInt((input && input.value || '').trim(), 10);
+        if (v === parentGate.a + parentGate.b) { parentGate.verified = true; render(); }
+        else if (err) { err.textContent = 'Hmm, try again — grown-ups only! 🔒'; }
+    }
+    function redeemMembershipCode() {
+        const el = document.getElementById('mCode');
+        const msg = document.getElementById('mCodeMsg');
+        const code = ((el && el.value) || '').trim();
+        if (code && MEMBERSHIP_CODES.indexOf(code) >= 0) {
+            activateMembership('code');
+            if (msg) { msg.textContent = '✅ Membership activated! Enjoy unlimited play.'; msg.style.color = '#27ae60'; }
+            setTimeout(render, 900);
+        } else if (msg) {
+            msg.textContent = '❌ That code didn\'t work. Check it and try again.';
+            msg.style.color = '#c0392b';
+        }
+    }
+
+    function renderTimeUp() {
+        return '<div style="min-height:82vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;">'
+            + '<div style="font-size:4rem;">🌙</div>'
+            + '<h2>Time\'s up for today!</h2>'
+            + '<p style="font-size:1.15rem;max-width:440px;">You played for <strong>' + fmtUsage(getUsageSeconds()) + '</strong> — great work! 🎉<br>Come back <strong>tomorrow</strong> for 10 more minutes of fun.</p>'
+            + '<div class="star-badge" style="margin:12px 0;font-size:1.1rem;">💎 ' + progress.stars + ' diamonds earned</div>'
+            + '<div class="parent-card" style="max-width:440px;">'
+            + '<div class="parent-progress-label"><strong>Grown-ups:</strong> want unlimited play time?</div>'
+            + '<button class="choice-btn" style="margin-top:10px;" onclick="newParentChallenge();go(\'membership\')">👑 Membership options</button>'
+            + '<div style="margin-top:8px;"><button class="choice-btn" onclick="go(\'parentDashboard\')">👨‍👩‍👧 Parent Dashboard</button></div>'
+            + '</div></div>';
+    }
+    function renderMembership() {
+        const m = getMembership();
+        let body = '';
+        if (m && m.active) {
+            body = '<div class="parent-card" style="max-width:440px;"><h3>👑 Membership active</h3>'
+                + '<div class="parent-progress-label">Unlimited play time is on for this device' + (m.source ? ' (' + esc(m.source) + ')' : '') + '.</div>'
+                + '<button class="choice-btn" style="margin-top:10px;" onclick="deactivateMembership();render();">Turn off membership (this device)</button></div>';
+        } else if (!parentGate.verified) {
+            body = '<div class="parent-card" style="max-width:440px;"><h3>🔒 Grown-ups only</h3>'
+                + '<div class="parent-progress-label">To keep little players safe, please solve this to continue:</div>'
+                + '<div style="font-size:1.8rem;font-weight:800;margin:14px 0;">' + parentGate.a + ' + ' + parentGate.b + ' = ?</div>'
+                + '<input id="pgAnswer" inputmode="numeric" style="font-size:1.3rem;padding:10px;width:130px;text-align:center;border-radius:10px;border:2px solid #ccc;" placeholder="?">'
+                + '<div><button class="choice-btn" style="margin-top:12px;" onclick="verifyParentGate()">Continue</button></div>'
+                + '<div id="pgError" class="parent-progress-label" style="color:#c0392b;min-height:1.4em;"></div></div>';
+        } else {
+            const payBtn = MEMBERSHIP_PAYMENT_URL
+                ? '<button class="choice-btn" style="font-size:1.1rem;padding:14px 22px;" onclick="window.open(\'' + MEMBERSHIP_PAYMENT_URL + '\',\'_blank\')">💳 Subscribe — unlimited play</button>'
+                : '<div class="parent-progress-label">Online signup isn\'t set up yet — ask the app owner for a membership code.</div>';
+            body = '<div class="parent-card" style="max-width:440px;"><h3>👑 BlockQuest Membership</h3>'
+                + '<div class="parent-progress-label">Free play is <strong>10 minutes a day</strong>. Membership unlocks <strong>unlimited</strong> play time on this device.</div>'
+                + '<div style="margin:14px 0;">' + payBtn + '</div>'
+                + '<div class="parent-progress-label">Have a code?</div>'
+                + '<input id="mCode" placeholder="Enter membership code" style="font-size:1.1rem;padding:10px;width:220px;border-radius:10px;border:2px solid #ccc;">'
+                + '<div><button class="choice-btn" style="margin-top:10px;" onclick="redeemMembershipCode()">Activate</button></div>'
+                + '<div id="mCodeMsg" class="parent-progress-label" style="min-height:1.4em;"></div></div>';
+        }
+        return topbar(true) + '<h2>👑 Membership</h2>'
+            + '<div class="parent-progress-label" style="text-align:center;">⏱️ Used today: ' + fmtUsage(getUsageSeconds()) + ' of ' + fmtUsage(dailyFreeSeconds()) + '</div>'
+            + '<div style="display:flex;justify-content:center;">' + body + '</div>';
+    }
+
+    // Active-time ticker: counts seconds while the page is visible and the
+    // screen isn't a grown-up/lock screen. Warns at 1 minute left.
+    let usageLastTick = Date.now();
+    let usageWarned = false;
+    function ensureUsageBanner() {
+        let bar = document.getElementById('usageBanner');
+        if (!bar) {
+            bar = document.createElement('div');
+            bar.id = 'usageBanner';
+            bar.style.cssText = 'display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#e67e22;color:#fff;text-align:center;padding:10px;font-weight:700;font-size:1rem;';
+            document.body.appendChild(bar);
+        }
+        return bar;
+    }
+    setInterval(() => {
+        const now = Date.now();
+        const elapsed = Math.min(30, Math.max(0, Math.round((now - usageLastTick) / 1000)));
+        usageLastTick = now;
+        if (document.visibilityState !== 'visible') return;
+        if (isMember() || isTimeUp() || isLockExemptScreen()) { const b = document.getElementById('usageBanner'); if (b) b.style.display = 'none'; return; }
+        if (elapsed > 0) addUsageSeconds(elapsed);
+        const remaining = usageRemainingSeconds();
+        const bar = ensureUsageBanner();
+        if (remaining <= 120 && remaining > 0) {
+            bar.style.display = 'block';
+            bar.textContent = remaining <= 60
+                ? '⏳ 1 minute left today!'
+                : '⏳ ' + Math.ceil(remaining / 60) + ' minutes left today!';
+            if (!usageWarned && remaining <= 60) {
+                usageWarned = true;
+                try { speak('One minute left today!'); } catch (e) {}
+            }
+        } else {
+            bar.style.display = 'none';
+        }
+        if (isTimeUp()) showTimeUp();
+    }, 5000);
+    document.addEventListener('visibilitychange', () => { usageLastTick = Date.now(); });
+
     function getDailyMissionSummary() {
         const d = ensureDailyState();
         const done = ['practice','math','review'].filter(t => d.tasks[t]).length;
@@ -2492,6 +2659,9 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         stopAllAudio();
     }
     function go(screen, params) {
+        // Daily free-time limit: block navigation into kid screens when time is up.
+        if (!isExemptScreen(screen) && isTimeUp()) { showTimeUp(); return; }
+        if (screen === 'membership') newParentChallenge();
         cancelNavigationTasks();
         state.stack.push({ screen: state.screen, params: state.params });
         state.screen = screen; state.params = params || null;
@@ -2699,6 +2869,9 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             </div>
             <div class="topbar-right">
                 <div class="star-badge" onclick="handleDebugTap()" style="cursor:pointer;" title="App version">💎 ${progress.stars} <span style="font-size:0.65rem;opacity:0.7;">${APP_VERSION}</span></div>
+                ${isMember()
+                    ? '<div class="star-badge" title="Membership active — unlimited play">👑</div>'
+                    : `<div class="star-badge" title="Play time left today">⏱️ ${fmtUsage(usageRemainingSeconds())}</div>`}
                 <button class="icon-btn" onclick="blipolaVoiceAction()" title="Blipola Voice">🎤</button>
                 <button class="icon-btn" onclick="toggleMute()">${muted ? '🔇' : '🔊'}</button>
             </div>
@@ -5732,9 +5905,17 @@ function recordRuntimeError(report){
         if (!debugMode && window.location.search.includes('debug=1')) {
             debugMode = true;
         }
+        // Daily free-time limit: force the time-up screen when exhausted.
+        if (!isExemptScreen(state.screen) && isTimeUp()) {
+            state.stack = [];
+            state.screen = 'timeUp';
+            state.params = null;
+        }
         const app = document.getElementById('app');
         let html = '';
         if (state.screen === 'home') html = renderHome();
+        else if (state.screen === 'timeUp') html = renderTimeUp();
+        else if (state.screen === 'membership') html = renderMembership();
         else if (state.screen === 'grades') html = renderGrades();
         else if (state.screen === 'gradeCourse') html = renderGradeCourse();
         else if (state.screen === 'gradeLesson') html = renderGradeLesson();
@@ -5960,6 +6141,8 @@ function recordRuntimeError(report){
         if (window.__KC_REPORT_BOOT_ERROR) window.__KC_REPORT_BOOT_ERROR(report.kind, report.message, report.source, report.line, report.column, report.stack);
         else showRuntimeErrorPanel();
     }
+    // Membership: check cloud status in the background (no-op until wired).
+    try { refreshMembership().then(() => { if (isMember()) render(); }).catch(() => {}); } catch (e) {}
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
