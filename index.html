@@ -1945,11 +1945,12 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         try{
             const sessionResult=await supa.auth.getSession();
             let session=sessionResult.data?.session||null;
-            if(session?.user && !session.user.is_anonymous){ await supa.auth.signOut(); session=null; }
-            if(!session){
-                const anon=await supa.auth.signInAnonymously();
-                if(anon.error||!anon.data?.session)return {ok:false,reason:anon.error?.message||'anonymous auth unavailable'};
-            }
+            // Each player account gets its own anonymous Auth identity. This
+            // prevents one browser session from becoming the owner of
+            // multiple player accounts under the RLS ownership model.
+            if(session){ await supa.auth.signOut(); session=null; }
+            const anon=await supa.auth.signInAnonymously();
+            if(anon.error||!anon.data?.session)return {ok:false,reason:anon.error?.message||'anonymous auth unavailable'};
             const {data,error}=await supa.rpc('claim_player_auth',{p_name:name,p_pin_hash:currentPinVerifier});
             if(error||!data)return {ok:false,reason:error?.message||'claim failed'};
             if(window.KCData) window.KCData.setPlayerId(data);
