@@ -24,21 +24,39 @@ jobs:
           echo "Commit: $GITHUB_SHA" | tee -a validation-report/summary.md
           echo "Run: $GITHUB_RUN_ID" | tee -a validation-report/summary.md
           overall=0
+
           echo "### External JavaScript" | tee -a validation-report/summary.md
-          if [ -f js/blipola-runtime.js ]; then
-            node --check js/blipola-runtime.js >validation-report/runtime.out 2>&1
-            status=$?
-            cat validation-report/runtime.out
-            if [ $status -ne 0 ]; then
-              overall=1
-              echo "- ❌ js/blipola-runtime.js" | tee -a validation-report/summary.md
-              echo '```text' >> validation-report/summary.md
-              cat validation-report/runtime.out >> validation-report/summary.md
-              echo '```' >> validation-report/summary.md
-            else
-              echo "- ✅ js/blipola-runtime.js" | tee -a validation-report/summary.md
-            fi
+          # Collect all JS files under js/, shared/, data/ plus sw.js at root
+          JS_FILES=()
+          while IFS= read -r f; do
+            JS_FILES+=("$f")
+          done < <(find js shared data -type f -name "*.js" 2>/dev/null | sort)
+          if [ -f sw.js ]; then
+            JS_FILES+=("sw.js")
           fi
+
+          if [ ${#JS_FILES[@]} -eq 0 ]; then
+            echo "- ⚠️ No JavaScript files found under js/, shared/, data/" | tee -a validation-report/summary.md
+          else
+            echo "Found ${#JS_FILES[@]} JavaScript file(s)" | tee -a validation-report/summary.md
+            for jsfile in "${JS_FILES[@]}"; do
+              safe_name=$(echo "$jsfile" | tr '/' '_' | tr ' ' '_')
+              out="validation-report/${safe_name}.out"
+              node --check "$jsfile" >"$out" 2>&1
+              status=$?
+              cat "$out"
+              if [ $status -ne 0 ]; then
+                overall=1
+                echo "- ❌ $jsfile" | tee -a validation-report/summary.md
+                echo '```text' >> validation-report/summary.md
+                cat "$out" >> validation-report/summary.md
+                echo '```' >> validation-report/summary.md
+              else
+                echo "- ✅ $jsfile" | tee -a validation-report/summary.md
+              fi
+            done
+          fi
+
           python3 - <<'PY'
           import re
           from pathlib import Path
@@ -65,6 +83,23 @@ jobs:
           else
             echo "- ✅ index.html inline JavaScript" | tee -a validation-report/summary.md
           fi
+
+          # Optional: curriculum content validator (non-blocking, informational)
+          if [ -f tools/validate_content.py ]; then
+            echo "### Curriculum content validator" | tee -a validation-report/summary.md
+            python3 tools/validate_content.py >validation-report/content-validator.out 2>&1
+            cstatus=$?
+            cat validation-report/content-validator.out
+            echo '```text' >> validation-report/summary.md
+            tail -n 50 validation-report/content-validator.out >> validation-report/summary.md
+            echo '```' >> validation-report/summary.md
+            if [ $cstatus -ne 0 ]; then
+              echo "- ⚠️ content validator reported issues (informational, not failing build)" | tee -a validation-report/summary.md
+            else
+              echo "- ✅ content validator passed" | tee -a validation-report/summary.md
+            fi
+          fi
+
           if [ $overall -eq 0 ]; then
             echo "### Result: PASS" | tee -a validation-report/summary.md
           else
