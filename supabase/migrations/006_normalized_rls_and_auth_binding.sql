@@ -19,6 +19,10 @@ $$;
 revoke all on function public.current_player_id() from public;
 grant execute on function public.current_player_id() to anon, authenticated;
 
+create unique index if not exists players_auth_user_id_unique
+  on public.players(auth_user_id)
+  where auth_user_id is not null;
+
 -- Bind a name+PIN login to the current anonymous Auth session.
 -- A single Auth user may own only one player account.
 create or replace function public.claim_player_auth(
