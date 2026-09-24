@@ -7,7 +7,7 @@ Open `index.html` in a browser — no build step required. For the installable/o
 ## Features
 
 - **Levels**: Letters and Numbers open directly (no levels). English, Chinese, Spanish, and Math use a 10-level picker (Level 1–10). Difficulty and vocabulary ramp by level: English/Chinese/Spanish levels are grouped by word length (3–4 letters up to 12–15 letters), and Math difficulty scales as your child improves. Progress and mastery are tracked separately per level.
-- **Shared vocabulary (one source of truth)** — English, Chinese (hanzi), and Spanish all come from a single `VOCAB_LEVELS` array in `index.html`. Add one word there and it appears in all three languages automatically, with its BlockQuest sprite image.
+- **Shared vocabulary (one source of truth)** — English, Chinese (hanzi), and Spanish all come from a single `VOCAB_LEVELS` array in `index.html`. Add one word there and it appears in all three languages automatically, with its emoji illustration.
 - **Learn mode** for Letters, Numbers, English, Chinese, and Spanish — tap a card to hear it read aloud (uses the browser's built-in text-to-speech):
   - Letters: letter shown, then "X is for Apple" with the picture word.
   - Numbers: spoken number.
@@ -53,12 +53,12 @@ All vocabulary, images, and translations are sourced from the [BlockQuest Wiki](
 The `VOCAB_LEVELS` array in `index.html` contains every word used across English, Chinese, and Spanish sections. Each entry includes:
 
 - `id` — the English word (lowercase)
-- `img` — path to the BlockQuest sprite in `images/words/`
+- `emoji` — the emoji illustration shown for the word
 - `en` — English display name
 - `zh.hanzi` — Chinese (Simplified) translation
 - `es` — Spanish translation
 
-Sprite images are item/mob PNGs from the BlockQuest Wiki. When adding a new vocab entry, pull the corresponding sprite from `https://original learning assets (search the item or mob page for the sprite file).
+Words use emoji illustrations so the app works fully offline with no image downloads.
 
 ### Chinese Translations
 
@@ -76,10 +76,9 @@ Spanish translations use the localization names from BlockQuest's Spanish langua
 
 ### Adding New Words
 
-1. Find the item/mob on [original learning assets) and download its sprite PNG.
-2. Place the sprite in `images/words/` (lowercase filename, e.g. `diamond.png`).
-3. Add one entry to `VOCAB_LEVELS` in `index.html` with `id`, `img`, `en`, `zh.hanzi`, and `es`.
-4. The word automatically appears in English, Chinese, and Spanish sections.
+1. Pick an emoji that illustrates the word.
+2. Add one entry to `VOCAB_LEVELS` in `index.html` with `id`, `emoji`, `en`, `zh.hanzi`, and `es`.
+3. The word automatically appears in English, Chinese, and Spanish sections.
 
 ## Blipola learning buddy
 
