@@ -758,6 +758,96 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
     <script src="./js/skill-engine.js"></script>
     <script src="./js/blipola-runtime.js"></script>
     <script>
+    // ---------- App version ----------
+    const APP_VERSION = 'v2-20250906';
+
+    // ---------- Debug / Dev Mode ----------
+    // Hidden diagnostic screen for parents and developers.
+    // Activate by tapping the version badge 5 times quickly, or
+    // by adding ?debug=1 to the URL.
+    let debugMode = false;
+    let debugTapCount = 0;
+    let debugTapTimer = null;
+    function activateDebug() {
+      debugMode = !debugMode;
+      render();
+    }
+    function handleDebugTap() {
+      debugTapCount++;
+      if (debugTapTimer) clearTimeout(debugTapTimer);
+      debugTapTimer = setTimeout(() => { debugTapCount = 0; }, 2000);
+      if (debugTapCount >= 5) {
+        debugTapCount = 0;
+        activateDebug();
+      }
+    }
+    function renderDebugPanel() {
+      if (!debugMode) return '';
+      const cacheNames = [];
+      if ('caches' in self) {
+        caches.keys().then(names => {
+          const el = document.getElementById('debugCacheNames');
+          if (el) el.textContent = names.join('\n');
+        }).catch(() => {});
+      }
+      const swReg = navigator.serviceWorker ? 'registered' : 'unsupported';
+      const offlineReady = navigator.onLine ? 'online' : 'offline';
+      // Count total content
+      let totalItems = 0;
+      const catCounts = CATEGORIES.map(c => {
+        const items = c.levels.reduce((a, l) => a + l.items.length, 0);
+        totalItems += items;
+        return `${c.icon} ${c.name}: ${items} items`;
+      }).join('\n');
+      // Find missing images
+      const missingImages = [];
+      CATEGORIES.forEach(c => {
+        c.levels.forEach(lv => {
+          lv.items.forEach(it => {
+            if (it.img) {
+              // We can't easily test image existence here without async,
+              // but we can flag references that don't end in known extensions.
+              if (!/\.(png|webp|jpg|jpeg|gif|svg)$/i.test(it.img)) {
+                missingImages.push(`[format] ${c.key}/${lv.id}/${it.id}: ${it.img}`);
+              }
+            }
+          });
+        });
+      });
+      // Duplicate IDs per category/level
+      const dupIds = [];
+      CATEGORIES.forEach(c => {
+        c.levels.forEach(lv => {
+          const seen = new Map();
+          lv.items.forEach(it => {
+            if (seen.has(it.id)) dupIds.push(`[dup] ${c.key}/${lv.id}: ${it.id}`);
+            seen.set(it.id, true);
+          });
+        });
+      });
+      const progressCounts = Object.entries(progress.mastery || {}).map(([k,v]) => {
+        const count = typeof v === 'object' ? Object.keys(v).length : 0;
+        return `${k}: ${count} items`;
+      }).join('\n');
+      return `
+      <div style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;overflow:auto;padding:20px;font-family:monospace;color:#0f0;font-size:0.85rem;">
+        <div style="max-width:800px;margin:0 auto;background:#111;border:2px solid #0f0;border-radius:8px;padding:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h2 style="color:#0f0;margin:0;">🛠️ Developer Debug</h2>
+            <button onclick="activateDebug()" style="background:#333;color:#0f0;border:1px solid #0f0;padding:6px 12px;cursor:pointer;border-radius:4px;">Close</button>
+          </div>
+          <div style="margin-bottom:12px;"><strong>App version:</strong> ${APP_VERSION}</div>
+          <div style="margin-bottom:12px;"><strong>Service Worker:</strong> ${swReg}</div>
+          <div style="margin-bottom:12px;"><strong>Network:</strong> ${offlineReady}</div>
+          <div style="margin-bottom:12px;"><strong>Cache names:</strong>\n<pre id="debugCacheNames" style="color:#ff0;">scanning...</pre></div>
+          <div style="margin-bottom:12px;"><strong>Content summary:</strong>\n<pre>${catCounts}\nTotal items: ${totalItems}</pre></div>
+          <div style="margin-bottom:12px;"><strong>Progress records:</strong>\n<pre>${progressCounts || 'none yet'}</pre></div>
+          <div style="margin-bottom:12px;"><strong>Duplicate IDs:</strong>\n<pre>${dupIds.length ? dupIds.join('\n') : 'none detected'}</pre></div>
+          <div style="margin-bottom:12px;"><strong>Image reference issues:</strong>\n<pre>${missingImages.length ? missingImages.join('\n') : 'none detected'}</pre></div>
+          <div style="margin-top:16px;color:#888;font-size:0.75rem;">Tap the version badge 5x to toggle this panel.</div>
+        </div>
+      </div>`;
+    }
 
     // ---------- Data ----------
     // ---------- Levels ----------
@@ -1879,7 +1969,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
     function getCurrentAccount(){return localStorage.getItem('kc_current_account')||'';}
     function accountProgressKey(name){return 'kc_account_progress_v1_'+name.toLowerCase();}
     // ---------- Supabase cloud accounts (name+PIN stored server-side) ----------
-    const supa = supabase.createClient('https://sjqhcpbdgaeapljbllhp.supabase.co','sb_publishable_DMSaun0u7qH2pAQzupS8Ww_G780gpm9');
+    const supa = window.supabase ? supabase.createClient('https://sjqhcpbdgaeapljbllhp.supabase.co','sb_publishable_DMSaun0u7qH2pAQzupS8Ww_G780gpm9') : null;
     function getCurrentAccountName(){
         const key=getCurrentAccount();
         if(!key)return '';
@@ -2009,7 +2099,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
     document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&getCurrentAccount())syncCloudProgress();});
     function closeAccountModal(){const m=document.getElementById('accountModal');if(m)m.style.display='none';}
     function openAccountModal(mode){const m=document.getElementById('accountModal');if(!m)return;const create=mode==='create';m.style.display='grid';m.innerHTML='<div class="account-box"><h2>⛏️ '+(create?'Create Your BlockQuest Account':'Welcome Back!')+'</h2><p>'+(create?'Create a child profile in the cloud.':'Log in to load this profile from the cloud.')+'</p><input id="accountName" maxlength="24" placeholder="Player name"><input id="accountPin" maxlength="6" inputmode="numeric" type="password" placeholder="4–6 digit PIN"><div class="account-actions"><button id="accountSubmit">'+(create?'Create':'Log In')+'</button><button id="accountCancel">Cancel</button></div><div id="accountStatus" class="account-status"></div><div class="account-switch"><button id="accountSwitch">'+(create?'Already have an account? Log in':'New player? Create an account')+'</button></div></div>';document.getElementById('accountSubmit').onclick=()=>submitAccount(mode);document.getElementById('accountCancel').onclick=closeAccountModal;document.getElementById('accountSwitch').onclick=()=>openAccountModal(create?'login':'create');}
-    function submitAccount(mode){const name=(document.getElementById('accountName')?.value||'').trim(),pin=(document.getElementById('accountPin')?.value||'').trim(),status=document.getElementById('accountStatus'),btn=document.getElementById('accountSubmit');if(!/^[A-Za-z0-9 _-]{2,24}$/.test(name)){status.textContent='Use 2–24 letters, numbers, spaces, _ or -.';return;}if(!/^\d{4,6}$/.test(pin)){status.textContent='PIN must be 4–6 digits.';return;}btn.disabled=true;status.textContent='Checking…';
+    function submitAccount(mode){const name=(document.getElementById('accountName')?.value||'').trim(),pin=(document.getElementById('accountPin')?.value||'').trim(),status=document.getElementById('accountStatus'),btn=document.getElementById('accountSubmit');if(!/^[A-Za-z0-9 _-]{2,24}$/.test(name)){status.textContent='Use 2–24 letters, numbers, spaces, _ or -.';return;}if(!/^\d{4,6}$/.test(pin)){status.textContent='PIN must be 4–6 digits.';return;}if(!supa){status.textContent='Cloud accounts need an internet connection. Your progress stays saved on this device.';return;}btn.disabled=true;status.textContent='Checking…';
     (async()=>{
         const key=name.toLowerCase();
         if(mode==='create'){
@@ -2595,7 +2685,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
                 <button class="icon-btn" onclick="goHome()">🏠</button>
             </div>
             <div class="topbar-right">
-                <div class="star-badge">💎 ${progress.stars}</div>
+                <div class="star-badge" onclick="handleDebugTap()" style="cursor:pointer;" title="App version">💎 ${progress.stars} <span style="font-size:0.65rem;opacity:0.7;">${APP_VERSION}</span></div>
                 <button class="icon-btn" onclick="blipolaVoiceAction()" title="Blipola Voice">🎤</button>
                 <button class="icon-btn" onclick="toggleMute()">${muted ? '🔇' : '🔊'}</button>
             </div>
@@ -5616,6 +5706,10 @@ function recordRuntimeError(report){
         recordRuntimeError(report);
     });
     function render() {
+        // Check for ?debug=1 URL parameter (from P0 offline-reliability PR)
+        if (!debugMode && window.location.search.includes('debug=1')) {
+            debugMode = true;
+        }
         const app = document.getElementById('app');
         let html = '';
         if (state.screen === 'home') html = renderHome();
@@ -5637,7 +5731,7 @@ function recordRuntimeError(report){
         else if (state.screen === 'timedEnd') html = renderTimedEnd();
         else if (state.screen === 'worksheets') html = renderWorksheets();
         else if (state.screen === 'progress') html = renderProgress();
-        app.innerHTML = html;
+        app.innerHTML = html + renderDebugPanel();
         if (state.screen !== 'home') {
             const first = app.querySelector('.center-col, h2, .grid, .parent-card');
             if (first) first.classList.add('mc-animate-in');
