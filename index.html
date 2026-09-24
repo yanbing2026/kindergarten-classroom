@@ -2140,9 +2140,11 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         closeAccountModal();renderAccountBar();progress=loadProgress();blipola=window.BlipolaClassroom.create(progress);render();
     })();
     }
-    function logoutAccount(){
+    async function logoutAccount(){
         localStorage.removeItem('kc_current_account');
+        currentPinVerifier='';
         if(window.KCData) window.KCData.setPlayerId('');
+        try { if(supa) await supa.auth.signOut(); } catch (_) {}
         renderAccountBar();
         progress=loadProgress();
         blipola=window.BlipolaClassroom.create(progress);
