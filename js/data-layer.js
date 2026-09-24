@@ -121,7 +121,7 @@
     });
   }
 
-  function setPlayerId(id) { try { if (id) localStorage.removeItem(PLAYER_ID_KEY); if (id) localStorage.setItem(PLAYER_ID_KEY, id); } catch (_) {} return id; }
+  function setPlayerId(id) { try { localStorage.removeItem(PLAYER_ID_KEY); if (id) localStorage.setItem(PLAYER_ID_KEY, id); } catch (_) {} return id; }
   function playerId() { try { return localStorage.getItem(PLAYER_ID_KEY) || null; } catch (_) { return null; } }
 
   function isUuid(value) {
