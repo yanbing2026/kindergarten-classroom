@@ -136,9 +136,3 @@ grant select, insert, update on table public.player_progress to authenticated;
 grant select, insert on table public.activity_events to authenticated;
 grant select, insert, update on table public.daily_goals to authenticated;
 
--- Legacy learning_events contains no auth ownership column and must not be
--- readable/writable from the public browser API.
-alter table if exists public.learning_events enable row level security;
-revoke all on table public.learning_events from anon, authenticated;
-drop policy if exists "learning_events_public_insert" on public.learning_events;
-drop policy if exists "learning_events_public_select" on public.learning_events;
