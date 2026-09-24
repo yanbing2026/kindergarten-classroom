@@ -2,6 +2,7 @@
   "name": "BlockQuest Classroom",
   "short_name": "BlockQuest",
   "description": "A supplemental kindergarten learning app: letters, numbers, words, Chinese, Spanish, colors, shapes, animals, and math.",
+  "categories": ["education", "kids"],
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
