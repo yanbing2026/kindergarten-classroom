@@ -172,7 +172,25 @@
       'g2.writing.paragraph-organization':'paragraph-organization-confusion'
     };
     const value=map[skillId];
-    return value?[value]:[];
+    if(value) return [value];
+    const fallback={
+      'g2.math.addition-subtraction':'operation-selection-confusion',
+      'g2.math.addition-subtraction-strategies':'strategy-selection-confusion',
+      'g2.math.measurement-time':'measurement-time-confusion',
+      'g2.math.geometry-fractions':'shape-fraction-confusion',
+      'g2.math.data-word-problems':'word-problem-representation-confusion',
+      'g2.ela.informational-reading':'informational-reading-confusion',
+      'g2.ela.grammar':'grammar-rule-confusion',
+      'g2.ela.reading-strategies':'reading-strategy-confusion',
+      'g2.ela.writing-research':'writing-research-confusion',
+      'g2.science.earth-materials':'earth-material-confusion',
+      'g2.social.story-elements':'history-narrative-confusion',
+      'g2.social.culture-diversity':'culture-diversity-confusion',
+      'g2.social.civic-participation':'civic-participation-confusion',
+      'g2.writing.research-sources':'source-selection-confusion',
+      'g2.writing.revision-editing':'revision-vs-editing-confusion'
+    };
+    return fallback[skillId]?[fallback[skillId]]:[];
   }
 
   function build(defs,subject){
