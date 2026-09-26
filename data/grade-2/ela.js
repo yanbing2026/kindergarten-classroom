@@ -1,195 +1,2193 @@
-// Grade 2 ela question bank — isolated module.
+// Grade 2 question bank — isolated module.
 window.KC_G2_ELA = [
-  ['Literature & Story Elements', [
-    ['Sam found a glowing shell on the beach at sunrise. What is the setting of this story?', ['a beach at sunrise', 'a snowy mountain', 'Sam', 'a glowing shell'], 'a beach at sunrise', 'Look for the words that tell where and when the story happens.', 'The story happens on a beach at sunrise, so that is the setting.'],
-    ['Maya the baker made bread for the whole town. Who is the main character?', ['Maya', 'the oven', 'the bread', 'the town'], 'Maya', 'Ask who the story is mostly about.', 'The story is mostly about Maya the baker, so she is the main character.'],
-    ['Leo could not find his kite anywhere. What is the problem in this story?', ['Leo lost his kite', 'Leo flew his kite', 'Leo bought a kite', 'Leo likes kites'], 'Leo lost his kite', 'Find what is going wrong for the character.', 'Leo cannot find his kite anywhere, so the lost kite is the problem.'],
-    ['Leo looked everywhere and found his kite stuck in a tree. How was the problem solved?', ['Leo found the kite in a tree', 'Leo lost the kite again', 'Leo went home sad', 'Leo never looked for it'], 'Leo found the kite in a tree', 'Look for how the character fixed what was wrong.', 'Finding the kite in the tree fixed the problem of the lost kite.'],
-    ['An ant shared his food with a hungry grasshopper. What is the lesson of this story?', ['sharing helps everyone', 'ants are tiny', 'summer is hot', 'bread is tasty'], 'sharing helps everyone', 'Ask what the characters learned by the end.', 'The ant learned that sharing helps everyone, and that is the lesson of the story.'],
-    ['Rosa always helps her friends carry heavy bags. What does this tell you about Rosa?', ['she is kind', 'she is grumpy', 'she is shy', 'she is loud'], 'she is kind', 'Think about what her actions tell you about her.', 'Helping friends with heavy bags shows Rosa is kind.'],
-    ['Tom hid behind the door when the thunder boomed. How does Tom feel?', ['scared', 'hungry', 'bored', 'silly'], 'scared', 'Look at what Tom does when the thunder booms.', 'Hiding when thunder booms shows Tom feels scared.'],
-    ['First, Ana planted a seed. Next, it rained. Last, a sprout grew. What happened in the middle of the story?', ['it rained', 'Ana planted a seed', 'a sprout grew', 'Ana ate dinner'], 'it rained', 'The middle comes after "first" and before "last."', 'After the seed was planted and before the sprout grew, it rained, so that is the middle.'],
-    ['Ben is brave and loves climbing trees. His sister Lily is shy and loves reading indoors. How are Ben and Lily different?', ['Ben likes adventure and Lily likes quiet play', 'they both climb trees', 'they both read indoors', 'Ben is shy too'], 'Ben likes adventure and Lily likes quiet play', 'Find one detail about Ben and one about Lily, then compare them.', 'The story shows Ben likes adventure while Lily likes quiet play, so that is how they are different.'],
-    ['Which line shows a character speaking?', ['"Look out!" yelled Mia.', 'Mia ran very fast.', 'The dog was big.', 'It was a sunny day.'], '"Look out!" yelled Mia.', 'Look for the quotation marks and the words that tell who said them.', 'The words inside the quotation marks are what Mia says, so that line shows a character speaking.'],
-    ['A picture shows a fox holding an umbrella in the rain. What does the illustration tell you?', ['the fox is out in the rain', 'the fox is fast asleep', 'the fox is reading a book', 'the fox is swimming'], 'the fox is out in the rain', 'Study what the fox is holding and what is falling.', 'The umbrella and the falling rain show the fox is out in the rain.'],
-    ['Nina packed a swimsuit, a towel, and sunscreen. Where is she probably going?', ['to the pool', 'to the library', 'to a snow fort', 'to bed'], 'to the pool', 'Think about where you would need all three of those things.', 'A swimsuit, a towel, and sunscreen are things you need at the pool, so she is probably going there.'],
-    ['In "The Tortoise and the Hare," the tortoise keeps going and wins the race. What is the lesson?', ['slow and steady wins the race', 'hares are the fastest', 'turtles love to nap', 'races are silly'], 'slow and steady wins the race', 'Think about what the tortoise did that the hare did not do.', 'The tortoise kept going without stopping, so the lesson is that slow and steady wins the race.'],
-    ['A story has a dragon, a castle, and a magic wand. What kind of story is it?', ['a fairy tale', 'a science report', 'a news story', 'a recipe'], 'a fairy tale', 'Look for the magic words: dragon, castle, magic wand.', 'Dragons, castles, and magic wands are signs of a fairy tale.'],
-    ['Which part is the ENDING? "At last, they hugged and walked home happy."', ['the ending', 'the beginning', 'the middle', 'the title'], 'the ending', 'Look for the words that tell the story is over, like "at last."', '"At last" and the happy hug show the story is over, so this is the ending.'],
-    ['A squirrel hid her nuts but cannot remember where. What is her problem?', ['she forgot where she hid the nuts', 'she has too many nuts', 'she is eating lunch', 'she loves trees'], 'she forgot where she hid the nuts', 'Ask what the squirrel is struggling with.', 'She cannot remember where the nuts are, so forgetting is her problem.'],
-    ['Which story could really happen?', ['A girl learns to ride her bike at the park.', 'A dragon gives the girl a magic bike.', 'The bike flies to the moon.', 'The moon talks to the girl.'], 'A girl learns to ride her bike at the park.', 'Ask yourself if it could happen in real life.', 'Learning to ride a bike at the park can really happen, so that story is realistic.'],
-    ['Jake left his plant in a dark closet for a week, and it drooped. Why did the plant droop?', ['it needed light', 'it needed a name', 'it needed a hat', 'it was too green'], 'it needed light', 'Connect what Jake did to what happened to the plant.', 'The plant drooped because it sat in the dark, so needing light is the reason.'],
-    ['Kate wants to win the spelling bee, so she practices ten words every night. What does this tell you about Kate?', ['she works hard for her goals', 'she hates words', 'she is lazy', 'she loves to sleep'], 'she works hard for her goals', 'Her plan shows what kind of person she is.', 'Practicing ten words every night shows Kate works hard for her goals.'],
-    ['At the start, the class was in the gym. Then the bell rang and they went to the art room. Where is the setting now?', ['the art room', 'the gym', 'the playground', 'home'], 'the art room', 'Follow where the class goes after the bell rings.', 'After the bell, they left the gym and went to the art room, so that is the new setting.'],
-    ['Which sentence is told by a character in the story?', ['"I was so excited to see the parade."', '"He was so excited to see the parade."', '"They were excited to see it."', '"The parade was very long."'], '"I was so excited to see the parade."', 'Look for the word that means the speaker is telling his or her own story.', '"I" shows the narrator is a character telling his or her own story.'],
-    ['A story is about two friends who build a birdhouse together. Which is the best title?', ['The Birdhouse Buddies', 'The Lost Key', 'Rainy Day', 'The Big Test'], 'The Birdhouse Buddies', 'Pick the title that tells what the story is mostly about.', '"The Birdhouse Buddies" names the friends and the birdhouse, so it fits the story best.'],
-    ['Which happened first? The cat climbed the tree. The cat ate dinner. The cat fell asleep.', ['The cat climbed the tree.', 'The cat ate dinner.', 'The cat fell asleep.', 'The cat woke up.'], 'The cat climbed the tree.', 'The list gives the events in order — read the first one.', 'The list gives the events in order, and climbing the tree comes first.'],
-    ['The story is mostly about Max and his dog Scout. Who is a minor character?', ['the mail carrier who waves once', 'Max', 'Scout', 'the leash'], 'the mail carrier who waves once', 'Main characters appear again and again. Minor characters appear only briefly.', 'The mail carrier waves once and never returns, so she is a minor character.'],
-    ['Read the poem: "Splish, splash, splish, / Rain falls on the roof. / Splish, splash, splish, / We cannot go out." What is the poem mostly about?', ['rain on a rainy day', 'a sunny beach', 'a snowstorm', 'a birthday party'], 'rain on a rainy day', 'Look at the words that repeat and the sounds they make.', 'The repeating words "splish, splash" and "rain" show the poem is about a rainy day.'],
-    ['One puppy could not move the box alone, but three puppies pushed it together. What is the lesson?', ['teamwork helps solve problems', 'puppies are funny', 'boxes are heavy', 'pushing is fun'], 'teamwork helps solve problems', 'Notice what changed when more puppies helped.', 'The puppies moved the box only when they worked together, so the lesson is that teamwork helps solve problems.'],
-    ['At first, Will was afraid of the water. By the end of summer, he was diving off the dock. How did Will change?', ['he became brave about swimming', 'he stayed afraid', 'he stopped swimming', 'he moved away'], 'he became brave about swimming', 'Compare how Will felt at the start and at the end.', 'Will went from afraid of water to diving off the dock, so he became brave about swimming.'],
-    ['Palm trees swayed. Warm sand burned our feet. Where are the characters?', ['at the beach', 'in the snow', 'at the zoo', 'in a cave'], 'at the beach', 'Palm trees and warm sand are clues to the place.', 'Palm trees and warm sand are clues that the setting is the beach.'],
-    ['A clever rabbit tricks a bear out of his honey every winter. What is the rabbit like?', ['clever', 'sleepy', 'shy', 'slow'], 'clever', 'What word does the story use to describe the rabbit?', 'The story calls the rabbit clever, and tricking the bear proves it.'],
-    ['Story: A duck lost her duckling, asked the farmer for help, and found it in the barn. Which retelling keeps the important parts?', ['A duck lost her duckling, asked the farmer for help, and found it in the barn.', 'A duck is yellow.', 'The farmer wears a hat.', 'Barns are red.'], 'A duck lost her duckling, asked the farmer for help, and found it in the barn.', 'A good retelling keeps the problem and how it was solved.', 'The first retelling keeps the lost duckling, the farmer\'s help, and the barn — the important parts.']
-  ]],
-  ['Informational Reading', [
-    ['Read: "Bees visit flowers to drink nectar. As they move, pollen sticks to their legs. At the next flower, the pollen falls off and helps new plants grow." What is the main idea?', ['Bees help plants grow as they visit flowers.', 'Bees drink water.', 'Flowers are pretty.', 'Pollen is yellow.'], 'Bees help plants grow as they visit flowers.', 'Ask what the whole paragraph is mostly about.', 'The paragraph explains how bees moving pollen helps plants grow, so that is the main idea.'],
-    ['Read: "Bees visit flowers to drink nectar. As they move, pollen sticks to their legs. At the next flower, the pollen falls off and helps new plants grow." Which detail supports the main idea?', ['Pollen sticks to the bees\' legs.', 'Bees wear tiny hats.', 'Flowers can sing.', 'Bees sleep all day.'], 'Pollen sticks to the bees\' legs.', 'Find a fact the author uses to explain the main idea.', 'Pollen sticking to the bees\' legs is a fact that explains how bees help plants grow.'],
-    ['A page about how turtles hatch has the heading "From Egg to Baby Turtle." What will the page be about?', ['how baby turtles hatch', 'what turtles eat', 'where turtles swim', 'how old turtles get'], 'how baby turtles hatch', 'The heading names the topic of the section.', 'The heading "From Egg to Baby Turtle" tells you the page will explain how baby turtles hatch.'],
-    ['Under a photo it says: "A frog\'s sticky tongue catches flies." What does the caption explain?', ['the photo of the frog', 'the title of the book', 'the page number', 'the author\'s name'], 'the photo of the frog', 'A caption sits under a picture and talks about it.', 'The caption is under the photo and describes the frog in it, so it explains the photo.'],
-    ['You read the word "habitat" and do not know it. Which part of the book lists hard words and their meanings?', ['the glossary', 'the front cover', 'the title page', 'the back cover'], 'the glossary', 'Think about which part of a book is like a mini dictionary.', 'A glossary lists hard words from the book and tells what they mean.'],
-    ['You want to read the chapter "Desert Animals." How can you find its page number?', ['check the table of contents', 'read the whole book', 'guess a page', 'count the pictures'], 'check the table of contents', 'One page lists every chapter title with its page number.', 'The table of contents lists each chapter title next to its page number, so you can find "Desert Animals."'],
-    ['Which is a fact?', ['Spiders have eight legs.', 'Spiders are the coolest.', 'Spiders are scary.', 'Spiders are ugly.'], 'Spiders have eight legs.', 'A fact can be checked and is true for everyone.', 'You can count a spider\'s eight legs, so it is a fact.'],
-    ['Which is an opinion?', ['Strawberries taste the best.', 'Strawberries are red.', 'Strawberries grow on plants.', 'Strawberries have seeds.'], 'Strawberries taste the best.', 'An opinion tells what someone thinks or feels.', '"Taste the best" tells what someone thinks, so it is an opinion.'],
-    ['The word "erupt" is printed in dark, bold letters. What should you do?', ['pay close attention — it is an important word', 'skip over it', 'erase it', 'sound out every letter twice'], 'pay close attention — it is an important word', 'Authors make important words stand out on purpose.', 'Bold letters mark a word the author wants you to notice because it is important.'],
-    ['A diagram of a plant has lines pointing to the roots, stem, and leaves. What do the labels do?', ['name the parts of the plant', 'tell a funny story', 'give the page number', 'show the author'], 'name the parts of the plant', 'Follow each line from the word to the picture.', 'Each label sits at the end of a line pointing to a plant part, so the labels name the parts.'],
-    ['Steps to plant a seed: 1. Fill a cup with soil. 2. Push the seed in. 3. Water it. What do you do first?', ['fill a cup with soil', 'water it', 'push the seed in', 'wait a week'], 'fill a cup with soil', 'Step 1 always comes first.', 'Step 1 says to fill a cup with soil, so that is what you do first.'],
-    ['Read: "It rained all night. The playground was covered in puddles." Why were there puddles?', ['it rained all night', 'kids played tag', 'the sun was out', 'the bell rang'], 'it rained all night', 'Find the sentence that explains why.', 'The rain all night caused the puddles, so the rain is the reason.'],
-    ['One book says sharks have sharp teeth. Another book says sharks can smell from far away. What do both books teach?', ['facts about sharks', 'how to draw sharks', 'stories about pirates', 'where to swim'], 'facts about sharks', 'Both books give information about the same animal.', 'Both books share facts about sharks, even though the facts are different.'],
-    ['A book explains how to build a bird feeder, step by step. Why did the author write it?', ['to teach readers how to do something', 'to tell a funny story', 'to share a poem', 'to sell toys'], 'to teach readers how to do something', 'Step-by-step directions are written for one special reason.', 'Step-by-step directions are written to teach readers how to build a bird feeder.'],
-    ['Read: "Whales are mammals. They breathe air through a blowhole." Which question does this text answer?', ['How do whales breathe?', 'What do whales eat?', 'Where do whales sleep?', 'How fast do whales swim?'], 'How do whales breathe?', 'Match the question to the fact the text gives.', 'The text says whales breathe air through a blowhole, so it answers how whales breathe.'],
-    ['You want to find every page that mentions "volcanoes." Where should you look?', ['the index', 'the dedication page', 'the front cover', 'the first page'], 'the index', 'This part lists topics in ABC order with all their page numbers.', 'The index lists "volcanoes" with every page number where the topic appears.'],
-    ['A map of the school shows the library right next to the gym. Where is the library?', ['next to the gym', 'under the gym', 'inside the gym', 'across town'], 'next to the gym', 'Read the labels and look at what sits beside the library.', 'The map shows the library right beside the gym, so that is where it is.'],
-    ['Under the heading "Planets," one part is called "Mars." What will that part tell about?', ['Mars', 'Jupiter', 'the Sun', 'stars'], 'Mars', 'A subheading names the smaller topic inside the bigger one.', 'The subheading "Mars" tells you that part will be about Mars.'],
-    ['A timeline shows: 1903 — first airplane flight. 1969 — first Moon landing. Which happened first?', ['the first airplane flight', 'the first Moon landing', 'they happened at the same time', 'neither one happened'], 'the first airplane flight', 'Read the dates from left to right — earlier years come first.', '1903 comes before 1969 on the timeline, so the first airplane flight happened first.'],
-    ['A chart shows books each class read: Room 1 — 20, Room 2 — 35, Room 3 — 12. Which class read the most books?', ['Room 2', 'Room 1', 'Room 3', 'Room 4'], 'Room 2', 'Find the biggest number in the chart.', 'Room 2 read 35 books, the biggest number, so Room 2 read the most.'],
-    ['Read: "The Arctic fox grows thick white fur in winter. The fur keeps it warm and hides it in the snow." What is the main idea?', ['Thick white fur helps the Arctic fox survive winter.', 'Foxes like snow.', 'Winter is cold.', 'Fur is white.'], 'Thick white fur helps the Arctic fox survive winter.', 'Ask what the two sentences have in common.', 'Both sentences tell how the fox\'s fur helps it in winter, so that is the main idea.'],
-    ['Which detail supports the main idea "Owls hunt at night"?', ['Owls have big eyes that see in the dark.', 'Owls are birds.', 'Owls have feathers.', 'Owls can be brown.'], 'Owls have big eyes that see in the dark.', 'Pick the fact that explains HOW owls can hunt at night.', 'Big eyes that see in the dark explain how owls hunt at night, so it supports the main idea.'],
-    ['A science book shows a photo of a caterpillar turning into a chrysalis. What does the photo help you understand?', ['how a caterpillar changes', 'what a caterpillar eats', 'where butterflies sleep', 'how fast they fly'], 'how a caterpillar changes', 'Look closely at what is happening in the photo.', 'The photo shows the caterpillar changing into a chrysalis, so it helps you understand how a caterpillar changes.'],
-    ['The glossary says: "migrate — to move to a new home when seasons change." What does "migrate" mean?', ['to move to a new home when seasons change', 'to build a nest', 'to eat seeds', 'to sing a song'], 'to move to a new home when seasons change', 'Read the words that come right after the dash.', 'The glossary entry says migrate means to move to a new home when seasons change.'],
-    ['First the caterpillar eats leaves. Then it forms a chrysalis. Finally, a butterfly comes out. What happens last?', ['a butterfly comes out', 'the caterpillar eats leaves', 'it forms a chrysalis', 'it lays eggs'], 'a butterfly comes out', 'The word "finally" points to the last step.', '"Finally" marks the last step, when the butterfly comes out.'],
-    ['Which detail tells about a penguin\'s home?', ['Penguins live near the South Pole.', 'Penguins are cute.', 'I like penguins.', 'Penguins are the best.'], 'Penguins live near the South Pole.', 'A detail about a home names a place.', 'The South Pole names where penguins live, so it is a detail about their home.'],
-    ['A poster lists what to pack for a field trip: lunch, water, hat, and sunscreen. What is the poster\'s job?', ['to give useful information', 'to tell a joke', 'to sing a song', 'to draw a picture'], 'to give useful information', 'The poster lists facts you need to know.', 'The poster lists what to pack, so its job is to give useful information.'],
-    ['You want to know what "nocturnal" means in your animal book. What is the fastest way to find out?', ['look it up in the glossary', 'read the book from page 1', 'look at the front cover', 'count the pages'], 'look it up in the glossary', 'Hard words from the book are collected in one special place.', 'The glossary collects the book\'s hard words with their meanings, so it is the fastest way.'],
-    ['Frogs live in water and on land. Fish live only in water. How are they different?', ['Frogs live in two places, but fish live in one.', 'Both live in water.', 'Both have scales.', 'Both are fish.'], 'Frogs live in two places, but fish live in one.', 'Find where each animal lives and compare.', 'Frogs live in water and on land while fish live only in water, so that is how they differ.'],
-    ['Steps to make a sandwich: 1. Get bread. 2. Add peanut butter. 3. Add jelly. 4. Eat. Which step comes second?', ['Add peanut butter.', 'Get bread.', 'Add jelly.', 'Eat.'], 'Add peanut butter.', 'Count the steps: 1, 2, 3, 4.', 'In order, the steps are get bread, add peanut butter, add jelly, eat — so adding peanut butter comes second.']
-  ]],
-  ['Vocabulary', [
-    ['The elephant was enormous — it took up the whole street! What does "enormous" mean?', ['very big', 'very small', 'very fast', 'very quiet'], 'very big', 'The elephant took up the whole street, so think about its size.', 'Taking up the whole street shows the elephant was very big, so enormous means very big.'],
-    ['"Be careful! The glass vase is fragile." What does "fragile" mean?', ['breaks easily', 'very heavy', 'very loud', 'not new; from long ago'], 'breaks easily', '"Be careful!" warns you about what could happen to the vase.', '"Be careful" warns that the vase could break, so fragile means breaks easily.'],
-    ['The curious puppy sniffed every box in the room. What does "curious" mean?', ['wants to learn and explore', 'wants to sleep', 'wants to hide', 'wants to eat'], 'wants to learn and explore', 'Sniffing every box shows the puppy wants to find out about things.', 'Sniffing every box shows the puppy wants to learn about things, so curious means wanting to learn and explore.'],
-    ['We will gather sticks to build a fort. What does "gather" mean?', ['collect together', 'throw away', 'break apart', 'give away'], 'collect together', 'They need many sticks in one place to build the fort.', 'They need sticks collected in one place to build the fort, so gather means collect together.'],
-    ['The wind made the leaves scatter across the yard. What does "scatter" mean?', ['spread out in different directions', 'stay in a pile', 'turn green', 'fall asleep'], 'spread out in different directions', 'The wind blew the leaves to many different spots.', 'The wind blew the leaves to many spots, so scatter means spread out in different directions.'],
-    ['She hesitated before jumping into the cold pool. What does "hesitate" mean?', ['paused because she was unsure', 'jumped right in', 'ran away', 'laughed loudly'], 'paused because she was unsure', 'She did not jump right away — what did she do instead?', 'She paused before jumping because she was unsure, so hesitate means to pause when unsure.'],
-    ['The eager kids lined up early for the field trip. What does "eager" mean?', ['excited and ready', 'tired and bored', 'sad and quiet', 'angry and loud'], 'excited and ready', 'Lining up early shows how they felt about the trip.', 'Lining up early shows they were excited and ready, so eager means excited and ready.'],
-    ['The old castle was built 500 years ago. What does "old" mean?', ['very old', 'very new', 'very small', 'very clean'], 'very old', '500 years ago is a very long time.', 'Built 500 years ago means the castle is very old, so ancient means very old.'],
-    ['The gentle nurse spoke softly to the scared boy. What does "gentle" mean?', ['kind and soft', 'loud and rough', 'fast and busy', 'sad and quiet'], 'kind and soft', 'Speaking softly to someone scared is your clue.', 'Speaking softly shows she is kind and soft, so gentle means kind and soft.'],
-    ['The fierce storm knocked down trees. What does "fierce" mean?', ['strong and wild', 'calm and quiet', 'soft and light', 'warm and sunny'], 'strong and wild', 'Knocking down trees shows how powerful the storm was.', 'A storm that knocks down trees is strong and wild, so fierce means strong and wild.'],
-    ['After the long hike, the weary campers fell asleep. What does "weary" mean?', ['very tired', 'very hungry', 'very happy', 'very cold'], 'very tired', 'A long hike would make anyone feel this way.', 'A long hike makes campers very tired, so weary means very tired.'],
-    ['We watched a splendid sunset of pink and gold. What does "splendid" mean?', ['wonderful and beautiful', 'dark and scary', 'plain and dull', 'cold and gray'], 'wonderful and beautiful', 'Pink and gold colors in the sky sound lovely.', 'A pink and gold sunset is wonderful and beautiful, so splendid means wonderful and beautiful.'],
-    ['The lost dog began to wander through the park. What does "wander" mean?', ['walk around with no plan', 'run straight home', 'sit very still', 'sleep all day'], 'walk around with no plan', 'A lost dog does not know where it is going.', 'A lost dog walks around with no plan, so wander means to walk around with no plan.'],
-    ['Scientists discovered a new kind of frog in the forest. What does "discover" mean?', ['found for the first time', 'lost again', 'drew a picture of', 'gave a name to'], 'found for the first time', 'A "new kind of frog" means no one knew about it before.', 'No one knew about this frog before, so the scientists found it for the first time — that is discover.'],
-    ['His hands began to tremble during the loud thunderstorm. What does "tremble" mean?', ['shake a little', 'clap loudly', 'wave hello', 'stay still'], 'shake a little', 'Loud thunder can make hands do this.', 'The loud storm made his hands shake a little, so tremble means to shake a little.'],
-    ['The eagle began to soar high above the mountains. What does "soar" mean?', ['fly high in the sky', 'walk on the ground', 'swim in the sea', 'sleep in a nest'], 'fly high in the sky', 'An eagle high above the mountains is doing what?', 'The eagle is flying high above the mountains, so soar means to fly high in the sky.'],
-    ['We could not see the fish in the murky pond water. What does "murky" mean?', ['dark and cloudy', 'clear and blue', 'warm and sunny', 'cold and icy'], 'dark and cloudy', 'They could not see the fish — ask yourself why not.', 'They could not see through the water, so it was dark and cloudy — that is murky.'],
-    ['The timid mouse hid when the door opened. What does "timid" mean?', ['shy and afraid', 'brave and bold', 'loud and silly', 'fast and strong'], 'shy and afraid', 'Hiding when the door opened shows how it feels.', 'Hiding shows the mouse is shy and afraid, so timid means shy and afraid.'],
-    ['The generous girl shared her lunch with everyone. What does "generous" mean?', ['likes to give and share', 'likes to keep things', 'likes to hide food', 'likes to eat alone'], 'likes to give and share', 'Sharing lunch with everyone is your clue.', 'Sharing her lunch with everyone shows she likes to give and share, so she is generous.'],
-    ['The stubborn mule would not move, no matter what. What does "stubborn" mean?', ['will not change its mind', 'moves very fast', 'sleeps all day', 'eats a lot'], 'will not change its mind', '"Would not move, no matter what" is your clue.', 'Refusing to move no matter what shows it will not change its mind, so stubborn means refusing to change.'],
-    ['Which word means almost the same as "happy"?', ['glad', 'sad', 'angry', 'tired'], 'glad', 'Think of another word for the big-smile feeling.', 'Glad and happy both name the same good feeling, so they are synonyms.'],
-    ['Which word means the opposite of "day"?', ['night', 'sun', 'light', 'morning'], 'night', 'Think of the time when it is dark outside.', 'Night is the opposite of day, so they are antonyms.'],
-    ['Which word means almost the same as "fast"?', ['quick', 'slow', 'late', 'tired'], 'quick', 'Think of a word for moving speedily.', 'Quick and fast both mean moving with speed, so they are synonyms.'],
-    ['Which word means the opposite of "hot"?', ['cold', 'warm', 'sunny', 'spicy'], 'cold', 'Think of ice.', 'Cold is the opposite of hot, so they are antonyms.'],
-    ['The arid desert gets almost no rain. What does "arid" mean?', ['very dry', 'very wet', 'very cold', 'very green'], 'very dry', 'The words "almost no rain" sit right next to the hard word.', '"Almost no rain" tells you the desert is very dry, so arid means very dry.'],
-    ['"He swung the bat." "A bat flew by at night." In the FIRST sentence, what does "bat" mean?', ['a stick used to hit a ball', 'a flying animal', 'a kind of hat', 'a ball'], 'a stick used to hit a ball', 'You swing something to hit a ball.', 'In "He swung the bat," he swings a stick to hit a ball, so bat means the stick there.'],
-    ['What does "unhappy" mean?', ['not happy', 'very happy', 'happy again', 'almost happy'], 'not happy', 'Look at the little part "un-" at the start of the word.', '"Un-" means "not," so unhappy means not happy.'],
-    ['What does "reread" mean?', ['read again', 'read fast', 'read loudly', 'stop reading'], 'read again', 'The little part "re-" means "again."', '"Re-" means "again," so reread means to read again.'],
-    ['What is a "sunflower"?', ['a flower that looks like the sun', 'a flower that grows at night', 'a kind of sun', 'a sunny day'], 'a flower that looks like the sun', 'Put the two small words together: sun + flower.', 'Sun + flower makes a flower that looks like the sun, so a sunflower is a flower that looks like the sun.'],
-    ['"The soup was ___." Which word is the strongest positive description?', ['delicious', 'okay', 'fine', 'good'], 'delicious', 'Which word shows the biggest, yummiest feeling?', 'Delicious is a strong positive description of food, stronger than okay or fine.']
-  ]],
-  ['Grammar', [
-    ['Which word names a specific person and needs a capital letter?', ['Mrs. Lee', 'teacher', 'woman', 'friend'], 'Mrs. Lee', 'A specific person\'s name starts with a capital letter.', 'Mrs. Lee names a specific person, so it is a proper noun and needs a capital letter.'],
-    ['Which is a common noun?', ['park', 'Disneyland', 'Tuesday', 'Sam'], 'park', 'A common noun names any one of something, not a special name.', 'Park names any park, not a special one, so it is a common noun.'],
-    ['In "The dog barked loudly," which word is the action verb?', ['barked', 'dog', 'loudly', 'the'], 'barked', 'Find the word that tells what the dog did.', 'Barked tells what the dog did, so it is the action verb.'],
-    ['In "the red apple," which word is the adjective?', ['red', 'apple', 'the', 'ate'], 'red', 'Find the word that tells what the apple is like.', 'Red tells what the apple is like, so it is the adjective.'],
-    ['Which sentence tells about yesterday?', ['We walked to school.', 'We walk to school.', 'We will walk to school.', 'We are walking to school.'], 'We walked to school.', 'Look for the verb ending that tells about the past.', 'Walked has the -ed ending that tells about yesterday, so it tells about the past.'],
-    ['What is the correct plural of "box"?', ['boxes', 'boxs', 'boxies', 'boxen'], 'boxes', 'Words ending in x add -es to make more than one.', 'Box ends in x, so you add -es to make boxes.'],
-    ['What is the correct plural of "baby"?', ['babies', 'babys', 'babyes', 'baby'], 'babies', 'Change the y to i, then add -es.', 'Baby changes y to i and adds -es to make babies.'],
-    ['Which sentence starts with a capital letter?', ['The cat sat.', 'the cat sat.', 'The cat sat', 'the Cat sat.'], 'The cat sat.', 'The first word of a sentence starts with a big letter.', '"The cat sat." starts with a capital T, so it is written correctly.'],
-    ['Which sentence asks a question?', ['Where is my hat?', 'Where is my hat.', 'Where is my hat!', 'where is my hat'], 'Where is my hat?', 'A question ends with a mark that looks like a little hook.', 'A question ends with a question mark, so "Where is my hat?" asks a question.'],
-    ['Which sentence shows strong feeling?', ['What a great day!', 'What a great day.', 'What a great day?', 'what a great day'], 'What a great day!', 'Strong feelings end with a straight up-and-down mark.', 'The exclamation mark shows strong feeling, so "What a great day!" is correct.'],
-    ['Which sentence uses commas correctly?', ['I like apples, bananas, and grapes.', 'I like apples bananas, and grapes.', 'I like, apples bananas and grapes.', 'I like apples bananas and grapes.'], 'I like apples, bananas, and grapes.', 'Put a comma between each thing in the list.', 'Commas go between apples, bananas, and grapes, so the first sentence is correct.'],
-    ['Which two words make the contraction "don\'t"?', ['do not', 'does not', 'did not', 'do it'], 'do not', 'The apostrophe takes the place of a missing letter.', 'Don\'t is made from do + not, with the apostrophe taking the place of the o.'],
-    ['What does the contraction "can\'t" mean?', ['cannot', 'can nott', 'cannt', 'can it'], 'cannot', 'Say the two words it stands for: can + not.', 'Can\'t is the short form of cannot.'],
-    ['Which sentence uses the correct present-tense verb for a plural subject?', ['The dogs are barking.', 'The dogs is barking.', 'The dogs am barking.', 'The dogs be barking.'], 'The dogs are barking.', 'Use "are" when you talk about more than one.', 'Dogs means more than one, so it needs "are": The dogs are barking.'],
-    ['Which sentence uses the correct past-tense verb with "we"?', ['We were at the zoo.', 'We was at the zoo.', 'We is at the zoo.', 'We be at the zoo.'], 'We were at the zoo.', 'The word "we" goes with a special past-tense partner.', '"We" goes with "were," so "We were at the zoo" is correct.'],
-    ['Which sentence uses the correct present-tense verb with "she"?', ['She has a red bike.', 'She have a red bike.', 'She haves a red bike.', 'She having a red bike.'], 'She has a red bike.', 'The word "she" goes with a special partner.', '"She" goes with "has," so "She has a red bike" is correct.'],
-    ['Maria lost her ball. ___ was sad. Which word fills the blank?', ['She', 'Her', 'Hers', 'Me'], 'She', 'The word starts the sentence and takes Maria\'s place.', 'She takes Maria\'s place at the start of the sentence, so "She was sad" is correct.'],
-    ['In "She sang sweetly," which word tells HOW she sang?', ['sweetly', 'she', 'sang', 'the'], 'sweetly', 'Find the word that tells how the singing sounded.', 'Sweetly tells how she sang, so it is the adverb.'],
-    ['Which is a complete sentence?', ['The bird built a nest.', 'Built a nest.', 'The bird.', 'Nest in tree.'], 'The bird built a nest.', 'A complete sentence needs a who and a what-they-did.', '"The bird built a nest" has a who (the bird) and what it did (built a nest), so it is complete.'],
-    ['Which is NOT a complete sentence?', ['Ran to the park.', 'The kids ran to the park.', 'They ran fast.', 'We ran too.'], 'Ran to the park.', 'Look for the one that is missing the who.', '"Ran to the park" is missing who ran, so it is not complete.'],
-    ['"Please close the door." What kind of sentence is this?', ['a command', 'a question', 'a telling sentence', 'an exclamation'], 'a command', 'It tells someone to do something.', 'It tells someone to do something, so it is a command.'],
-    ['Which word needs a capital letter?', ['Thanksgiving', 'dinner', 'turkey', 'family'], 'Thanksgiving', 'Holidays are special names.', 'Thanksgiving is the special name of a holiday, so it needs a capital letter.'],
-    ['Which word needs a capital letter?', ['Chicago', 'city', 'street', 'town'], 'Chicago', 'A specific city is a special name.', 'Chicago names a specific city, so it needs a capital letter.'],
-    ['Which sentence tells about right now?', ['I am reading a book.', 'I read a book yesterday.', 'I will read a book.', 'I have read a book.'], 'I am reading a book.', 'Look for the words that tell about this very moment.', '"Am reading" tells what is happening right now.'],
-    ['In "The fluffy puppy wagged its tail," which word tells what the puppy is like?', ['fluffy', 'puppy', 'wagged', 'tail'], 'fluffy', 'Find the word that describes the puppy.', 'Fluffy describes what the puppy is like, so it is the adjective.'],
-    ['Which sentence has the capital letters correct?', ['We visited Grandma on Sunday.', 'we visited grandma on sunday.', 'We visited grandma on Sunday.', 'We visited Grandma on sunday.'], 'We visited Grandma on Sunday.', 'Special names and days of the week need capitals.', 'Grandma (used as a name) and Sunday both need capital letters, so the first sentence is correct.'],
-    ['Which date is written correctly?', ['July 4, 2026', 'July, 4 2026', 'July 4 2026,', 'july 4, 2026'], 'July 4, 2026', 'Put a comma between the day and the year.', 'A comma goes between the day and the year: July 4, 2026.'],
-    ['Which sentence uses the past tense correctly?', ['I ate my lunch.', 'I eated my lunch.', 'I eats my lunch.', 'I eat my lunch yesterday.'], 'I ate my lunch.', 'Some verbs change their spelling in the past instead of adding -ed.', 'Eat changes to ate in the past, so "I ate my lunch" is correct.'],
-    ['In "The cook made soup," what is the word "cook"?', ['a noun — a person', 'a verb', 'an adjective', 'a punctuation mark'], 'a noun — a person', 'Ask who made the soup.', 'The cook is the person who made the soup, so cook is a noun here.'],
-    ['Which is the BEST way to write this? "my dog is big"', ['My dog is big.', 'my dog is big', 'My dog is big', 'my Dog Is Big.'], 'My dog is big.', 'A sentence needs a capital first letter and an end mark.', '"My dog is big." has a capital M and a period, so it is the best way.']
-  ]],
-  ['Reading Strategies', [
-    ['You read: "The nocturnal owl hunts at night." What does "nocturnal" mean?', ['active at night', 'active in the day', 'very sleepy', 'very loud'], 'active at night', 'The words "hunts at night" sit right next to the hard word.', '"Hunts at night" tells you nocturnal means active at night.'],
-    ['You did not understand a tricky sentence. What should you do?', ['read it again slowly', 'skip the whole book', 'close the book', 'guess and move on'], 'read it again slowly', 'A second look often makes tricky parts clear.', 'Reading a tricky sentence again slowly often makes it clear.'],
-    ['Before reading a book called "The Lost Puppy," what is a good prediction?', ['It will be about finding a lost puppy.', 'It will be about baking cakes.', 'It will be about outer space.', 'It will have no words.'], 'It will be about finding a lost puppy.', 'Use the title to make your best guess.', 'The title "The Lost Puppy" hints the book will be about finding a lost puppy.'],
-    ['You predicted the puppy would be found at the park, but the book says the beach. What should you do?', ['change your prediction to match the book', 'keep the old prediction', 'stop reading', 'skip the ending'], 'change your prediction to match the book', 'Good readers fix their guesses when the book gives new facts.', 'Good readers change their predictions when the book gives new facts.'],
-    ['The author writes: "Sticky mud squished between my toes." What should you picture in your mind?', ['mud squishing between toes', 'a clean dry floor', 'snow falling softly', 'a sunny beach'], 'mud squishing between toes', 'Make a movie in your mind from the describing words.', 'The describing words tell you to picture sticky mud squishing between toes.'],
-    ['Which is a good question to ask yourself while reading?', ['Why did the character do that?', 'What page am I on?', 'How many words are here?', 'What time is lunch?'], 'Why did the character do that?', 'A good reading question is about the story itself.', '"Why did the character do that?" asks about the story, so it deepens understanding.'],
-    ['The character is nervous on the first day of school, and you felt that way too. What is this called?', ['a text-to-self connection', 'a spelling test', 'a book report', 'a library card'], 'a text-to-self connection', 'You are connecting the story to your own life.', 'Connecting the character\'s feelings to your own life is a text-to-self connection.'],
-    ['Mia grabbed her umbrella and rain boots. What can you infer?', ['It is raining or about to rain.', 'It is a sunny beach day.', 'It is snowing hard.', 'It is bedtime.'], 'It is raining or about to rain.', 'Umbrellas and rain boots are clues — put them together.', 'Umbrellas and rain boots are clues that it is raining or about to rain.'],
-    ['The floor was wet and there was an empty bucket nearby. What probably happened?', ['Someone spilled water.', 'It snowed inside.', 'A bird flew in.', 'Nothing happened.'], 'Someone spilled water.', 'A wet floor plus an empty bucket tells a story.', 'A wet floor and an empty bucket are clues that someone spilled water.'],
-    ['Story: A boy plants a seed, waters it daily, and grows a sunflower. Which is the best summary?', ['A boy plants and waters a seed until a sunflower grows.', 'A boy likes hats.', 'Sunflowers are yellow.', 'Water is wet.'], 'A boy plants and waters a seed until a sunflower grows.', 'A summary keeps only the most important parts.', 'The first choice keeps the planting, watering, and growing — the most important parts.'],
-    ['You read a sentence that does not make sense. What is the smart move?', ['stop and fix it up', 'keep reading fast', 'skip two pages', 'close your eyes'], 'stop and fix it up', 'Good readers notice when something sounds wrong.', 'Good readers stop and fix it up when a sentence does not make sense.'],
-    ['You do not know the word "igloo." The picture shows a house made of ice blocks. What can the picture tell you?', ['an igloo is a house made of ice', 'an igloo is a kind of dog', 'an igloo is a car', 'an igloo is a cake'], 'an igloo is a house made of ice', 'Study what the picture shows.', 'The picture shows a house made of ice blocks, so an igloo is a house made of ice.'],
-    ['You see the long word "sunlight." What is a good way to read it?', ['break it into sun + light', 'guess a random word', 'skip it', 'say the alphabet'], 'break it into sun + light', 'Two small words you know are hiding inside.', 'Sunlight breaks into sun + light, two words you know, so chunking helps you read it.'],
-    ['You want to check how to spell "beautiful." What is the best tool?', ['a dictionary', 'a ruler', 'a clock', 'a map'], 'a dictionary', 'Think about which tool holds word spellings.', 'A dictionary shows correct spellings, so it is the best tool to check "beautiful."'],
-    ['You are stuck on the word "frog." What can you try first?', ['say the first sound /f/ and keep going', 'say only the last sound', 'close the book', 'pick a new book'], 'say the first sound /f/ and keep going', 'Start with the sounds you know and blend forward.', 'Saying the first sound /f/ and blending forward helps you read "frog."'],
-    ['You need to remember what the bear ate in the story. What should you do?', ['go back and reread that part', 'guess the food', 'ask a friend to guess', 'skip to the end'], 'go back and reread that part', 'The answer is hiding in the part you already read.', 'Going back and rereading that part helps you find what the bear ate.'],
-    ['While reading, you ask: "What is this page mostly about?" What are you finding?', ['the main idea', 'the page number', 'the author\'s name', 'the book\'s price'], 'the main idea', '"Mostly about" points to one special answer.', 'Asking what a page is mostly about helps you find the main idea.'],
-    ['After reading, your teacher asks you to retell the story. What should you include?', ['the important events in order', 'every single word', 'the color of the book', 'your lunch menu'], 'the important events in order', 'Keep the big parts and leave out tiny details.', 'Retelling means sharing the important events in order, not every word.'],
-    ['The book says penguins cannot fly but are great swimmers. What new fact did you learn?', ['Penguins are great swimmers.', 'Penguins can fly.', 'Penguins live in trees.', 'Penguins eat pizza.'], 'Penguins are great swimmers.', 'Find the fact the book actually gives.', 'The book says penguins are great swimmers, so that is the new fact you learned.'],
-    ['The character forgot her lunch, so she was hungry at noon. Why was she hungry?', ['she forgot her lunch', 'she ate breakfast', 'she played tag', 'she drank water'], 'she forgot her lunch', 'Find the reason the author gives.', 'Forgetting her lunch caused her hunger, so that is why she was hungry.'],
-    ['Tom shares his toys. His brother Sam shares his toys too. How are the brothers alike?', ['Both brothers share.', 'Tom is taller.', 'Sam is older.', 'Both like pizza.'], 'Both brothers share.', 'Find what is the SAME about them.', 'Tom and Sam both share their toys, so that is how they are alike.'],
-    ['"She brushed her teeth. She put on pajamas. She read a book." What happened first?', ['She brushed her teeth.', 'She put on pajamas.', 'She read a book.', 'She fell asleep.'], 'She brushed her teeth.', 'The first sentence in the list tells what happened first.', 'The list starts with brushing teeth, so that happened first.'],
-    ['"The baby wailed when her toy broke." What does "wailed" mean?', ['cried loudly', 'laughed softly', 'slept quietly', 'ate quickly'], 'cried loudly', 'A baby with a broken toy would make a loud, sad sound.', 'A baby with a broken toy cries loudly, so wailed means cried loudly.'],
-    ['You guessed "bridge" for a word, but the sentence still sounds wrong. What should you try next?', ['try another word that makes sense', 'keep the wrong word', 'stop reading', 'skip the page'], 'try another word that makes sense', 'Good readers keep trying until the sentence sounds right.', 'Good readers try another word that makes sense until the sentence sounds right.'],
-    ['How can illustrations help you read?', ['They give clues about the words.', 'They make the book heavier.', 'They hide the words.', 'They change the story.'], 'They give clues about the words.', 'Pictures and words work together.', 'Illustrations give clues about the words, so they help you read.'],
-    ['Why is it good to reread a sentence until it sounds smooth?', ['Smooth reading helps you understand.', 'It makes the book longer.', 'It erases mistakes.', 'It changes the words.'], 'Smooth reading helps you understand.', 'Choppy reading makes the meaning hard to catch.', 'Reading smoothly helps the meaning come through, so it helps you understand.'],
-    ['Which words are the MOST important in "The tiny ant carried a huge crumb"?', ['tiny ant, huge crumb', 'the, a', 'carried, the', 'ant, the'], 'tiny ant, huge crumb', 'Important words carry the meaning; small words like "the" do not.', 'Tiny ant and huge crumb carry the meaning of the sentence, so they are the most important words.'],
-    ['Fact 1: Birds have feathers. Fact 2: Feathers keep birds warm. What can you figure out?', ['Feathers help birds stay warm.', 'Birds like snow.', 'Feathers are colorful.', 'Birds eat feathers.'], 'Feathers help birds stay warm.', 'Put the two facts together.', 'Putting the facts together shows feathers help birds stay warm.'],
-    ['Why might you reread the ending of a story?', ['to make sure you understand how it ended', 'to make the book longer', 'to find new spelling words', 'to count the pages'], 'to make sure you understand how it ended', 'Endings can be tricky — a second read helps.', 'Rereading the ending helps you make sure you understand how the story ended.'],
-    ['Before reading about frogs, you ask: "What do I already know about frogs?" Why is that helpful?', ['It helps your brain connect new facts.', 'It makes reading slower.', 'It skips the hard words.', 'It ends the lesson.'], 'It helps your brain connect new facts.', 'Old knowledge is like a hook that new facts can hang on.', 'Thinking about what you already know helps your brain connect new facts about frogs.']
-  ]],
-  ['Writing & Research', [
-    ['Which is the best topic sentence for a paragraph about dogs?', ['Dogs make wonderful pets for many reasons.', 'Dogs.', 'I saw a dog.', 'Woof.'], 'Dogs make wonderful pets for many reasons.', 'A topic sentence tells the big idea of the paragraph.', '"Dogs make wonderful pets for many reasons" tells the big idea, so it is the best topic sentence.'],
-    ['Topic: Dogs make wonderful pets. Which detail supports it?', ['Dogs can learn tricks and play fetch.', 'Dogs have tails.', 'I like pizza.', 'Cats are cute.'], 'Dogs can learn tricks and play fetch.', 'A detail must help prove the big idea is true.', 'Learning tricks and playing fetch proves dogs make wonderful pets, so it supports the topic.'],
-    ['Which is the best closing sentence for a paragraph about why recess is fun?', ['That is why recess is the best part of the day.', 'Recess.', 'I am done.', 'The end?'], 'That is why recess is the best part of the day.', 'A closing sentence wraps up the big idea.', '"That is why recess is the best part of the day" wraps up the big idea, so it is the best closing.'],
-    ['"I woke up. I ate breakfast. I went to school." Which sentence comes FIRST?', ['I woke up.', 'I ate breakfast.', 'I went to school.', 'I came home.'], 'I woke up.', 'Think about what happens first in a morning.', 'Waking up happens before breakfast and school, so it comes first.'],
-    ['Which gives an opinion WITH a reason?', ['I think soccer is fun because I love running.', 'Soccer is fun.', 'I like soccer.', 'Soccer.'], 'I think soccer is fun because I love running.', 'Look for the word that gives the "why."', '"Because I love running" gives the reason, so the first choice is an opinion with a reason.'],
-    ['Which sentence gives information?', ['A butterfly starts as a caterpillar.', 'Butterflies are the best.', 'I love butterflies!', 'Wow, butterflies!'], 'A butterfly starts as a caterpillar.', 'Information teaches a fact.', '"A butterfly starts as a caterpillar" teaches a fact, so it gives information.'],
-    ['Which sentence uses a sequence word correctly?', ['First, we packed our bags.', 'First we packed, our bags.', 'First. We packed our bags', 'first we packed our bags'], 'First, we packed our bags.', 'A comma comes after sequence words like "First."', '"First" is a sequence word and needs a comma after it, so the first sentence is correct.'],
-    ['Which revision adds the BEST detail to "The dog ran"?', ['The fluffy brown dog ran fast across the park.', 'The dog ran ran ran.', 'Dog.', 'The dog.'], 'The fluffy brown dog ran fast across the park.', 'Good details tell what something looks like and where it is.', '"Fluffy brown" and "across the park" add describing details, so it is the best revision.'],
-    ['"The soup was ___." Which word is the BEST choice?', ['delicious', 'okay', 'thing', 'stuff'], 'delicious', 'Pick the strongest, clearest word.', 'Delicious is the strongest, clearest word for tasty soup, so it is the best choice.'],
-    ['Which sentence has the capital letters correct?', ['My friend Sam lives in Texas.', 'my friend sam lives in texas.', 'My friend sam lives in Texas.', 'My friend Sam lives in texas.'], 'My friend Sam lives in Texas.', 'Names of people and places need capitals.', 'Sam and Texas are special names, so both need capitals.'],
-    ['Which sentence is edited correctly?', ['Where are you going?', 'Where are you going.', 'where are you going?', 'Where are you going'], 'Where are you going?', 'Questions need a capital first letter and a question mark.', '"Where are you going?" has a capital W and a question mark, so it is edited correctly.'],
-    ['You want to learn about dolphins. Which is the best research question?', ['What do dolphins eat?', 'Do I like dolphins?', 'Are dolphins cool?', 'Dolphins.'], 'What do dolphins eat?', 'A research question asks for facts you can look up.', '"What do dolphins eat?" asks for facts you can look up, so it is the best research question.'],
-    ['Which source would have facts about the moon?', ['a science book about space', 'a fairy tale', 'a comic book', 'a cookbook'], 'a science book about space', 'Match the source to the topic.', 'A science book about space would have facts about the moon.'],
-    ['You read: "Koalas sleep 20 hours a day." Which note keeps the important fact?', ['Koalas sleep 20 hours a day.', 'Koalas are cute.', 'I like koalas.', 'Sleep is nice.'], 'Koalas sleep 20 hours a day.', 'A good note keeps the fact, not just a feeling.', 'The note keeps the fact "20 hours a day," so it is the best note.'],
-    ['Which fact belongs in a report about penguins?', ['Penguins cannot fly.', 'Penguins are my favorite.', 'I saw a penguin once.', 'Penguins are funny.'], 'Penguins cannot fly.', 'A report needs facts, not opinions.', '"Penguins cannot fly" is a fact, so it belongs in the report.'],
-    ['One book says a whale is a mammal. A website says the same thing. What should you think?', ['The fact is probably true.', 'The fact is false.', 'Books are always wrong.', 'Websites are always wrong.'], 'The fact is probably true.', 'Two sources agreeing makes a fact stronger.', 'When two sources agree, the fact is probably true.'],
-    ['How should you share your research with the class?', ['Speak clearly and show your notes.', 'Whisper and hide your paper.', 'Read very fast.', 'Never look up.'], 'Speak clearly and show your notes.', 'Think about what helps listeners understand.', 'Speaking clearly and showing your notes helps the class understand your research.'],
-    ['Which sentence starts a good story?', ['On Saturday, my kite got stuck in a tall tree.', 'Kites.', 'I am writing.', 'The end.'], 'On Saturday, my kite got stuck in a tall tree.', 'A story start tells when and what happened.', '"On Saturday, my kite got stuck in a tall tree" tells when and what happened, so it starts a good story.'],
-    ['Which words help put a story in order?', ['first, next, last', 'and, and, and', 'big, small, red', 'run, jump, play'], 'first, next, last', 'These words tell the order of events.', 'First, next, and last tell the order of events, so they help put a story in order.'],
-    ['Which is the best ending for a story about a lost toy found under the bed?', ['I hugged my teddy and felt so happy.', 'The end.', 'Bye.', 'I am done writing.'], 'I hugged my teddy and felt so happy.', 'A good ending shows how the character feels.', '"I hugged my teddy and felt so happy" shows the character\'s happy feeling, so it is the best ending.'],
-    ['Which combines these sentences best? "The cat is soft. The cat is gray."', ['The cat is soft and gray.', 'The cat is soft the cat is gray.', 'Soft gray.', 'The cat.'], 'The cat is soft and gray.', 'Join the two ideas with the word "and."', '"The cat is soft and gray" joins both ideas with "and," so it is the best combination.'],
-    ['Which word is spelled correctly?', ['because', 'becuase', 'becaus', 'becausee'], 'because', 'Say it slowly: be-cause.', 'Because is spelled b-e-c-a-u-s-e, so the first choice is correct.'],
-    ['Which sentence is an opinion?', ['Chocolate ice cream is the best.', 'Ice cream is cold.', 'Ice cream melts in heat.', 'Ice cream is a dessert.'], 'Chocolate ice cream is the best.', 'An opinion tells what someone thinks.', '"Is the best" tells what someone thinks, so it is an opinion.'],
-    ['Your research question is "How do birds build nests?" Where should you look FIRST?', ['a book about birds', 'a book about cars', 'a cookbook', 'a book of jokes'], 'a book about birds', 'Pick the source that matches your question.', 'A book about birds would explain how birds build nests, so look there first.'],
-    ['Which is the best note to take about tigers?', ['Tigers have stripes and hunt at night.', 'Tigers.', 'I like tigers a lot!', 'Roar!'], 'Tigers have stripes and hunt at night.', 'Notes should hold facts you can use later.', '"Tigers have stripes and hunt at night" holds facts you can use in your report.'],
-    ['Which sentence does NOT belong in a paragraph about cats as pets?', ['My bike is red.', 'Cats purr when they are happy.', 'Cats use a litter box.', 'Cats like to nap in the sun.'], 'My bike is red.', 'Every sentence should be about cats.', '"My bike is red" is about a bike, not cats, so it does not belong.'],
-    ['Which sentence is written correctly?', ['Sam and I went to the park.', 'Sam and i went to the park.', 'sam and I went to the park.', 'Sam and I went to the park'], 'Sam and I went to the park.', 'The word "I" is always capital, and sentences need end marks.', '"I" is always capital and the sentence needs a period, so the first choice is correct.'],
-    ['Which is the correct greeting for a friendly letter?', ['Dear Grandma,', 'dear grandma', 'Dear grandma.', 'grandma dear,'], 'Dear Grandma,', 'A greeting starts with capitals and ends with a comma.', '"Dear Grandma," has a capital D, a capital G, and a comma, so it is correct.'],
-    ['In "How to brush your teeth," which step comes first?', ['Put toothpaste on the brush.', 'Rinse your mouth.', 'Spit.', 'Put the brush away.'], 'Put toothpaste on the brush.', 'Think about the very first thing you do.', 'You put toothpaste on the brush before anything else, so it comes first.'],
-    ['You finished writing and editing your story. What is the last step?', ['Share it with others.', 'Throw it away.', 'Start over.', 'Hide it.'], 'Share it with others.', 'Writing is meant to be read.', 'Sharing your finished story lets others read it, so it is the last step.']
-  ]]
+  [
+    "Literature & Story Elements",
+    [
+      [
+        "Sam found a glowing shell on the beach at sunrise. What is the setting of this story?",
+        [
+          "a beach at sunrise",
+          "a snowy mountain",
+          "Sam",
+          "a glowing shell"
+        ],
+        "a beach at sunrise",
+        "Look for the words that tell where and when the story happens.",
+        "The story happens on a beach at sunrise, so that is the setting."
+      ],
+      [
+        "Maya the baker made bread for the whole town. Who is the main character?",
+        [
+          "the oven",
+          "Maya",
+          "the bread",
+          "the town"
+        ],
+        "Maya",
+        "Ask who the story is mostly about.",
+        "The story is mostly about Maya the baker, so she is the main character."
+      ],
+      [
+        "Leo could not find his kite anywhere. What is the problem in this story?",
+        [
+          "Leo flew his kite",
+          "Leo bought a kite",
+          "Leo lost his kite",
+          "Leo likes kites"
+        ],
+        "Leo lost his kite",
+        "Find what is going wrong for the character.",
+        "Leo cannot find his kite anywhere, so the lost kite is the problem."
+      ],
+      [
+        "Leo looked everywhere and found his kite stuck in a tree. How was the problem solved?",
+        [
+          "Leo lost the kite again",
+          "Leo went home sad",
+          "Leo never looked for it",
+          "Leo found the kite in a tree"
+        ],
+        "Leo found the kite in a tree",
+        "Look for how the character fixed what was wrong.",
+        "Finding the kite in the tree fixed the problem of the lost kite."
+      ],
+      [
+        "An ant shared his food with a hungry grasshopper. What is the lesson of this story?",
+        [
+          "sharing helps everyone",
+          "ants are tiny",
+          "summer is hot",
+          "bread is tasty"
+        ],
+        "sharing helps everyone",
+        "Ask what the characters learned by the end.",
+        "The ant learned that sharing helps everyone, and that is the lesson of the story."
+      ],
+      [
+        "Rosa always helps her friends carry heavy bags. What does this tell you about Rosa?",
+        [
+          "she is grumpy",
+          "she is kind",
+          "she is shy",
+          "she is loud"
+        ],
+        "she is kind",
+        "Think about what her actions tell you about her.",
+        "Helping friends with heavy bags shows Rosa is kind."
+      ],
+      [
+        "Tom hid behind the door when the thunder boomed. How does Tom feel?",
+        [
+          "hungry",
+          "bored",
+          "scared",
+          "silly"
+        ],
+        "scared",
+        "Look at what Tom does when the thunder booms.",
+        "Hiding when thunder booms shows Tom feels scared."
+      ],
+      [
+        "First, Ana planted a seed. Next, it rained. Last, a sprout grew. What happened in the middle of the story?",
+        [
+          "Ana planted a seed",
+          "a sprout grew",
+          "Ana ate dinner",
+          "it rained"
+        ],
+        "it rained",
+        "The middle comes after \"first\" and before \"last.\"",
+        "After the seed was planted and before the sprout grew, it rained, so that is the middle."
+      ],
+      [
+        "Ben is brave and loves climbing trees. His sister Lily is shy and loves reading indoors. How are Ben and Lily different?",
+        [
+          "Ben likes adventure and Lily likes quiet play",
+          "they both climb trees",
+          "they both read indoors",
+          "Ben is shy too"
+        ],
+        "Ben likes adventure and Lily likes quiet play",
+        "Find one detail about Ben and one about Lily, then compare them.",
+        "The story shows Ben likes adventure while Lily likes quiet play, so that is how they are different."
+      ],
+      [
+        "Which line shows a character speaking?",
+        [
+          "Mia ran very fast.",
+          "\"Look out!\" yelled Mia.",
+          "The dog was big.",
+          "It was a sunny day."
+        ],
+        "\"Look out!\" yelled Mia.",
+        "Look for the quotation marks and the words that tell who said them.",
+        "The words inside the quotation marks are what Mia says, so that line shows a character speaking."
+      ],
+      [
+        "A picture shows a fox holding an umbrella in the rain. What does the illustration tell you?",
+        [
+          "the fox is fast asleep",
+          "the fox is reading a book",
+          "the fox is out in the rain",
+          "the fox is swimming"
+        ],
+        "the fox is out in the rain",
+        "Study what the fox is holding and what is falling.",
+        "The umbrella and the falling rain show the fox is out in the rain."
+      ],
+      [
+        "Nina packed a swimsuit, a towel, and sunscreen. Where is she probably going?",
+        [
+          "to the library",
+          "to a snow fort",
+          "to bed",
+          "to the pool"
+        ],
+        "to the pool",
+        "Think about where you would need all three of those things.",
+        "A swimsuit, a towel, and sunscreen are things you need at the pool, so she is probably going there."
+      ],
+      [
+        "In \"The Tortoise and the Hare,\" the tortoise keeps going and wins the race. What is the lesson?",
+        [
+          "slow and steady wins the race",
+          "hares are the fastest",
+          "turtles love to nap",
+          "races are silly"
+        ],
+        "slow and steady wins the race",
+        "Think about what the tortoise did that the hare did not do.",
+        "The tortoise kept going without stopping, so the lesson is that slow and steady wins the race."
+      ],
+      [
+        "A story has a dragon, a castle, and a magic wand. What kind of story is it?",
+        [
+          "a science report",
+          "a fairy tale",
+          "a news story",
+          "a recipe"
+        ],
+        "a fairy tale",
+        "Look for the magic words: dragon, castle, magic wand.",
+        "Dragons, castles, and magic wands are signs of a fairy tale."
+      ],
+      [
+        "Which part is the ENDING? \"At last, they hugged and walked home happy.\"",
+        [
+          "the beginning",
+          "the middle",
+          "the ending",
+          "the title"
+        ],
+        "the ending",
+        "Look for the words that tell the story is over, like \"at last.\"",
+        "\"At last\" and the happy hug show the story is over, so this is the ending."
+      ],
+      [
+        "A squirrel hid her nuts but cannot remember where. What is her problem?",
+        [
+          "she has too many nuts",
+          "she is eating lunch",
+          "she loves trees",
+          "she forgot where she hid the nuts"
+        ],
+        "she forgot where she hid the nuts",
+        "Ask what the squirrel is struggling with.",
+        "She cannot remember where the nuts are, so forgetting is her problem."
+      ],
+      [
+        "Which story could really happen?",
+        [
+          "A girl learns to ride her bike at the park.",
+          "A dragon gives the girl a magic bike.",
+          "The bike flies to the moon.",
+          "The moon talks to the girl."
+        ],
+        "A girl learns to ride her bike at the park.",
+        "Ask yourself if it could happen in real life.",
+        "Learning to ride a bike at the park can really happen, so that story is realistic."
+      ],
+      [
+        "Jake left his plant in a dark closet for a week, and it drooped. Why did the plant droop?",
+        [
+          "it needed a name",
+          "it needed light",
+          "it needed a hat",
+          "it was too green"
+        ],
+        "it needed light",
+        "Connect what Jake did to what happened to the plant.",
+        "The plant drooped because it sat in the dark, so needing light is the reason."
+      ],
+      [
+        "Kate wants to win the spelling bee, so she practices ten words every night. What does this tell you about Kate?",
+        [
+          "she hates words",
+          "she is lazy",
+          "she works hard for her goals",
+          "she loves to sleep"
+        ],
+        "she works hard for her goals",
+        "Her plan shows what kind of person she is.",
+        "Practicing ten words every night shows Kate works hard for her goals."
+      ],
+      [
+        "At the start, the class was in the gym. Then the bell rang and they went to the art room. Where is the setting now?",
+        [
+          "the gym",
+          "the playground",
+          "home",
+          "the art room"
+        ],
+        "the art room",
+        "Follow where the class goes after the bell rings.",
+        "After the bell, they left the gym and went to the art room, so that is the new setting."
+      ],
+      [
+        "Which sentence is told by a character in the story?",
+        [
+          "\"I was so excited to see the parade.\"",
+          "\"He was so excited to see the parade.\"",
+          "\"They were excited to see it.\"",
+          "\"The parade was very long.\""
+        ],
+        "\"I was so excited to see the parade.\"",
+        "Look for the word that means the speaker is telling his or her own story.",
+        "\"I\" shows the narrator is a character telling his or her own story."
+      ],
+      [
+        "A story is about two friends who build a birdhouse together. Which is the best title?",
+        [
+          "The Lost Key",
+          "The Birdhouse Buddies",
+          "Rainy Day",
+          "The Big Test"
+        ],
+        "The Birdhouse Buddies",
+        "Pick the title that tells what the story is mostly about.",
+        "\"The Birdhouse Buddies\" names the friends and the birdhouse, so it fits the story best."
+      ],
+      [
+        "Which happened first? The cat climbed the tree. The cat ate dinner. The cat fell asleep.",
+        [
+          "The cat ate dinner.",
+          "The cat fell asleep.",
+          "The cat climbed the tree.",
+          "The cat woke up."
+        ],
+        "The cat climbed the tree.",
+        "The list gives the events in order — read the first one.",
+        "The list gives the events in order, and climbing the tree comes first."
+      ],
+      [
+        "The story is mostly about Max and his dog Scout. Who is a minor character?",
+        [
+          "Max",
+          "Scout",
+          "the leash",
+          "the mail carrier who waves once"
+        ],
+        "the mail carrier who waves once",
+        "Main characters appear again and again. Minor characters appear only briefly.",
+        "The mail carrier waves once and never returns, so she is a minor character."
+      ],
+      [
+        "Read the poem: \"Splish, splash, splish, / Rain falls on the roof. / Splish, splash, splish, / We cannot go out.\" What is the poem mostly about?",
+        [
+          "rain on a rainy day",
+          "a sunny beach",
+          "a snowstorm",
+          "a birthday party"
+        ],
+        "rain on a rainy day",
+        "Look at the words that repeat and the sounds they make.",
+        "The repeating words \"splish, splash\" and \"rain\" show the poem is about a rainy day."
+      ],
+      [
+        "One puppy could not move the box alone, but three puppies pushed it together. What is the lesson?",
+        [
+          "puppies are funny",
+          "teamwork helps solve problems",
+          "boxes are heavy",
+          "pushing is fun"
+        ],
+        "teamwork helps solve problems",
+        "Notice what changed when more puppies helped.",
+        "The puppies moved the box only when they worked together, so the lesson is that teamwork helps solve problems."
+      ],
+      [
+        "At first, Will was afraid of the water. By the end of summer, he was diving off the dock. How did Will change?",
+        [
+          "he stayed afraid",
+          "he stopped swimming",
+          "he became brave about swimming",
+          "he moved away"
+        ],
+        "he became brave about swimming",
+        "Compare how Will felt at the start and at the end.",
+        "Will went from afraid of water to diving off the dock, so he became brave about swimming."
+      ],
+      [
+        "Palm trees swayed. Warm sand burned our feet. Where are the characters?",
+        [
+          "in the snow",
+          "at the zoo",
+          "in a cave",
+          "at the beach"
+        ],
+        "at the beach",
+        "Palm trees and warm sand are clues to the place.",
+        "Palm trees and warm sand are clues that the setting is the beach."
+      ],
+      [
+        "A clever rabbit tricks a bear out of his honey every winter. What is the rabbit like?",
+        [
+          "clever",
+          "sleepy",
+          "shy",
+          "slow"
+        ],
+        "clever",
+        "What word does the story use to describe the rabbit?",
+        "The story calls the rabbit clever, and tricking the bear proves it."
+      ],
+      [
+        "Story: A duck lost her duckling, asked the farmer for help, and found it in the barn. Which retelling keeps the important parts?",
+        [
+          "A duck is yellow.",
+          "A duck lost her duckling, asked the farmer for help, and found it in the barn.",
+          "The farmer wears a hat.",
+          "Barns are red."
+        ],
+        "A duck lost her duckling, asked the farmer for help, and found it in the barn.",
+        "A good retelling keeps the problem and how it was solved.",
+        "The first retelling keeps the lost duckling, the farmer's help, and the barn — the important parts."
+      ]
+    ]
+  ],
+  [
+    "Informational Reading",
+    [
+      [
+        "Read: \"Bees visit flowers to drink nectar. As they move, pollen sticks to their legs. At the next flower, the pollen falls off and helps new plants grow.\" What is the main idea?",
+        [
+          "Bees drink water.",
+          "Flowers are pretty.",
+          "Bees help plants grow as they visit flowers.",
+          "Pollen is yellow."
+        ],
+        "Bees help plants grow as they visit flowers.",
+        "Ask what the whole paragraph is mostly about.",
+        "The paragraph explains how bees moving pollen helps plants grow, so that is the main idea."
+      ],
+      [
+        "Read: \"Bees visit flowers to drink nectar. As they move, pollen sticks to their legs. At the next flower, the pollen falls off and helps new plants grow.\" Which detail supports the main idea?",
+        [
+          "Bees wear tiny hats.",
+          "Flowers can sing.",
+          "Bees sleep all day.",
+          "Pollen sticks to the bees' legs."
+        ],
+        "Pollen sticks to the bees' legs.",
+        "Find a fact the author uses to explain the main idea.",
+        "Pollen sticking to the bees' legs is a fact that explains how bees help plants grow."
+      ],
+      [
+        "A page about how turtles hatch has the heading \"From Egg to Baby Turtle.\" What will the page be about?",
+        [
+          "how baby turtles hatch",
+          "what turtles eat",
+          "where turtles swim",
+          "how old turtles get"
+        ],
+        "how baby turtles hatch",
+        "The heading names the topic of the section.",
+        "The heading \"From Egg to Baby Turtle\" tells you the page will explain how baby turtles hatch."
+      ],
+      [
+        "Under a photo it says: \"A frog's sticky tongue catches flies.\" What does the caption explain?",
+        [
+          "the title of the book",
+          "the photo of the frog",
+          "the page number",
+          "the author's name"
+        ],
+        "the photo of the frog",
+        "A caption sits under a picture and talks about it.",
+        "The caption is under the photo and describes the frog in it, so it explains the photo."
+      ],
+      [
+        "You read the word \"habitat\" and do not know it. Which part of the book lists hard words and their meanings?",
+        [
+          "the front cover",
+          "the title page",
+          "the glossary",
+          "the back cover"
+        ],
+        "the glossary",
+        "Think about which part of a book is like a mini dictionary.",
+        "A glossary lists hard words from the book and tells what they mean."
+      ],
+      [
+        "You want to read the chapter \"Desert Animals.\" How can you find its page number?",
+        [
+          "read the whole book",
+          "guess a page",
+          "count the pictures",
+          "check the table of contents"
+        ],
+        "check the table of contents",
+        "One page lists every chapter title with its page number.",
+        "The table of contents lists each chapter title next to its page number, so you can find \"Desert Animals.\""
+      ],
+      [
+        "Which is a fact?",
+        [
+          "Spiders have eight legs.",
+          "Spiders are the coolest.",
+          "Spiders are scary.",
+          "Spiders are ugly."
+        ],
+        "Spiders have eight legs.",
+        "A fact can be checked and is true for everyone.",
+        "You can count a spider's eight legs, so it is a fact."
+      ],
+      [
+        "Which is an opinion?",
+        [
+          "Strawberries are red.",
+          "Strawberries taste the best.",
+          "Strawberries grow on plants.",
+          "Strawberries have seeds."
+        ],
+        "Strawberries taste the best.",
+        "An opinion tells what someone thinks or feels.",
+        "\"Taste the best\" tells what someone thinks, so it is an opinion."
+      ],
+      [
+        "The word \"erupt\" is printed in dark, bold letters. What should you do?",
+        [
+          "skip over it",
+          "erase it",
+          "pay close attention — it is an important word",
+          "sound out every letter twice"
+        ],
+        "pay close attention — it is an important word",
+        "Authors make important words stand out on purpose.",
+        "Bold letters mark a word the author wants you to notice because it is important."
+      ],
+      [
+        "A diagram of a plant has lines pointing to the roots, stem, and leaves. What do the labels do?",
+        [
+          "tell a funny story",
+          "give the page number",
+          "show the author",
+          "name the parts of the plant"
+        ],
+        "name the parts of the plant",
+        "Follow each line from the word to the picture.",
+        "Each label sits at the end of a line pointing to a plant part, so the labels name the parts."
+      ],
+      [
+        "Steps to plant a seed: 1. Fill a cup with soil. 2. Push the seed in. 3. Water it. What do you do first?",
+        [
+          "fill a cup with soil",
+          "water it",
+          "push the seed in",
+          "wait a week"
+        ],
+        "fill a cup with soil",
+        "Step 1 always comes first.",
+        "Step 1 says to fill a cup with soil, so that is what you do first."
+      ],
+      [
+        "Read: \"It rained all night. The playground was covered in puddles.\" Why were there puddles?",
+        [
+          "kids played tag",
+          "it rained all night",
+          "the sun was out",
+          "the bell rang"
+        ],
+        "it rained all night",
+        "Find the sentence that explains why.",
+        "The rain all night caused the puddles, so the rain is the reason."
+      ],
+      [
+        "One book says sharks have sharp teeth. Another book says sharks can smell from far away. What do both books teach?",
+        [
+          "how to draw sharks",
+          "stories about pirates",
+          "facts about sharks",
+          "where to swim"
+        ],
+        "facts about sharks",
+        "Both books give information about the same animal.",
+        "Both books share facts about sharks, even though the facts are different."
+      ],
+      [
+        "A book explains how to build a bird feeder, step by step. Why did the author write it?",
+        [
+          "to tell a funny story",
+          "to share a poem",
+          "to sell toys",
+          "to teach readers how to do something"
+        ],
+        "to teach readers how to do something",
+        "Step-by-step directions are written for one special reason.",
+        "Step-by-step directions are written to teach readers how to build a bird feeder."
+      ],
+      [
+        "Read: \"Whales are mammals. They breathe air through a blowhole.\" Which question does this text answer?",
+        [
+          "How do whales breathe?",
+          "What do whales eat?",
+          "Where do whales sleep?",
+          "How fast do whales swim?"
+        ],
+        "How do whales breathe?",
+        "Match the question to the fact the text gives.",
+        "The text says whales breathe air through a blowhole, so it answers how whales breathe."
+      ],
+      [
+        "You want to find every page that mentions \"volcanoes.\" Where should you look?",
+        [
+          "the dedication page",
+          "the index",
+          "the front cover",
+          "the first page"
+        ],
+        "the index",
+        "This part lists topics in ABC order with all their page numbers.",
+        "The index lists \"volcanoes\" with every page number where the topic appears."
+      ],
+      [
+        "A map of the school shows the library right next to the gym. Where is the library?",
+        [
+          "under the gym",
+          "inside the gym",
+          "next to the gym",
+          "across town"
+        ],
+        "next to the gym",
+        "Read the labels and look at what sits beside the library.",
+        "The map shows the library right beside the gym, so that is where it is."
+      ],
+      [
+        "Under the heading \"Planets,\" one part is called \"Mars.\" What will that part tell about?",
+        [
+          "Jupiter",
+          "the Sun",
+          "stars",
+          "Mars"
+        ],
+        "Mars",
+        "A subheading names the smaller topic inside the bigger one.",
+        "The subheading \"Mars\" tells you that part will be about Mars."
+      ],
+      [
+        "A timeline shows: 1903 — first airplane flight. 1969 — first Moon landing. Which happened first?",
+        [
+          "the first airplane flight",
+          "the first Moon landing",
+          "they happened at the same time",
+          "neither one happened"
+        ],
+        "the first airplane flight",
+        "Read the dates from left to right — earlier years come first.",
+        "1903 comes before 1969 on the timeline, so the first airplane flight happened first."
+      ],
+      [
+        "A chart shows books each class read: Room 1 — 20, Room 2 — 35, Room 3 — 12. Which class read the most books?",
+        [
+          "Room 1",
+          "Room 2",
+          "Room 3",
+          "Room 4"
+        ],
+        "Room 2",
+        "Find the biggest number in the chart.",
+        "Room 2 read 35 books, the biggest number, so Room 2 read the most."
+      ],
+      [
+        "Read: \"The Arctic fox grows thick white fur in winter. The fur keeps it warm and hides it in the snow.\" What is the main idea?",
+        [
+          "Foxes like snow.",
+          "Winter is cold.",
+          "Thick white fur helps the Arctic fox survive winter.",
+          "Fur is white."
+        ],
+        "Thick white fur helps the Arctic fox survive winter.",
+        "Ask what the two sentences have in common.",
+        "Both sentences tell how the fox's fur helps it in winter, so that is the main idea."
+      ],
+      [
+        "Which detail supports the main idea \"Owls hunt at night\"?",
+        [
+          "Owls are birds.",
+          "Owls have feathers.",
+          "Owls can be brown.",
+          "Owls have big eyes that see in the dark."
+        ],
+        "Owls have big eyes that see in the dark.",
+        "Pick the fact that explains HOW owls can hunt at night.",
+        "Big eyes that see in the dark explain how owls hunt at night, so it supports the main idea."
+      ],
+      [
+        "A science book shows a photo of a caterpillar turning into a chrysalis. What does the photo help you understand?",
+        [
+          "how a caterpillar changes",
+          "what a caterpillar eats",
+          "where butterflies sleep",
+          "how fast they fly"
+        ],
+        "how a caterpillar changes",
+        "Look closely at what is happening in the photo.",
+        "The photo shows the caterpillar changing into a chrysalis, so it helps you understand how a caterpillar changes."
+      ],
+      [
+        "The glossary says: \"migrate — to move to a new home when seasons change.\" What does \"migrate\" mean?",
+        [
+          "to build a nest",
+          "to move to a new home when seasons change",
+          "to eat seeds",
+          "to sing a song"
+        ],
+        "to move to a new home when seasons change",
+        "Read the words that come right after the dash.",
+        "The glossary entry says migrate means to move to a new home when seasons change."
+      ],
+      [
+        "First the caterpillar eats leaves. Then it forms a chrysalis. Finally, a butterfly comes out. What happens last?",
+        [
+          "the caterpillar eats leaves",
+          "it forms a chrysalis",
+          "a butterfly comes out",
+          "it lays eggs"
+        ],
+        "a butterfly comes out",
+        "The word \"finally\" points to the last step.",
+        "\"Finally\" marks the last step, when the butterfly comes out."
+      ],
+      [
+        "Which detail tells about a penguin's home?",
+        [
+          "Penguins are cute.",
+          "I like penguins.",
+          "Penguins are the best.",
+          "Penguins live near the South Pole."
+        ],
+        "Penguins live near the South Pole.",
+        "A detail about a home names a place.",
+        "The South Pole names where penguins live, so it is a detail about their home."
+      ],
+      [
+        "A poster lists what to pack for a field trip: lunch, water, hat, and sunscreen. What is the poster's job?",
+        [
+          "to give useful information",
+          "to tell a joke",
+          "to sing a song",
+          "to draw a picture"
+        ],
+        "to give useful information",
+        "The poster lists facts you need to know.",
+        "The poster lists what to pack, so its job is to give useful information."
+      ],
+      [
+        "You want to know what \"nocturnal\" means in your animal book. What is the fastest way to find out?",
+        [
+          "read the book from page 1",
+          "look it up in the glossary",
+          "look at the front cover",
+          "count the pages"
+        ],
+        "look it up in the glossary",
+        "Hard words from the book are collected in one special place.",
+        "The glossary collects the book's hard words with their meanings, so it is the fastest way."
+      ],
+      [
+        "Frogs live in water and on land. Fish live only in water. How are they different?",
+        [
+          "Both live in water.",
+          "Both have scales.",
+          "Frogs live in two places, but fish live in one.",
+          "Both are fish."
+        ],
+        "Frogs live in two places, but fish live in one.",
+        "Find where each animal lives and compare.",
+        "Frogs live in water and on land while fish live only in water, so that is how they differ."
+      ],
+      [
+        "Steps to make a sandwich: 1. Get bread. 2. Add peanut butter. 3. Add jelly. 4. Eat. Which step comes second?",
+        [
+          "Get bread.",
+          "Add jelly.",
+          "Eat.",
+          "Add peanut butter."
+        ],
+        "Add peanut butter.",
+        "Count the steps: 1, 2, 3, 4.",
+        "In order, the steps are get bread, add peanut butter, add jelly, eat — so adding peanut butter comes second."
+      ]
+    ]
+  ],
+  [
+    "Vocabulary",
+    [
+      [
+        "The elephant was enormous — it took up the whole street! What does \"enormous\" mean?",
+        [
+          "very big",
+          "very small",
+          "very fast",
+          "very quiet"
+        ],
+        "very big",
+        "The elephant took up the whole street, so think about its size.",
+        "Taking up the whole street shows the elephant was very big, so enormous means very big."
+      ],
+      [
+        "\"Be careful! The glass vase is fragile.\" What does \"fragile\" mean?",
+        [
+          "very heavy",
+          "breaks easily",
+          "very loud",
+          "not new; from long ago"
+        ],
+        "breaks easily",
+        "\"Be careful!\" warns you about what could happen to the vase.",
+        "\"Be careful\" warns that the vase could break, so fragile means breaks easily."
+      ],
+      [
+        "The curious puppy sniffed every box in the room. What does \"curious\" mean?",
+        [
+          "wants to sleep",
+          "wants to hide",
+          "wants to learn and explore",
+          "wants to eat"
+        ],
+        "wants to learn and explore",
+        "Sniffing every box shows the puppy wants to find out about things.",
+        "Sniffing every box shows the puppy wants to learn about things, so curious means wanting to learn and explore."
+      ],
+      [
+        "We will gather sticks to build a fort. What does \"gather\" mean?",
+        [
+          "throw away",
+          "break apart",
+          "give away",
+          "collect together"
+        ],
+        "collect together",
+        "They need many sticks in one place to build the fort.",
+        "They need sticks collected in one place to build the fort, so gather means collect together."
+      ],
+      [
+        "The wind made the leaves scatter across the yard. What does \"scatter\" mean?",
+        [
+          "spread out in different directions",
+          "stay in a pile",
+          "turn green",
+          "fall asleep"
+        ],
+        "spread out in different directions",
+        "The wind blew the leaves to many different spots.",
+        "The wind blew the leaves to many spots, so scatter means spread out in different directions."
+      ],
+      [
+        "She hesitated before jumping into the cold pool. What does \"hesitate\" mean?",
+        [
+          "jumped right in",
+          "paused because she was unsure",
+          "ran away",
+          "laughed loudly"
+        ],
+        "paused because she was unsure",
+        "She did not jump right away — what did she do instead?",
+        "She paused before jumping because she was unsure, so hesitate means to pause when unsure."
+      ],
+      [
+        "The eager kids lined up early for the field trip. What does \"eager\" mean?",
+        [
+          "tired and bored",
+          "sad and quiet",
+          "excited and ready",
+          "angry and loud"
+        ],
+        "excited and ready",
+        "Lining up early shows how they felt about the trip.",
+        "Lining up early shows they were excited and ready, so eager means excited and ready."
+      ],
+      [
+        "The old castle was built 500 years ago. What does \"old\" mean?",
+        [
+          "very new",
+          "very small",
+          "very clean",
+          "very old"
+        ],
+        "very old",
+        "500 years ago is a very long time.",
+        "Built 500 years ago means the castle is very old, so ancient means very old."
+      ],
+      [
+        "The gentle nurse spoke softly to the scared boy. What does \"gentle\" mean?",
+        [
+          "kind and soft",
+          "loud and rough",
+          "fast and busy",
+          "sad and quiet"
+        ],
+        "kind and soft",
+        "Speaking softly to someone scared is your clue.",
+        "Speaking softly shows she is kind and soft, so gentle means kind and soft."
+      ],
+      [
+        "The fierce storm knocked down trees. What does \"fierce\" mean?",
+        [
+          "calm and quiet",
+          "strong and wild",
+          "soft and light",
+          "warm and sunny"
+        ],
+        "strong and wild",
+        "Knocking down trees shows how powerful the storm was.",
+        "A storm that knocks down trees is strong and wild, so fierce means strong and wild."
+      ],
+      [
+        "After the long hike, the weary campers fell asleep. What does \"weary\" mean?",
+        [
+          "very hungry",
+          "very happy",
+          "very tired",
+          "very cold"
+        ],
+        "very tired",
+        "A long hike would make anyone feel this way.",
+        "A long hike makes campers very tired, so weary means very tired."
+      ],
+      [
+        "We watched a splendid sunset of pink and gold. What does \"splendid\" mean?",
+        [
+          "dark and scary",
+          "plain and dull",
+          "cold and gray",
+          "wonderful and beautiful"
+        ],
+        "wonderful and beautiful",
+        "Pink and gold colors in the sky sound lovely.",
+        "A pink and gold sunset is wonderful and beautiful, so splendid means wonderful and beautiful."
+      ],
+      [
+        "The lost dog began to wander through the park. What does \"wander\" mean?",
+        [
+          "walk around with no plan",
+          "run straight home",
+          "sit very still",
+          "sleep all day"
+        ],
+        "walk around with no plan",
+        "A lost dog does not know where it is going.",
+        "A lost dog walks around with no plan, so wander means to walk around with no plan."
+      ],
+      [
+        "Scientists discovered a new kind of frog in the forest. What does \"discover\" mean?",
+        [
+          "lost again",
+          "found for the first time",
+          "drew a picture of",
+          "gave a name to"
+        ],
+        "found for the first time",
+        "A \"new kind of frog\" means no one knew about it before.",
+        "No one knew about this frog before, so the scientists found it for the first time — that is discover."
+      ],
+      [
+        "His hands began to tremble during the loud thunderstorm. What does \"tremble\" mean?",
+        [
+          "clap loudly",
+          "wave hello",
+          "shake a little",
+          "stay still"
+        ],
+        "shake a little",
+        "Loud thunder can make hands do this.",
+        "The loud storm made his hands shake a little, so tremble means to shake a little."
+      ],
+      [
+        "The eagle began to soar high above the mountains. What does \"soar\" mean?",
+        [
+          "walk on the ground",
+          "swim in the sea",
+          "sleep in a nest",
+          "fly high in the sky"
+        ],
+        "fly high in the sky",
+        "An eagle high above the mountains is doing what?",
+        "The eagle is flying high above the mountains, so soar means to fly high in the sky."
+      ],
+      [
+        "We could not see the fish in the murky pond water. What does \"murky\" mean?",
+        [
+          "dark and cloudy",
+          "clear and blue",
+          "warm and sunny",
+          "cold and icy"
+        ],
+        "dark and cloudy",
+        "They could not see the fish — ask yourself why not.",
+        "They could not see through the water, so it was dark and cloudy — that is murky."
+      ],
+      [
+        "The timid mouse hid when the door opened. What does \"timid\" mean?",
+        [
+          "brave and bold",
+          "shy and afraid",
+          "loud and silly",
+          "fast and strong"
+        ],
+        "shy and afraid",
+        "Hiding when the door opened shows how it feels.",
+        "Hiding shows the mouse is shy and afraid, so timid means shy and afraid."
+      ],
+      [
+        "The generous girl shared her lunch with everyone. What does \"generous\" mean?",
+        [
+          "likes to keep things",
+          "likes to hide food",
+          "likes to give and share",
+          "likes to eat alone"
+        ],
+        "likes to give and share",
+        "Sharing lunch with everyone is your clue.",
+        "Sharing her lunch with everyone shows she likes to give and share, so she is generous."
+      ],
+      [
+        "The stubborn mule would not move, no matter what. What does \"stubborn\" mean?",
+        [
+          "moves very fast",
+          "sleeps all day",
+          "eats a lot",
+          "will not change its mind"
+        ],
+        "will not change its mind",
+        "\"Would not move, no matter what\" is your clue.",
+        "Refusing to move no matter what shows it will not change its mind, so stubborn means refusing to change."
+      ],
+      [
+        "Which word means almost the same as \"happy\"?",
+        [
+          "glad",
+          "sad",
+          "angry",
+          "tired"
+        ],
+        "glad",
+        "Think of another word for the big-smile feeling.",
+        "Glad and happy both name the same good feeling, so they are synonyms."
+      ],
+      [
+        "Which word means the opposite of \"day\"?",
+        [
+          "sun",
+          "night",
+          "light",
+          "morning"
+        ],
+        "night",
+        "Think of the time when it is dark outside.",
+        "Night is the opposite of day, so they are antonyms."
+      ],
+      [
+        "Which word means almost the same as \"fast\"?",
+        [
+          "slow",
+          "late",
+          "quick",
+          "tired"
+        ],
+        "quick",
+        "Think of a word for moving speedily.",
+        "Quick and fast both mean moving with speed, so they are synonyms."
+      ],
+      [
+        "Which word means the opposite of \"hot\"?",
+        [
+          "warm",
+          "sunny",
+          "spicy",
+          "cold"
+        ],
+        "cold",
+        "Think of ice.",
+        "Cold is the opposite of hot, so they are antonyms."
+      ],
+      [
+        "The arid desert gets almost no rain. What does \"arid\" mean?",
+        [
+          "very dry",
+          "very wet",
+          "very cold",
+          "very green"
+        ],
+        "very dry",
+        "The words \"almost no rain\" sit right next to the hard word.",
+        "\"Almost no rain\" tells you the desert is very dry, so arid means very dry."
+      ],
+      [
+        "\"He swung the bat.\" \"A bat flew by at night.\" In the FIRST sentence, what does \"bat\" mean?",
+        [
+          "a flying animal",
+          "a stick used to hit a ball",
+          "a kind of hat",
+          "a ball"
+        ],
+        "a stick used to hit a ball",
+        "You swing something to hit a ball.",
+        "In \"He swung the bat,\" he swings a stick to hit a ball, so bat means the stick there."
+      ],
+      [
+        "What does \"unhappy\" mean?",
+        [
+          "very happy",
+          "happy again",
+          "not happy",
+          "almost happy"
+        ],
+        "not happy",
+        "Look at the little part \"un-\" at the start of the word.",
+        "\"Un-\" means \"not,\" so unhappy means not happy."
+      ],
+      [
+        "What does \"reread\" mean?",
+        [
+          "read fast",
+          "read loudly",
+          "stop reading",
+          "read again"
+        ],
+        "read again",
+        "The little part \"re-\" means \"again.\"",
+        "\"Re-\" means \"again,\" so reread means to read again."
+      ],
+      [
+        "What is a \"sunflower\"?",
+        [
+          "a flower that looks like the sun",
+          "a flower that grows at night",
+          "a kind of sun",
+          "a sunny day"
+        ],
+        "a flower that looks like the sun",
+        "Put the two small words together: sun + flower.",
+        "Sun + flower makes a flower that looks like the sun, so a sunflower is a flower that looks like the sun."
+      ],
+      [
+        "\"The soup was ___.\" Which word is the strongest positive description?",
+        [
+          "okay",
+          "delicious",
+          "fine",
+          "good"
+        ],
+        "delicious",
+        "Which word shows the biggest, yummiest feeling?",
+        "Delicious is a strong positive description of food, stronger than okay or fine."
+      ]
+    ]
+  ],
+  [
+    "Grammar",
+    [
+      [
+        "Which word names a specific person and needs a capital letter?",
+        [
+          "teacher",
+          "woman",
+          "Mrs. Lee",
+          "friend"
+        ],
+        "Mrs. Lee",
+        "A specific person's name starts with a capital letter.",
+        "Mrs. Lee names a specific person, so it is a proper noun and needs a capital letter."
+      ],
+      [
+        "Which is a common noun?",
+        [
+          "Disneyland",
+          "Tuesday",
+          "Sam",
+          "park"
+        ],
+        "park",
+        "A common noun names any one of something, not a special name.",
+        "Park names any park, not a special one, so it is a common noun."
+      ],
+      [
+        "In \"The dog barked loudly,\" which word is the action verb?",
+        [
+          "barked",
+          "dog",
+          "loudly",
+          "the"
+        ],
+        "barked",
+        "Find the word that tells what the dog did.",
+        "Barked tells what the dog did, so it is the action verb."
+      ],
+      [
+        "In \"the red apple,\" which word is the adjective?",
+        [
+          "apple",
+          "red",
+          "the",
+          "ate"
+        ],
+        "red",
+        "Find the word that tells what the apple is like.",
+        "Red tells what the apple is like, so it is the adjective."
+      ],
+      [
+        "Which sentence tells about yesterday?",
+        [
+          "We walk to school.",
+          "We will walk to school.",
+          "We walked to school.",
+          "We are walking to school."
+        ],
+        "We walked to school.",
+        "Look for the verb ending that tells about the past.",
+        "Walked has the -ed ending that tells about yesterday, so it tells about the past."
+      ],
+      [
+        "What is the correct plural of \"box\"?",
+        [
+          "boxs",
+          "boxies",
+          "boxen",
+          "boxes"
+        ],
+        "boxes",
+        "Words ending in x add -es to make more than one.",
+        "Box ends in x, so you add -es to make boxes."
+      ],
+      [
+        "What is the correct plural of \"baby\"?",
+        [
+          "babies",
+          "babys",
+          "babyes",
+          "baby"
+        ],
+        "babies",
+        "Change the y to i, then add -es.",
+        "Baby changes y to i and adds -es to make babies."
+      ],
+      [
+        "Which sentence starts with a capital letter?",
+        [
+          "the cat sat.",
+          "The cat sat.",
+          "The cat sat",
+          "the Cat sat."
+        ],
+        "The cat sat.",
+        "The first word of a sentence starts with a big letter.",
+        "\"The cat sat.\" starts with a capital T, so it is written correctly."
+      ],
+      [
+        "Which sentence asks a question?",
+        [
+          "Where is my hat.",
+          "Where is my hat!",
+          "Where is my hat?",
+          "where is my hat"
+        ],
+        "Where is my hat?",
+        "A question ends with a mark that looks like a little hook.",
+        "A question ends with a question mark, so \"Where is my hat?\" asks a question."
+      ],
+      [
+        "Which sentence shows strong feeling?",
+        [
+          "What a great day.",
+          "What a great day?",
+          "what a great day",
+          "What a great day!"
+        ],
+        "What a great day!",
+        "Strong feelings end with a straight up-and-down mark.",
+        "The exclamation mark shows strong feeling, so \"What a great day!\" is correct."
+      ],
+      [
+        "Which sentence uses commas correctly?",
+        [
+          "I like apples, bananas, and grapes.",
+          "I like apples bananas, and grapes.",
+          "I like, apples bananas and grapes.",
+          "I like apples bananas and grapes."
+        ],
+        "I like apples, bananas, and grapes.",
+        "Put a comma between each thing in the list.",
+        "Commas go between apples, bananas, and grapes, so the first sentence is correct."
+      ],
+      [
+        "Which two words make the contraction \"don't\"?",
+        [
+          "does not",
+          "do not",
+          "did not",
+          "do it"
+        ],
+        "do not",
+        "The apostrophe takes the place of a missing letter.",
+        "Don't is made from do + not, with the apostrophe taking the place of the o."
+      ],
+      [
+        "What does the contraction \"can't\" mean?",
+        [
+          "can nott",
+          "cannt",
+          "cannot",
+          "can it"
+        ],
+        "cannot",
+        "Say the two words it stands for: can + not.",
+        "Can't is the short form of cannot."
+      ],
+      [
+        "Which sentence uses the correct present-tense verb for a plural subject?",
+        [
+          "The dogs is barking.",
+          "The dogs am barking.",
+          "The dogs be barking.",
+          "The dogs are barking."
+        ],
+        "The dogs are barking.",
+        "Use \"are\" when you talk about more than one.",
+        "Dogs means more than one, so it needs \"are\": The dogs are barking."
+      ],
+      [
+        "Which sentence uses the correct past-tense verb with \"we\"?",
+        [
+          "We were at the zoo.",
+          "We was at the zoo.",
+          "We is at the zoo.",
+          "We be at the zoo."
+        ],
+        "We were at the zoo.",
+        "The word \"we\" goes with a special past-tense partner.",
+        "\"We\" goes with \"were,\" so \"We were at the zoo\" is correct."
+      ],
+      [
+        "Which sentence uses the correct present-tense verb with \"she\"?",
+        [
+          "She have a red bike.",
+          "She has a red bike.",
+          "She haves a red bike.",
+          "She having a red bike."
+        ],
+        "She has a red bike.",
+        "The word \"she\" goes with a special partner.",
+        "\"She\" goes with \"has,\" so \"She has a red bike\" is correct."
+      ],
+      [
+        "Maria lost her ball. ___ was sad. Which word fills the blank?",
+        [
+          "Her",
+          "Hers",
+          "She",
+          "Me"
+        ],
+        "She",
+        "The word starts the sentence and takes Maria's place.",
+        "She takes Maria's place at the start of the sentence, so \"She was sad\" is correct."
+      ],
+      [
+        "In \"She sang sweetly,\" which word tells HOW she sang?",
+        [
+          "she",
+          "sang",
+          "the",
+          "sweetly"
+        ],
+        "sweetly",
+        "Find the word that tells how the singing sounded.",
+        "Sweetly tells how she sang, so it is the adverb."
+      ],
+      [
+        "Which is a complete sentence?",
+        [
+          "The bird built a nest.",
+          "Built a nest.",
+          "The bird.",
+          "Nest in tree."
+        ],
+        "The bird built a nest.",
+        "A complete sentence needs a who and a what-they-did.",
+        "\"The bird built a nest\" has a who (the bird) and what it did (built a nest), so it is complete."
+      ],
+      [
+        "Which is NOT a complete sentence?",
+        [
+          "The kids ran to the park.",
+          "Ran to the park.",
+          "They ran fast.",
+          "We ran too."
+        ],
+        "Ran to the park.",
+        "Look for the one that is missing the who.",
+        "\"Ran to the park\" is missing who ran, so it is not complete."
+      ],
+      [
+        "\"Please close the door.\" What kind of sentence is this?",
+        [
+          "a question",
+          "a telling sentence",
+          "a command",
+          "an exclamation"
+        ],
+        "a command",
+        "It tells someone to do something.",
+        "It tells someone to do something, so it is a command."
+      ],
+      [
+        "Which word needs a capital letter?",
+        [
+          "dinner",
+          "turkey",
+          "family",
+          "Thanksgiving"
+        ],
+        "Thanksgiving",
+        "Holidays are special names.",
+        "Thanksgiving is the special name of a holiday, so it needs a capital letter."
+      ],
+      [
+        "Which word needs a capital letter?",
+        [
+          "Chicago",
+          "city",
+          "street",
+          "town"
+        ],
+        "Chicago",
+        "A specific city is a special name.",
+        "Chicago names a specific city, so it needs a capital letter."
+      ],
+      [
+        "Which sentence tells about right now?",
+        [
+          "I read a book yesterday.",
+          "I am reading a book.",
+          "I will read a book.",
+          "I have read a book."
+        ],
+        "I am reading a book.",
+        "Look for the words that tell about this very moment.",
+        "\"Am reading\" tells what is happening right now."
+      ],
+      [
+        "In \"The fluffy puppy wagged its tail,\" which word tells what the puppy is like?",
+        [
+          "puppy",
+          "wagged",
+          "fluffy",
+          "tail"
+        ],
+        "fluffy",
+        "Find the word that describes the puppy.",
+        "Fluffy describes what the puppy is like, so it is the adjective."
+      ],
+      [
+        "Which sentence has the capital letters correct?",
+        [
+          "we visited grandma on sunday.",
+          "We visited grandma on Sunday.",
+          "We visited Grandma on sunday.",
+          "We visited Grandma on Sunday."
+        ],
+        "We visited Grandma on Sunday.",
+        "Special names and days of the week need capitals.",
+        "Grandma (used as a name) and Sunday both need capital letters, so the first sentence is correct."
+      ],
+      [
+        "Which date is written correctly?",
+        [
+          "July 4, 2026",
+          "July, 4 2026",
+          "July 4 2026,",
+          "july 4, 2026"
+        ],
+        "July 4, 2026",
+        "Put a comma between the day and the year.",
+        "A comma goes between the day and the year: July 4, 2026."
+      ],
+      [
+        "Which sentence uses the past tense correctly?",
+        [
+          "I eated my lunch.",
+          "I ate my lunch.",
+          "I eats my lunch.",
+          "I eat my lunch yesterday."
+        ],
+        "I ate my lunch.",
+        "Some verbs change their spelling in the past instead of adding -ed.",
+        "Eat changes to ate in the past, so \"I ate my lunch\" is correct."
+      ],
+      [
+        "In \"The cook made soup,\" what is the word \"cook\"?",
+        [
+          "a verb",
+          "an adjective",
+          "a noun — a person",
+          "a punctuation mark"
+        ],
+        "a noun — a person",
+        "Ask who made the soup.",
+        "The cook is the person who made the soup, so cook is a noun here."
+      ],
+      [
+        "Which is the BEST way to write this? \"my dog is big\"",
+        [
+          "my dog is big",
+          "My dog is big",
+          "my Dog Is Big.",
+          "My dog is big."
+        ],
+        "My dog is big.",
+        "A sentence needs a capital first letter and an end mark.",
+        "\"My dog is big.\" has a capital M and a period, so it is the best way."
+      ]
+    ]
+  ],
+  [
+    "Reading Strategies",
+    [
+      [
+        "You read: \"The nocturnal owl hunts at night.\" What does \"nocturnal\" mean?",
+        [
+          "active at night",
+          "active in the day",
+          "very sleepy",
+          "very loud"
+        ],
+        "active at night",
+        "The words \"hunts at night\" sit right next to the hard word.",
+        "\"Hunts at night\" tells you nocturnal means active at night."
+      ],
+      [
+        "You did not understand a tricky sentence. What should you do?",
+        [
+          "skip the whole book",
+          "read it again slowly",
+          "close the book",
+          "guess and move on"
+        ],
+        "read it again slowly",
+        "A second look often makes tricky parts clear.",
+        "Reading a tricky sentence again slowly often makes it clear."
+      ],
+      [
+        "Before reading a book called \"The Lost Puppy,\" what is a good prediction?",
+        [
+          "It will be about baking cakes.",
+          "It will be about outer space.",
+          "It will be about finding a lost puppy.",
+          "It will have no words."
+        ],
+        "It will be about finding a lost puppy.",
+        "Use the title to make your best guess.",
+        "The title \"The Lost Puppy\" hints the book will be about finding a lost puppy."
+      ],
+      [
+        "You predicted the puppy would be found at the park, but the book says the beach. What should you do?",
+        [
+          "keep the old prediction",
+          "stop reading",
+          "skip the ending",
+          "change your prediction to match the book"
+        ],
+        "change your prediction to match the book",
+        "Good readers fix their guesses when the book gives new facts.",
+        "Good readers change their predictions when the book gives new facts."
+      ],
+      [
+        "The author writes: \"Sticky mud squished between my toes.\" What should you picture in your mind?",
+        [
+          "mud squishing between toes",
+          "a clean dry floor",
+          "snow falling softly",
+          "a sunny beach"
+        ],
+        "mud squishing between toes",
+        "Make a movie in your mind from the describing words.",
+        "The describing words tell you to picture sticky mud squishing between toes."
+      ],
+      [
+        "Which is a good question to ask yourself while reading?",
+        [
+          "What page am I on?",
+          "Why did the character do that?",
+          "How many words are here?",
+          "What time is lunch?"
+        ],
+        "Why did the character do that?",
+        "A good reading question is about the story itself.",
+        "\"Why did the character do that?\" asks about the story, so it deepens understanding."
+      ],
+      [
+        "The character is nervous on the first day of school, and you felt that way too. What is this called?",
+        [
+          "a spelling test",
+          "a book report",
+          "a text-to-self connection",
+          "a library card"
+        ],
+        "a text-to-self connection",
+        "You are connecting the story to your own life.",
+        "Connecting the character's feelings to your own life is a text-to-self connection."
+      ],
+      [
+        "Mia grabbed her umbrella and rain boots. What can you infer?",
+        [
+          "It is a sunny beach day.",
+          "It is snowing hard.",
+          "It is bedtime.",
+          "It is raining or about to rain."
+        ],
+        "It is raining or about to rain.",
+        "Umbrellas and rain boots are clues — put them together.",
+        "Umbrellas and rain boots are clues that it is raining or about to rain."
+      ],
+      [
+        "The floor was wet and there was an empty bucket nearby. What probably happened?",
+        [
+          "Someone spilled water.",
+          "It snowed inside.",
+          "A bird flew in.",
+          "Nothing happened."
+        ],
+        "Someone spilled water.",
+        "A wet floor plus an empty bucket tells a story.",
+        "A wet floor and an empty bucket are clues that someone spilled water."
+      ],
+      [
+        "Story: A boy plants a seed, waters it daily, and grows a sunflower. Which is the best summary?",
+        [
+          "A boy likes hats.",
+          "A boy plants and waters a seed until a sunflower grows.",
+          "Sunflowers are yellow.",
+          "Water is wet."
+        ],
+        "A boy plants and waters a seed until a sunflower grows.",
+        "A summary keeps only the most important parts.",
+        "The first choice keeps the planting, watering, and growing — the most important parts."
+      ],
+      [
+        "You read a sentence that does not make sense. What is the smart move?",
+        [
+          "keep reading fast",
+          "skip two pages",
+          "stop and fix it up",
+          "close your eyes"
+        ],
+        "stop and fix it up",
+        "Good readers notice when something sounds wrong.",
+        "Good readers stop and fix it up when a sentence does not make sense."
+      ],
+      [
+        "You do not know the word \"igloo.\" The picture shows a house made of ice blocks. What can the picture tell you?",
+        [
+          "an igloo is a kind of dog",
+          "an igloo is a car",
+          "an igloo is a cake",
+          "an igloo is a house made of ice"
+        ],
+        "an igloo is a house made of ice",
+        "Study what the picture shows.",
+        "The picture shows a house made of ice blocks, so an igloo is a house made of ice."
+      ],
+      [
+        "You see the long word \"sunlight.\" What is a good way to read it?",
+        [
+          "break it into sun + light",
+          "guess a random word",
+          "skip it",
+          "say the alphabet"
+        ],
+        "break it into sun + light",
+        "Two small words you know are hiding inside.",
+        "Sunlight breaks into sun + light, two words you know, so chunking helps you read it."
+      ],
+      [
+        "You want to check how to spell \"beautiful.\" What is the best tool?",
+        [
+          "a ruler",
+          "a dictionary",
+          "a clock",
+          "a map"
+        ],
+        "a dictionary",
+        "Think about which tool holds word spellings.",
+        "A dictionary shows correct spellings, so it is the best tool to check \"beautiful.\""
+      ],
+      [
+        "You are stuck on the word \"frog.\" What can you try first?",
+        [
+          "say only the last sound",
+          "close the book",
+          "say the first sound /f/ and keep going",
+          "pick a new book"
+        ],
+        "say the first sound /f/ and keep going",
+        "Start with the sounds you know and blend forward.",
+        "Saying the first sound /f/ and blending forward helps you read \"frog.\""
+      ],
+      [
+        "You need to remember what the bear ate in the story. What should you do?",
+        [
+          "guess the food",
+          "ask a friend to guess",
+          "skip to the end",
+          "go back and reread that part"
+        ],
+        "go back and reread that part",
+        "The answer is hiding in the part you already read.",
+        "Going back and rereading that part helps you find what the bear ate."
+      ],
+      [
+        "While reading, you ask: \"What is this page mostly about?\" What are you finding?",
+        [
+          "the main idea",
+          "the page number",
+          "the author's name",
+          "the book's price"
+        ],
+        "the main idea",
+        "\"Mostly about\" points to one special answer.",
+        "Asking what a page is mostly about helps you find the main idea."
+      ],
+      [
+        "After reading, your teacher asks you to retell the story. What should you include?",
+        [
+          "every single word",
+          "the important events in order",
+          "the color of the book",
+          "your lunch menu"
+        ],
+        "the important events in order",
+        "Keep the big parts and leave out tiny details.",
+        "Retelling means sharing the important events in order, not every word."
+      ],
+      [
+        "The book says penguins cannot fly but are great swimmers. What new fact did you learn?",
+        [
+          "Penguins can fly.",
+          "Penguins live in trees.",
+          "Penguins are great swimmers.",
+          "Penguins eat pizza."
+        ],
+        "Penguins are great swimmers.",
+        "Find the fact the book actually gives.",
+        "The book says penguins are great swimmers, so that is the new fact you learned."
+      ],
+      [
+        "The character forgot her lunch, so she was hungry at noon. Why was she hungry?",
+        [
+          "she ate breakfast",
+          "she played tag",
+          "she drank water",
+          "she forgot her lunch"
+        ],
+        "she forgot her lunch",
+        "Find the reason the author gives.",
+        "Forgetting her lunch caused her hunger, so that is why she was hungry."
+      ],
+      [
+        "Tom shares his toys. His brother Sam shares his toys too. How are the brothers alike?",
+        [
+          "Both brothers share.",
+          "Tom is taller.",
+          "Sam is older.",
+          "Both like pizza."
+        ],
+        "Both brothers share.",
+        "Find what is the SAME about them.",
+        "Tom and Sam both share their toys, so that is how they are alike."
+      ],
+      [
+        "\"She brushed her teeth. She put on pajamas. She read a book.\" What happened first?",
+        [
+          "She put on pajamas.",
+          "She brushed her teeth.",
+          "She read a book.",
+          "She fell asleep."
+        ],
+        "She brushed her teeth.",
+        "The first sentence in the list tells what happened first.",
+        "The list starts with brushing teeth, so that happened first."
+      ],
+      [
+        "\"The baby wailed when her toy broke.\" What does \"wailed\" mean?",
+        [
+          "laughed softly",
+          "slept quietly",
+          "cried loudly",
+          "ate quickly"
+        ],
+        "cried loudly",
+        "A baby with a broken toy would make a loud, sad sound.",
+        "A baby with a broken toy cries loudly, so wailed means cried loudly."
+      ],
+      [
+        "You guessed \"bridge\" for a word, but the sentence still sounds wrong. What should you try next?",
+        [
+          "keep the wrong word",
+          "stop reading",
+          "skip the page",
+          "try another word that makes sense"
+        ],
+        "try another word that makes sense",
+        "Good readers keep trying until the sentence sounds right.",
+        "Good readers try another word that makes sense until the sentence sounds right."
+      ],
+      [
+        "How can illustrations help you read?",
+        [
+          "They give clues about the words.",
+          "They make the book heavier.",
+          "They hide the words.",
+          "They change the story."
+        ],
+        "They give clues about the words.",
+        "Pictures and words work together.",
+        "Illustrations give clues about the words, so they help you read."
+      ],
+      [
+        "Why is it good to reread a sentence until it sounds smooth?",
+        [
+          "It makes the book longer.",
+          "Smooth reading helps you understand.",
+          "It erases mistakes.",
+          "It changes the words."
+        ],
+        "Smooth reading helps you understand.",
+        "Choppy reading makes the meaning hard to catch.",
+        "Reading smoothly helps the meaning come through, so it helps you understand."
+      ],
+      [
+        "Which words are the MOST important in \"The tiny ant carried a huge crumb\"?",
+        [
+          "the, a",
+          "carried, the",
+          "tiny ant, huge crumb",
+          "ant, the"
+        ],
+        "tiny ant, huge crumb",
+        "Important words carry the meaning; small words like \"the\" do not.",
+        "Tiny ant and huge crumb carry the meaning of the sentence, so they are the most important words."
+      ],
+      [
+        "Fact 1: Birds have feathers. Fact 2: Feathers keep birds warm. What can you figure out?",
+        [
+          "Birds like snow.",
+          "Feathers are colorful.",
+          "Birds eat feathers.",
+          "Feathers help birds stay warm."
+        ],
+        "Feathers help birds stay warm.",
+        "Put the two facts together.",
+        "Putting the facts together shows feathers help birds stay warm."
+      ],
+      [
+        "Why might you reread the ending of a story?",
+        [
+          "to make sure you understand how it ended",
+          "to make the book longer",
+          "to find new spelling words",
+          "to count the pages"
+        ],
+        "to make sure you understand how it ended",
+        "Endings can be tricky — a second read helps.",
+        "Rereading the ending helps you make sure you understand how the story ended."
+      ],
+      [
+        "Before reading about frogs, you ask: \"What do I already know about frogs?\" Why is that helpful?",
+        [
+          "It makes reading slower.",
+          "It helps your brain connect new facts.",
+          "It skips the hard words.",
+          "It ends the lesson."
+        ],
+        "It helps your brain connect new facts.",
+        "Old knowledge is like a hook that new facts can hang on.",
+        "Thinking about what you already know helps your brain connect new facts about frogs."
+      ]
+    ]
+  ],
+  [
+    "Writing & Research",
+    [
+      [
+        "Which is the best topic sentence for a paragraph about dogs?",
+        [
+          "Dogs.",
+          "I saw a dog.",
+          "Dogs make wonderful pets for many reasons.",
+          "Woof."
+        ],
+        "Dogs make wonderful pets for many reasons.",
+        "A topic sentence tells the big idea of the paragraph.",
+        "\"Dogs make wonderful pets for many reasons\" tells the big idea, so it is the best topic sentence."
+      ],
+      [
+        "Topic: Dogs make wonderful pets. Which detail supports it?",
+        [
+          "Dogs have tails.",
+          "I like pizza.",
+          "Cats are cute.",
+          "Dogs can learn tricks and play fetch."
+        ],
+        "Dogs can learn tricks and play fetch.",
+        "A detail must help prove the big idea is true.",
+        "Learning tricks and playing fetch proves dogs make wonderful pets, so it supports the topic."
+      ],
+      [
+        "Which is the best closing sentence for a paragraph about why recess is fun?",
+        [
+          "That is why recess is the best part of the day.",
+          "Recess.",
+          "I am done.",
+          "The end?"
+        ],
+        "That is why recess is the best part of the day.",
+        "A closing sentence wraps up the big idea.",
+        "\"That is why recess is the best part of the day\" wraps up the big idea, so it is the best closing."
+      ],
+      [
+        "\"I woke up. I ate breakfast. I went to school.\" Which sentence comes FIRST?",
+        [
+          "I ate breakfast.",
+          "I woke up.",
+          "I went to school.",
+          "I came home."
+        ],
+        "I woke up.",
+        "Think about what happens first in a morning.",
+        "Waking up happens before breakfast and school, so it comes first."
+      ],
+      [
+        "Which gives an opinion WITH a reason?",
+        [
+          "Soccer is fun.",
+          "I like soccer.",
+          "I think soccer is fun because I love running.",
+          "Soccer."
+        ],
+        "I think soccer is fun because I love running.",
+        "Look for the word that gives the \"why.\"",
+        "\"Because I love running\" gives the reason, so the first choice is an opinion with a reason."
+      ],
+      [
+        "Which sentence gives information?",
+        [
+          "Butterflies are the best.",
+          "I love butterflies!",
+          "Wow, butterflies!",
+          "A butterfly starts as a caterpillar."
+        ],
+        "A butterfly starts as a caterpillar.",
+        "Information teaches a fact.",
+        "\"A butterfly starts as a caterpillar\" teaches a fact, so it gives information."
+      ],
+      [
+        "Which sentence uses a sequence word correctly?",
+        [
+          "First, we packed our bags.",
+          "First we packed, our bags.",
+          "First. We packed our bags",
+          "first we packed our bags"
+        ],
+        "First, we packed our bags.",
+        "A comma comes after sequence words like \"First.\"",
+        "\"First\" is a sequence word and needs a comma after it, so the first sentence is correct."
+      ],
+      [
+        "Which revision adds the BEST detail to \"The dog ran\"?",
+        [
+          "The dog ran ran ran.",
+          "The fluffy brown dog ran fast across the park.",
+          "Dog.",
+          "The dog."
+        ],
+        "The fluffy brown dog ran fast across the park.",
+        "Good details tell what something looks like and where it is.",
+        "\"Fluffy brown\" and \"across the park\" add describing details, so it is the best revision."
+      ],
+      [
+        "\"The soup was ___.\" Which word is the BEST choice?",
+        [
+          "okay",
+          "thing",
+          "delicious",
+          "stuff"
+        ],
+        "delicious",
+        "Pick the strongest, clearest word.",
+        "Delicious is the strongest, clearest word for tasty soup, so it is the best choice."
+      ],
+      [
+        "Which sentence has the capital letters correct?",
+        [
+          "my friend sam lives in texas.",
+          "My friend sam lives in Texas.",
+          "My friend Sam lives in texas.",
+          "My friend Sam lives in Texas."
+        ],
+        "My friend Sam lives in Texas.",
+        "Names of people and places need capitals.",
+        "Sam and Texas are special names, so both need capitals."
+      ],
+      [
+        "Which sentence is edited correctly?",
+        [
+          "Where are you going?",
+          "Where are you going.",
+          "where are you going?",
+          "Where are you going"
+        ],
+        "Where are you going?",
+        "Questions need a capital first letter and a question mark.",
+        "\"Where are you going?\" has a capital W and a question mark, so it is edited correctly."
+      ],
+      [
+        "You want to learn about dolphins. Which is the best research question?",
+        [
+          "Do I like dolphins?",
+          "What do dolphins eat?",
+          "Are dolphins cool?",
+          "Dolphins."
+        ],
+        "What do dolphins eat?",
+        "A research question asks for facts you can look up.",
+        "\"What do dolphins eat?\" asks for facts you can look up, so it is the best research question."
+      ],
+      [
+        "Which source would have facts about the moon?",
+        [
+          "a fairy tale",
+          "a comic book",
+          "a science book about space",
+          "a cookbook"
+        ],
+        "a science book about space",
+        "Match the source to the topic.",
+        "A science book about space would have facts about the moon."
+      ],
+      [
+        "You read: \"Koalas sleep 20 hours a day.\" Which note keeps the important fact?",
+        [
+          "Koalas are cute.",
+          "I like koalas.",
+          "Sleep is nice.",
+          "Koalas sleep 20 hours a day."
+        ],
+        "Koalas sleep 20 hours a day.",
+        "A good note keeps the fact, not just a feeling.",
+        "The note keeps the fact \"20 hours a day,\" so it is the best note."
+      ],
+      [
+        "Which fact belongs in a report about penguins?",
+        [
+          "Penguins cannot fly.",
+          "Penguins are my favorite.",
+          "I saw a penguin once.",
+          "Penguins are funny."
+        ],
+        "Penguins cannot fly.",
+        "A report needs facts, not opinions.",
+        "\"Penguins cannot fly\" is a fact, so it belongs in the report."
+      ],
+      [
+        "One book says a whale is a mammal. A website says the same thing. What should you think?",
+        [
+          "The fact is false.",
+          "The fact is probably true.",
+          "Books are always wrong.",
+          "Websites are always wrong."
+        ],
+        "The fact is probably true.",
+        "Two sources agreeing makes a fact stronger.",
+        "When two sources agree, the fact is probably true."
+      ],
+      [
+        "How should you share your research with the class?",
+        [
+          "Whisper and hide your paper.",
+          "Read very fast.",
+          "Speak clearly and show your notes.",
+          "Never look up."
+        ],
+        "Speak clearly and show your notes.",
+        "Think about what helps listeners understand.",
+        "Speaking clearly and showing your notes helps the class understand your research."
+      ],
+      [
+        "Which sentence starts a good story?",
+        [
+          "Kites.",
+          "I am writing.",
+          "The end.",
+          "On Saturday, my kite got stuck in a tall tree."
+        ],
+        "On Saturday, my kite got stuck in a tall tree.",
+        "A story start tells when and what happened.",
+        "\"On Saturday, my kite got stuck in a tall tree\" tells when and what happened, so it starts a good story."
+      ],
+      [
+        "Which words help put a story in order?",
+        [
+          "first, next, last",
+          "and, and, and",
+          "big, small, red",
+          "run, jump, play"
+        ],
+        "first, next, last",
+        "These words tell the order of events.",
+        "First, next, and last tell the order of events, so they help put a story in order."
+      ],
+      [
+        "Which is the best ending for a story about a lost toy found under the bed?",
+        [
+          "The end.",
+          "I hugged my teddy and felt so happy.",
+          "Bye.",
+          "I am done writing."
+        ],
+        "I hugged my teddy and felt so happy.",
+        "A good ending shows how the character feels.",
+        "\"I hugged my teddy and felt so happy\" shows the character's happy feeling, so it is the best ending."
+      ],
+      [
+        "Which combines these sentences best? \"The cat is soft. The cat is gray.\"",
+        [
+          "The cat is soft the cat is gray.",
+          "Soft gray.",
+          "The cat is soft and gray.",
+          "The cat."
+        ],
+        "The cat is soft and gray.",
+        "Join the two ideas with the word \"and.\"",
+        "\"The cat is soft and gray\" joins both ideas with \"and,\" so it is the best combination."
+      ],
+      [
+        "Which word is spelled correctly?",
+        [
+          "becuase",
+          "becaus",
+          "becausee",
+          "because"
+        ],
+        "because",
+        "Say it slowly: be-cause.",
+        "Because is spelled b-e-c-a-u-s-e, so the first choice is correct."
+      ],
+      [
+        "Which sentence is an opinion?",
+        [
+          "Chocolate ice cream is the best.",
+          "Ice cream is cold.",
+          "Ice cream melts in heat.",
+          "Ice cream is a dessert."
+        ],
+        "Chocolate ice cream is the best.",
+        "An opinion tells what someone thinks.",
+        "\"Is the best\" tells what someone thinks, so it is an opinion."
+      ],
+      [
+        "Your research question is \"How do birds build nests?\" Where should you look FIRST?",
+        [
+          "a book about cars",
+          "a book about birds",
+          "a cookbook",
+          "a book of jokes"
+        ],
+        "a book about birds",
+        "Pick the source that matches your question.",
+        "A book about birds would explain how birds build nests, so look there first."
+      ],
+      [
+        "Which is the best note to take about tigers?",
+        [
+          "Tigers.",
+          "I like tigers a lot!",
+          "Tigers have stripes and hunt at night.",
+          "Roar!"
+        ],
+        "Tigers have stripes and hunt at night.",
+        "Notes should hold facts you can use later.",
+        "\"Tigers have stripes and hunt at night\" holds facts you can use in your report."
+      ],
+      [
+        "Which sentence does NOT belong in a paragraph about cats as pets?",
+        [
+          "Cats purr when they are happy.",
+          "Cats use a litter box.",
+          "Cats like to nap in the sun.",
+          "My bike is red."
+        ],
+        "My bike is red.",
+        "Every sentence should be about cats.",
+        "\"My bike is red\" is about a bike, not cats, so it does not belong."
+      ],
+      [
+        "Which sentence is written correctly?",
+        [
+          "Sam and I went to the park.",
+          "Sam and i went to the park.",
+          "sam and I went to the park.",
+          "Sam and I went to the park"
+        ],
+        "Sam and I went to the park.",
+        "The word \"I\" is always capital, and sentences need end marks.",
+        "\"I\" is always capital and the sentence needs a period, so the first choice is correct."
+      ],
+      [
+        "Which is the correct greeting for a friendly letter?",
+        [
+          "dear grandma",
+          "Dear Grandma,",
+          "Dear grandma.",
+          "grandma dear,"
+        ],
+        "Dear Grandma,",
+        "A greeting starts with capitals and ends with a comma.",
+        "\"Dear Grandma,\" has a capital D, a capital G, and a comma, so it is correct."
+      ],
+      [
+        "In \"How to brush your teeth,\" which step comes first?",
+        [
+          "Rinse your mouth.",
+          "Spit.",
+          "Put toothpaste on the brush.",
+          "Put the brush away."
+        ],
+        "Put toothpaste on the brush.",
+        "Think about the very first thing you do.",
+        "You put toothpaste on the brush before anything else, so it comes first."
+      ],
+      [
+        "You finished writing and editing your story. What is the last step?",
+        [
+          "Throw it away.",
+          "Start over.",
+          "Hide it.",
+          "Share it with others."
+        ],
+        "Share it with others.",
+        "Writing is meant to be read.",
+        "Sharing your finished story lets others read it, so it is the last step."
+      ]
+    ]
+  ]
 ];
