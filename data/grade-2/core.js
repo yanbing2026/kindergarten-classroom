@@ -188,7 +188,13 @@
       'g2.social.culture-diversity':'culture-diversity-confusion',
       'g2.social.civic-participation':'civic-participation-confusion',
       'g2.writing.research-sources':'source-selection-confusion',
-      'g2.writing.revision-editing':'revision-vs-editing-confusion'
+      'g2.writing.revision-editing':'revision-vs-editing-confusion',
+      'g2.math.odd-even':'odd-even-confusion',
+      'g2.math.word-problems':'word-problem-representation-confusion',
+      'g2.math.fractions':'fraction-part-whole-confusion',
+      'g2.math.money':'money-value-confusion',
+      'g2.math.vocabulary':'math-vocabulary-confusion',
+      'g2.ela.paragraph-organization':'paragraph-organization-confusion'
     };
     return fallback[skillId]?[fallback[skillId]]:[];
   }
