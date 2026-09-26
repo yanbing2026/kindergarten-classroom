@@ -1,195 +1,2193 @@
-// Grade 2 writing question bank — isolated module.
+// Grade 2 question bank — isolated module.
 window.KC_G2_WRITING = [
-  ['Paragraph Writing', [
-    ['Which is the best topic sentence?', ['Sea turtles swim far to lay their eggs.','Turtles.','They are green.','I saw one.'], 'Sea turtles swim far to lay their eggs.', 'A topic sentence tells what the paragraph is about.', 'It states the main idea the paragraph will explain.'],
-    ['Which is the best topic sentence for a paragraph about penguins?', ['Penguins cannot fly, but they swim very well.','Birds.','It is cold.','I like ice.'], 'Penguins cannot fly, but they swim very well.', 'Pick the sentence that tells the main idea about penguins.', 'It names the topic and gives a main idea the details can support.'],
-    ['The topic is: My dog loves the park. Which sentence is a good supporting detail?', ['She runs fast to fetch the red ball.','My dog.','The park is fun.','I like dogs.'], 'She runs fast to fetch the red ball.', 'A detail gives more information about the topic.', 'It adds a specific fact about what the dog does at the park.'],
-    ['Which is the best closing sentence for a paragraph about butterflies?', ['That is why butterflies are so amazing.','Butterflies are insects.','I like wings.','They fly.'], 'That is why butterflies are so amazing.', 'A closing sentence wraps up the paragraph.', 'It sums up the paragraph instead of adding a new fact.'],
-    ['Which sentence comes FIRST in a paragraph about making a sandwich?', ['First, I put cheese on the bread.','Next, I add the lettuce.','Last, I cut it in half.','Then I put on the top slice.'], 'First, I put cheese on the bread.', 'Look for the word that starts a set of steps.', 'The word First shows this step happens before the others.'],
-    ['Which word best completes the sentence? "____, the chicks hatch from the eggs."', ['Last','First','Next','Then'], 'Last', 'Hatching happens at the very end.', 'Last signals the final step in the sequence.'],
-    ['Which sentence is a good detail for a paragraph about the school garden?', ['We planted orange carrots and red tomatoes.','Our garden.','I like it.','Gardens are fun.'], 'We planted orange carrots and red tomatoes.', 'A detail paints a clear picture with specifics.', 'It names exactly what was planted in the garden.'],
-    ['Which is the best topic sentence for a paragraph about sharks?', ['Sharks have sharp teeth for catching fish.','Fish.','The sea is big.','Scary!'], 'Sharks have sharp teeth for catching fish.', 'The topic sentence should name sharks and give a main idea.', 'It tells the reader the paragraph will explain something about sharks.'],
-    ['Which sentence does NOT belong in a paragraph about winter?', ['Swimming in the pool is my favorite thing.','Snowflakes fall softly on the trees.','Kids sled down the hill.','I wear my warm red coat.'], 'Swimming in the pool is my favorite thing.', 'Look for the sentence about a different season.', 'Swimming in a pool is a summer activity, not a winter one.'],
-    ['Which is the best closing sentence for a paragraph about my bike?', ['Riding my blue bike is the best part of my day.','Bikes have wheels.','I fell once.','My bike.'], 'Riding my blue bike is the best part of my day.', 'A closing sentence ends with a final thought or feeling.', 'It wraps up the paragraph with a clear ending feeling.'],
-    ['Which order of sequencing words is correct?', ['First, next, then, last','Last, first, next, then','Next, then, last, first','First, last, next, then'], 'First, next, then, last', 'Think of the order you tell steps in a story.', 'These words go in time order from beginning to end.'],
-    ['Which is the best topic sentence for a paragraph about apples?', ['Apples grow on trees and come in many colors.','Fruit.','Red.','I ate one.'], 'Apples grow on trees and come in many colors.', 'Pick the sentence that gives a main idea about apples.', 'It names the topic and states something the paragraph can explain.'],
-    ['The topic is: Our class pet is a hamster. Which is a good supporting detail?', ['He stuffs seeds into his puffy cheeks.','Hamsters.','I like school.','He is a pet.'], 'He stuffs seeds into his puffy cheeks.', 'A detail adds a specific fact about the hamster.', 'It describes something the hamster actually does.'],
-    ['Which is the best closing sentence for a paragraph about the beach?', ['I cannot wait to visit the beach again.','Sand is hot.','Water.','We left.'], 'I cannot wait to visit the beach again.', 'The closing sentence should end the paragraph with a final thought.', 'It wraps up the beach paragraph instead of starting a new idea.'],
-    ['Which sentence comes FIRST in a paragraph about baking cookies?', ['First, I mix the flour and sugar.','Then I roll the dough into balls.','Next, I add chocolate chips.','Last, I take them out of the oven.'], 'First, I mix the flour and sugar.', 'Mixing comes before shaping and baking.', 'The word First marks the beginning of the steps.'],
-    ['The topic is: The zoo trip was fun. Which is a good supporting detail?', ['We watched the tall giraffes eat leaves.','The zoo.','Animals are cool.','I went.'], 'We watched the tall giraffes eat leaves.', 'Pick the sentence that tells something specific we saw.', 'It gives a clear detail about the zoo trip.'],
-    ['Which is the best topic sentence for a paragraph about the moon?', ['The moon changes shape in the night sky.','Night.','It is round.','Look up.'], 'The moon changes shape in the night sky.', 'The topic sentence should name the moon and give a main idea.', 'It tells the reader what the paragraph will explain about the moon.'],
-    ['Which is NOT a good topic sentence?', ['Recess.','Recess is my favorite time of day.','I love recess because we play tag.','At recess we run and laugh together.'], 'Recess.', 'A topic sentence must be a full sentence with a main idea.', 'It is only one word, so it cannot state a main idea.'],
-    ['Which word best completes the sentence? "____, we eat the popcorn at the movie."', ['Last','First','Next','Then'], 'Last', 'Eating the popcorn happens at the end of the movie.', 'Last marks the final part of the sequence.'],
-    ['Which is the best closing sentence for a paragraph about a rainy day?', ['I love listening to the rain on the roof.','Rain.','It is wet.','Umbrellas.'], 'I love listening to the rain on the roof.', 'The closing sentence should end with a feeling or final thought.', 'It wraps up the paragraph with a personal ending.'],
-    ['The topic is: Spiders are interesting. Which is a good supporting detail?', ['Some spiders spin sticky webs to catch bugs.','Spiders.','I am scared.','Bugs.'], 'Some spiders spin sticky webs to catch bugs.', 'A detail gives a real fact about spiders.', 'It explains something interesting that spiders do.'],
-    ['"First, I put on my helmet." Which sentence should come NEXT?', ['Next, I hop on my scooter.','Last, I go home.','First, I wake up.','Then I eat dinner.'], 'Next, I hop on my scooter.', 'Next comes right after First in a sequence.', 'It continues the steps in the correct time order.'],
-    ['Which is the best topic sentence for a paragraph about soccer?', ['Soccer is a fast game played with a round ball.','Sports.','Run!','I play.'], 'Soccer is a fast game played with a round ball.', 'Pick the sentence that names soccer and gives a main idea.', 'It states what soccer is so the paragraph can add details.'],
-    ['Which sentence is a closing sentence?', ['That is why fall is my favorite season.','Leaves turn orange in fall.','Fall comes after summer.','I rake leaves into piles.'], 'That is why fall is my favorite season.', 'A closing sentence sums up the paragraph.', 'It ends the paragraph with a final thought about fall.'],
-    ['The topic is: My grandma makes the best soup. Which is a good supporting detail?', ['She adds sweet carrots and soft noodles.','Grandma.','Soup is hot.','I eat.'], 'She adds sweet carrots and soft noodles.', 'A detail names something specific about the soup.', 'It tells exactly what Grandma puts in the soup.'],
-    ['Which sentence comes LAST in a paragraph about planting a flower?', ['Last, I watch the flower bloom.','First, I dig a small hole.','Next, I drop in the seed.','Then I water the soil.'], 'Last, I watch the flower bloom.', 'Blooming happens after digging, planting, and watering.', 'The word Last marks the final step.'],
-    ['Which is the best topic sentence for a paragraph about trains?', ['Trains carry people and boxes across the land.','Wheels.','Choo choo.','Fast.'], 'Trains carry people and boxes across the land.', 'Pick the full sentence that gives a main idea about trains.', 'It names the topic and states what trains do.'],
-    ['Which detail does NOT belong in a paragraph about cats?', ['Dogs bark very loudly.','Her fur is soft like a blanket.','She purrs when I pet her.','She naps in the sunny window.'], 'Dogs bark very loudly.', 'Look for the sentence about a different animal.', 'It is about dogs, not cats, so it does not belong.'],
-    ['Which is the best closing sentence for a paragraph about my birthday party?', ['It was the happiest birthday ever.','Cake.','I am seven.','We played games.'], 'It was the happiest birthday ever.', 'The closing sentence ends with a final feeling.', 'It sums up the party instead of adding another fact.'],
-    ['Which paragraph has a topic sentence, details, and a closing sentence?', ['My kitten is silly. She chases her tail. She naps on my lap. She makes me laugh every day.','Silly. Tail. Nap. Laugh.','She chases her tail. My kitten is silly.','She makes me laugh every day. She chases her tail. She naps on my lap.'], 'My kitten is silly. She chases her tail. She naps on my lap. She makes me laugh every day.', 'A good paragraph starts with a topic, adds details, and ends with a closing.', 'It opens with the main idea, gives two details, and ends with a closing thought.'],
-  ]],
-  ['Narrative Writing', [
-    ['Which is the best beginning for a story about a lost puppy?', ['One rainy morning, Max the puppy slipped out the open gate.','Puppies.','The end.','Dogs are cute.'], 'One rainy morning, Max the puppy slipped out the open gate.', 'A story beginning should name who and hint at what happens.', 'It introduces the character and starts the problem right away.'],
-    ['Which sentence shows WHO is in the story?', ['Lena and her brother built a fort in the backyard.','It was fun.','They played.','Outside.'], 'Lena and her brother built a fort in the backyard.', 'Look for the sentence that names the characters.', 'It names Lena and her brother as the characters.'],
-    ['"Watch out!" ___ Mia as the ball flew by. Which word is strongest?', ['shouted','said','talked','spoke'], 'shouted', 'Which word shows she was loud and fast?', 'Shouted shows her voice was loud, which fits a warning.'],
-    ['Which sentence tells WHAT happened in the story?', ['The kite crashed into the tall oak tree.','Kites are fun.','It was windy.','I like red.'], 'The kite crashed into the tall oak tree.', 'Look for the sentence that tells the event.', 'It describes the main event of the story.'],
-    ['Which is the best ending for a story about baking a cake for Mom?', ['Mom smiled and said it was the sweetest surprise.','Cake.','We ate.','The end of cake.'], 'Mom smiled and said it was the sweetest surprise.', 'A good ending wraps up the story with a feeling.', 'It shows how the story ends and how Mom felt.'],
-    ['Which order tells the story correctly?', ['First the dragon woke, next he found the map, then he flew to the cave, last he met the king.','Last the dragon woke, first he found the map, next he flew to the cave, then he met the king.','Next the dragon woke, then he found the map, last he flew to the cave, first he met the king.','First the dragon woke, last he found the map, next he flew to the cave, then he met the king.'], 'First the dragon woke, next he found the map, then he flew to the cave, last he met the king.', 'Story events must go in time order.', 'The sequencing words put the events from beginning to end.'],
-    ['The soup was ___. Which word paints the strongest picture?', ['steaming','hot','warm','okay'], 'steaming', 'Which word helps you see and feel the soup?', 'Steaming paints a vivid picture of hot soup.'],
-    ['Which sentence is the MIDDLE of the story about a lost tooth?', ['Next, I bit into an apple and the tooth popped out!','First, my tooth felt wiggly.','Last, I put it under my pillow.','The tooth fairy came at night.'], 'Next, I bit into an apple and the tooth popped out!', 'The middle comes between the beginning and the end.', 'The word Next places it between First and Last.'],
-    ['The ___ bear lumbered through the woods. Which word is stronger than "big"?', ['enormous','big','nice','good'], 'enormous', 'Which word makes the bear sound the biggest?', 'Enormous is a stronger, more vivid word than big.'],
-    ['Which beginning grabs the reader\'s attention?', ['Crash! The vase tumbled off the table.','One day something happened.','This is a story.','I will tell you a tale.'], 'Crash! The vase tumbled off the table.', 'A strong beginning drops the reader into action.', 'It starts with exciting action instead of a dull opener.'],
-    ['"____, the turtle crossed the finish line and won the race." Which word fits?', ['Last','First','Next','Then'], 'Last', 'Crossing the finish line ends the race.', 'Last shows this is the final event.'],
-    ['Which sentence shows how Sam feels?', ['Sam\'s hands shook as he stepped onto the stage.','Sam went on stage.','The stage was big.','People watched.'], 'Sam\'s hands shook as he stepped onto the stage.', 'Look for words that show a feeling in his body.', 'Shaking hands show Sam is nervous.'],
-    ['Which sentence best starts a story about a snow day?', ['Snow covered everything when I woke up.','Snow.','Winter is cold.','I slept.'], 'Snow covered everything when I woke up.', 'A story start should set the scene.', 'It shows where and when the story begins.'],
-    ['The rabbit ___ across the field. Which verb is strongest?', ['hopped','went','moved','walked'], 'hopped', 'Which verb shows exactly how a rabbit moves?', 'Hopped is a precise, lively verb for a rabbit.'],
-    ['Which event happened LAST in the story?', ['The seed grew into a tall sunflower.','We dug a hole in the dirt.','We dropped the seed in.','We watered the soil.'], 'The seed grew into a tall sunflower.', 'Growing happens after planting and watering.', 'It is the final result of all the earlier steps.'],
-    ['Which is the best ending for a story about finding a lost key?', ['We cheered when Dad found the key under the mat.','Keys.','We looked.','The mat.'], 'We cheered when Dad found the key under the mat.', 'A good ending solves the problem with a feeling.', 'It shows the key was found and how everyone felt.'],
-    ['"I hid the treasure here," ___ the pirate. Which word is best for a whisper?', ['whispered','said','talked','told'], 'whispered', 'Which word tells how softly he spoke?', 'Whispered shows he spoke very quietly, like a pirate sharing a secret.'],
-    ['Which sentence tells WHERE the story happens?', ['The race took place at the big park by the lake.','It was fun.','We ran fast.','Go!'], 'The race took place at the big park by the lake.', 'Look for the sentence that names the place.', 'It tells the setting: the park by the lake.'],
-    ['Which sentence comes FIRST in the story about the lost mitten?', ['Mia built a snowman in the yard.','Then she noticed her mitten was gone.','Next she looked behind the snowman.','Last she found it on the porch.'], 'Mia built a snowman in the yard.', 'The first event happens before the mitten is lost.', 'Building the snowman starts the story before the problem begins.'],
-    ['The ___ puppy licked my face. Which word is better than "nice"?', ['playful','nice','good','fine'], 'playful', 'Which word shows what the puppy is like?', 'Playful describes the puppy\'s lively personality.'],
-    ['Which sentence is the MIDDLE of the farm trip story?', ['Next we fed the baby goats.','First we rode the bus.','Last we waved goodbye.','We packed our lunches.'], 'Next we fed the baby goats.', 'The middle event comes between First and Last.', 'The word Next places it in the middle of the trip.'],
-    ['The ___ dragon guarded the gold. Which word is strongest?', ['fearsome','bad','mean','big'], 'fearsome', 'Which word makes the dragon sound the scariest?', 'Fearsome is a vivid word that shows the dragon is frightening.'],
-    ['Which sentence shows the PROBLEM in the story?', ['But the bridge was broken, and the river was wide.','They walked along.','The day was nice.','Birds sang sweetly.'], 'But the bridge was broken, and the river was wide.', 'The problem is what makes the story tricky.', 'A broken bridge blocks the characters and creates the problem.'],
-    ['Which is the best beginning for a story about a field trip?', ['The bus rumbled as we pulled up to the aquarium.','Trips.','We went.','Fish.'], 'The bus rumbled as we pulled up to the aquarium.', 'A strong beginning sets the scene with a detail.', 'It shows where the trip begins with a lively sound detail.'],
-    ['The fox ___ through the dark forest. Which verb shows the most?', ['darted','went','moved','walked'], 'darted', 'Which verb shows fast, quick movement?', 'Darted shows the fox moved swiftly and suddenly.'],
-    ['Which ending wraps up the story about the science fair?', ['I held my blue ribbon and grinned all the way home.','Science.','It ended.','Ribbon.'], 'I held my blue ribbon and grinned all the way home.', 'A good ending shows the final feeling.', 'It ends the story by showing pride and happiness.'],
-    ['Which sentence tells WHEN the story happens?', ['On Saturday morning, we flew kites at the hill.','We flew kites.','Kites are fun.','The hill was steep.'], 'On Saturday morning, we flew kites at the hill.', 'Look for the sentence that names the time.', 'It tells the reader the story happens on Saturday morning.'],
-    ['Which is the best title for a story about a frog who learns to sing?', ['Freddy the Frog Finds His Song','Frog.','A Story.','Singing.'], 'Freddy the Frog Finds His Song', 'A good title names the character and hints at the story.', 'It names Freddy and tells what the story is about.'],
-    ['The wind ___ through the trees. Which word is strongest?', ['howled','blew','moved','went'], 'howled', 'Which word helps you hear the wind?', 'Howled paints a vivid sound picture of strong wind.'],
-    ['Which sentence belongs in the MIDDLE of the bread-baking story?', ['Next the dough rose big and puffy.','First we mixed the dough.','Last we ate warm slices.','We washed the bowls.'], 'Next the dough rose big and puffy.', 'The middle comes after First and before Last.', 'The word Next places it between the beginning and the end.'],
-  ]],
-  ['Informative Writing', [
-    ['Which sentence is a FACT?', ['Some ants can carry objects heavier than their bodies.','Ants are the coolest bugs.','I love ants.','Ants are yucky.'], 'Some ants can carry objects heavier than their bodies.', 'A fact can be checked and proven true.', 'Scientists have measured how much ants can lift.'],
-    ['Which is the best topic sentence for an informative paragraph about whales?', ['Whales are the largest animals in the ocean.','Whales!','I like whales.','Big.'], 'Whales are the largest animals in the ocean.', 'An informative topic sentence states a fact as the main idea.', 'It gives a checkable fact the paragraph can explain.'],
-    ['Which sentence gives a fact about the sun?', ['The sun is a star made of hot gas.','The sun is pretty.','I like sunny days.','Sunshine makes me happy.'], 'The sun is a star made of hot gas.', 'A fact can be proven true by science.', 'Scientists know the sun is a star made of hot gases.'],
-    ['Which sentence is an OPINION?', ['Chocolate ice cream is the best flavor.','Ice cream is cold.','Ice cream melts in the sun.','Milk is used to make ice cream.'], 'Chocolate ice cream is the best flavor.', 'An opinion is what someone thinks or feels.', 'Best flavor is a personal judgment, not a checkable fact.'],
-    ['Which detail belongs in an informative paragraph about bees?', ['Bees make honey in their hives.','I am scared of bees.','Bees are the worst.','Buzz buzz.'], 'Bees make honey in their hives.', 'Informative details are true facts.', 'It is a real fact about what bees do.'],
-    ['Which sentence gives a fact about penguins?', ['Penguins have thick feathers that keep them warm.','Penguins are cute.','I love penguins.','Penguins are funny.'], 'Penguins have thick feathers that keep them warm.', 'A fact can be checked in a science book.', 'Their thick feathers are a real feature scientists describe.'],
-    ['Which sentence gives a fact about teeth?', ['Adult humans have 32 teeth.','Teeth are the best.','I like my smile.','Teeth are cool.'], 'Adult humans have 32 teeth.', 'A fact is a number or detail that can be counted.', 'Dentists count 32 teeth in a full adult set.'],
-    ['Which is the best topic sentence for an informative paragraph about volcanoes?', ['A volcano is a mountain that can erupt with hot lava.','Boom!','Lava is scary.','I saw a movie.'], 'A volcano is a mountain that can erupt with hot lava.', 'An informative topic sentence explains what something is.', 'It defines a volcano with a fact the paragraph can expand.'],
-    ['Which sentence is an OPINION?', ['Winter is the most fun season.','Snow is frozen water.','Winter follows fall.','Days are shorter in winter.'], 'Winter is the most fun season.', 'Look for words like most fun that show a feeling.', 'Most fun is a personal judgment, not a fact.'],
-    ['Which detail belongs in an informative paragraph about the heart?', ['The heart pumps blood through your body.','Hearts are lovely.','I love you.','Red.'], 'The heart pumps blood through your body.', 'Informative details explain how something works.', 'It is a true fact about what the heart does.'],
-    ['Which sentence gives a fact about spiders?', ['Spiders have eight legs.','Spiders are gross.','I hate spiders.','Spiders are scary.'], 'Spiders have eight legs.', 'A fact can be counted and checked.', 'You can count eight legs on a spider.'],
-    ['Which is the best topic sentence for an informative paragraph about how plants grow?', ['Plants need sunlight, water, and soil to grow.','Plants.','I like flowers.','Green.'], 'Plants need sunlight, water, and soil to grow.', 'An informative topic sentence states true facts.', 'It lists real things plants need, which details can explain.'],
-    ['Which sentence is an OPINION about pizza?', ['Pepperoni pizza is the tastiest.','Pizza is baked in an oven.','Cheese melts on pizza.','Pizza is round.'], 'Pepperoni pizza is the tastiest.', 'Tastiest shows what someone thinks, not a fact.', 'It is a personal judgment about flavor.'],
-    ['Which sentence gives a fact about the moon?', ['The moon orbits around Earth.','The moon is beautiful.','I love the moon.','Moonlight is magical.'], 'The moon orbits around Earth.', 'A fact can be proven by science.', 'Scientists have observed the moon orbiting Earth.'],
-    ['Which detail belongs in an informative paragraph about firefighters?', ['Firefighters wear heavy coats to stay safe.','Fire is scary.','I want a dog.','Hot.'], 'Firefighters wear heavy coats to stay safe.', 'Informative details are true facts about the topic.', 'It is a real fact about firefighter gear.'],
-    ['Which detail would BEST support the idea that a common year has 365 days?', ['A calendar can be used to count 365 days in a common year.','Birthdays are the best.','I love cake at parties.','Some months have fun holidays.'], 'A calendar can be used to count 365 days in a common year.', 'Supporting details should give information that helps prove or explain the main idea.', 'A calendar lets you check and count the days in a common year.'],
-    ['Which is the best topic sentence for an informative paragraph about dinosaurs?', ['Dinosaurs lived on Earth millions of years ago.','Rawr!','They are cool.','Big lizards.'], 'Dinosaurs lived on Earth millions of years ago.', 'An informative topic sentence states a true main idea.', 'It gives a fact that details about dinosaurs can support.'],
-    ['Which sentence is a FACT?', ['The library has many books.','Libraries are boring.','Reading is the best.','I love the library.'], 'The library has many books.', 'A fact can be checked by looking.', 'You can see the many books on the shelves.'],
-    ['Which detail belongs in an informative paragraph about rainbows?', ['A rainbow appears when sun and rain mix in the sky.','Rainbows are pretty.','I love colors.','Wow.'], 'A rainbow appears when sun and rain mix in the sky.', 'Informative details explain how something happens.', 'It is a true fact about how rainbows form.'],
-    ['A writer says, "Swimming is the most fun sport." Which detail BEST supports that opinion?', ['Swimming gives me a chance to race and play with friends.', 'Swimmers wear goggles.', 'Pools hold water.', 'Swimming uses arms and legs.'], 'Swimming gives me a chance to race and play with friends.', 'A supporting detail should give a reason for the opinion.', 'Racing and playing with friends explains why the writer thinks swimming is fun.'],
-    ['Which sentence gives a fact about elephants?', ['Elephants are the largest land animals.','Elephants are cute.','I love elephants.','Elephants are funny.'], 'Elephants are the largest land animals.', 'A fact can be measured and checked.', 'Scientists have measured elephants as the biggest land animals.'],
-    ['Which is the best topic sentence for an informative paragraph about the water cycle?', ['Water moves in a cycle from clouds to ground and back.','Rain.','Wet.','I like puddles.'], 'Water moves in a cycle from clouds to ground and back.', 'An informative topic sentence explains a process.', 'It states the main idea the paragraph will explain step by step.'],
-    ['Which detail belongs in an informative paragraph about owls?', ['Owls hunt for mice at night.','Owls are spooky.','Hoot hoot.','I like birds.'], 'Owls hunt for mice at night.', 'Informative details are true facts.', 'It is a real fact about how owls find food.'],
-    ['Which sentence is a FACT?', ['Fish breathe through gills.','Fish are boring.','I like fish.','Fish are pretty.'], 'Fish breathe through gills.', 'A fact can be proven by science.', 'Scientists know gills take air from water.'],
-    ['A writer thinks art is the best school subject. Which detail would BEST support that opinion?', ['Art class lets students create pictures and use their imagination.', 'School has classrooms.', 'Teachers help us learn.', 'Students eat lunch at school.'], 'Art class lets students create pictures and use their imagination.', 'A supporting detail should explain why the writer likes art.', 'Creating and using imagination gives a reason for the writer’s opinion.'],
-    ['Which is the best topic sentence for an informative paragraph about magnets?', ['Magnets pull some metals toward them.','Cool!','I have one.','Sticky.'], 'Magnets pull some metals toward them.', 'An informative topic sentence states a true main idea.', 'It is a fact the paragraph can explain with examples.'],
-    ['Which detail belongs in an informative paragraph about the desert?', ['Deserts get very little rain each year.','Deserts are boring.','I hate sand.','Hot hot.'], 'Deserts get very little rain each year.', 'Informative details are facts you can measure.', 'Rainfall in deserts is measured and very low.'],
-    ['Which sentence gives a fact about birds?', ['Birds lay eggs with hard shells.','Birds are pretty.','I love robins.','Singing is nice.'], 'Birds lay eggs with hard shells.', 'A fact can be observed and checked.', 'You can see and touch the hard shells of bird eggs.'],
-    ['Which sentence is an OPINION?', ['Summer is too hot.','Summer follows spring.','The sun shines in summer.','Some kids swim in summer.'], 'Summer is too hot.', 'Too hot shows how someone feels.', 'It is a feeling about the weather, not a fact.'],
-    ['Which is the best closing sentence for an informative paragraph about sea turtles?', ['Now you know how sea turtles live and grow.','Turtles rule!','I like them.','The end.'], 'Now you know how sea turtles live and grow.', 'An informative closing sums up what was taught.', 'It wraps up the facts the paragraph explained.'],
-  ]],
-  ['Opinion Writing', [
-    ['Which is the best opinion topic sentence?', ['The zoo is the best place for a field trip.','The zoo has animals.','We went to the zoo.','Zoos are places.'], 'The zoo is the best place for a field trip.', 'An opinion topic sentence states what someone thinks.', 'Best place shows a belief, not just a fact.'],
-    ['Mia thinks recess should be longer. Which sentence is a REASON?', ['Kids need time to run and play.','Recess is at noon.','I like tag.','The bell rings loudly.'], 'Kids need time to run and play.', 'A reason explains WHY the opinion is held.', 'It gives a why behind wanting longer recess.'],
-    ['Why should our class get a pet fish? Which reason is strongest?', ['Watching fish swim is calm and teaches us to care for animals.','Fish are cool.','I want one.','Fish live in water.'], 'Watching fish swim is calm and teaches us to care for animals.', 'The strongest reason gives real benefits.', 'It explains two clear benefits of a class fish.'],
-    ['Which sentence is an OPINION?', ['Dogs make the best pets.','Dogs have four legs.','Dogs bark.','Dogs need water.'], 'Dogs make the best pets.', 'An opinion shows what someone thinks is best.', 'Best pets is a judgment, not a checkable fact.'],
-    ['Which is the best closing sentence for an opinion paragraph about swimming?', ['That is why every kid should learn to swim.','Swim.','Water is wet.','I swam today.'], 'That is why every kid should learn to swim.', 'An opinion closing restates the belief.', 'It wraps up the paragraph by repeating the opinion.'],
-    ['School lunches should have more fruit. Which is a good REASON?', ['Fruit gives our bodies energy to learn and play.','Fruit is food.','I ate an apple.','Lunch is at noon.'], 'Fruit gives our bodies energy to learn and play.', 'A reason tells why the opinion matters.', 'It explains a health benefit of more fruit.'],
-    ['Which sentence states an OPINION?', ['Reading before bed is the coziest time of day.','Books have pages.','We read in class.','The library is open.'], 'Reading before bed is the coziest time of day.', 'Coziest shows a personal feeling.', 'It is a judgment about the best reading time.'],
-    ['We should keep the park clean. Which reason is strongest?', ['Clean parks are safe and fun for everyone.','Parks have trees.','I go to the park.','The park is big.'], 'Clean parks are safe and fun for everyone.', 'The strongest reason helps many people.', 'It gives clear benefits for the whole community.'],
-    ['The opinion is: Soccer is the best sport. Which sentence does NOT support it?', ['Soccer is played on a field.','You get great exercise running.','You learn to work as a team.','Scoring a goal feels amazing.'], 'Soccer is played on a field.', 'A supporting sentence must give a reason it is best.', 'Where it is played is a fact, not a reason it is the best.'],
-    ['Which is the best opinion topic sentence about pizza day?', ['Pizza day is the best lunch of the week.','We eat pizza on Fridays.','Pizza has cheese.','Lunch is yummy.'], 'Pizza day is the best lunch of the week.', 'An opinion topic sentence states a belief.', 'Best lunch shows what the writer thinks.'],
-    ['Why should we plant trees at school? Which reason is strongest?', ['Trees give shade and clean the air we breathe.','Trees are tall.','I like climbing.','Leaves fall down.'], 'Trees give shade and clean the air we breathe.', 'The strongest reason gives real benefits.', 'It names two clear ways trees help the school.'],
-    ['A writer says, "Snow days are the best days of the year." Which detail BEST supports that opinion?', ['Snow days give children extra time to play outside or relax at home.', 'Snow is cold.', 'It snows in winter.', 'We wear coats.'], 'Snow days give children extra time to play outside or relax at home.', 'A supporting detail should explain why the writer thinks snow days are best.', 'Extra time to play or relax gives a reason for the opinion.'],
-    ['Which is the best closing sentence for an opinion paragraph about recess?', ['That is why recess is important for every kid.','Recess.','We play.','Time is up.'], 'That is why recess is important for every kid.', 'An opinion closing restates the main belief.', 'It ends by repeating why recess matters.'],
-    ['Sam thinks bikes are better than scooters. Which is a REASON?', ['Bikes go faster on long rides.','Bikes have two wheels.','I have a scooter.','Scooters are fun too.'], 'Bikes go faster on long rides.', 'A reason explains why bikes are better.', 'It gives a why behind his opinion.'],
-    ['The library should stay open later. Which reason is strongest?', ['Kids need more time to read and finish homework.','Libraries have books.','I like reading.','It closes at five.'], 'Kids need more time to read and finish homework.', 'The strongest reason shows a real need.', 'It explains why extra time helps kids.'],
-    ['Which sentence is an OPINION?', ['Chocolate milk is better than plain milk.','Milk comes from cows.','Milk is white.','We drink milk at lunch.'], 'Chocolate milk is better than plain milk.', 'Better than shows a personal taste.', 'It is a judgment about flavor, not a fact.'],
-    ['We should feed the birds in winter. Which is a good REASON?', ['Birds cannot find much food in the snow.','Birds have wings.','I like robins.','Winter is cold.'], 'Birds cannot find much food in the snow.', 'A reason explains why the birds need help.', 'It gives a why behind feeding the birds.'],
-    ['Which is the best opinion topic sentence about art class?', ['Art class is the most creative part of the day.','We paint in art.','Art uses colors.','Class is fun.'], 'Art class is the most creative part of the day.', 'An opinion topic sentence states a belief.', 'Most creative shows what the writer thinks.'],
-    ['The opinion is: Dogs are great pets. Which is NOT a good reason?', ['Dogs have tails.','Dogs are loyal and love to play.','Dogs can learn fun tricks.','Dogs greet you happily at the door.'], 'Dogs have tails.', 'A good reason explains why dogs are great.', 'Having a tail is a fact, not a reason they are great pets.'],
-    ['Which is the best closing sentence for an opinion paragraph about bookshelves?', ['That is why I think every home needs a bookshelf.','Books.','I read.','Shelves hold books.'], 'That is why I think every home needs a bookshelf.', 'An opinion closing restates the belief.', 'It ends by repeating the writer\'s opinion.'],
-    ['Which sentence is an OPINION?', ['Spring is the prettiest season.','Flowers bloom in spring.','Spring follows winter.','It rains in spring.'], 'Spring is the prettiest season.', 'Prettiest shows a personal feeling.', 'It is a judgment, not a checkable fact.'],
-    ['Why is sharing toys a good idea? Which is a REASON?', ['Sharing lets everyone have fun together.','Toys are plastic.','I have many toys.','My toy is red.'], 'Sharing lets everyone have fun together.', 'A reason tells why sharing is good.', 'It explains the benefit of sharing.'],
-    ['Which is the best opinion topic sentence?', ['A treehouse would be the coolest gift ever.','Treehouses are in trees.','Wood is brown.','I climb trees.'], 'A treehouse would be the coolest gift ever.', 'An opinion topic sentence states a belief.', 'Coolest gift shows what the writer thinks.'],
-    ['We should have longer library time. Which reason is strongest?', ['More time means we can finish whole chapters.','Books are fun.','I like the chairs.','The library is quiet.'], 'More time means we can finish whole chapters.', 'The strongest reason shows what more time allows.', 'It explains a clear benefit of longer library time.'],
-    ['Which sentence is an OPINION about movies?', ['Funny movies are the best movies.','Movies play on screens.','We watched a movie.','Popcorn is sold there.'], 'Funny movies are the best movies.', 'Best movies shows a personal taste.', 'It is a judgment, not a fact.'],
-    ['The opinion is: Homework should be shorter. Which sentence does NOT support it?', ['Pencils are used for homework.','Kids need time to play and rest.','Long homework makes kids too tired to read.','Families need time together at night.'], 'Pencils are used for homework.', 'A supporting sentence must give a reason for shorter homework.', 'Pencils are a fact, not a reason homework should be shorter.'],
-    ['Our school needs a garden. Which reason is strongest?', ['A garden teaches us how food grows.','Gardens are outside.','I like dirt.','Plants are green.'], 'A garden teaches us how food grows.', 'The strongest reason shows what students learn.', 'It explains a clear learning benefit of a garden.'],
-    ['Which sentence is an OPINION?', ['Blue is the prettiest color.','The sky is blue.','Blueberries are blue.','I see blue cars.'], 'Blue is the prettiest color.', 'Prettiest shows a personal feeling.', 'It is a judgment, not a checkable fact.'],
-    ['Which is the best closing sentence for an opinion paragraph about Saturdays?', ['That is why Saturday is my favorite day of the week.','Saturday.','Weekend.','I sleep in.'], 'That is why Saturday is my favorite day of the week.', 'An opinion closing restates the belief.', 'It ends by repeating the writer\'s favorite-day opinion.'],
-    ['Everyone should learn to cook. Which reason is strongest?', ['Cooking lets you make healthy food for your family.','Food tastes good.','I like pizza.','Kitchens have stoves.'], 'Cooking lets you make healthy food for your family.', 'The strongest reason gives a real benefit.', 'It explains how cooking helps the whole family.'],
-  ]],
-  ['Research & Sources', [
-    ['Which is a reliable source for facts about sharks?', ['A science book about sharks from the library.','A story I made up.','A cartoon about sharks.','What my friend guessed.'], 'A science book about sharks from the library.', 'Reliable sources are written by experts and checked for facts.', 'A library science book is written and checked by experts.'],
-    ['Which is the best research question about sea turtles?', ['What do sea turtles eat?','Are turtles cool?','Do I like turtles?','Turtles?'], 'What do sea turtles eat?', 'A good research question asks for facts you can find.', 'It asks for a fact that books and experts can answer.'],
-    ['Which source is NOT reliable?', ['A blog post by someone who never studied volcanoes.','A science textbook.','A park ranger\'s talk.','An encyclopedia.'], 'A blog post by someone who never studied volcanoes.', 'Reliable sources come from people who know the topic.', 'The blogger has no knowledge of volcanoes to share.'],
-    ['You want facts about the moon. Where should you look?', ['A space book or a trusted science website.','A fairy tale.','A comic strip.','Ask the cat.'], 'A space book or a trusted science website.', 'Facts come from sources made to teach true information.', 'Space books and science sites are checked for correct facts.'],
-    ['Which is a good research question about bees?', ['How do bees make honey?','Are bees nice?','Do I like honey?','Bees?'], 'How do bees make honey?', 'A good research question starts with how or why.', 'It asks for a fact that research can answer.'],
-    ['Which source gives true facts about penguins?', ['A zoo sign about penguins.','A cartoon penguin movie.','A stuffed penguin.','A song about penguins.'], 'A zoo sign about penguins.', 'Zoo signs are written by animal experts.', 'The sign shares facts checked by people who study penguins.'],
-    ['Your question is: Why do leaves change color? Which source is best?', ['A science book about trees.','A story about a talking leaf.','A coloring page.','A guess from a friend.'], 'A science book about trees.', 'Match the source to the question.', 'A tree science book explains exactly why leaves change.'],
-    ['Which is NOT a good research question?', ['What is your favorite animal?','How do spiders spin webs?','Why is the sky blue?','Where do bears sleep in winter?'], 'What is your favorite animal?', 'A research question should ask for facts, not opinions.', 'Favorite is an opinion that research cannot answer.'],
-    ['Who is an expert you could ask about teeth?', ['A dentist.','A clown.','A dog.','A baby.'], 'A dentist.', 'An expert studies and works with the topic.', 'A dentist studies and cares for teeth every day.'],
-    ['Which source is best for facts about George Washington?', ['A history book from the library.','A cartoon.','A joke book.','A dream I had.'], 'A history book from the library.', 'History facts come from books written by historians.', 'A history book is researched and checked for true facts.'],
-    ['You read that bats sleep upside down. What should you do next?', ['Check another trusted source to make sure it is true.','Tell everyone right away.','Make up more facts.','Forget about it.'], 'Check another trusted source to make sure it is true.', 'Good researchers double-check surprising facts.', 'A second source confirms the fact is really true.'],
-    ['Which is a reliable source for facts about planets?', ['A kids\' science website run by NASA.','A movie about aliens.','A horoscope.','A guessing game.'], 'A kids\' science website run by NASA.', 'Reliable sources come from real space experts.', 'NASA scientists study planets and share true facts.'],
-    ['Which is the best research question about plants?', ['How do plants drink water?','Are plants pretty?','Do I like plants?','Plants?'], 'How do plants drink water?', 'A good research question asks how something works.', 'It asks for a fact that science books can explain.'],
-    ['Which source is trustworthy for animal facts?', ['A book written by a veterinarian.','A cartoon show.','A rumor at lunch.','A pet rock.'], 'A book written by a veterinarian.', 'Trust sources written by people who study animals.', 'A veterinarian is an animal doctor and expert.'],
-    ['You want to know when dinosaurs lived. Which source is best?', ['A dinosaur book by a scientist.','A dinosaur toy.','A movie with dinosaurs.','A drawing.'], 'A dinosaur book by a scientist.', 'Match the expert to the question.', 'A scientist studies dinosaur fossils and knows the facts.'],
-    ['Which is a good research question about birds?', ['Why do birds fly south in winter?','Are birds cool?','Do I like birds?','Birds?'], 'Why do birds fly south in winter?', 'A good research question starts with why or how.', 'It asks for a fact that bird experts can explain.'],
-    ['An expert on the ocean is called a:', ['marine biologist.','pilot.','baker.','singer.'], 'marine biologist.', 'Think about who studies the sea for a living.', 'A marine biologist is a scientist who studies ocean life.'],
-    ['Which source is NOT reliable?', ['Something a stranger posted without checking.','A library book.','A teacher\'s lesson.','A museum sign.'], 'Something a stranger posted without checking.', 'Reliable sources are checked by experts first.', 'An unchecked post may share wrong information.'],
-    ['Where is the best place to find facts about your town\'s history?', ['The local library or museum.','A made-up story.','A video game.','A wild guess.'], 'The local library or museum.', 'Libraries and museums keep checked historical records.', 'They store true facts about the town\'s past.'],
-    ['Which question can research answer with a fact?', ['How many legs does a spider have?','What is the prettiest bug?','Which bug is the funniest?','Do I like bugs?'], 'How many legs does a spider have?', 'Research answers questions with checkable facts.', 'Leg count is a fact you can count and verify.'],
-    ['You found two sources that disagree. What should you do?', ['Check a third trusted source.','Pick the funnier one.','Give up.','Make something up.'], 'Check a third trusted source.', 'A third source helps you find which fact is right.', 'Comparing sources is how researchers check the truth.'],
-    ['Which source is best for learning about the human body?', ['A science book with labeled diagrams.','A comic about superheroes.','A song.','A rumor.'], 'A science book with labeled diagrams.', 'Diagrams in science books are checked by experts.', 'The book teaches true facts with clear pictures.'],
-    ['Which is a strong research question?', ['Why do volcanoes erupt?','Are volcanoes scary?','Do I like lava?','Volcanoes?'], 'Why do volcanoes erupt?', 'Strong research questions ask why or how.', 'It asks for a fact that science can explain.'],
-    ['Who could you interview about being a firefighter?', ['A real firefighter.','A movie star.','A cat.','A robot toy.'], 'A real firefighter.', 'Interview someone who does the job.', 'A firefighter knows the true facts from experience.'],
-    ['You are writing about pandas. Which note is a useful fact?', ['Pandas eat bamboo for most of the day.','Pandas are cute.','I love pandas.','Pandas are funny.'], 'Pandas eat bamboo for most of the day.', 'Useful notes are facts, not opinions.', 'It is a checkable fact about panda diets.'],
-    ['Which source is best for facts about recycling?', ['A book about Earth from the library.','A trash can.','A joke.','A guess.'], 'A book about Earth from the library.', 'Library books are checked for true facts.', 'The book explains recycling with correct information.'],
-    ['Which is NOT a good research question?', ['What should I have for lunch?','How do fish breathe underwater?','Why do we need sleep?','Where does rain come from?'], 'What should I have for lunch?', 'A research question asks for facts, not personal choices.', 'Lunch is a personal choice, not a research fact.'],
-    ['If a website has many spelling mistakes, you should:', ['Be careful, because it may not be trustworthy.','Trust it more.','Copy everything it says.','Ignore the mistakes.'], 'Be careful, because it may not be trustworthy.', 'Careless writing can mean careless facts.', 'Mistakes are a clue the site was not checked by experts.'],
-    ['Which source is reliable for weather facts?', ['A weather scientist\'s report.','A wish.','A cartoon cloud.','A guess.'], 'A weather scientist\'s report.', 'Weather facts come from scientists who study the sky.', 'The report is based on real measurements.'],
-    ['You are writing about cheetahs. Which note is a useful fact?', ['A cheetah can run 70 miles per hour.','Cheetahs are the coolest.','I love cheetahs.','Cheetahs are funny.'], 'A cheetah can run 70 miles per hour.', 'Useful notes are facts you can check.', 'The speed is a measured fact, not an opinion.'],
-  ]],
-  ['Revision & Editing', [
-    ['Which sentence uses capital letters correctly?', ['My friend Ana lives on Oak Street.','my friend Ana lives on Oak Street.','My friend ana lives on oak street.','My friend Ana lives on oak street.'], 'My friend Ana lives on Oak Street.', 'Names of people and streets start with capitals.', 'Ana and Oak Street are proper names that need capitals.'],
-    ['Which sentence ends with the correct punctuation?', ['Where did the lost puppy go?','Where did the lost puppy go.','where did the lost puppy go?','Where did the lost puppy go'], 'Where did the lost puppy go?', 'A question needs a capital at the start and a question mark at the end.', 'It starts with a capital and ends with a question mark.'],
-    ['Which sentence is spelled correctly?', ['The bright sun warmed the sand.','The brite sun warmed the sand.','The bright sun warmed the sandd.','The bright sun wormed the sand.'], 'The bright sun warmed the sand.', 'Sound out each word and check the letters.', 'Every word is spelled with the correct letters.'],
-    ['Which sentence needs a capital letter fix?', ['sam and I played soccer.','Sam and I played soccer.','We had fun.','It was sunny.'], 'sam and I played soccer.', 'A sentence must start with a capital letter.', 'The name sam should be Sam at the start.'],
-    ['Which sentence needs a period added?', ['We ate lunch at the park','We ate lunch at the park.','We ate lunch!','Did we eat lunch?'], 'We ate lunch at the park', 'A telling sentence ends with a period.', 'It is missing its end mark.'],
-    ['Which sentence is edited correctly? "I went to the park becaus it was sunny."', ['I went to the park because it was sunny.','I went to the park becaus it was sunny.','i went to the park because it was sunny.','I went to the park because it was sunny'], 'I went to the park because it was sunny.', 'Fix the spelling of "because" and check the capital and end punctuation.', 'The edited sentence fixes the spelling, keeps the capital I, and ends with a period.'],
-    ['"The dog ran." Which revision adds a detail?', ['The fluffy brown dog ran fast across the yard.','The dog ran.','Dog ran.','The dog.'], 'The fluffy brown dog ran fast across the yard.', 'Revision adds details that paint a picture.', 'It adds what the dog looks like and where it ran.'],
-    ['Which sentence starts with a capital letter?', ['Turtles swim in the sea.','turtles swim in the sea.','turtles swim in the Sea.','Turtles swim in the sea'], 'Turtles swim in the sea.', 'Check the first letter and the end mark.', 'It starts with a capital T and ends with a period.'],
-    ['Which sentence is written correctly?', ['I read a book about space.','i read a book about space.','I read a book about space','i read a book about space'], 'I read a book about space.', 'The word I is always capital, and sentences end with a period.', 'It has a capital I and ends with a period.'],
-    ['Which revision makes the sentence clearer? "The dog went there."', ['The brown dog ran to the water bowl.', 'The dog went there.', 'The dog went somewhere.', 'There went the dog.'], 'The brown dog ran to the water bowl.', 'A strong revision adds specific details instead of vague words.', 'The revision tells what the dog did and where it went.'],
-    ['Which is the correct way to fix this run-on: "I like apples they are sweet."?', ['I like apples. They are sweet.','I like apples they are sweet.','i like apples. They are sweet.','I like apples, they are sweet.'], 'I like apples. They are sweet.', 'Two complete thoughts need a period between them.', 'The period splits the run-on into two correct sentences.'],
-    ['"The cake was good." Which revision uses a stronger word?', ['The cake was delicious.','The cake was good.','The cake was okay.','Cake good.'], 'The cake was delicious.', 'Revision can swap a plain word for a stronger one.', 'Delicious is a stronger, more vivid word than good.'],
-    ['Which sentence is written correctly?', ['Mia and I built a snowman.','Mia and me built a snowman.','Me and Mia built a snowman.','Mia and I builded a snowman.'], 'Mia and I built a snowman.', 'Use I when you are doing the action.', 'I is correct as part of the subject doing the building.'],
-    ['Which sentence needs a question mark?', ['What time is lunch','What time is lunch.','What time is lunch!','Lunch is at noon.'], 'What time is lunch', 'A question that asks for information needs a question mark.', 'It asks what time, so it needs a question mark at the end.'],
-    ['Which sentence fixes BOTH errors? "my teacher mrs. Lee likes books"', ['My teacher Mrs. Lee likes books.', 'My teacher mrs. Lee likes books.', 'my teacher Mrs. Lee likes books.', 'My teacher Mrs. lee likes books.'], 'My teacher Mrs. Lee likes books.', 'Look for the capital at the beginning and capitals in the title and name.', 'The sentence needs capitals for My, Mrs., and Lee.'],
-    ['Which order of sentences makes sense?', ['First I woke up. Then I ate breakfast.','Then I ate breakfast. First I woke up.','First I ate breakfast. Then I woke up.','I woke up then I ate breakfast first.'], 'First I woke up. Then I ate breakfast.', 'Revision puts events in time order.', 'Waking up happens before eating breakfast.'],
-    ['Which sentence uses capitals correctly for a name?', ['My teacher is Mrs. Lee.','My teacher is mrs. Lee.','My teacher is Mrs. lee.','my teacher is Mrs. Lee.'], 'My teacher is Mrs. Lee.', 'Titles and last names start with capitals.', 'Mrs. and Lee are proper names needing capitals.'],
-    ['Which sentence is written correctly?', ['The cat sat on the warm rug.','The cat sat on the warm rug','the cat sat on the warm rug.','The cat sat on the warm rug,'], 'The cat sat on the warm rug.', 'Check the first letter and the end mark.', 'It starts with a capital and ends with a period.'],
-    ['"The garden is pretty." Which added detail helps most?', ['Red roses and yellow sunflowers grow in the garden.','The garden is pretty.','Garden pretty.','It is.'], 'Red roses and yellow sunflowers grow in the garden.', 'Revision adds details that show, not just tell.', 'It names exactly what grows in the garden.'],
-    ['Which revision adds the most useful detail? "We saw a bird."', ['We saw a small blue bird building a nest in the tree.', 'We saw a bird.', 'We saw an animal.', 'We saw something.'], 'We saw a small blue bird building a nest in the tree.', 'Choose details that tell what the bird looked like and what it was doing.', 'The revision adds specific details about the bird, its action, and its location.'],
-    ['Which sentence shows strong feeling correctly?', ['What a big fish!','what a big fish!','What a big fish','What a big fish,'], 'What a big fish!', 'Strong feelings end with an exclamation mark.', 'It starts with a capital and ends with an exclamation mark.'],
-    ['Which sentence fixes the capitals?', ['We visited Grandma on Sunday.','We visited grandma on sunday.','we visited Grandma on Sunday.','We visited grandma on Sunday.'], 'We visited Grandma on Sunday.', 'Names for family used as names and days of the week need capitals.', 'Grandma and Sunday both need capital letters.'],
-    ['Which sentence is written correctly?', ['Dad drives a red car.','Dad drives a red car','dad drives a red car.','Dad drives a red Car.'], 'Dad drives a red car.', 'Family names used as names need capitals; common words do not.', 'Dad is capitalized and car is not, with a period at the end.'],
-    ['Which word is spelled correctly?', ['night','nite','nigth','nigt'], 'night', 'Remember the igh pattern.', 'Night is spelled n-i-g-h-t.'],
-    ['"___ dog barked at the mail truck." Which word starts the sentence correctly?', ['The','the','a','an'], 'The', 'The first word of a sentence needs a capital.', 'The starts the sentence with a capital T.'],
-    ['Which two short sentences are combined correctly? "The bird sings. It is morning."', ['The bird sings in the morning.','The bird sings it is morning.','the bird sings in the morning.','The bird sings in the morning'], 'The bird sings in the morning.', 'Combining keeps one capital and one end mark.', 'It joins the ideas with correct capitals and a period.'],
-    ['Which sentence is punctuated correctly?', ['Mom, can we go to the park?','Mom can we go to the park.','mom, can we go to the park?','Mom, can we go to the park'], 'Mom, can we go to the park?', 'A question needs a capital, a comma after the name, and a question mark.', 'It has the capital, comma, and question mark in the right places.'],
-    ['Which word is spelled correctly?', ['water','watter','woter','watar'], 'water', 'Sound it out: w-a-t-e-r.', 'Water is spelled w-a-t-e-r.'],
-    ['Which order of sentences makes sense?', ['I put on my boots. I jumped in the puddle. I got all wet.','I got all wet. I put on my boots. I jumped in the puddle.','I jumped in the puddle. I got all wet. I put on my boots.','I put on my boots. I got all wet. I jumped in the puddle.'], 'I put on my boots. I jumped in the puddle. I got all wet.', 'Revision puts events in the order they happened.', 'Boots first, then jumping, then getting wet.'],
-    ['Which sentence fixes the capital letter?', ['On Saturday, we picked juicy red strawberries.','On saturday, we picked juicy red strawberries.','on Saturday, we picked juicy red strawberries.','On Saturday we picked juicy red strawberries'], 'On Saturday, we picked juicy red strawberries.', 'Days of the week start with capitals and need the comma after them here.', 'Saturday is capitalized and the sentence is complete.'],
-  ]],
+  [
+    "Paragraph Writing",
+    [
+      [
+        "Which is the best topic sentence?",
+        [
+          "Sea turtles swim far to lay their eggs.",
+          "Turtles.",
+          "They are green.",
+          "I saw one."
+        ],
+        "Sea turtles swim far to lay their eggs.",
+        "A topic sentence tells what the paragraph is about.",
+        "It states the main idea the paragraph will explain."
+      ],
+      [
+        "Which is the best topic sentence for a paragraph about penguins?",
+        [
+          "Birds.",
+          "Penguins cannot fly, but they swim very well.",
+          "It is cold.",
+          "I like ice."
+        ],
+        "Penguins cannot fly, but they swim very well.",
+        "Pick the sentence that tells the main idea about penguins.",
+        "It names the topic and gives a main idea the details can support."
+      ],
+      [
+        "The topic is: My dog loves the park. Which sentence is a good supporting detail?",
+        [
+          "My dog.",
+          "The park is fun.",
+          "She runs fast to fetch the red ball.",
+          "I like dogs."
+        ],
+        "She runs fast to fetch the red ball.",
+        "A detail gives more information about the topic.",
+        "It adds a specific fact about what the dog does at the park."
+      ],
+      [
+        "Which is the best closing sentence for a paragraph about butterflies?",
+        [
+          "Butterflies are insects.",
+          "I like wings.",
+          "They fly.",
+          "That is why butterflies are so amazing."
+        ],
+        "That is why butterflies are so amazing.",
+        "A closing sentence wraps up the paragraph.",
+        "It sums up the paragraph instead of adding a new fact."
+      ],
+      [
+        "Which sentence comes FIRST in a paragraph about making a sandwich?",
+        [
+          "First, I put cheese on the bread.",
+          "Next, I add the lettuce.",
+          "Last, I cut it in half.",
+          "Then I put on the top slice."
+        ],
+        "First, I put cheese on the bread.",
+        "Look for the word that starts a set of steps.",
+        "The word First shows this step happens before the others."
+      ],
+      [
+        "Which word best completes the sentence? \"____, the chicks hatch from the eggs.\"",
+        [
+          "First",
+          "Last",
+          "Next",
+          "Then"
+        ],
+        "Last",
+        "Hatching happens at the very end.",
+        "Last signals the final step in the sequence."
+      ],
+      [
+        "Which sentence is a good detail for a paragraph about the school garden?",
+        [
+          "Our garden.",
+          "I like it.",
+          "We planted orange carrots and red tomatoes.",
+          "Gardens are fun."
+        ],
+        "We planted orange carrots and red tomatoes.",
+        "A detail paints a clear picture with specifics.",
+        "It names exactly what was planted in the garden."
+      ],
+      [
+        "Which is the best topic sentence for a paragraph about sharks?",
+        [
+          "Fish.",
+          "The sea is big.",
+          "Scary!",
+          "Sharks have sharp teeth for catching fish."
+        ],
+        "Sharks have sharp teeth for catching fish.",
+        "The topic sentence should name sharks and give a main idea.",
+        "It tells the reader the paragraph will explain something about sharks."
+      ],
+      [
+        "Which sentence does NOT belong in a paragraph about winter?",
+        [
+          "Swimming in the pool is my favorite thing.",
+          "Snowflakes fall softly on the trees.",
+          "Kids sled down the hill.",
+          "I wear my warm red coat."
+        ],
+        "Swimming in the pool is my favorite thing.",
+        "Look for the sentence about a different season.",
+        "Swimming in a pool is a summer activity, not a winter one."
+      ],
+      [
+        "Which is the best closing sentence for a paragraph about my bike?",
+        [
+          "Bikes have wheels.",
+          "Riding my blue bike is the best part of my day.",
+          "I fell once.",
+          "My bike."
+        ],
+        "Riding my blue bike is the best part of my day.",
+        "A closing sentence ends with a final thought or feeling.",
+        "It wraps up the paragraph with a clear ending feeling."
+      ],
+      [
+        "Which order of sequencing words is correct?",
+        [
+          "Last, first, next, then",
+          "Next, then, last, first",
+          "First, next, then, last",
+          "First, last, next, then"
+        ],
+        "First, next, then, last",
+        "Think of the order you tell steps in a story.",
+        "These words go in time order from beginning to end."
+      ],
+      [
+        "Which is the best topic sentence for a paragraph about apples?",
+        [
+          "Fruit.",
+          "Red.",
+          "I ate one.",
+          "Apples grow on trees and come in many colors."
+        ],
+        "Apples grow on trees and come in many colors.",
+        "Pick the sentence that gives a main idea about apples.",
+        "It names the topic and states something the paragraph can explain."
+      ],
+      [
+        "The topic is: Our class pet is a hamster. Which is a good supporting detail?",
+        [
+          "He stuffs seeds into his puffy cheeks.",
+          "Hamsters.",
+          "I like school.",
+          "He is a pet."
+        ],
+        "He stuffs seeds into his puffy cheeks.",
+        "A detail adds a specific fact about the hamster.",
+        "It describes something the hamster actually does."
+      ],
+      [
+        "Which is the best closing sentence for a paragraph about the beach?",
+        [
+          "Sand is hot.",
+          "I cannot wait to visit the beach again.",
+          "Water.",
+          "We left."
+        ],
+        "I cannot wait to visit the beach again.",
+        "The closing sentence should end the paragraph with a final thought.",
+        "It wraps up the beach paragraph instead of starting a new idea."
+      ],
+      [
+        "Which sentence comes FIRST in a paragraph about baking cookies?",
+        [
+          "Then I roll the dough into balls.",
+          "Next, I add chocolate chips.",
+          "First, I mix the flour and sugar.",
+          "Last, I take them out of the oven."
+        ],
+        "First, I mix the flour and sugar.",
+        "Mixing comes before shaping and baking.",
+        "The word First marks the beginning of the steps."
+      ],
+      [
+        "The topic is: The zoo trip was fun. Which is a good supporting detail?",
+        [
+          "The zoo.",
+          "Animals are cool.",
+          "I went.",
+          "We watched the tall giraffes eat leaves."
+        ],
+        "We watched the tall giraffes eat leaves.",
+        "Pick the sentence that tells something specific we saw.",
+        "It gives a clear detail about the zoo trip."
+      ],
+      [
+        "Which is the best topic sentence for a paragraph about the moon?",
+        [
+          "The moon changes shape in the night sky.",
+          "Night.",
+          "It is round.",
+          "Look up."
+        ],
+        "The moon changes shape in the night sky.",
+        "The topic sentence should name the moon and give a main idea.",
+        "It tells the reader what the paragraph will explain about the moon."
+      ],
+      [
+        "Which is NOT a good topic sentence?",
+        [
+          "Recess is my favorite time of day.",
+          "Recess.",
+          "I love recess because we play tag.",
+          "At recess we run and laugh together."
+        ],
+        "Recess.",
+        "A topic sentence must be a full sentence with a main idea.",
+        "It is only one word, so it cannot state a main idea."
+      ],
+      [
+        "Which word best completes the sentence? \"____, we eat the popcorn at the movie.\"",
+        [
+          "First",
+          "Next",
+          "Last",
+          "Then"
+        ],
+        "Last",
+        "Eating the popcorn happens at the end of the movie.",
+        "Last marks the final part of the sequence."
+      ],
+      [
+        "Which is the best closing sentence for a paragraph about a rainy day?",
+        [
+          "Rain.",
+          "It is wet.",
+          "Umbrellas.",
+          "I love listening to the rain on the roof."
+        ],
+        "I love listening to the rain on the roof.",
+        "The closing sentence should end with a feeling or final thought.",
+        "It wraps up the paragraph with a personal ending."
+      ],
+      [
+        "The topic is: Spiders are interesting. Which is a good supporting detail?",
+        [
+          "Some spiders spin sticky webs to catch bugs.",
+          "Spiders.",
+          "I am scared.",
+          "Bugs."
+        ],
+        "Some spiders spin sticky webs to catch bugs.",
+        "A detail gives a real fact about spiders.",
+        "It explains something interesting that spiders do."
+      ],
+      [
+        "\"First, I put on my helmet.\" Which sentence should come NEXT?",
+        [
+          "Last, I go home.",
+          "Next, I hop on my scooter.",
+          "First, I wake up.",
+          "Then I eat dinner."
+        ],
+        "Next, I hop on my scooter.",
+        "Next comes right after First in a sequence.",
+        "It continues the steps in the correct time order."
+      ],
+      [
+        "Which is the best topic sentence for a paragraph about soccer?",
+        [
+          "Sports.",
+          "Run!",
+          "Soccer is a fast game played with a round ball.",
+          "I play."
+        ],
+        "Soccer is a fast game played with a round ball.",
+        "Pick the sentence that names soccer and gives a main idea.",
+        "It states what soccer is so the paragraph can add details."
+      ],
+      [
+        "Which sentence is a closing sentence?",
+        [
+          "Leaves turn orange in fall.",
+          "Fall comes after summer.",
+          "I rake leaves into piles.",
+          "That is why fall is my favorite season."
+        ],
+        "That is why fall is my favorite season.",
+        "A closing sentence sums up the paragraph.",
+        "It ends the paragraph with a final thought about fall."
+      ],
+      [
+        "The topic is: My grandma makes the best soup. Which is a good supporting detail?",
+        [
+          "She adds sweet carrots and soft noodles.",
+          "Grandma.",
+          "Soup is hot.",
+          "I eat."
+        ],
+        "She adds sweet carrots and soft noodles.",
+        "A detail names something specific about the soup.",
+        "It tells exactly what Grandma puts in the soup."
+      ],
+      [
+        "Which sentence comes LAST in a paragraph about planting a flower?",
+        [
+          "First, I dig a small hole.",
+          "Last, I watch the flower bloom.",
+          "Next, I drop in the seed.",
+          "Then I water the soil."
+        ],
+        "Last, I watch the flower bloom.",
+        "Blooming happens after digging, planting, and watering.",
+        "The word Last marks the final step."
+      ],
+      [
+        "Which is the best topic sentence for a paragraph about trains?",
+        [
+          "Wheels.",
+          "Choo choo.",
+          "Trains carry people and boxes across the land.",
+          "Fast."
+        ],
+        "Trains carry people and boxes across the land.",
+        "Pick the full sentence that gives a main idea about trains.",
+        "It names the topic and states what trains do."
+      ],
+      [
+        "Which detail does NOT belong in a paragraph about cats?",
+        [
+          "Her fur is soft like a blanket.",
+          "She purrs when I pet her.",
+          "She naps in the sunny window.",
+          "Dogs bark very loudly."
+        ],
+        "Dogs bark very loudly.",
+        "Look for the sentence about a different animal.",
+        "It is about dogs, not cats, so it does not belong."
+      ],
+      [
+        "Which is the best closing sentence for a paragraph about my birthday party?",
+        [
+          "It was the happiest birthday ever.",
+          "Cake.",
+          "I am seven.",
+          "We played games."
+        ],
+        "It was the happiest birthday ever.",
+        "The closing sentence ends with a final feeling.",
+        "It sums up the party instead of adding another fact."
+      ],
+      [
+        "Which paragraph has a topic sentence, details, and a closing sentence?",
+        [
+          "Silly. Tail. Nap. Laugh.",
+          "My kitten is silly. She chases her tail. She naps on my lap. She makes me laugh every day.",
+          "She chases her tail. My kitten is silly.",
+          "She makes me laugh every day. She chases her tail. She naps on my lap."
+        ],
+        "My kitten is silly. She chases her tail. She naps on my lap. She makes me laugh every day.",
+        "A good paragraph starts with a topic, adds details, and ends with a closing.",
+        "It opens with the main idea, gives two details, and ends with a closing thought."
+      ]
+    ]
+  ],
+  [
+    "Narrative Writing",
+    [
+      [
+        "Which is the best beginning for a story about a lost puppy?",
+        [
+          "Puppies.",
+          "The end.",
+          "One rainy morning, Max the puppy slipped out the open gate.",
+          "Dogs are cute."
+        ],
+        "One rainy morning, Max the puppy slipped out the open gate.",
+        "A story beginning should name who and hint at what happens.",
+        "It introduces the character and starts the problem right away."
+      ],
+      [
+        "Which sentence shows WHO is in the story?",
+        [
+          "It was fun.",
+          "They played.",
+          "Outside.",
+          "Lena and her brother built a fort in the backyard."
+        ],
+        "Lena and her brother built a fort in the backyard.",
+        "Look for the sentence that names the characters.",
+        "It names Lena and her brother as the characters."
+      ],
+      [
+        "\"Watch out!\" ___ Mia as the ball flew by. Which word is strongest?",
+        [
+          "shouted",
+          "said",
+          "talked",
+          "spoke"
+        ],
+        "shouted",
+        "Which word shows she was loud and fast?",
+        "Shouted shows her voice was loud, which fits a warning."
+      ],
+      [
+        "Which sentence tells WHAT happened in the story?",
+        [
+          "Kites are fun.",
+          "The kite crashed into the tall oak tree.",
+          "It was windy.",
+          "I like red."
+        ],
+        "The kite crashed into the tall oak tree.",
+        "Look for the sentence that tells the event.",
+        "It describes the main event of the story."
+      ],
+      [
+        "Which is the best ending for a story about baking a cake for Mom?",
+        [
+          "Cake.",
+          "We ate.",
+          "Mom smiled and said it was the sweetest surprise.",
+          "The end of cake."
+        ],
+        "Mom smiled and said it was the sweetest surprise.",
+        "A good ending wraps up the story with a feeling.",
+        "It shows how the story ends and how Mom felt."
+      ],
+      [
+        "Which order tells the story correctly?",
+        [
+          "Last the dragon woke, first he found the map, next he flew to the cave, then he met the king.",
+          "Next the dragon woke, then he found the map, last he flew to the cave, first he met the king.",
+          "First the dragon woke, last he found the map, next he flew to the cave, then he met the king.",
+          "First the dragon woke, next he found the map, then he flew to the cave, last he met the king."
+        ],
+        "First the dragon woke, next he found the map, then he flew to the cave, last he met the king.",
+        "Story events must go in time order.",
+        "The sequencing words put the events from beginning to end."
+      ],
+      [
+        "The soup was ___. Which word paints the strongest picture?",
+        [
+          "steaming",
+          "hot",
+          "warm",
+          "okay"
+        ],
+        "steaming",
+        "Which word helps you see and feel the soup?",
+        "Steaming paints a vivid picture of hot soup."
+      ],
+      [
+        "Which sentence is the MIDDLE of the story about a lost tooth?",
+        [
+          "First, my tooth felt wiggly.",
+          "Next, I bit into an apple and the tooth popped out!",
+          "Last, I put it under my pillow.",
+          "The tooth fairy came at night."
+        ],
+        "Next, I bit into an apple and the tooth popped out!",
+        "The middle comes between the beginning and the end.",
+        "The word Next places it between First and Last."
+      ],
+      [
+        "The ___ bear lumbered through the woods. Which word is stronger than \"big\"?",
+        [
+          "big",
+          "nice",
+          "enormous",
+          "good"
+        ],
+        "enormous",
+        "Which word makes the bear sound the biggest?",
+        "Enormous is a stronger, more vivid word than big."
+      ],
+      [
+        "Which beginning grabs the reader's attention?",
+        [
+          "One day something happened.",
+          "This is a story.",
+          "I will tell you a tale.",
+          "Crash! The vase tumbled off the table."
+        ],
+        "Crash! The vase tumbled off the table.",
+        "A strong beginning drops the reader into action.",
+        "It starts with exciting action instead of a dull opener."
+      ],
+      [
+        "\"____, the turtle crossed the finish line and won the race.\" Which word fits?",
+        [
+          "Last",
+          "First",
+          "Next",
+          "Then"
+        ],
+        "Last",
+        "Crossing the finish line ends the race.",
+        "Last shows this is the final event."
+      ],
+      [
+        "Which sentence shows how Sam feels?",
+        [
+          "Sam went on stage.",
+          "Sam's hands shook as he stepped onto the stage.",
+          "The stage was big.",
+          "People watched."
+        ],
+        "Sam's hands shook as he stepped onto the stage.",
+        "Look for words that show a feeling in his body.",
+        "Shaking hands show Sam is nervous."
+      ],
+      [
+        "Which sentence best starts a story about a snow day?",
+        [
+          "Snow.",
+          "Winter is cold.",
+          "Snow covered everything when I woke up.",
+          "I slept."
+        ],
+        "Snow covered everything when I woke up.",
+        "A story start should set the scene.",
+        "It shows where and when the story begins."
+      ],
+      [
+        "The rabbit ___ across the field. Which verb is strongest?",
+        [
+          "went",
+          "moved",
+          "walked",
+          "hopped"
+        ],
+        "hopped",
+        "Which verb shows exactly how a rabbit moves?",
+        "Hopped is a precise, lively verb for a rabbit."
+      ],
+      [
+        "Which event happened LAST in the story?",
+        [
+          "The seed grew into a tall sunflower.",
+          "We dug a hole in the dirt.",
+          "We dropped the seed in.",
+          "We watered the soil."
+        ],
+        "The seed grew into a tall sunflower.",
+        "Growing happens after planting and watering.",
+        "It is the final result of all the earlier steps."
+      ],
+      [
+        "Which is the best ending for a story about finding a lost key?",
+        [
+          "Keys.",
+          "We cheered when Dad found the key under the mat.",
+          "We looked.",
+          "The mat."
+        ],
+        "We cheered when Dad found the key under the mat.",
+        "A good ending solves the problem with a feeling.",
+        "It shows the key was found and how everyone felt."
+      ],
+      [
+        "\"I hid the treasure here,\" ___ the pirate. Which word is best for a whisper?",
+        [
+          "said",
+          "talked",
+          "whispered",
+          "told"
+        ],
+        "whispered",
+        "Which word tells how softly he spoke?",
+        "Whispered shows he spoke very quietly, like a pirate sharing a secret."
+      ],
+      [
+        "Which sentence tells WHERE the story happens?",
+        [
+          "It was fun.",
+          "We ran fast.",
+          "Go!",
+          "The race took place at the big park by the lake."
+        ],
+        "The race took place at the big park by the lake.",
+        "Look for the sentence that names the place.",
+        "It tells the setting: the park by the lake."
+      ],
+      [
+        "Which sentence comes FIRST in the story about the lost mitten?",
+        [
+          "Mia built a snowman in the yard.",
+          "Then she noticed her mitten was gone.",
+          "Next she looked behind the snowman.",
+          "Last she found it on the porch."
+        ],
+        "Mia built a snowman in the yard.",
+        "The first event happens before the mitten is lost.",
+        "Building the snowman starts the story before the problem begins."
+      ],
+      [
+        "The ___ puppy licked my face. Which word is better than \"nice\"?",
+        [
+          "nice",
+          "playful",
+          "good",
+          "fine"
+        ],
+        "playful",
+        "Which word shows what the puppy is like?",
+        "Playful describes the puppy's lively personality."
+      ],
+      [
+        "Which sentence is the MIDDLE of the farm trip story?",
+        [
+          "First we rode the bus.",
+          "Last we waved goodbye.",
+          "Next we fed the baby goats.",
+          "We packed our lunches."
+        ],
+        "Next we fed the baby goats.",
+        "The middle event comes between First and Last.",
+        "The word Next places it in the middle of the trip."
+      ],
+      [
+        "The ___ dragon guarded the gold. Which word is strongest?",
+        [
+          "bad",
+          "mean",
+          "big",
+          "fearsome"
+        ],
+        "fearsome",
+        "Which word makes the dragon sound the scariest?",
+        "Fearsome is a vivid word that shows the dragon is frightening."
+      ],
+      [
+        "Which sentence shows the PROBLEM in the story?",
+        [
+          "But the bridge was broken, and the river was wide.",
+          "They walked along.",
+          "The day was nice.",
+          "Birds sang sweetly."
+        ],
+        "But the bridge was broken, and the river was wide.",
+        "The problem is what makes the story tricky.",
+        "A broken bridge blocks the characters and creates the problem."
+      ],
+      [
+        "Which is the best beginning for a story about a field trip?",
+        [
+          "Trips.",
+          "The bus rumbled as we pulled up to the aquarium.",
+          "We went.",
+          "Fish."
+        ],
+        "The bus rumbled as we pulled up to the aquarium.",
+        "A strong beginning sets the scene with a detail.",
+        "It shows where the trip begins with a lively sound detail."
+      ],
+      [
+        "The fox ___ through the dark forest. Which verb shows the most?",
+        [
+          "went",
+          "moved",
+          "darted",
+          "walked"
+        ],
+        "darted",
+        "Which verb shows fast, quick movement?",
+        "Darted shows the fox moved swiftly and suddenly."
+      ],
+      [
+        "Which ending wraps up the story about the science fair?",
+        [
+          "Science.",
+          "It ended.",
+          "Ribbon.",
+          "I held my blue ribbon and grinned all the way home."
+        ],
+        "I held my blue ribbon and grinned all the way home.",
+        "A good ending shows the final feeling.",
+        "It ends the story by showing pride and happiness."
+      ],
+      [
+        "Which sentence tells WHEN the story happens?",
+        [
+          "On Saturday morning, we flew kites at the hill.",
+          "We flew kites.",
+          "Kites are fun.",
+          "The hill was steep."
+        ],
+        "On Saturday morning, we flew kites at the hill.",
+        "Look for the sentence that names the time.",
+        "It tells the reader the story happens on Saturday morning."
+      ],
+      [
+        "Which is the best title for a story about a frog who learns to sing?",
+        [
+          "Frog.",
+          "Freddy the Frog Finds His Song",
+          "A Story.",
+          "Singing."
+        ],
+        "Freddy the Frog Finds His Song",
+        "A good title names the character and hints at the story.",
+        "It names Freddy and tells what the story is about."
+      ],
+      [
+        "The wind ___ through the trees. Which word is strongest?",
+        [
+          "blew",
+          "moved",
+          "howled",
+          "went"
+        ],
+        "howled",
+        "Which word helps you hear the wind?",
+        "Howled paints a vivid sound picture of strong wind."
+      ],
+      [
+        "Which sentence belongs in the MIDDLE of the bread-baking story?",
+        [
+          "First we mixed the dough.",
+          "Last we ate warm slices.",
+          "We washed the bowls.",
+          "Next the dough rose big and puffy."
+        ],
+        "Next the dough rose big and puffy.",
+        "The middle comes after First and before Last.",
+        "The word Next places it between the beginning and the end."
+      ]
+    ]
+  ],
+  [
+    "Informative Writing",
+    [
+      [
+        "Which sentence is a FACT?",
+        [
+          "Some ants can carry objects heavier than their bodies.",
+          "Ants are the coolest bugs.",
+          "I love ants.",
+          "Ants are yucky."
+        ],
+        "Some ants can carry objects heavier than their bodies.",
+        "A fact can be checked and proven true.",
+        "Scientists have measured how much ants can lift."
+      ],
+      [
+        "Which is the best topic sentence for an informative paragraph about whales?",
+        [
+          "Whales!",
+          "Whales are the largest animals in the ocean.",
+          "I like whales.",
+          "Big."
+        ],
+        "Whales are the largest animals in the ocean.",
+        "An informative topic sentence states a fact as the main idea.",
+        "It gives a checkable fact the paragraph can explain."
+      ],
+      [
+        "Which sentence gives a fact about the sun?",
+        [
+          "The sun is pretty.",
+          "I like sunny days.",
+          "The sun is a star made of hot gas.",
+          "Sunshine makes me happy."
+        ],
+        "The sun is a star made of hot gas.",
+        "A fact can be proven true by science.",
+        "Scientists know the sun is a star made of hot gases."
+      ],
+      [
+        "Which sentence is an OPINION?",
+        [
+          "Ice cream is cold.",
+          "Ice cream melts in the sun.",
+          "Milk is used to make ice cream.",
+          "Chocolate ice cream is the best flavor."
+        ],
+        "Chocolate ice cream is the best flavor.",
+        "An opinion is what someone thinks or feels.",
+        "Best flavor is a personal judgment, not a checkable fact."
+      ],
+      [
+        "Which detail belongs in an informative paragraph about bees?",
+        [
+          "Bees make honey in their hives.",
+          "I am scared of bees.",
+          "Bees are the worst.",
+          "Buzz buzz."
+        ],
+        "Bees make honey in their hives.",
+        "Informative details are true facts.",
+        "It is a real fact about what bees do."
+      ],
+      [
+        "Which sentence gives a fact about penguins?",
+        [
+          "Penguins are cute.",
+          "Penguins have thick feathers that keep them warm.",
+          "I love penguins.",
+          "Penguins are funny."
+        ],
+        "Penguins have thick feathers that keep them warm.",
+        "A fact can be checked in a science book.",
+        "Their thick feathers are a real feature scientists describe."
+      ],
+      [
+        "Which sentence gives a fact about teeth?",
+        [
+          "Teeth are the best.",
+          "I like my smile.",
+          "Adult humans have 32 teeth.",
+          "Teeth are cool."
+        ],
+        "Adult humans have 32 teeth.",
+        "A fact is a number or detail that can be counted.",
+        "Dentists count 32 teeth in a full adult set."
+      ],
+      [
+        "Which is the best topic sentence for an informative paragraph about volcanoes?",
+        [
+          "Boom!",
+          "Lava is scary.",
+          "I saw a movie.",
+          "A volcano is a mountain that can erupt with hot lava."
+        ],
+        "A volcano is a mountain that can erupt with hot lava.",
+        "An informative topic sentence explains what something is.",
+        "It defines a volcano with a fact the paragraph can expand."
+      ],
+      [
+        "Which sentence is an OPINION?",
+        [
+          "Winter is the most fun season.",
+          "Snow is frozen water.",
+          "Winter follows fall.",
+          "Days are shorter in winter."
+        ],
+        "Winter is the most fun season.",
+        "Look for words like most fun that show a feeling.",
+        "Most fun is a personal judgment, not a fact."
+      ],
+      [
+        "Which detail belongs in an informative paragraph about the heart?",
+        [
+          "Hearts are lovely.",
+          "The heart pumps blood through your body.",
+          "I love you.",
+          "Red."
+        ],
+        "The heart pumps blood through your body.",
+        "Informative details explain how something works.",
+        "It is a true fact about what the heart does."
+      ],
+      [
+        "Which sentence gives a fact about spiders?",
+        [
+          "Spiders are gross.",
+          "I hate spiders.",
+          "Spiders have eight legs.",
+          "Spiders are scary."
+        ],
+        "Spiders have eight legs.",
+        "A fact can be counted and checked.",
+        "You can count eight legs on a spider."
+      ],
+      [
+        "Which is the best topic sentence for an informative paragraph about how plants grow?",
+        [
+          "Plants.",
+          "I like flowers.",
+          "Green.",
+          "Plants need sunlight, water, and soil to grow."
+        ],
+        "Plants need sunlight, water, and soil to grow.",
+        "An informative topic sentence states true facts.",
+        "It lists real things plants need, which details can explain."
+      ],
+      [
+        "Which sentence is an OPINION about pizza?",
+        [
+          "Pepperoni pizza is the tastiest.",
+          "Pizza is baked in an oven.",
+          "Cheese melts on pizza.",
+          "Pizza is round."
+        ],
+        "Pepperoni pizza is the tastiest.",
+        "Tastiest shows what someone thinks, not a fact.",
+        "It is a personal judgment about flavor."
+      ],
+      [
+        "Which sentence gives a fact about the moon?",
+        [
+          "The moon is beautiful.",
+          "The moon orbits around Earth.",
+          "I love the moon.",
+          "Moonlight is magical."
+        ],
+        "The moon orbits around Earth.",
+        "A fact can be proven by science.",
+        "Scientists have observed the moon orbiting Earth."
+      ],
+      [
+        "Which detail belongs in an informative paragraph about firefighters?",
+        [
+          "Fire is scary.",
+          "I want a dog.",
+          "Firefighters wear heavy coats to stay safe.",
+          "Hot."
+        ],
+        "Firefighters wear heavy coats to stay safe.",
+        "Informative details are true facts about the topic.",
+        "It is a real fact about firefighter gear."
+      ],
+      [
+        "Which detail would BEST support the idea that a common year has 365 days?",
+        [
+          "Birthdays are the best.",
+          "I love cake at parties.",
+          "Some months have fun holidays.",
+          "A calendar can be used to count 365 days in a common year."
+        ],
+        "A calendar can be used to count 365 days in a common year.",
+        "Supporting details should give information that helps prove or explain the main idea.",
+        "A calendar lets you check and count the days in a common year."
+      ],
+      [
+        "Which is the best topic sentence for an informative paragraph about dinosaurs?",
+        [
+          "Dinosaurs lived on Earth millions of years ago.",
+          "Rawr!",
+          "They are cool.",
+          "Big lizards."
+        ],
+        "Dinosaurs lived on Earth millions of years ago.",
+        "An informative topic sentence states a true main idea.",
+        "It gives a fact that details about dinosaurs can support."
+      ],
+      [
+        "Which sentence is a FACT?",
+        [
+          "Libraries are boring.",
+          "The library has many books.",
+          "Reading is the best.",
+          "I love the library."
+        ],
+        "The library has many books.",
+        "A fact can be checked by looking.",
+        "You can see the many books on the shelves."
+      ],
+      [
+        "Which detail belongs in an informative paragraph about rainbows?",
+        [
+          "Rainbows are pretty.",
+          "I love colors.",
+          "A rainbow appears when sun and rain mix in the sky.",
+          "Wow."
+        ],
+        "A rainbow appears when sun and rain mix in the sky.",
+        "Informative details explain how something happens.",
+        "It is a true fact about how rainbows form."
+      ],
+      [
+        "A writer says, \"Swimming is the most fun sport.\" Which detail BEST supports that opinion?",
+        [
+          "Swimmers wear goggles.",
+          "Pools hold water.",
+          "Swimming uses arms and legs.",
+          "Swimming gives me a chance to race and play with friends."
+        ],
+        "Swimming gives me a chance to race and play with friends.",
+        "A supporting detail should give a reason for the opinion.",
+        "Racing and playing with friends explains why the writer thinks swimming is fun."
+      ],
+      [
+        "Which sentence gives a fact about elephants?",
+        [
+          "Elephants are the largest land animals.",
+          "Elephants are cute.",
+          "I love elephants.",
+          "Elephants are funny."
+        ],
+        "Elephants are the largest land animals.",
+        "A fact can be measured and checked.",
+        "Scientists have measured elephants as the biggest land animals."
+      ],
+      [
+        "Which is the best topic sentence for an informative paragraph about the water cycle?",
+        [
+          "Rain.",
+          "Water moves in a cycle from clouds to ground and back.",
+          "Wet.",
+          "I like puddles."
+        ],
+        "Water moves in a cycle from clouds to ground and back.",
+        "An informative topic sentence explains a process.",
+        "It states the main idea the paragraph will explain step by step."
+      ],
+      [
+        "Which detail belongs in an informative paragraph about owls?",
+        [
+          "Owls are spooky.",
+          "Hoot hoot.",
+          "Owls hunt for mice at night.",
+          "I like birds."
+        ],
+        "Owls hunt for mice at night.",
+        "Informative details are true facts.",
+        "It is a real fact about how owls find food."
+      ],
+      [
+        "Which sentence is a FACT?",
+        [
+          "Fish are boring.",
+          "I like fish.",
+          "Fish are pretty.",
+          "Fish breathe through gills."
+        ],
+        "Fish breathe through gills.",
+        "A fact can be proven by science.",
+        "Scientists know gills take air from water."
+      ],
+      [
+        "A writer thinks art is the best school subject. Which detail would BEST support that opinion?",
+        [
+          "Art class lets students create pictures and use their imagination.",
+          "School has classrooms.",
+          "Teachers help us learn.",
+          "Students eat lunch at school."
+        ],
+        "Art class lets students create pictures and use their imagination.",
+        "A supporting detail should explain why the writer likes art.",
+        "Creating and using imagination gives a reason for the writer’s opinion."
+      ],
+      [
+        "Which is the best topic sentence for an informative paragraph about magnets?",
+        [
+          "Cool!",
+          "Magnets pull some metals toward them.",
+          "I have one.",
+          "Sticky."
+        ],
+        "Magnets pull some metals toward them.",
+        "An informative topic sentence states a true main idea.",
+        "It is a fact the paragraph can explain with examples."
+      ],
+      [
+        "Which detail belongs in an informative paragraph about the desert?",
+        [
+          "Deserts are boring.",
+          "I hate sand.",
+          "Deserts get very little rain each year.",
+          "Hot hot."
+        ],
+        "Deserts get very little rain each year.",
+        "Informative details are facts you can measure.",
+        "Rainfall in deserts is measured and very low."
+      ],
+      [
+        "Which sentence gives a fact about birds?",
+        [
+          "Birds are pretty.",
+          "I love robins.",
+          "Singing is nice.",
+          "Birds lay eggs with hard shells."
+        ],
+        "Birds lay eggs with hard shells.",
+        "A fact can be observed and checked.",
+        "You can see and touch the hard shells of bird eggs."
+      ],
+      [
+        "Which sentence is an OPINION?",
+        [
+          "Summer is too hot.",
+          "Summer follows spring.",
+          "The sun shines in summer.",
+          "Some kids swim in summer."
+        ],
+        "Summer is too hot.",
+        "Too hot shows how someone feels.",
+        "It is a feeling about the weather, not a fact."
+      ],
+      [
+        "Which is the best closing sentence for an informative paragraph about sea turtles?",
+        [
+          "Turtles rule!",
+          "Now you know how sea turtles live and grow.",
+          "I like them.",
+          "The end."
+        ],
+        "Now you know how sea turtles live and grow.",
+        "An informative closing sums up what was taught.",
+        "It wraps up the facts the paragraph explained."
+      ]
+    ]
+  ],
+  [
+    "Opinion Writing",
+    [
+      [
+        "Which is the best opinion topic sentence?",
+        [
+          "The zoo has animals.",
+          "We went to the zoo.",
+          "The zoo is the best place for a field trip.",
+          "Zoos are places."
+        ],
+        "The zoo is the best place for a field trip.",
+        "An opinion topic sentence states what someone thinks.",
+        "Best place shows a belief, not just a fact."
+      ],
+      [
+        "Mia thinks recess should be longer. Which sentence is a REASON?",
+        [
+          "Recess is at noon.",
+          "I like tag.",
+          "The bell rings loudly.",
+          "Kids need time to run and play."
+        ],
+        "Kids need time to run and play.",
+        "A reason explains WHY the opinion is held.",
+        "It gives a why behind wanting longer recess."
+      ],
+      [
+        "Why should our class get a pet fish? Which reason is strongest?",
+        [
+          "Watching fish swim is calm and teaches us to care for animals.",
+          "Fish are cool.",
+          "I want one.",
+          "Fish live in water."
+        ],
+        "Watching fish swim is calm and teaches us to care for animals.",
+        "The strongest reason gives real benefits.",
+        "It explains two clear benefits of a class fish."
+      ],
+      [
+        "Which sentence is an OPINION?",
+        [
+          "Dogs have four legs.",
+          "Dogs make the best pets.",
+          "Dogs bark.",
+          "Dogs need water."
+        ],
+        "Dogs make the best pets.",
+        "An opinion shows what someone thinks is best.",
+        "Best pets is a judgment, not a checkable fact."
+      ],
+      [
+        "Which is the best closing sentence for an opinion paragraph about swimming?",
+        [
+          "Swim.",
+          "Water is wet.",
+          "That is why every kid should learn to swim.",
+          "I swam today."
+        ],
+        "That is why every kid should learn to swim.",
+        "An opinion closing restates the belief.",
+        "It wraps up the paragraph by repeating the opinion."
+      ],
+      [
+        "School lunches should have more fruit. Which is a good REASON?",
+        [
+          "Fruit is food.",
+          "I ate an apple.",
+          "Lunch is at noon.",
+          "Fruit gives our bodies energy to learn and play."
+        ],
+        "Fruit gives our bodies energy to learn and play.",
+        "A reason tells why the opinion matters.",
+        "It explains a health benefit of more fruit."
+      ],
+      [
+        "Which sentence states an OPINION?",
+        [
+          "Reading before bed is the coziest time of day.",
+          "Books have pages.",
+          "We read in class.",
+          "The library is open."
+        ],
+        "Reading before bed is the coziest time of day.",
+        "Coziest shows a personal feeling.",
+        "It is a judgment about the best reading time."
+      ],
+      [
+        "We should keep the park clean. Which reason is strongest?",
+        [
+          "Parks have trees.",
+          "Clean parks are safe and fun for everyone.",
+          "I go to the park.",
+          "The park is big."
+        ],
+        "Clean parks are safe and fun for everyone.",
+        "The strongest reason helps many people.",
+        "It gives clear benefits for the whole community."
+      ],
+      [
+        "The opinion is: Soccer is the best sport. Which sentence does NOT support it?",
+        [
+          "You get great exercise running.",
+          "You learn to work as a team.",
+          "Soccer is played on a field.",
+          "Scoring a goal feels amazing."
+        ],
+        "Soccer is played on a field.",
+        "A supporting sentence must give a reason it is best.",
+        "Where it is played is a fact, not a reason it is the best."
+      ],
+      [
+        "Which is the best opinion topic sentence about pizza day?",
+        [
+          "We eat pizza on Fridays.",
+          "Pizza has cheese.",
+          "Lunch is yummy.",
+          "Pizza day is the best lunch of the week."
+        ],
+        "Pizza day is the best lunch of the week.",
+        "An opinion topic sentence states a belief.",
+        "Best lunch shows what the writer thinks."
+      ],
+      [
+        "Why should we plant trees at school? Which reason is strongest?",
+        [
+          "Trees give shade and clean the air we breathe.",
+          "Trees are tall.",
+          "I like climbing.",
+          "Leaves fall down."
+        ],
+        "Trees give shade and clean the air we breathe.",
+        "The strongest reason gives real benefits.",
+        "It names two clear ways trees help the school."
+      ],
+      [
+        "A writer says, \"Snow days are the best days of the year.\" Which detail BEST supports that opinion?",
+        [
+          "Snow is cold.",
+          "Snow days give children extra time to play outside or relax at home.",
+          "It snows in winter.",
+          "We wear coats."
+        ],
+        "Snow days give children extra time to play outside or relax at home.",
+        "A supporting detail should explain why the writer thinks snow days are best.",
+        "Extra time to play or relax gives a reason for the opinion."
+      ],
+      [
+        "Which is the best closing sentence for an opinion paragraph about recess?",
+        [
+          "Recess.",
+          "We play.",
+          "That is why recess is important for every kid.",
+          "Time is up."
+        ],
+        "That is why recess is important for every kid.",
+        "An opinion closing restates the main belief.",
+        "It ends by repeating why recess matters."
+      ],
+      [
+        "Sam thinks bikes are better than scooters. Which is a REASON?",
+        [
+          "Bikes have two wheels.",
+          "I have a scooter.",
+          "Scooters are fun too.",
+          "Bikes go faster on long rides."
+        ],
+        "Bikes go faster on long rides.",
+        "A reason explains why bikes are better.",
+        "It gives a why behind his opinion."
+      ],
+      [
+        "The library should stay open later. Which reason is strongest?",
+        [
+          "Kids need more time to read and finish homework.",
+          "Libraries have books.",
+          "I like reading.",
+          "It closes at five."
+        ],
+        "Kids need more time to read and finish homework.",
+        "The strongest reason shows a real need.",
+        "It explains why extra time helps kids."
+      ],
+      [
+        "Which sentence is an OPINION?",
+        [
+          "Milk comes from cows.",
+          "Chocolate milk is better than plain milk.",
+          "Milk is white.",
+          "We drink milk at lunch."
+        ],
+        "Chocolate milk is better than plain milk.",
+        "Better than shows a personal taste.",
+        "It is a judgment about flavor, not a fact."
+      ],
+      [
+        "We should feed the birds in winter. Which is a good REASON?",
+        [
+          "Birds have wings.",
+          "I like robins.",
+          "Birds cannot find much food in the snow.",
+          "Winter is cold."
+        ],
+        "Birds cannot find much food in the snow.",
+        "A reason explains why the birds need help.",
+        "It gives a why behind feeding the birds."
+      ],
+      [
+        "Which is the best opinion topic sentence about art class?",
+        [
+          "We paint in art.",
+          "Art uses colors.",
+          "Class is fun.",
+          "Art class is the most creative part of the day."
+        ],
+        "Art class is the most creative part of the day.",
+        "An opinion topic sentence states a belief.",
+        "Most creative shows what the writer thinks."
+      ],
+      [
+        "The opinion is: Dogs are great pets. Which is NOT a good reason?",
+        [
+          "Dogs have tails.",
+          "Dogs are loyal and love to play.",
+          "Dogs can learn fun tricks.",
+          "Dogs greet you happily at the door."
+        ],
+        "Dogs have tails.",
+        "A good reason explains why dogs are great.",
+        "Having a tail is a fact, not a reason they are great pets."
+      ],
+      [
+        "Which is the best closing sentence for an opinion paragraph about bookshelves?",
+        [
+          "Books.",
+          "That is why I think every home needs a bookshelf.",
+          "I read.",
+          "Shelves hold books."
+        ],
+        "That is why I think every home needs a bookshelf.",
+        "An opinion closing restates the belief.",
+        "It ends by repeating the writer's opinion."
+      ],
+      [
+        "Which sentence is an OPINION?",
+        [
+          "Flowers bloom in spring.",
+          "Spring follows winter.",
+          "Spring is the prettiest season.",
+          "It rains in spring."
+        ],
+        "Spring is the prettiest season.",
+        "Prettiest shows a personal feeling.",
+        "It is a judgment, not a checkable fact."
+      ],
+      [
+        "Why is sharing toys a good idea? Which is a REASON?",
+        [
+          "Toys are plastic.",
+          "I have many toys.",
+          "My toy is red.",
+          "Sharing lets everyone have fun together."
+        ],
+        "Sharing lets everyone have fun together.",
+        "A reason tells why sharing is good.",
+        "It explains the benefit of sharing."
+      ],
+      [
+        "Which is the best opinion topic sentence?",
+        [
+          "A treehouse would be the coolest gift ever.",
+          "Treehouses are in trees.",
+          "Wood is brown.",
+          "I climb trees."
+        ],
+        "A treehouse would be the coolest gift ever.",
+        "An opinion topic sentence states a belief.",
+        "Coolest gift shows what the writer thinks."
+      ],
+      [
+        "We should have longer library time. Which reason is strongest?",
+        [
+          "Books are fun.",
+          "More time means we can finish whole chapters.",
+          "I like the chairs.",
+          "The library is quiet."
+        ],
+        "More time means we can finish whole chapters.",
+        "The strongest reason shows what more time allows.",
+        "It explains a clear benefit of longer library time."
+      ],
+      [
+        "Which sentence is an OPINION about movies?",
+        [
+          "Movies play on screens.",
+          "We watched a movie.",
+          "Funny movies are the best movies.",
+          "Popcorn is sold there."
+        ],
+        "Funny movies are the best movies.",
+        "Best movies shows a personal taste.",
+        "It is a judgment, not a fact."
+      ],
+      [
+        "The opinion is: Homework should be shorter. Which sentence does NOT support it?",
+        [
+          "Kids need time to play and rest.",
+          "Long homework makes kids too tired to read.",
+          "Families need time together at night.",
+          "Pencils are used for homework."
+        ],
+        "Pencils are used for homework.",
+        "A supporting sentence must give a reason for shorter homework.",
+        "Pencils are a fact, not a reason homework should be shorter."
+      ],
+      [
+        "Our school needs a garden. Which reason is strongest?",
+        [
+          "A garden teaches us how food grows.",
+          "Gardens are outside.",
+          "I like dirt.",
+          "Plants are green."
+        ],
+        "A garden teaches us how food grows.",
+        "The strongest reason shows what students learn.",
+        "It explains a clear learning benefit of a garden."
+      ],
+      [
+        "Which sentence is an OPINION?",
+        [
+          "The sky is blue.",
+          "Blue is the prettiest color.",
+          "Blueberries are blue.",
+          "I see blue cars."
+        ],
+        "Blue is the prettiest color.",
+        "Prettiest shows a personal feeling.",
+        "It is a judgment, not a checkable fact."
+      ],
+      [
+        "Which is the best closing sentence for an opinion paragraph about Saturdays?",
+        [
+          "Saturday.",
+          "Weekend.",
+          "That is why Saturday is my favorite day of the week.",
+          "I sleep in."
+        ],
+        "That is why Saturday is my favorite day of the week.",
+        "An opinion closing restates the belief.",
+        "It ends by repeating the writer's favorite-day opinion."
+      ],
+      [
+        "Everyone should learn to cook. Which reason is strongest?",
+        [
+          "Food tastes good.",
+          "I like pizza.",
+          "Kitchens have stoves.",
+          "Cooking lets you make healthy food for your family."
+        ],
+        "Cooking lets you make healthy food for your family.",
+        "The strongest reason gives a real benefit.",
+        "It explains how cooking helps the whole family."
+      ]
+    ]
+  ],
+  [
+    "Research & Sources",
+    [
+      [
+        "Which is a reliable source for facts about sharks?",
+        [
+          "A science book about sharks from the library.",
+          "A story I made up.",
+          "A cartoon about sharks.",
+          "What my friend guessed."
+        ],
+        "A science book about sharks from the library.",
+        "Reliable sources are written by experts and checked for facts.",
+        "A library science book is written and checked by experts."
+      ],
+      [
+        "Which is the best research question about sea turtles?",
+        [
+          "Are turtles cool?",
+          "What do sea turtles eat?",
+          "Do I like turtles?",
+          "Turtles?"
+        ],
+        "What do sea turtles eat?",
+        "A good research question asks for facts you can find.",
+        "It asks for a fact that books and experts can answer."
+      ],
+      [
+        "Which source is NOT reliable?",
+        [
+          "A science textbook.",
+          "A park ranger's talk.",
+          "A blog post by someone who never studied volcanoes.",
+          "An encyclopedia."
+        ],
+        "A blog post by someone who never studied volcanoes.",
+        "Reliable sources come from people who know the topic.",
+        "The blogger has no knowledge of volcanoes to share."
+      ],
+      [
+        "You want facts about the moon. Where should you look?",
+        [
+          "A fairy tale.",
+          "A comic strip.",
+          "Ask the cat.",
+          "A space book or a trusted science website."
+        ],
+        "A space book or a trusted science website.",
+        "Facts come from sources made to teach true information.",
+        "Space books and science sites are checked for correct facts."
+      ],
+      [
+        "Which is a good research question about bees?",
+        [
+          "How do bees make honey?",
+          "Are bees nice?",
+          "Do I like honey?",
+          "Bees?"
+        ],
+        "How do bees make honey?",
+        "A good research question starts with how or why.",
+        "It asks for a fact that research can answer."
+      ],
+      [
+        "Which source gives true facts about penguins?",
+        [
+          "A cartoon penguin movie.",
+          "A zoo sign about penguins.",
+          "A stuffed penguin.",
+          "A song about penguins."
+        ],
+        "A zoo sign about penguins.",
+        "Zoo signs are written by animal experts.",
+        "The sign shares facts checked by people who study penguins."
+      ],
+      [
+        "Your question is: Why do leaves change color? Which source is best?",
+        [
+          "A story about a talking leaf.",
+          "A coloring page.",
+          "A science book about trees.",
+          "A guess from a friend."
+        ],
+        "A science book about trees.",
+        "Match the source to the question.",
+        "A tree science book explains exactly why leaves change."
+      ],
+      [
+        "Which is NOT a good research question?",
+        [
+          "How do spiders spin webs?",
+          "Why is the sky blue?",
+          "Where do bears sleep in winter?",
+          "What is your favorite animal?"
+        ],
+        "What is your favorite animal?",
+        "A research question should ask for facts, not opinions.",
+        "Favorite is an opinion that research cannot answer."
+      ],
+      [
+        "Who is an expert you could ask about teeth?",
+        [
+          "A dentist.",
+          "A clown.",
+          "A dog.",
+          "A baby."
+        ],
+        "A dentist.",
+        "An expert studies and works with the topic.",
+        "A dentist studies and cares for teeth every day."
+      ],
+      [
+        "Which source is best for facts about George Washington?",
+        [
+          "A cartoon.",
+          "A history book from the library.",
+          "A joke book.",
+          "A dream I had."
+        ],
+        "A history book from the library.",
+        "History facts come from books written by historians.",
+        "A history book is researched and checked for true facts."
+      ],
+      [
+        "You read that bats sleep upside down. What should you do next?",
+        [
+          "Tell everyone right away.",
+          "Make up more facts.",
+          "Check another trusted source to make sure it is true.",
+          "Forget about it."
+        ],
+        "Check another trusted source to make sure it is true.",
+        "Good researchers double-check surprising facts.",
+        "A second source confirms the fact is really true."
+      ],
+      [
+        "Which is a reliable source for facts about planets?",
+        [
+          "A movie about aliens.",
+          "A horoscope.",
+          "A guessing game.",
+          "A kids' science website run by NASA."
+        ],
+        "A kids' science website run by NASA.",
+        "Reliable sources come from real space experts.",
+        "NASA scientists study planets and share true facts."
+      ],
+      [
+        "Which is the best research question about plants?",
+        [
+          "How do plants drink water?",
+          "Are plants pretty?",
+          "Do I like plants?",
+          "Plants?"
+        ],
+        "How do plants drink water?",
+        "A good research question asks how something works.",
+        "It asks for a fact that science books can explain."
+      ],
+      [
+        "Which source is trustworthy for animal facts?",
+        [
+          "A cartoon show.",
+          "A book written by a veterinarian.",
+          "A rumor at lunch.",
+          "A pet rock."
+        ],
+        "A book written by a veterinarian.",
+        "Trust sources written by people who study animals.",
+        "A veterinarian is an animal doctor and expert."
+      ],
+      [
+        "You want to know when dinosaurs lived. Which source is best?",
+        [
+          "A dinosaur toy.",
+          "A movie with dinosaurs.",
+          "A dinosaur book by a scientist.",
+          "A drawing."
+        ],
+        "A dinosaur book by a scientist.",
+        "Match the expert to the question.",
+        "A scientist studies dinosaur fossils and knows the facts."
+      ],
+      [
+        "Which is a good research question about birds?",
+        [
+          "Are birds cool?",
+          "Do I like birds?",
+          "Birds?",
+          "Why do birds fly south in winter?"
+        ],
+        "Why do birds fly south in winter?",
+        "A good research question starts with why or how.",
+        "It asks for a fact that bird experts can explain."
+      ],
+      [
+        "An expert on the ocean is called a:",
+        [
+          "marine biologist.",
+          "pilot.",
+          "baker.",
+          "singer."
+        ],
+        "marine biologist.",
+        "Think about who studies the sea for a living.",
+        "A marine biologist is a scientist who studies ocean life."
+      ],
+      [
+        "Which source is NOT reliable?",
+        [
+          "A library book.",
+          "Something a stranger posted without checking.",
+          "A teacher's lesson.",
+          "A museum sign."
+        ],
+        "Something a stranger posted without checking.",
+        "Reliable sources are checked by experts first.",
+        "An unchecked post may share wrong information."
+      ],
+      [
+        "Where is the best place to find facts about your town's history?",
+        [
+          "A made-up story.",
+          "A video game.",
+          "The local library or museum.",
+          "A wild guess."
+        ],
+        "The local library or museum.",
+        "Libraries and museums keep checked historical records.",
+        "They store true facts about the town's past."
+      ],
+      [
+        "Which question can research answer with a fact?",
+        [
+          "What is the prettiest bug?",
+          "Which bug is the funniest?",
+          "Do I like bugs?",
+          "How many legs does a spider have?"
+        ],
+        "How many legs does a spider have?",
+        "Research answers questions with checkable facts.",
+        "Leg count is a fact you can count and verify."
+      ],
+      [
+        "You found two sources that disagree. What should you do?",
+        [
+          "Check a third trusted source.",
+          "Pick the funnier one.",
+          "Give up.",
+          "Make something up."
+        ],
+        "Check a third trusted source.",
+        "A third source helps you find which fact is right.",
+        "Comparing sources is how researchers check the truth."
+      ],
+      [
+        "Which source is best for learning about the human body?",
+        [
+          "A comic about superheroes.",
+          "A science book with labeled diagrams.",
+          "A song.",
+          "A rumor."
+        ],
+        "A science book with labeled diagrams.",
+        "Diagrams in science books are checked by experts.",
+        "The book teaches true facts with clear pictures."
+      ],
+      [
+        "Which is a strong research question?",
+        [
+          "Are volcanoes scary?",
+          "Do I like lava?",
+          "Why do volcanoes erupt?",
+          "Volcanoes?"
+        ],
+        "Why do volcanoes erupt?",
+        "Strong research questions ask why or how.",
+        "It asks for a fact that science can explain."
+      ],
+      [
+        "Who could you interview about being a firefighter?",
+        [
+          "A movie star.",
+          "A cat.",
+          "A robot toy.",
+          "A real firefighter."
+        ],
+        "A real firefighter.",
+        "Interview someone who does the job.",
+        "A firefighter knows the true facts from experience."
+      ],
+      [
+        "You are writing about pandas. Which note is a useful fact?",
+        [
+          "Pandas eat bamboo for most of the day.",
+          "Pandas are cute.",
+          "I love pandas.",
+          "Pandas are funny."
+        ],
+        "Pandas eat bamboo for most of the day.",
+        "Useful notes are facts, not opinions.",
+        "It is a checkable fact about panda diets."
+      ],
+      [
+        "Which source is best for facts about recycling?",
+        [
+          "A trash can.",
+          "A book about Earth from the library.",
+          "A joke.",
+          "A guess."
+        ],
+        "A book about Earth from the library.",
+        "Library books are checked for true facts.",
+        "The book explains recycling with correct information."
+      ],
+      [
+        "Which is NOT a good research question?",
+        [
+          "How do fish breathe underwater?",
+          "Why do we need sleep?",
+          "What should I have for lunch?",
+          "Where does rain come from?"
+        ],
+        "What should I have for lunch?",
+        "A research question asks for facts, not personal choices.",
+        "Lunch is a personal choice, not a research fact."
+      ],
+      [
+        "If a website has many spelling mistakes, you should:",
+        [
+          "Trust it more.",
+          "Copy everything it says.",
+          "Ignore the mistakes.",
+          "Be careful, because it may not be trustworthy."
+        ],
+        "Be careful, because it may not be trustworthy.",
+        "Careless writing can mean careless facts.",
+        "Mistakes are a clue the site was not checked by experts."
+      ],
+      [
+        "Which source is reliable for weather facts?",
+        [
+          "A weather scientist's report.",
+          "A wish.",
+          "A cartoon cloud.",
+          "A guess."
+        ],
+        "A weather scientist's report.",
+        "Weather facts come from scientists who study the sky.",
+        "The report is based on real measurements."
+      ],
+      [
+        "You are writing about cheetahs. Which note is a useful fact?",
+        [
+          "Cheetahs are the coolest.",
+          "A cheetah can run 70 miles per hour.",
+          "I love cheetahs.",
+          "Cheetahs are funny."
+        ],
+        "A cheetah can run 70 miles per hour.",
+        "Useful notes are facts you can check.",
+        "The speed is a measured fact, not an opinion."
+      ]
+    ]
+  ],
+  [
+    "Revision & Editing",
+    [
+      [
+        "Which sentence uses capital letters correctly?",
+        [
+          "my friend Ana lives on Oak Street.",
+          "My friend ana lives on oak street.",
+          "My friend Ana lives on Oak Street.",
+          "My friend Ana lives on oak street."
+        ],
+        "My friend Ana lives on Oak Street.",
+        "Names of people and streets start with capitals.",
+        "Ana and Oak Street are proper names that need capitals."
+      ],
+      [
+        "Which sentence ends with the correct punctuation?",
+        [
+          "Where did the lost puppy go.",
+          "where did the lost puppy go?",
+          "Where did the lost puppy go",
+          "Where did the lost puppy go?"
+        ],
+        "Where did the lost puppy go?",
+        "A question needs a capital at the start and a question mark at the end.",
+        "It starts with a capital and ends with a question mark."
+      ],
+      [
+        "Which sentence is spelled correctly?",
+        [
+          "The bright sun warmed the sand.",
+          "The brite sun warmed the sand.",
+          "The bright sun warmed the sandd.",
+          "The bright sun wormed the sand."
+        ],
+        "The bright sun warmed the sand.",
+        "Sound out each word and check the letters.",
+        "Every word is spelled with the correct letters."
+      ],
+      [
+        "Which sentence needs a capital letter fix?",
+        [
+          "Sam and I played soccer.",
+          "sam and I played soccer.",
+          "We had fun.",
+          "It was sunny."
+        ],
+        "sam and I played soccer.",
+        "A sentence must start with a capital letter.",
+        "The name sam should be Sam at the start."
+      ],
+      [
+        "Which sentence needs a period added?",
+        [
+          "We ate lunch at the park.",
+          "We ate lunch!",
+          "We ate lunch at the park",
+          "Did we eat lunch?"
+        ],
+        "We ate lunch at the park",
+        "A telling sentence ends with a period.",
+        "It is missing its end mark."
+      ],
+      [
+        "Which sentence is edited correctly? \"I went to the park becaus it was sunny.\"",
+        [
+          "I went to the park becaus it was sunny.",
+          "i went to the park because it was sunny.",
+          "I went to the park because it was sunny",
+          "I went to the park because it was sunny."
+        ],
+        "I went to the park because it was sunny.",
+        "Fix the spelling of \"because\" and check the capital and end punctuation.",
+        "The edited sentence fixes the spelling, keeps the capital I, and ends with a period."
+      ],
+      [
+        "\"The dog ran.\" Which revision adds a detail?",
+        [
+          "The fluffy brown dog ran fast across the yard.",
+          "The dog ran.",
+          "Dog ran.",
+          "The dog."
+        ],
+        "The fluffy brown dog ran fast across the yard.",
+        "Revision adds details that paint a picture.",
+        "It adds what the dog looks like and where it ran."
+      ],
+      [
+        "Which sentence starts with a capital letter?",
+        [
+          "turtles swim in the sea.",
+          "Turtles swim in the sea.",
+          "turtles swim in the Sea.",
+          "Turtles swim in the sea"
+        ],
+        "Turtles swim in the sea.",
+        "Check the first letter and the end mark.",
+        "It starts with a capital T and ends with a period."
+      ],
+      [
+        "Which sentence is written correctly?",
+        [
+          "i read a book about space.",
+          "I read a book about space",
+          "I read a book about space.",
+          "i read a book about space"
+        ],
+        "I read a book about space.",
+        "The word I is always capital, and sentences end with a period.",
+        "It has a capital I and ends with a period."
+      ],
+      [
+        "Which revision makes the sentence clearer? \"The dog went there.\"",
+        [
+          "The dog went there.",
+          "The dog went somewhere.",
+          "There went the dog.",
+          "The brown dog ran to the water bowl."
+        ],
+        "The brown dog ran to the water bowl.",
+        "A strong revision adds specific details instead of vague words.",
+        "The revision tells what the dog did and where it went."
+      ],
+      [
+        "Which is the correct way to fix this run-on: \"I like apples they are sweet.\"?",
+        [
+          "I like apples. They are sweet.",
+          "I like apples they are sweet.",
+          "i like apples. They are sweet.",
+          "I like apples, they are sweet."
+        ],
+        "I like apples. They are sweet.",
+        "Two complete thoughts need a period between them.",
+        "The period splits the run-on into two correct sentences."
+      ],
+      [
+        "\"The cake was good.\" Which revision uses a stronger word?",
+        [
+          "The cake was good.",
+          "The cake was delicious.",
+          "The cake was okay.",
+          "Cake good."
+        ],
+        "The cake was delicious.",
+        "Revision can swap a plain word for a stronger one.",
+        "Delicious is a stronger, more vivid word than good."
+      ],
+      [
+        "Which sentence is written correctly?",
+        [
+          "Mia and me built a snowman.",
+          "Me and Mia built a snowman.",
+          "Mia and I built a snowman.",
+          "Mia and I builded a snowman."
+        ],
+        "Mia and I built a snowman.",
+        "Use I when you are doing the action.",
+        "I is correct as part of the subject doing the building."
+      ],
+      [
+        "Which sentence needs a question mark?",
+        [
+          "What time is lunch.",
+          "What time is lunch!",
+          "Lunch is at noon.",
+          "What time is lunch"
+        ],
+        "What time is lunch",
+        "A question that asks for information needs a question mark.",
+        "It asks what time, so it needs a question mark at the end."
+      ],
+      [
+        "Which sentence fixes BOTH errors? \"my teacher mrs. Lee likes books\"",
+        [
+          "My teacher Mrs. Lee likes books.",
+          "My teacher mrs. Lee likes books.",
+          "my teacher Mrs. Lee likes books.",
+          "My teacher Mrs. lee likes books."
+        ],
+        "My teacher Mrs. Lee likes books.",
+        "Look for the capital at the beginning and capitals in the title and name.",
+        "The sentence needs capitals for My, Mrs., and Lee."
+      ],
+      [
+        "Which order of sentences makes sense?",
+        [
+          "Then I ate breakfast. First I woke up.",
+          "First I woke up. Then I ate breakfast.",
+          "First I ate breakfast. Then I woke up.",
+          "I woke up then I ate breakfast first."
+        ],
+        "First I woke up. Then I ate breakfast.",
+        "Revision puts events in time order.",
+        "Waking up happens before eating breakfast."
+      ],
+      [
+        "Which sentence uses capitals correctly for a name?",
+        [
+          "My teacher is mrs. Lee.",
+          "My teacher is Mrs. lee.",
+          "My teacher is Mrs. Lee.",
+          "my teacher is Mrs. Lee."
+        ],
+        "My teacher is Mrs. Lee.",
+        "Titles and last names start with capitals.",
+        "Mrs. and Lee are proper names needing capitals."
+      ],
+      [
+        "Which sentence is written correctly?",
+        [
+          "The cat sat on the warm rug",
+          "the cat sat on the warm rug.",
+          "The cat sat on the warm rug,",
+          "The cat sat on the warm rug."
+        ],
+        "The cat sat on the warm rug.",
+        "Check the first letter and the end mark.",
+        "It starts with a capital and ends with a period."
+      ],
+      [
+        "\"The garden is pretty.\" Which added detail helps most?",
+        [
+          "Red roses and yellow sunflowers grow in the garden.",
+          "The garden is pretty.",
+          "Garden pretty.",
+          "It is."
+        ],
+        "Red roses and yellow sunflowers grow in the garden.",
+        "Revision adds details that show, not just tell.",
+        "It names exactly what grows in the garden."
+      ],
+      [
+        "Which revision adds the most useful detail? \"We saw a bird.\"",
+        [
+          "We saw a bird.",
+          "We saw a small blue bird building a nest in the tree.",
+          "We saw an animal.",
+          "We saw something."
+        ],
+        "We saw a small blue bird building a nest in the tree.",
+        "Choose details that tell what the bird looked like and what it was doing.",
+        "The revision adds specific details about the bird, its action, and its location."
+      ],
+      [
+        "Which sentence shows strong feeling correctly?",
+        [
+          "what a big fish!",
+          "What a big fish",
+          "What a big fish!",
+          "What a big fish,"
+        ],
+        "What a big fish!",
+        "Strong feelings end with an exclamation mark.",
+        "It starts with a capital and ends with an exclamation mark."
+      ],
+      [
+        "Which sentence fixes the capitals?",
+        [
+          "We visited grandma on sunday.",
+          "we visited Grandma on Sunday.",
+          "We visited grandma on Sunday.",
+          "We visited Grandma on Sunday."
+        ],
+        "We visited Grandma on Sunday.",
+        "Names for family used as names and days of the week need capitals.",
+        "Grandma and Sunday both need capital letters."
+      ],
+      [
+        "Which sentence is written correctly?",
+        [
+          "Dad drives a red car.",
+          "Dad drives a red car",
+          "dad drives a red car.",
+          "Dad drives a red Car."
+        ],
+        "Dad drives a red car.",
+        "Family names used as names need capitals; common words do not.",
+        "Dad is capitalized and car is not, with a period at the end."
+      ],
+      [
+        "Which word is spelled correctly?",
+        [
+          "nite",
+          "night",
+          "nigth",
+          "nigt"
+        ],
+        "night",
+        "Remember the igh pattern.",
+        "Night is spelled n-i-g-h-t."
+      ],
+      [
+        "\"___ dog barked at the mail truck.\" Which word starts the sentence correctly?",
+        [
+          "the",
+          "a",
+          "The",
+          "an"
+        ],
+        "The",
+        "The first word of a sentence needs a capital.",
+        "The starts the sentence with a capital T."
+      ],
+      [
+        "Which two short sentences are combined correctly? \"The bird sings. It is morning.\"",
+        [
+          "The bird sings it is morning.",
+          "the bird sings in the morning.",
+          "The bird sings in the morning",
+          "The bird sings in the morning."
+        ],
+        "The bird sings in the morning.",
+        "Combining keeps one capital and one end mark.",
+        "It joins the ideas with correct capitals and a period."
+      ],
+      [
+        "Which sentence is punctuated correctly?",
+        [
+          "Mom, can we go to the park?",
+          "Mom can we go to the park.",
+          "mom, can we go to the park?",
+          "Mom, can we go to the park"
+        ],
+        "Mom, can we go to the park?",
+        "A question needs a capital, a comma after the name, and a question mark.",
+        "It has the capital, comma, and question mark in the right places."
+      ],
+      [
+        "Which word is spelled correctly?",
+        [
+          "watter",
+          "water",
+          "woter",
+          "watar"
+        ],
+        "water",
+        "Sound it out: w-a-t-e-r.",
+        "Water is spelled w-a-t-e-r."
+      ],
+      [
+        "Which order of sentences makes sense?",
+        [
+          "I got all wet. I put on my boots. I jumped in the puddle.",
+          "I jumped in the puddle. I got all wet. I put on my boots.",
+          "I put on my boots. I jumped in the puddle. I got all wet.",
+          "I put on my boots. I got all wet. I jumped in the puddle."
+        ],
+        "I put on my boots. I jumped in the puddle. I got all wet.",
+        "Revision puts events in the order they happened.",
+        "Boots first, then jumping, then getting wet."
+      ],
+      [
+        "Which sentence fixes the capital letter?",
+        [
+          "On saturday, we picked juicy red strawberries.",
+          "on Saturday, we picked juicy red strawberries.",
+          "On Saturday we picked juicy red strawberries",
+          "On Saturday, we picked juicy red strawberries."
+        ],
+        "On Saturday, we picked juicy red strawberries.",
+        "Days of the week start with capitals and need the comma after them here.",
+        "Saturday is capitalized and the sentence is complete."
+      ]
+    ]
+  ]
 ];
