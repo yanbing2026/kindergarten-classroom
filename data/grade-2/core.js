@@ -111,15 +111,62 @@
     return 'g2.'+subject+'.'+unitKey;
   }
 
-  function deriveDifficulty(subject,prompt,interaction){
-    const text=String(prompt||'');
-    let d=2;
-    if(/word problem|multi-step|explain|evidence|infer|compare|best|why|how/i.test(text)) d=3;
-    if(/two-step|multiple|justify|revise|support.*reason|choose.*evidence/i.test(text)) d=4;
-    if(/calculate|solve|measure|order|add|subtract|multiply|divide/i.test(text)) d=Math.max(d,3);
-    if(/picture|which of these|what is|who|where|when/i.test(text)) d=Math.min(d,2);
-    if(interaction==='graph'||interaction==='wordproblem') d=Math.max(d,3);
-    return Math.max(1,Math.min(5,d));
+  function deriveDifficulty(subject,prompt,interaction,unitKey,questionIndex){
+    const text=String(prompt||'').trim();
+    const unit=String(unitKey||'').toLowerCase();
+    const words=text.split(/\s+/).filter(Boolean).length;
+    let score=2;
+
+    if(/^(what is|what are|who is|who|where|when|which)\b/i.test(text) &&
+       !/why|how|explain|compare|difference|evidence|best|probably|likely|order|between|more than|less than/i.test(text)){
+      score=1;
+    }
+    if(/how many sides|how many corners|how many vertices|what day comes|what is a rule|what is a law|who works|who drives|what is voting/i.test(text)){
+      score=1;
+    }
+
+    if(/add|sum|subtract|difference|count by|value of|digit|round|half|third|fourth|money|time|measure|sides|faces|votes|tally/i.test(text)){
+      score=Math.max(score,2);
+    }
+
+    if(/compare|greater|less|smallest|largest|order|between|missing|pattern|main idea|setting|problem|solution|lesson|detail|sequence|infer|probably|likely|meaning|support|classify|why|how|explain|best/i.test(text)){
+      score=Math.max(score,3);
+    }
+    if(interaction==='graph'||interaction==='wordproblem'){
+      score=Math.max(score,3);
+    }
+
+    const highSignals=[
+      /two[- ]step|then|after.*then|before.*then/i,
+      /multiple|all four|all three|each.*and.*each|both.*and/i,
+      /justify|evidence|support.*answer|best.*because|why.*because/i,
+      /compare.*and|difference.*between.*and|order.*from/i,
+      /same.*graph|same.*chart|using.*graph|using.*pictograph/i,
+      /first.*then|first.*and.*then/i
+    ];
+    const highCount=highSignals.filter(re=>re.test(text)).length;
+    if(highCount>=1) score=Math.max(score,4);
+
+    if((highCount>=2 && words>=18) ||
+       /two[- ]step.*then.*and|three[- ]step|multiple.*conditions/i.test(text)){
+      score=5;
+    }
+
+    if(/research|sources|revision|editing/.test(unit) &&
+       /best|support|evidence|revise|edit|source/i.test(text)){
+      score=Math.max(score,3);
+    }
+    if(/data-word-problems/.test(unit) &&
+       /in all|how many more|left|then|using the same/i.test(text)){
+      score=Math.max(score,3);
+    }
+
+    if(words<=9 && /^(which|what|who|where|when)\b/i.test(text) &&
+       !/why|how|evidence|compare|order|between|then/i.test(text)){
+      score=Math.min(score,2);
+    }
+
+    return Math.max(1,Math.min(5,score));
   }
 
   function deriveCognitive(prompt){
@@ -226,7 +273,7 @@
             prompt,
             skillId,
             skillName:skillId.split('.').slice(-1)[0].replace(/-/g,' '),
-            difficulty:deriveDifficulty(subject,prompt,interaction),
+            difficulty:deriveDifficulty(subject,prompt,interaction,unitKey,questionIndex),
             cognitiveLevel:deriveCognitive(prompt),
             misconceptionTargets:misconceptionFor(subject,skillId),
             choices,
