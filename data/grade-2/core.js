@@ -82,17 +82,32 @@
   };
 
   const COGNITIVE_RULES=[
-    [/which|what is|who|where|when|name|identify/i,'remember'],
-    [/choose|select|sort|classify|match|compare|difference|similar/i,'analyze'],
+    [/revise|edit|improve|write|best sentence|support/i,'create'],
     [/explain|why|how|meaning|lesson|main idea|infer|evidence/i,'reason'],
+    [/choose|select|sort|classify|match|compare|difference|similar/i,'analyze'],
     [/solve|calculate|find|measure|use|apply/i,'apply'],
-    [/revise|edit|improve|write|best sentence|support/i,'create']
+    [/which|what is|who|where|when|name|identify/i,'remember']
   ];
 
   function deriveSkill(subject,unitKey,prompt){
     const rules=RULES[subject]||[];
     const text=String(prompt||'');
     for(const [re,key] of rules) if(re.test(text)) return 'g2.'+subject+'.'+key;
+    const unitRules=[
+      [/place-value|numbers/i,'place-value'],
+      [/story|literature/i,'story-elements'],
+      [/vocabulary|word/i,'vocabulary'],
+      [/writing|paragraph/i,'paragraph-organization'],
+      [/matter|properties/i,'matter-properties'],
+      [/living|plants|animals/i,'living-things'],
+      [/weather|seasons/i,'weather-seasons'],
+      [/light|sound/i,'light-sound'],
+      [/government|community|civics/i,'civics-government'],
+      [/geography|maps/i,'geography'],
+      [/history|past/i,'history'],
+      [/economics|money/i,'economics']
+    ];
+    for(const [re,key] of unitRules) if(re.test(unitKey)) return 'g2.'+subject+'.'+key;
     return 'g2.'+subject+'.'+unitKey;
   }
 
