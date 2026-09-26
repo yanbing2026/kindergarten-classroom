@@ -245,6 +245,7 @@
       correct: !!result.correct,
       firstTry: !!result.firstTry,
       difficulty: meta.difficulty,
+      questionId: result.question?.id || result.question?.lessonId || null,
       misconception
     }]).slice(-12);
     if (misconception) prev.lastMisconception = misconception;
