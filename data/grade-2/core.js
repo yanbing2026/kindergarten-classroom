@@ -137,7 +137,7 @@
     }
 
     const highSignals=[
-      /two[- ]step|then|after.*then|before.*then/i,
+      /two[- ]step|then.*then|first.*then.*then|after.*then.*and|before.*then.*and/i,
       /multiple|all four|all three|each.*and.*each|both.*and/i,
       /justify|evidence|support.*answer|best.*because|why.*because/i,
       /compare.*and|difference.*between.*and|order.*from/i,
@@ -147,7 +147,7 @@
     const highCount=highSignals.filter(re=>re.test(text)).length;
     if(highCount>=1) score=Math.max(score,4);
 
-    if((highCount>=2 && words>=18) ||
+    if((highCount>=2 && words>=24) ||
        /two[- ]step.*then.*and|three[- ]step|multiple.*conditions/i.test(text)){
       score=5;
     }
