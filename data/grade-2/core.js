@@ -111,7 +111,7 @@
     return 'g2.'+subject+'.'+unitKey;
   }
 
-  function deriveDifficulty(subject,prompt,interaction,unitKey,questionIndex){
+  function deriveDifficulty(subject,prompt,interaction,unitKey,questionIndex,cognitiveLevel){
     const text=String(prompt||'').trim();
     const unit=String(unitKey||'').toLowerCase();
     const words=text.split(/\s+/).filter(Boolean).length;
@@ -158,6 +158,16 @@
        /in all|how many more|left|then|using the same/i.test(text)){
       score=Math.max(score,3);
     }
+
+    // Cognitive demand provides a second calibration signal. It prevents
+    // recognition items from being overstated while ensuring analysis,
+    // reasoning, and creation tasks are not left at Level 1-2.
+    if(cognitiveLevel==='remember') score=Math.min(score,2);
+    if(cognitiveLevel==='understand') score=Math.max(score,2);
+    if(cognitiveLevel==='apply') score=Math.max(score,2);
+    if(cognitiveLevel==='analyze') score=Math.max(score,3);
+    if(cognitiveLevel==='reason') score=Math.max(score,3);
+    if(cognitiveLevel==='create') score=Math.max(score,4);
 
     if(words<=9 && /^(which|what|who|where|when)\b/i.test(text) &&
        !/why|how|evidence|compare|order|between|then/i.test(text)){
@@ -271,8 +281,8 @@
             prompt,
             skillId,
             skillName:skillId.split('.').slice(-1)[0].replace(/-/g,' '),
-            difficulty:deriveDifficulty(subject,prompt,interaction,unitKey,questionIndex),
             cognitiveLevel:deriveCognitive(prompt),
+            difficulty:deriveDifficulty(subject,prompt,interaction,unitKey,questionIndex,deriveCognitive(prompt)),
             misconceptionTargets:misconceptionFor(subject,skillId),
             choices,
             answer,
