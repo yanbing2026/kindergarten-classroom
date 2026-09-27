@@ -233,6 +233,9 @@
     };
     prev.attempts += 1;
     if (result.correct) prev.correct += 1;
+    if (Number.isFinite(Number(meta.difficulty))) {
+      prev.lastDifficulty = Number(meta.difficulty);
+    }
     if (result.correct && result.firstTry) prev.firstTryCorrect += 1;
     // Bayesian-style smoothing prevents one lucky answer from claiming mastery.
     prev.mastery = Math.round(((prev.correct + 1) / (prev.attempts + 2)) * 100);
@@ -407,7 +410,12 @@
     const progress=context?.progress || {};
     const meta=describeQuestion(q, context);
     const skill=getSkillState(progress, meta);
-    if(!skill) return 50 + Math.random()*20;
+    if(!skill) {
+      // New skills start with the bank's lower-middle difficulty instead of
+      // choosing completely at random.
+      const d=Number(meta.difficulty)||2;
+      return 62 - Math.abs(d-2.5)*8 + Math.random()*10;
+    }
     const mastery=Number(skill.mastery)||0;
     let score=(100-mastery);
     const last=skill.recent?.[skill.recent.length-1];
@@ -477,9 +485,15 @@
 
   function nextDifficulty(skill){
     if (!skill) return 2;
-    if (skill.mastery >= 85 && skill.attempts >= 4) return Math.min(5, (skill.lastDifficulty || 2) + 1);
-    if (skill.mastery < 60 && skill.attempts >= 2) return Math.max(1, (skill.lastDifficulty || 2) - 1);
-    return skill.lastDifficulty || 2;
+    const mastery=Number(skill.mastery)||0;
+    const last=Math.max(1,Math.min(5,Number(skill.lastDifficulty)||2));
+    const attempts=Number(skill.attempts)||0;
+    if(attempts<2) return last;
+    if(mastery>=90 && attempts>=6) return Math.min(5,last+1);
+    if(mastery>=80 && attempts>=4) return Math.min(5,last+1);
+    if(mastery<45 && attempts>=3) return Math.max(1,last-1);
+    if(mastery<60 && attempts>=2) return Math.max(1,last-1);
+    return last;
   }
 
   window.KCSkillEngine = {
