@@ -170,7 +170,7 @@
     if(cognitiveLevel==='create') score=Math.max(score,4);
 
     if(words<=9 && /^(which|what|who|where|when)\b/i.test(text) &&
-       !/why|how|evidence|compare|order|between|then/i.test(text) && cognitiveLevel!=='create'){
+       !/why|how|evidence|compare|order|between|then/i.test(text) && cognitiveLevel!=='create' && cognitiveLevel!=='analyze'){
       score=Math.min(score,2);
     }
 
