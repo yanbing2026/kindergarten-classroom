@@ -21,9 +21,9 @@ CI：`.github/workflows/validate.yml`（push + PR 自动跑；内容校验告警
 ## 发布
 `.github/workflows/pages.yml`：push 到 `main` → `actions/deploy-pages`，artifact 为整仓（`.`）。
 合并进 `main` 即上线。
-⚠️ **已知不一致，动发布前先确认**：Pages 的 source 目前仍指向 legacy 分支
-`improvement/p1-learning-experience`，与 workflow 的 `main` 目标不一致——先看
-`gh api repos/yanbing2026/kindergarten-classroom/pages` 再改发布相关的东西。
+**已核实（2026-09-27）**：线上 `index.html` 与 `main` 逐字节一致（sha256 相同），发布确实走 Actions；
+`gh api .../pages` 里显示的那条 legacy 源（`improvement/p1-learning-experience`，2026-09-06 停更）
+是**残留配置，不是发布源**，别被它误导，也不用去改。
 
 ## 绝不手改的生成文件
 本仓库**没有生成文件**，全部是手写源。但有两条硬约束：
