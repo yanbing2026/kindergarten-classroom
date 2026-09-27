@@ -82,9 +82,9 @@
   };
 
   const COGNITIVE_RULES=[
-    [/revise|edit|improve|write|best sentence|support/i,'create'],
+    [/write|revise|improve|revision/i,'create'],
     [/explain|why|how|meaning|lesson|main idea|infer|evidence/i,'reason'],
-    [/choose|select|sort|classify|match|compare|difference|similar/i,'analyze'],
+    [/choose|select|sort|classify|match|compare|difference|similar|edit|best sentence/i,'analyze'],
     [/solve|calculate|find|measure|use|apply/i,'apply'],
     [/which|what is|who|where|when|name|identify/i,'remember']
   ];
@@ -170,7 +170,7 @@
     if(cognitiveLevel==='create') score=Math.max(score,4);
 
     if(words<=9 && /^(which|what|who|where|when)\b/i.test(text) &&
-       !/why|how|evidence|compare|order|between|then/i.test(text)){
+       !/why|how|evidence|compare|order|between|then/i.test(text) && cognitiveLevel!=='create'){
       score=Math.min(score,2);
     }
 
