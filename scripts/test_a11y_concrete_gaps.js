@@ -231,8 +231,104 @@ renderFn();
 assert.strictEqual(mockElements.app.focusCalls.length, 0, 'render() must not steal focus from an active textarea');
 console.log('✓ Dynamic render() focus management behavior verified');
 
-// 5. Main-flow keyboard accessibility verification
-assert(html.includes('<button class="big-btn play" onclick="\'+todayAction+\'">START ▶</button>'), 'today-card button must have explicit onclick binding');
-console.log('✓ Main flow button keyboard reachability verified');
+// 5. Main-flow keyboard accessibility and single-navigation verification
+// Extracted directly from index.html (no duplicated HTML template)
+const renderHomeSrc = extractFunction(html, 'renderHome');
+const getTodayLessonSrc = extractFunction(html, 'getTodayLesson');
+const startTodayAdventureSrc = extractFunction(html, 'startTodayAdventure');
+
+// Assert structural contracts from renderHome source
+assert(
+    renderHomeSrc.includes('<button class="big-btn play">START ▶</button>'),
+    'renderHome must render START as a native <button> (ensuring keyboard Tab reachability)'
+);
+assert(
+    !renderHomeSrc.includes('<button class="big-btn play" onclick='),
+    'START button must NOT have an inline onclick (to prevent double go() trigger when event bubbles)'
+);
+assert(
+    renderHomeSrc.includes('<div class="today-card" onclick="'),
+    'today-card container must have onclick handler to catch clicks and bubbled button activations'
+);
+
+// Dynamic execution of extracted functions with mock DOM & event propagation:
+// Verify that single click on START button triggers navigation exactly once.
+let goCalls = 0;
+let lastGoArgs = null;
+global.go = (...args) => {
+    goCalls++;
+    lastGoArgs = args;
+};
+global.startQuiz = (catKey, level, itemId) => {
+    global.go('play', { key: catKey, level, item: itemId });
+};
+global.startMath = (level) => {
+    global.go('play', { key: 'math', level });
+};
+
+// Set up minimal globals required by getTodayLesson & renderHome
+global.progress = { mathCorrect: {}, stars: 0, activityLog: [] };
+global.CATEGORIES = [
+    {
+        key: 'letters',
+        name: 'Letters',
+        icon: '🔤',
+        levels: [{ id: 'L1', items: [{ id: 'A' }, { id: 'B' }] }]
+    }
+];
+global.GRADE_CURRICULUM = [];
+global.MASTERY_THRESHOLD = 2;
+global.renderDailyMissions = () => '';
+global.renderTodayReview = () => '';
+global.topbar = () => '';
+global.getMasteryCount = () => 0;
+global.isDue = () => false;
+
+const evalGetTodayLesson = eval(`(${getTodayLessonSrc})`);
+global.getTodayLesson = evalGetTodayLesson;
+const evalStartTodayAdventure = eval(`(${startTodayAdventureSrc})`);
+global.startTodayAdventure = evalStartTodayAdventure;
+
+const evalRenderHome = eval(`(${renderHomeSrc})`);
+const homeHTML = evalRenderHome();
+
+// Extract the today-card segment from the truly evaluated homeHTML
+const cardMatch = homeHTML.match(/<div class="today-card" onclick="([^"]+)">([\s\S]*?<button class="big-btn play"[^>]*>START ▶<\/button>[\s\S]*?)<\/div>/);
+assert(cardMatch, 'Rendered home HTML must contain .today-card with onclick');
+const cardOnclickAttr = cardMatch[1];
+const cardInner = cardMatch[2];
+
+assert(cardInner.includes('<button class="big-btn play">START ▶</button>'), 'START button must be inside today-card');
+assert(!cardInner.includes('<button class="big-btn play" onclick='), 'START button inside today-card must not have inline onclick');
+
+// Test event propagation model matching browser dispatch:
+// Native <button> inside a clickable parent div bubbles click to parent
+function simulateButtonClickOnTodayCard(cardHandlerCode, buttonHandlerCode) {
+    // If button has handler, button fires first
+    if (buttonHandlerCode) {
+        eval(buttonHandlerCode);
+    }
+    // Event bubbles to parent container
+    if (cardHandlerCode) {
+        eval(cardHandlerCode);
+    }
+}
+
+// 1) Test button click (must trigger navigation exactly 1 time)
+goCalls = 0;
+const btnOnclickMatch = cardInner.match(/<button class="big-btn play"[^>]*onclick="([^"]+)"/);
+const btnOnclickAttr = btnOnclickMatch ? btnOnclickMatch[1] : null;
+assert.strictEqual(btnOnclickAttr, null, 'Extracted button onclick must be null');
+
+simulateButtonClickOnTodayCard(cardOnclickAttr, btnOnclickAttr);
+assert.strictEqual(goCalls, 1, `Single click on START button must trigger navigation exactly once, got ${goCalls}`);
+
+// 2) Test card click directly (must trigger navigation exactly 1 time)
+goCalls = 0;
+eval(cardOnclickAttr);
+assert.strictEqual(goCalls, 1, `Direct click on today-card must trigger navigation exactly once, got ${goCalls}`);
+
+console.log('✓ Main flow button single-trigger navigation and keyboard reachability verified');
 
 console.log('\nAll N10 a11y concrete gap tests PASSED! ✅');
+

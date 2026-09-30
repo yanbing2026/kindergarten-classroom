@@ -61,7 +61,7 @@
   - 首页主入口：
     - 年级卡片：原生 `<button class="home-grade-card ...">`；
     - 今日复习按钮：原生 `<button class="review-btn" onclick="startReview()">`；
-    - 今日探险卡片：卡片内的 `<button class="big-btn play" onclick="startTodayAdventure()">` 绑定了明确的点击回调，键盘 Tab 聚焦至按钮按下 Enter 即可启动探险；
+    - 今日探险卡片：卡片内部为原生 `<button class="big-btn play">START ▶</button>`，享有默认焦点与 Tab stop，键盘 Tab 聚焦后按下 Enter 产生的标准 click 事件冒泡至父容器 `<div class="today-card" onclick="...">` 触发探险；按钮自身无需绑定 onclick，避免双重执行；
     - 底部学习工具：原生 `<button class="home-tool">`；
   - Quiz 与 Math 答题选项：
     - 语言/字母等测验：原生 `<button class="choice-btn">`；
@@ -78,7 +78,7 @@
 
 | 序号 | 元素与定位 | 交互功能 | 判定归类 | 现状与未来改造建议 |
 |---|---|---|---|---|
-| 1 | `index.html:2906` `<div class="today-card" onclick="...">` | 首页「今日探险」大卡片 | **主流程（已在本轮覆盖）** | 该 div 作为卡片容器，内部包含原生 `<button class="big-btn play">`。本轮已为内部 `<button>` 增加显式 `onclick`，键盘 Tab 直接聚焦并激活该按钮。后续可将外部容器改为单纯包裹层或语义卡片。 |
+| 1 | `index.html:2907` `<div class="today-card" onclick="...">` | 首页「今日探险」大卡片 | **主流程（已在本轮覆盖）** | 该 div 作为卡片容器，内部包含原生 `<button class="big-btn play">START ▶</button>`。原生按钮具备默认键盘 Tab 可达性与 Enter/Space 激活机制，激活产生的 click 事件自然冒泡至父容器触发导航。按钮自身不设 onclick，杜绝双重触发。 |
 | 2 | `index.html:2945` `<div class="star-badge" id="topbarStarBadge" onclick="handleDebugTap()">` | 顶栏钻石数/版本号，连续点击 5 次激活调试模式 | **长尾诊断（彩蛋）** | 面向家长/开发者的隐藏彩蛋，非儿童常规流程。未来可考虑为其增加键盘专用激活快捷键或隐藏在家长设置内。 |
 | 3 | `index.html:2925` `<div class="card" onclick="go('category', ...)">` | Level 选择器（`renderLevelPicker`）关卡卡片 | **长尾浏览（次级主线）** | 当前为 `div.card`。未来建议重构为 `<button class="card" type="button">`，并在 CSS 中重置默认 button 边框/字体继承。 |
 | 4 | `index.html:3112` `<div class="card" onclick="learnTap(...)">` | 认读卡片（`renderLearn`）朗读互动 | **长尾浏览** | 朗读展示卡片。未来建议将卡片整体改为 `<button type="button" class="card">`，或在内部添加发音按钮。 |
