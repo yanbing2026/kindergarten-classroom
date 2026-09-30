@@ -110,6 +110,7 @@ jobs:
             "scripts/test_math_adaptive.js"
             "scripts/test_build_question_weights.js"
             "scripts/test_progress_stores.js"
+            "scripts/test_render_state_preservation.js"
           )
           for test_script in "${TEST_SCRIPTS[@]}"; do
             safe_name=$(echo "$test_script" | tr '/' '_' | tr ' ' '_')
