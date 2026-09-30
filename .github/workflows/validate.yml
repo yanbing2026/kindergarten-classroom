@@ -105,6 +105,28 @@ jobs:
             fi
           done
 
+          echo "### Unit tests" | tee -a validation-report/summary.md
+          TEST_SCRIPTS=(
+            "scripts/test_math_adaptive.js"
+            "scripts/test_build_question_weights.js"
+          )
+          for test_script in "${TEST_SCRIPTS[@]}"; do
+            safe_name=$(echo "$test_script" | tr '/' '_' | tr ' ' '_')
+            out="validation-report/${safe_name}.out"
+            node "$test_script" >"$out" 2>&1
+            tstatus=$?
+            cat "$out"
+            if [ $tstatus -ne 0 ]; then
+              overall=1
+              echo "- ❌ $test_script" | tee -a validation-report/summary.md
+              echo '```text' >> validation-report/summary.md
+              cat "$out" >> validation-report/summary.md
+              echo '```' >> validation-report/summary.md
+            else
+              echo "- ✅ $test_script" | tee -a validation-report/summary.md
+            fi
+          done
+
           # Optional: curriculum content validator (non-blocking, informational)
           if [ -f tools/validate_content.py ]; then
             echo "### Curriculum content validator" | tee -a validation-report/summary.md
