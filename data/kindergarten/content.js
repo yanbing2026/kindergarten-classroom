@@ -126,7 +126,6 @@
             {id:'teamwork',emoji:'🤝',en:'Teamwork',zh:{hanzi:'团队合作'},es:'Trabajo en equipo'},
             {id:'wonderful',emoji:'🌟',en:'Wonderful',zh:{hanzi:'精彩的'},es:'Maravilloso'},
             {id:'zebra',emoji:'🦓',en:'Zebra',zh:{hanzi:'斑马'},es:'Cebra'},
-            {id:'butterfly',emoji:'🦋',en:'Butterfly',zh:{hanzi:'蝴蝶'},es:'Mariposa'},
             {id:'caterpillar',emoji:'🐛',en:'Caterpillar',zh:{hanzi:'毛毛虫'},es:'Oruga'},
             {id:'chocolate',emoji:'🍫',en:'Chocolate',zh:{hanzi:'巧克力'},es:'Chocolate'},
             {id:'community',emoji:'🏘️',en:'Community',zh:{hanzi:'社区'},es:'Comunidad'},
@@ -163,10 +162,6 @@
             {id:'understanding',emoji:'💡',en:'Understanding',zh:{hanzi:'理解'},es:'Comprensión'},
         ],
         [ // Level 8 — original kindergarten vocabulary
-            {id:'vegetable',emoji:'🥦',en:'Vegetable',zh:{hanzi:'蔬菜'},es:'Verdura'},
-            {id:'wonderful',emoji:'🌟',en:'Wonderful',zh:{hanzi:'精彩的'},es:'Maravilloso'},
-            {id:'yesterday',emoji:'📅',en:'Yesterday',zh:{hanzi:'昨天'},es:'Ayer'},
-            {id:'yourself',emoji:'🙂',en:'Yourself',zh:{hanzi:'你自己'},es:'Tú mismo'},
             {id:'achievement',emoji:'🏆',en:'Achievement',zh:{hanzi:'成就'},es:'Logro'},
             {id:'communication',emoji:'💬',en:'Communication',zh:{hanzi:'交流'},es:'Comunicación'},
             {id:'cooperation',emoji:'🤝',en:'Cooperation',zh:{hanzi:'合作'},es:'Cooperación'},
@@ -185,7 +180,6 @@
         [ // Level 9 — original kindergarten vocabulary
             {id:'successful',emoji:'🏆',en:'Successful',zh:{hanzi:'成功的'},es:'Exitoso'},
             {id:'vocabulary',emoji:'📚',en:'Vocabulary',zh:{hanzi:'词汇'},es:'Vocabulario'},
-            {id:'adventure',emoji:'🧭',en:'Adventure',zh:{hanzi:'冒险'},es:'Aventura'},
             {id:'discovery',emoji:'🔍',en:'Discovery',zh:{hanzi:'发现'},es:'Descubrimiento'},
             {id:'explorer',emoji:'🧭',en:'Explorer',zh:{hanzi:'探险家'},es:'Explorador'},
             {id:'alphabet',emoji:'🔤',en:'Alphabet',zh:{hanzi:'字母表'},es:'Alfabeto'},
@@ -207,7 +201,6 @@
             {id:'technology',emoji:'💻',en:'Technology',zh:{hanzi:'技术'},es:'Tecnología'},
             {id:'understand',emoji:'💡',en:'Understand',zh:{hanzi:'理解'},es:'Entender'},
             {id:'wondering',emoji:'🤔',en:'Wondering',zh:{hanzi:'思考'},es:'Preguntándose'},
-            {id:'yesterday',emoji:'📅',en:'Yesterday',zh:{hanzi:'昨天'},es:'Ayer'},
             {id:'youngster',emoji:'🧒',en:'Youngster',zh:{hanzi:'小朋友'},es:'Niño'},
         ],
     ];
