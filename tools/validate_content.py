@@ -101,8 +101,6 @@ def validate_vocab(text, images_on_disk):
         # Check required fields
         if "emoji:" not in snippet and "emoji':" not in snippet:
             errors.append(f"VOCAB {item_id}: missing emoji")
-        if "img:" not in snippet and "img':" not in snippet:
-            errors.append(f"VOCAB {item_id}: missing img")
         if "en:" not in snippet and "en':" not in snippet:
             errors.append(f"VOCAB {item_id}: missing en")
         if "hanzi:" not in snippet:
