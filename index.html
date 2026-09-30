@@ -761,7 +761,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
     <script src="./js/blipola-runtime.js"></script>
     <script>
     // ---------- App version ----------
-    const APP_VERSION = 'v2-20260930-n6';
+    const APP_VERSION = 'v2-20260930-n4';
 
     // ---------- Debug / Dev Mode ----------
     // Hidden diagnostic screen for parents and developers.
@@ -2188,6 +2188,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
                 // Kindergarten content back then).
                 if (typeof p.mathCorrect === 'number') p.mathCorrect = {};
                 if (!p.mathCorrect || typeof p.mathCorrect !== 'object') p.mathCorrect = {};
+                if (typeof p.mathStreak !== 'number') p.mathStreak = 0;
                 if (p.mastery) {
                     const migrated = {};
                     for (const k in p.mastery) {
@@ -2205,7 +2206,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
                 return p;
             }
         } catch (e) {}
-        return { stars: 0, mastery: {}, due: {}, mathCorrect: {}, activityLog: [], gradeMastery: {} };
+        return { stars: 0, mastery: {}, due: {}, mathCorrect: {}, mathStreak: 0, activityLog: [], gradeMastery: {} };
     }
     function logActivity(type, key, itemId, correct, firstTry) {
         if (!Array.isArray(progress.activityLog)) progress.activityLog = [];
@@ -3839,10 +3840,44 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
     }
 
     // ---------- Math game ----------
+    // ---------- Math adaptive difficulty ----------
+    // 3 consecutive correct answers level up; 3 consecutive wrong answers level down.
+    // Clamped within MATH_LEVELS bounds (Level 1 to Level 10).
+    function stepMathAdaptive(currentLevel, streak, isCorrect) {
+        let lvNum = parseInt(String(currentLevel || 'L1').replace(/\D/g, ''), 10) || 1;
+        let newStreak = streak || 0;
+        let newLevel = currentLevel || ('L' + lvNum);
+        let changed = false;
+
+        if (isCorrect) {
+            newStreak = (newStreak > 0 ? newStreak : 0) + 1;
+            if (newStreak >= 3) {
+                if (lvNum < 10) {
+                    lvNum += 1;
+                    newLevel = 'L' + lvNum;
+                    changed = true;
+                }
+                newStreak = 0;
+            }
+        } else {
+            newStreak = (newStreak < 0 ? newStreak : 0) - 1;
+            if (newStreak <= -3) {
+                if (lvNum > 1) {
+                    lvNum -= 1;
+                    newLevel = 'L' + lvNum;
+                    changed = true;
+                }
+                newStreak = 0;
+            }
+        }
+        return { level: newLevel, streak: newStreak, changed };
+    }
+    if (typeof window !== 'undefined') window.stepMathAdaptive = stepMathAdaptive;
+
     let mathState = null;
     function startMath(level) {
-        mathState = { idx: 0, stars: 0, level, questions: [] };
-        for (let i = 0; i < ROUND_LENGTH; i++) mathState.questions.push(buildMathQuestion(level));
+        level = level || 'L1';
+        mathState = { idx: 0, stars: 0, level, questions: [buildMathQuestion(level)] };
         go('mathPlay', { level });
     }
     // ---------- Math operation plan by level ----------
@@ -3930,9 +3965,10 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             <button class="choice-btn" data-id="${n}" onclick="handleMathChoice(${n}, this)">${n}</button>
         `).join('');
         const sym = MATH_SYMBOL[q.op];
+        const lvNum = parseInt(String(mathState.level).replace(/\D/g, ''), 10) || 1;
         return `${topbar(true)}
         <div class="center-col">
-            <div style="color:#999;margin-bottom:8px;">Question ${mathState.idx + 1} of ${mathState.questions.length}</div>
+            <div style="color:#999;margin-bottom:8px;">Level ${lvNum} · Question ${mathState.idx + 1} of ${ROUND_LENGTH}</div>
             <div class="math-row">
                 <div class="math-eq">
                     <span>${q.a}</span>
@@ -3958,8 +3994,15 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             q.awaitingNext = true;
             awardStar();
             mathState.stars += 1;
-            if (q.firstAttempt) { progress.mathCorrect[mathState.level] = (progress.mathCorrect[mathState.level] || 0) + 1; }
-            else { btnEl.classList.add('persist'); }
+            const isFirstTry = !!q.firstAttempt;
+            if (isFirstTry) {
+                progress.mathCorrect[mathState.level] = (progress.mathCorrect[mathState.level] || 0) + 1;
+            } else {
+                btnEl.classList.add('persist');
+            }
+            const adapt = stepMathAdaptive(mathState.level, progress.mathStreak || 0, isFirstTry);
+            mathState.level = adapt.level;
+            progress.mathStreak = adapt.streak;
             saveProgress();
             confettiBurst();
             speak(descriptivePraise('math', q));
@@ -3974,9 +4017,10 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
     }
     function nextMathQuestion() {
         mathState.idx += 1;
-        if (mathState.idx >= mathState.questions.length) {
+        if (mathState.idx >= ROUND_LENGTH) {
             go('roundEnd', { stars: mathState.stars, key: 'math', level: mathState.level });
         } else {
+            mathState.questions[mathState.idx] = buildMathQuestion(mathState.level);
             render();
         }
     }
@@ -4599,6 +4643,7 @@ return `${topbar(true)}
             mastery: progress.mastery,
             due: progress.due,
             mathCorrect: progress.mathCorrect,
+            mathStreak: progress.mathStreak || 0,
             skillStats: progress.skillStats || {},
             remediationHistory: progress.remediationHistory || [],
             version: 'kc_progress_v1'
