@@ -77,6 +77,7 @@
             position: relative;
             z-index: 1;
         }
+        #app:focus { outline: none; }
         /* ponytail: flex-column children default min-width:auto and refuse to
            shrink below min-content -> whole page scrolls sideways on phones.
            One rule lets every section shrink to the screen width. */
@@ -753,7 +754,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
 <button id="globalBlipolaVoice" class="global-blipola-voice" type="button" onclick="blipolaVoiceAction()" aria-label="Blipola voice">🎤<span>Blipola</span></button>
 <div id="accountModal" class="account-modal" style="display:none"></div>
 
-    <div class="container" id="app"></div>
+    <div class="container" id="app" tabindex="-1"></div>
 
     <script id="supabaseScript" async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="window.__initSupabase&&window.__initSupabase()"></script>
     <script src="./js/data-layer.js"></script>
@@ -761,7 +762,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
     <script src="./js/blipola-runtime.js"></script>
     <script>
     // ---------- App version ----------
-    const APP_VERSION = 'v2-20260930-n9';
+    const APP_VERSION = 'v2-20260930-n10';
 
     // ---------- Debug / Dev Mode ----------
     // Hidden diagnostic screen for parents and developers.
@@ -1955,7 +1956,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             return '<span class="world-skill-chip '+(pct===100?'mastered':'')+'">'+cat.icon+' '+esc(name)+' <b>'+pct+'%</b></span>';
         }).join('');
         const buildings = data.buildings.map(b => buildingVisual(b.slice(b.indexOf(' ')+1), Math.min(100, Math.round(data.skills.reduce((sum,name) => sum + getWorldSkillPercent(name), 0) / Math.max(1, data.skills.length))))).join('');
-        panel.innerHTML='<div class="world-detail-title">'+stage.icon+' '+esc(stage.name)+' <button class="world-close" onclick="toggleWorldStage('+index+')">✕</button></div><div class="world-detail-grid"><div><div class="world-detail-label">📚 LEARNING SKILLS</div><div class="world-skills">'+skills+'</div></div><div><div class="world-detail-label">🏗️ BUILDINGS</div><div class="world-buildings">'+buildings+'</div></div></div>';
+        panel.innerHTML='<div class="world-detail-title">'+stage.icon+' '+esc(stage.name)+' <button class="world-close" onclick="toggleWorldStage('+index+')" aria-label="Close">✕</button></div><div class="world-detail-grid"><div><div class="world-detail-label">📚 LEARNING SKILLS</div><div class="world-skills">'+skills+'</div></div><div><div class="world-detail-label">🏗️ BUILDINGS</div><div class="world-buildings">'+buildings+'</div></div></div>';
         panel.classList.remove('open'); void panel.offsetWidth; panel.classList.add('open');
     }
     function renderWorldProgress(compact = false) {
@@ -2938,22 +2939,27 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
     function topbar(showBack) {
         return `<div class="topbar">
             <div class="topbar-left">
-                ${showBack ? `<button class="icon-btn" onclick="goBack()">⬅️</button>` : ''}
-                <button class="icon-btn" onclick="goHome()">🏠</button>
+                ${showBack ? `<button class="icon-btn" onclick="goBack()" aria-label="Go back">⬅️</button>` : ''}
+                <button class="icon-btn" onclick="goHome()" aria-label="Home">🏠</button>
             </div>
             <div class="topbar-right">
                 <div class="star-badge" id="topbarStarBadge" onclick="handleDebugTap()" style="cursor:pointer;" title="App version">💎 ${progress.stars} <span style="font-size:0.65rem;opacity:0.7;">${APP_VERSION}</span></div>
                 ${isMember()
                     ? '<div class="star-badge" title="Membership active — unlimited play">👑</div>'
                     : `<div class="star-badge" title="Play time left today">⏱️ ${fmtUsage(usageRemainingSeconds())}</div>`}
-                <button class="icon-btn" onclick="blipolaVoiceAction()" title="Blipola Voice">🎤</button>
-                <button class="icon-btn" id="muteBtn" onclick="toggleMute()">${muted ? '🔇' : '🔊'}</button>
+                <button class="icon-btn" onclick="blipolaVoiceAction()" title="Blipola Voice" aria-label="Blipola Voice">🎤</button>
+                <button class="icon-btn" id="muteBtn" onclick="toggleMute()" aria-label="${muted ? 'Unmute sound' : 'Mute sound'}">${muted ? '🔇' : '🔊'}</button>
             </div>
         </div>`;
     }
     function renderTopbarMuteOnly() {
         const btn = document.getElementById('muteBtn') || document.querySelector('.topbar-right button[onclick="toggleMute()"]');
-        if (btn) btn.textContent = muted ? '🔇' : '🔊';
+        if (btn) {
+            btn.textContent = muted ? '🔇' : '🔊';
+            if (typeof btn.setAttribute === 'function') {
+                btn.setAttribute('aria-label', muted ? 'Unmute sound' : 'Mute sound');
+            }
+        }
     }
     function toggleMute() {
         muted = !muted;
@@ -3721,9 +3727,9 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         `).join('');
         return `${topbar(true)}
         <div class="center-col">
-            <div id="blipolaBuddy" style="display:flex;align-items:center;gap:10px;margin:0 auto 10px;max-width:720px;padding:9px 12px;border:2px solid #333;border-radius:14px;background:#fff;font-weight:800;">🤖 <span>Blipola</span><span id="blipolaMessage" style="font-weight:600;opacity:.78;">Think first. You can ask me for a clue.</span><button class="choice-btn" type="button" onclick="blipolaHint()" style="margin-left:auto;padding:7px 10px;">💡 Hint</button></div>
+            <div id="blipolaBuddy" style="display:flex;align-items:center;gap:10px;margin:0 auto 10px;max-width:720px;padding:9px 12px;border:2px solid #333;border-radius:14px;background:#fff;font-weight:800;">🤖 <span>Blipola</span><span id="blipolaMessage" aria-live="polite" style="font-weight:600;opacity:.78;">Think first. You can ask me for a clue.</span><button class="choice-btn" type="button" onclick="blipolaHint()" style="margin-left:auto;padding:7px 10px;">💡 Hint</button></div>
             <div style="color:#999;margin-bottom:8px;">Question ${quiz.idx + 1} of ${quiz.reviewMode ? ROUND_LENGTH : quiz.questions.length}</div>
-            <div id="streakBadge" class="streak-badge"></div>
+            <div id="streakBadge" class="streak-badge" aria-live="polite"></div>
             <div class="prompt-box">${q.promptHTML}</div>
             <div class="choices">${choicesHTML}</div>
         </div>`;
@@ -4088,8 +4094,8 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
                 ${TRACE_COLORS.map(c => `<div class="color-swatch${c.hex === traceColor ? ' active' : ''}" style="background:${c.hex};" onclick="pickTraceColor('${c.hex}')" title="${c.name}"></div>`).join('')}
             </div>
             <div class="trace-controls">
-                <button class="icon-btn" onclick="replayTrace()">🔊</button>
-                <button class="icon-btn" onclick="clearTraceCanvas()">🧹</button>
+                <button class="icon-btn" onclick="replayTrace()" aria-label="Hear pronunciation">🔊</button>
+                <button class="icon-btn" onclick="clearTraceCanvas()" aria-label="Clear canvas">🧹</button>
             </div>
             <button class="big-btn again" onclick="nextTraceItem()">➡️ Next</button>
         </div>`;
@@ -5904,7 +5910,7 @@ function gradeStageFor(index,total){if(index===0)return {name:'LESSON',copy:'Lea
     function handleCompareChoice(value){const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];if(!q)return;finishInteractiveAnswer(String(value)===String(q.answer),q.explanation||'Compare the two numbers.');}
     function renderGradeSortHTML(q,picked){const remaining=q.words.filter(w=>!picked.includes(w));return '<div class="grade-sort-selected">'+(picked.length?picked.map((w,i)=>'<span class="grade-sort-token">'+(i+1)+'. '+esc(w)+'</span>').join(''):'<span class="grade-sort-empty">Tap the words in the order you want.</span>')+'</div><div class="grade-sort-words">'+remaining.map(w=>'<button class="grade-choice grade-sort-word" onclick="handleGradeSortChoice(this,\''+esc(w).replace(/'/g,"\\'")+'\')">'+esc(w)+'</button>').join('')+'</div>'+(picked.length?'<button class="grade-sort-reset" onclick="resetGradeSort()">↺ Reset order</button>':'');}
     function renderGradeSortOnly(){const el=document.getElementById('gradeSortContainer');const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];if(!el||!q||q.type!=='sort')return false;el.innerHTML=renderGradeSortHTML(q,gradeQuiz.sortPicked||[]);return true;}
-    function renderGradeLesson(){const q=gradeQuiz.unit.lessons[gradeQuiz.idx],grade=GRADE_CURRICULUM.find(g=>g.id===gradeQuiz.gradeId),course=grade.courses[gradeQuiz.courseIndex];let interaction=gradeInteractiveVisual(q);let visualInteraction=interaction;if(!interaction&&q.type==='sort'){const picked=gradeQuiz.sortPicked||[];interaction='<div id="gradeSortContainer">'+renderGradeSortHTML(q,picked)+'</div>';}else if(q.type==='number'&&!visualInteraction){interaction='<input id="gradeNumberAnswer" class="grade-text-answer" inputmode="numeric" autocomplete="off" placeholder="'+esc(q.placeholder||'Type your answer')+'" /><div class="grade-text-meta">Type your answer, then check it.</div><button class="grade-text-submit" onclick="handleGradeNumberSubmit()">✓ Check my answer</button>';}else if(q.type==='text'&&!visualInteraction){interaction='<textarea id="gradeTextAnswer" class="grade-text-answer" placeholder="'+esc(q.placeholder||'Write your answer...')+'" rows="4"></textarea><div class="grade-text-meta">Aim for '+(q.minWords||4)+'+ words.</div><button class="grade-text-submit" onclick="handleGradeTextSubmit()">✓ Check my writing</button>';}else if(!visualInteraction){const choices=q.choices.map(c=>'<button class="grade-choice" onclick="handleGradeChoice(this,\''+esc(c).replace(/'/g,"\\'")+'\')">'+esc(c)+'</button>').join('');interaction='<div class="grade-choices">'+choices+'</div>';}return topbar(true)+'<div class="center-col"><div class="grade-lesson-card"><div class="grade-blipola">🤖 <strong>Blipola</strong><span id="gradeBlipolaMessage">'+gradeQuizMessage()+'</span><button class="grade-hint" onclick="gradeHint()">💡 Hint</button></div><div class="grade-lesson-kicker">'+grade.label+' · '+course.name+' · UNIT '+(gradeQuiz.unitIndex+1)+' · QUESTION '+(gradeQuiz.idx+1)+'/'+gradeQuiz.unit.lessons.length+'</div><div class="grade-lesson-title">'+q.title+'</div><div class="grade-lesson-prompt">'+q.prompt+'</div>'+interaction+'<div id="gradeFeedback" class="grade-feedback"></div></div></div>'}
+    function renderGradeLesson(){const q=gradeQuiz.unit.lessons[gradeQuiz.idx],grade=GRADE_CURRICULUM.find(g=>g.id===gradeQuiz.gradeId),course=grade.courses[gradeQuiz.courseIndex];let interaction=gradeInteractiveVisual(q);let visualInteraction=interaction;if(!interaction&&q.type==='sort'){const picked=gradeQuiz.sortPicked||[];interaction='<div id="gradeSortContainer">'+renderGradeSortHTML(q,picked)+'</div>';}else if(q.type==='number'&&!visualInteraction){interaction='<input id="gradeNumberAnswer" class="grade-text-answer" inputmode="numeric" autocomplete="off" placeholder="'+esc(q.placeholder||'Type your answer')+'" /><div class="grade-text-meta">Type your answer, then check it.</div><button class="grade-text-submit" onclick="handleGradeNumberSubmit()">✓ Check my answer</button>';}else if(q.type==='text'&&!visualInteraction){interaction='<textarea id="gradeTextAnswer" class="grade-text-answer" placeholder="'+esc(q.placeholder||'Write your answer...')+'" rows="4"></textarea><div class="grade-text-meta">Aim for '+(q.minWords||4)+'+ words.</div><button class="grade-text-submit" onclick="handleGradeTextSubmit()">✓ Check my writing</button>';}else if(!visualInteraction){const choices=q.choices.map(c=>'<button class="grade-choice" onclick="handleGradeChoice(this,\''+esc(c).replace(/'/g,"\\'")+'\')">'+esc(c)+'</button>').join('');interaction='<div class="grade-choices">'+choices+'</div>';}return topbar(true)+'<div class="center-col"><div class="grade-lesson-card"><div class="grade-blipola">🤖 <strong>Blipola</strong><span id="gradeBlipolaMessage" aria-live="polite">'+gradeQuizMessage()+'</span><button class="grade-hint" onclick="gradeHint()">💡 Hint</button></div><div class="grade-lesson-kicker">'+grade.label+' · '+course.name+' · UNIT '+(gradeQuiz.unitIndex+1)+' · QUESTION '+(gradeQuiz.idx+1)+'/'+gradeQuiz.unit.lessons.length+'</div><div class="grade-lesson-title">'+q.title+'</div><div class="grade-lesson-prompt">'+q.prompt+'</div>'+interaction+'<div id="gradeFeedback" class="grade-feedback" aria-live="polite"></div></div></div>'}
     function handleGradeChoice(btn,id){if(!gradeQuiz||gradeQuiz.awaitingNext)return;const q=gradeQuiz.unit.lessons[gradeQuiz.idx],correct=id===q.answer,feedback=document.getElementById('gradeFeedback');recordNormalizedGradeAnswer(correct,gradeQuiz.firstAttempt,q,null);if(correct){gradeQuiz.awaitingNext=true;btn.classList.add('correct');if(gradeQuiz.firstAttempt)gradeQuiz.correctFirstTry++;gradeQuiz.stars++;awardStar();const key=gradeQuiz.gradeId+'_'+gradeQuiz.courseIndex+'_'+gradeQuiz.unitIndex;progress.gradeMastery=progress.gradeMastery||{};progress.gradeMastery[key]=(progress.gradeMastery[key]||0)+(gradeQuiz.firstAttempt?1:0);logActivity('grade',gradeQuiz.gradeId+'_'+gradeQuiz.courseIndex,q.title,true,gradeQuiz.firstAttempt);saveProgress();feedback.textContent='✓ Correct! '+q.explanation;speak('Correct! '+q.explanation);confettiBurst();scheduleNavigation(nextGradeQuestion,900);}else{btn.classList.add('incorrect');btn.disabled=true;gradeQuiz.firstAttempt=false;gradeQuiz.wrongAttempts++;feedback.textContent='Try again. '+q.hint;speak('Try again. '+q.hint);logActivity('grade',gradeQuiz.gradeId+'_'+gradeQuiz.courseIndex,q.title,false,false);}}
     function gradeWritingScore(text,q){const clean=(text||'').trim();const words=clean.toLowerCase().match(/[a-z']+/g)||[];const wordCount=words.length;const rubric=(q.rubric||[]).map(x=>x.toLowerCase());const hits=rubric.filter(x=>words.includes(x)).length;const hasCapital=/^[A-Z]/.test(clean);const hasPunctuation=/[.!?]$/.test(clean);let score=0;if(wordCount>=(q.minWords||4))score++;if(rubric.length&&hits>=1)score++;if(hasCapital)score++;if(hasPunctuation)score++;return {score,max:4,wordCount,hits,hasCapital,hasPunctuation,good:wordCount>=(q.minWords||4)&&(!rubric.length||hits>=1)};}
     function handleGradeSortChoice(btn,word){if(!gradeQuiz||gradeQuiz.awaitingNext)return;gradeQuiz.sortPicked=gradeQuiz.sortPicked||[];gradeQuiz.sortPicked.push(word);if(gradeQuiz.sortPicked.length<gradeQuiz.unit.lessons[gradeQuiz.idx].words.length){if(!renderGradeSortOnly())render();return;}const q=gradeQuiz.unit.lessons[gradeQuiz.idx],correct=JSON.stringify(gradeQuiz.sortPicked)===JSON.stringify(q.answer),feedback=document.getElementById('gradeFeedback');recordNormalizedGradeAnswer(correct,gradeQuiz.firstAttempt,q);if(correct){gradeQuiz.awaitingNext=true;if(gradeQuiz.firstAttempt)gradeQuiz.correctFirstTry++;gradeQuiz.stars++;awardStar();const key=gradeQuiz.gradeId+'_'+gradeQuiz.courseIndex+'_'+gradeQuiz.unitIndex;progress.gradeMastery=progress.gradeMastery||{};progress.gradeMastery[key]=(progress.gradeMastery[key]||0)+(gradeQuiz.firstAttempt?1:0);saveProgress();feedback.textContent='✓ Correct! '+q.explanation;speak('Correct! '+q.explanation);confettiBurst();scheduleNavigation(nextGradeQuestion,900);}else{gradeQuiz.firstAttempt=false;gradeQuiz.wrongAttempts++;gradeQuiz.sortPicked=[];feedback.textContent='Try again. '+q.hint;speak('Try again. '+q.hint);logActivity('grade',gradeQuiz.gradeId+'_'+gradeQuiz.courseIndex,q.title,false,false);setTimeout(()=>{if(!renderGradeSortOnly())render();},250);}}
@@ -6055,6 +6061,16 @@ function recordRuntimeError(report){
         if (state.screen === 'draw') afterDrawRender();
         if (state.screen === 'timed') afterTimedRender();
         if (state.screen === 'parentDashboard') loadCloudParentDashboard();
+        if (app) {
+            if (!app.hasAttribute('tabindex')) {
+                app.setAttribute('tabindex', '-1');
+            }
+            const active = document.activeElement;
+            const isInputActive = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
+            if (!isInputActive && typeof app.focus === 'function') {
+                app.focus({ preventScroll: true });
+            }
+        }
     }
 
     // ---------- Render: Draw (blank canvas) ----------
@@ -6090,7 +6106,7 @@ function recordRuntimeError(report){
                 </div>
                 <div class="draw-tool-btn${drawEraser ? ' active' : ''}" id="eraserBtn" onclick="toggleEraser()" title="Eraser">🧽</div>
                 <div class="draw-tool-btn" id="undoBtn" onclick="undoDraw()" title="Undo">↩️</div>
-                <button class="icon-btn" onclick="clearDrawCanvas()" title="Clear">🧹</button>
+                <button class="icon-btn" onclick="clearDrawCanvas()" title="Clear" aria-label="Clear canvas">🧹</button>
             </div>
         </div>`;
     }
