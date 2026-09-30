@@ -1,6 +1,6 @@
 // App version — bump this on every deployment to invalidate stale caches.
 // Keep in sync with APP_VERSION in index.html.
-const APP_VERSION = 'v2-20260930-n3';
+const APP_VERSION = 'v2-20260930-n3-css';
 const CACHE_NAME = `kc-${APP_VERSION}`;
 
 // Minimal app shell: HTML, manifest, icons, fonts, service worker itself.
