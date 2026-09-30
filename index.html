@@ -753,13 +753,13 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
 
     <div class="container" id="app"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script id="supabaseScript" async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="window.__initSupabase&&window.__initSupabase()"></script>
     <script src="./js/data-layer.js"></script>
     <script src="./js/skill-engine.js"></script>
     <script src="./js/blipola-runtime.js"></script>
     <script>
     // ---------- App version ----------
-    const APP_VERSION = 'v2-20250906';
+    const APP_VERSION = 'v2-20260930';
 
     // ---------- Debug / Dev Mode ----------
     // Hidden diagnostic screen for parents and developers.
@@ -1969,8 +1969,30 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
     function getCurrentAccount(){return localStorage.getItem('kc_current_account')||'';}
     function accountProgressKey(name){return 'kc_account_progress_v1_'+name.toLowerCase();}
     // ---------- Supabase cloud accounts (name+PIN stored server-side) ----------
-    const supa = window.supabase ? supabase.createClient('https://sjqhcpbdgaeapljbllhp.supabase.co','sb_publishable_DMSaun0u7qH2pAQzupS8Ww_G780gpm9') : null;
+    let supa = null;
+    function initSupabase(deferred) {
+        if (supa || !window.supabase) return;
+        try {
+            supa = window.supabase.createClient('https://sjqhcpbdgaeapljbllhp.supabase.co','sb_publishable_DMSaun0u7qH2pAQzupS8Ww_G780gpm9');
+            window.supa = supa;
+            if (deferred) {
+                if (typeof refreshMembership === 'function') refreshMembership(true).catch(() => {});
+                if (window.KCData) window.KCData.flushNormalized().catch(() => {});
+            }
+        } catch (e) {
+            console.warn('Supabase init failed', e);
+        }
+    }
+    initSupabase(false);
     window.supa = supa;
+    window.__initSupabase = () => initSupabase(true);
+    const supaScript = document.getElementById('supabaseScript') || document.querySelector('script[src*="supabase-js"]');
+    if (supaScript && !supa) {
+        supaScript.addEventListener('load', () => initSupabase(true));
+        supaScript.addEventListener('error', () => {
+            console.warn('Supabase CDN unreachable, running in offline mode');
+        });
+    }
     function getCurrentAccountName(){
         const key=getCurrentAccount();
         if(!key)return '';
@@ -2055,7 +2077,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
         return data[0].pin_salt;
     }
     async function cloudSaveProgress(name,progressObj){
-        if(!name||!currentPinVerifier)return false;
+        if(!supa||!name||!currentPinVerifier)return false;
         try{
             const {data,error}=await supa.rpc('save_player_progress',{
                 p_name:name,p_pin_hash:currentPinVerifier,p_progress:progressObj||{}
