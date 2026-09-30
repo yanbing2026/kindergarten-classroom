@@ -2,40 +2,92 @@
  * Self-test for Math adaptive difficulty transitions.
  * Run with: node scripts/test_math_adaptive.js
  */
+const fs = require('fs');
+const path = require('path');
 const assert = require('assert');
 
-// Core adaptive step function exactly as in index.html
-function stepMathAdaptive(currentLevel, streak, isCorrect) {
-    let lvNum = parseInt(String(currentLevel || 'L1').replace(/\D/g, ''), 10) || 1;
-    let newStreak = streak || 0;
-    let newLevel = currentLevel || ('L' + lvNum);
-    let changed = false;
+// Extract stepMathAdaptive function source directly from index.html
+const htmlPath = path.resolve(__dirname, '../index.html');
+assert(fs.existsSync(htmlPath), `index.html not found at ${htmlPath}`);
+const html = fs.readFileSync(htmlPath, 'utf8');
 
-    if (isCorrect) {
-        newStreak = (newStreak > 0 ? newStreak : 0) + 1;
-        if (newStreak >= 3) {
-            if (lvNum < 10) {
-                lvNum += 1;
-                newLevel = 'L' + lvNum;
-                changed = true;
-            }
-            newStreak = 0;
+function extractFunction(source, fnName) {
+    const startPattern = `function ${fnName}(`;
+    const startIdx = source.indexOf(startPattern);
+    assert(startIdx !== -1, `Could not find "${startPattern}" in index.html`);
+    const openBraceIdx = source.indexOf('{', startIdx);
+    assert(openBraceIdx !== -1, `Could not find opening brace for "${fnName}"`);
+    let depth = 0;
+    let endIdx = -1;
+    let inString = null;
+    let inLineComment = false;
+    let inBlockComment = false;
+
+    for (let i = openBraceIdx; i < source.length; i++) {
+        const c = source[i];
+        const next = source[i + 1];
+
+        if (inLineComment) {
+            if (c === '\n') inLineComment = false;
+            continue;
         }
-    } else {
-        newStreak = (newStreak < 0 ? newStreak : 0) - 1;
-        if (newStreak <= -3) {
-            if (lvNum > 1) {
-                lvNum -= 1;
-                newLevel = 'L' + lvNum;
-                changed = true;
+        if (inBlockComment) {
+            if (c === '*' && next === '/') {
+                inBlockComment = false;
+                i++;
             }
-            newStreak = 0;
+            continue;
+        }
+        if (inString) {
+            if (c === '\\') {
+                i++;
+            } else if (c === inString) {
+                inString = null;
+            }
+            continue;
+        }
+        if (c === '/' && next === '/') {
+            inLineComment = true;
+            i++;
+            continue;
+        }
+        if (c === '/' && next === '*') {
+            inBlockComment = true;
+            i++;
+            continue;
+        }
+        if (c === '"' || c === "'" || c === '`') {
+            inString = c;
+            continue;
+        }
+        if (c === '{') {
+            depth++;
+        } else if (c === '}') {
+            depth--;
+            if (depth === 0) {
+                endIdx = i + 1;
+                break;
+            }
         }
     }
-    return { level: newLevel, streak: newStreak, changed };
+    assert(endIdx !== -1, `Could not find matching closing brace for "${fnName}"`);
+    return source.slice(startIdx, endIdx);
 }
 
-console.log('Testing stepMathAdaptive...');
+const stepMathAdaptiveSource = extractFunction(html, 'stepMathAdaptive');
+
+// Assert extracted source is non-empty and contains critical logic lines (fail fast, no fallback)
+assert(stepMathAdaptiveSource && stepMathAdaptiveSource.length > 0, 'Extracted stepMathAdaptive source must not be empty');
+assert(stepMathAdaptiveSource.includes('function stepMathAdaptive('), 'Source must contain function declaration');
+assert(stepMathAdaptiveSource.includes('newStreak >= 3'), 'Source must contain level-up condition (newStreak >= 3)');
+assert(stepMathAdaptiveSource.includes('newStreak <= -3'), 'Source must contain level-down condition (newStreak <= -3)');
+assert(stepMathAdaptiveSource.includes('lvNum < 10') && stepMathAdaptiveSource.includes('lvNum > 1'), 'Source must contain level boundary clamps (1 to 10)');
+assert(stepMathAdaptiveSource.includes('return { level: newLevel, streak: newStreak, changed }'), 'Source must return level, streak, changed');
+
+const stepMathAdaptive = eval(`(${stepMathAdaptiveSource})`);
+assert.strictEqual(typeof stepMathAdaptive, 'function', 'stepMathAdaptive must evaluate to a function');
+
+console.log('Testing stepMathAdaptive (extracted from index.html)...');
 
 // Test 1: 3 consecutive correct answers level up from L1 to L2
 let state = { level: 'L1', streak: 0 };
