@@ -52,9 +52,13 @@ assert.strictEqual(
     `Found non-image/orphan files under images/: ${JSON.stringify(nonImageFiles)}`
 );
 
-// 2. Extract SCIENCE_LEVELS IDs from index.html
-const scienceBlockMatch = indexHtml.match(/const\s+SCIENCE_LEVELS\s*=\s*\[([\s\S]*?)\];\s*const\s+SCIENCE_LEVELS_MAPPED/);
-assert(scienceBlockMatch, 'Could not find SCIENCE_LEVELS in index.html');
+// 2. Extract SCIENCE_LEVELS IDs from content.js or index.html
+const contentJsPath = path.join(ROOT_DIR, 'data/kindergarten/content.js');
+const curriculumSource = fs.existsSync(contentJsPath)
+    ? fs.readFileSync(contentJsPath, 'utf8')
+    : indexHtml;
+const scienceBlockMatch = curriculumSource.match(/const\s+SCIENCE_LEVELS\s*=\s*\[([\s\S]*?)\];\s*const\s+SCIENCE_LEVELS_MAPPED/);
+assert(scienceBlockMatch, 'Could not find SCIENCE_LEVELS in content.js or index.html');
 const scienceIdMatches = [...scienceBlockMatch[1].matchAll(/id\s*:\s*'([^']+)'/g)];
 const scienceIds = scienceIdMatches.map(m => m[1]);
 assert.strictEqual(scienceIds.length, 96, `Expected exactly 96 science items, found ${scienceIds.length}`);

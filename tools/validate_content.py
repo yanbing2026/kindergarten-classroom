@@ -16,6 +16,7 @@ from collections import defaultdict
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 INDEX_FILE = PROJECT_ROOT / "index.html"
+CONTENT_FILE = PROJECT_ROOT / "data" / "kindergarten" / "content.js"
 IMAGES_DIR = PROJECT_ROOT / "images"
 
 IMAGE_EXTS = {'.png', '.webp', '.jpg', '.jpeg', '.gif', '.svg'}
@@ -24,7 +25,10 @@ IMAGE_EXTS = {'.png', '.webp', '.jpg', '.jpeg', '.gif', '.svg'}
 def load_text():
     if not INDEX_FILE.exists():
         raise SystemExit(f"ERROR: {INDEX_FILE} not found")
-    return INDEX_FILE.read_text()
+    text = INDEX_FILE.read_text(encoding="utf-8")
+    if CONTENT_FILE.exists():
+        text += "\n" + CONTENT_FILE.read_text(encoding="utf-8")
+    return text
 
 
 def get_all_images_on_disk():

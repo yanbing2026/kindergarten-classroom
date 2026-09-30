@@ -107,6 +107,7 @@ jobs:
 
           echo "### Unit tests" | tee -a validation-report/summary.md
           TEST_SCRIPTS=(
+            "scripts/test_data_extraction.js"
             "scripts/test_math_adaptive.js"
             "scripts/test_build_question_weights.js"
             "scripts/test_progress_stores.js"
