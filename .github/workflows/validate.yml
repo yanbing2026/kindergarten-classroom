@@ -64,6 +64,9 @@ jobs:
           scripts = re.findall(r"<script(?![^>]*src=)[^>]*>(.*?)</script>", html, re.S | re.I)
           Path("/tmp/index-inline.js").write_text("\n\n".join(scripts), encoding="utf-8")
           Path("validation-report/index-inline.js").write_text("\n\n".join(scripts), encoding="utf-8")
+          for i, s in enumerate(scripts):
+            Path(f"/tmp/index-inline-{i}.js").write_text(s, encoding="utf-8")
+            Path(f"validation-report/index-inline-{i}.js").write_text(s, encoding="utf-8")
           print(f"Found {len(scripts)} inline script block(s)")
           PY
           echo "### Inline JavaScript in index.html" | tee -a validation-report/summary.md
@@ -83,6 +86,24 @@ jobs:
           else
             echo "- ✅ index.html inline JavaScript" | tee -a validation-report/summary.md
           fi
+
+          for f in /tmp/index-inline-*.js; do
+            [ -f "$f" ] || continue
+            bname=$(basename "$f")
+            out="validation-report/${bname}.out"
+            node --check "$f" >"$out" 2>&1
+            bstatus=$?
+            cat "$out"
+            if [ $bstatus -ne 0 ]; then
+              overall=1
+              echo "- ❌ index.html inline block: $bname" | tee -a validation-report/summary.md
+              echo '```text' >> validation-report/summary.md
+              cat "$out" >> validation-report/summary.md
+              echo '```' >> validation-report/summary.md
+            else
+              echo "- ✅ index.html inline block: $bname" | tee -a validation-report/summary.md
+            fi
+          done
 
           # Optional: curriculum content validator (non-blocking, informational)
           if [ -f tools/validate_content.py ]; then
