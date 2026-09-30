@@ -761,7 +761,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
     <script src="./js/blipola-runtime.js"></script>
     <script>
     // ---------- App version ----------
-    const APP_VERSION = 'v2-20260930-n4';
+    const APP_VERSION = 'v2-20260930-n7';
 
     // ---------- Debug / Dev Mode ----------
     // Hidden diagnostic screen for parents and developers.
@@ -4577,7 +4577,7 @@ body { padding-bottom: calc(46px + env(safe-area-inset-bottom)); }
             const status = skillStatus(x.stats);
             return '<div class="parent-focus-row"><span>' + x.cat.icon + ' <strong>' + x.cat.name + '</strong></span><span>' + status.icon + ' ' + status.label + '</span></div>';
         }).join('');        const adaptiveStats=progress.skillStats&&typeof progress.skillStats==='object'?progress.skillStats:{};
-        const skillRows=Object.entries(adaptiveStats).map(([skillId,s])=>({skillId,s})).sort((a,b)=>(Number(a.s.mastery||0)-Number(b.s.mastery||0))).slice(0,8).map(({skillId,s})=>{const mastery=Math.max(0,Math.min(100,Math.round(Number(s.mastery||0))));const due=s.nextReviewAt&&Date.now()>=Number(s.nextReviewAt);const status=due?'🔄 Review due':mastery>=85?'🏆 Strong':mastery>=60?'🌱 Developing':'🎯 Needs practice';const misconception=s.lastMisconception?'<div class="parent-progress-label">Common error: '+cloudEscape(String(s.lastMisconception).replace(/-/g,' '))+'</div>':'';return '<div class="parent-focus-row"><span><strong>'+cloudEscape(String(skillId).replace(/^[^.]+\./,'').replace(/-/g,' '))+'</strong><br><span class="parent-progress-label">'+Number(s.attempts||0)+' attempts · '+Number(s.firstTryCorrect||0)+' first try</span></span><span>'+status+' · '+mastery+'%</span></div>'+misconception;}).join('');
+        const skillRows=Object.entries(adaptiveStats).map(([skillId,s])=>({skillId,s})).sort((a,b)=>(Number(a.s.mastery||0)-Number(b.s.mastery||0))).slice(0,8).map(({skillId,s})=>{const mastery=Math.max(0,Math.min(100,Math.round(Number(s.mastery||0))));const nextReview=s.nextReviewAt?(Number.isFinite(Number(s.nextReviewAt))?Number(s.nextReviewAt):Date.parse(s.nextReviewAt)):0;const due=nextReview>0&&Date.now()>=nextReview;const status=due?'🔄 Review due':mastery>=85?'🏆 Strong':mastery>=60?'🌱 Developing':'🎯 Needs practice';const misconception=s.lastMisconception?'<div class="parent-progress-label">Common error: '+cloudEscape(String(s.lastMisconception).replace(/-/g,' '))+'</div>':'';return '<div class="parent-focus-row"><span><strong>'+cloudEscape(String(skillId).replace(/^[^.]+\./,'').replace(/-/g,' '))+'</strong><br><span class="parent-progress-label">'+Number(s.attempts||0)+' attempts · '+Number(s.firstTryCorrect||0)+' first try</span></span><span>'+status+' · '+mastery+'%</span></div>'+misconception;}).join('');
                 const recoveryStats=Object.entries(adaptiveStats).map(([skillId,s])=>({skillId,s,rem:s.remediation||null})).filter(x=>x.rem && Number(x.rem.attempts||0)>0).sort((a,b)=>Number(b.rem.lastAt?Date.parse(b.rem.lastAt):0)-Number(a.rem.lastAt?Date.parse(a.rem.lastAt):0)).slice(0,8);
         const recoveryRows=recoveryStats.map(({skillId,s,rem})=>{
             const name=cloudEscape(String(skillId).replace(/^[^.]+\./,'').replace(/-/g,' '));
@@ -4607,7 +4607,7 @@ return `${topbar(true)}
     function renderProgress() {
         const rows = CATEGORIES.map(c => {
             const { mastered, total } = categoryMasteredAllLevels(c);
-            const pct = Math.round((mastered / total) * 100);
+            const pct = total > 0 ? Math.round((mastered / total) * 100) : 0;
             return `<div style="margin-bottom:16px;">
                 <div style="display:flex;justify-content:space-between;font-weight:700;">
                     <span>${c.icon} ${c.name}</span><span>${mastered}/${total}</span>
@@ -4646,6 +4646,7 @@ return `${topbar(true)}
             mathStreak: progress.mathStreak || 0,
             skillStats: progress.skillStats || {},
             remediationHistory: progress.remediationHistory || [],
+            gradeMastery: progress.gradeMastery || {},
             version: 'kc_progress_v1'
         }, null, 2);
         const blob = new Blob([data], { type: 'application/json' });
