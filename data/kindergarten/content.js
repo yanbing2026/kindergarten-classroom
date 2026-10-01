@@ -744,6 +744,9 @@
             {id:'dc3',number:4,answer:[2,2],options:[[2,2],[1,3],[0,4],[3,1]]},
             {id:'dc4',number:5,answer:[2,3],options:[[2,3],[1,4],[0,5],[3,3]]},
             {id:'dc5',number:1,answer:[0,1],options:[[0,1],[1,0],[0,2],[2,0]]},
+            {id:'dc16',number:3,answer:[0,3],options:[[0,3],[1,3],[2,2],[0,4]]},
+            {id:'dc17',number:4,answer:[1,3],options:[[1,3],[0,3],[2,3],[1,4]]},
+            {id:'dc18',number:5,answer:[1,4],options:[[1,4],[1,3],[2,4],[0,4]]},
         ],
         [ // Level 2 — Decompose 6-10
             {id:'dc6',number:6,answer:[3,3],options:[[3,3],[2,4],[1,5],[0,6]]},
@@ -751,6 +754,9 @@
             {id:'dc8',number:8,answer:[4,4],options:[[4,4],[3,5],[2,6],[1,7]]},
             {id:'dc9',number:9,answer:[4,5],options:[[4,5],[3,6],[2,7],[5,5]]},
             {id:'dc10',number:10,answer:[5,5],options:[[5,5],[4,6],[3,7],[2,8]]},
+            {id:'dc19',number:6,answer:[2,4],options:[[2,4],[2,3],[3,4],[1,4]]},
+            {id:'dc20',number:8,answer:[3,5],options:[[3,5],[2,5],[4,5],[3,4]]},
+            {id:'dc21',number:10,answer:[4,6],options:[[4,6],[3,6],[5,6],[4,5]]},
         ],
         [ // Level 3 — Multiple ways
             {id:'dc11',number:5,answer:[1,4],options:[[1,4],[2,3],[0,5],[3,3]]},
@@ -758,6 +764,9 @@
             {id:'dc13',number:10,answer:[3,7],options:[[3,7],[4,6],[5,5],[2,8]]},
             {id:'dc14',number:8,answer:[1,7],options:[[1,7],[2,6],[3,5],[4,4]]},
             {id:'dc15',number:6,answer:[0,6],options:[[0,6],[1,5],[2,4],[3,3]]},
+            {id:'dc22',number:4,answer:[0,4],options:[[0,4],[0,3],[1,4],[2,3]]},
+            {id:'dc23',number:9,answer:[2,7],options:[[2,7],[1,7],[3,7],[2,6]]},
+            {id:'dc24',number:10,answer:[2,8],options:[[2,8],[1,8],[3,8],[2,7]]},
         ],
     ];
 
