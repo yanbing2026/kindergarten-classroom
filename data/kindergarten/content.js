@@ -838,6 +838,9 @@
             {id:'pc3',scenario:'📚',question:'What do you read first?',answer:'Front cover',options:['Front cover','Last page','Back cover','Middle']},
             {id:'pc4',scenario:'📖',question:'Where are the pages?',answer:'Inside',options:['Inside','Front cover','Back cover','Spine']},
             {id:'pc5',scenario:'✍️',question:'Who writes a book?',answer:'Author',options:['Author','Reader','Teacher','Student']},
+            {id:'pc11',scenario:'🎨',question:'Who draws the pictures in a book?',answer:'Illustrator',options:['Illustrator','Author','Reader','Publisher']},
+            {id:'pc12',scenario:'🏷️',question:'What tells you the name of a book?',answer:'Title',options:['Title','Page number','Cover','Spine']},
+            {id:'pc13',scenario:'📚',question:'What holds the pages together?',answer:'Spine',options:['Spine','Front cover','Back cover','Bookmark']},
         ],
         [ // Level 2 — Reading direction
             {id:'pc6',scenario:'➡️',question:'Which way do you read words on a page?',answer:'Left to right',options:['Left to right','Right to left','Top to bottom','Bottom to top']},
@@ -845,6 +848,9 @@
             {id:'pc8',scenario:'📖',question:'Which page comes first in a book?',answer:'Front',options:['Front','Back','Middle','It doesn\'t matter']},
             {id:'pc9',scenario:'➡️➡️',question:'After the first page, where do you go?',answer:'Next page',options:['Next page','Previous page','Last page','Back cover']},
             {id:'pc10',scenario:'📖✅',question:'When you finish a book, what comes last?',answer:'Back cover',options:['Back cover','Front cover','First page','Title page']},
+            {id:'pc14',scenario:'␣',question:'What goes between words when you write?',answer:'Space',options:['Space','Period','Comma','Letter']},
+            {id:'pc15',scenario:'🔤',question:'What letter starts a sentence?',answer:'Capital letter',options:['Capital letter','Lowercase letter','Number','Symbol']},
+            {id:'pc16',scenario:'❓',question:'What mark ends an asking sentence?',answer:'Question mark',options:['Question mark','Period','Comma','Space']},
         ],
     ];
 

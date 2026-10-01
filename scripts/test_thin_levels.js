@@ -32,7 +32,7 @@ assert(Array.isArray(CATEGORIES), 'CATEGORIES must be loaded from content.js');
 console.log('Testing thin kindergarten categories for ROUND_LENGTH >= 8 items per level...');
 
 // Categories to verify as they are expanded.
-const ACTIVE_CATEGORIES = ['sentences', 'decompose'];
+const ACTIVE_CATEGORIES = ['sentences', 'decompose', 'printconcepts'];
 
 for (const catKey of ACTIVE_CATEGORIES) {
     const cat = CATEGORIES.find(c => c.key === catKey);
