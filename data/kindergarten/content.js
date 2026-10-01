@@ -686,18 +686,23 @@
     const SIGHTWORDS_LEVELS = [
         [ // Level 1
             {id:'the',emoji:'📖'},{id:'a',emoji:'📝'},{id:'I',emoji:'🙋'},{id:'is',emoji:'✅'},{id:'it',emoji:'🔹'},
+            {id:'see',emoji:'👀'},{id:'can',emoji:'🥫'},{id:'you',emoji:'👉'},
         ],
         [ // Level 2
             {id:'my',emoji:'🎒'},{id:'we',emoji:'👫'},{id:'he',emoji:'👦'},{id:'she',emoji:'👧'},{id:'do',emoji:'❓'},
+            {id:'in',emoji:'📥'},{id:'up',emoji:'⬆️'},{id:'on',emoji:'🔛'},
         ],
         [ // Level 3
             {id:'go',emoji:'🏃'},{id:'no',emoji:'🚫'},{id:'so',emoji:'➡️'},{id:'to',emoji:'🎯'},{id:'me',emoji:'🙋‍♂️'},
+            {id:'big',emoji:'🐘'},{id:'run',emoji:'🏃‍♂️'},{id:'play',emoji:'🎮'},
         ],
         [ // Level 4
             {id:'and',emoji:'➕'},{id:'or',emoji:'🔀'},{id:'but',emoji:'⚡'},{id:'if',emoji:'🤔'},{id:'at',emoji:'📍'},
+            {id:'like',emoji:'👍'},{id:'help',emoji:'🤝'},{id:'look',emoji:'🔍'},
         ],
         [ // Level 5
             {id:'said',emoji:'💬'},{id:'was',emoji:'⏪'},{id:'have',emoji:'🤲'},{id:'been',emoji:'🕐'},{id:'come',emoji:'🚶'},
+            {id:'good',emoji:'🌟'},{id:'make',emoji:'🛠️'},{id:'away',emoji:'🛫'},
         ],
     ];
 
