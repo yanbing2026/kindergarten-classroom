@@ -26,6 +26,10 @@ jobs:
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
+        with:
+          # Re-create the Pages site if it is missing: a site whose source branch
+          # was deleted comes back as 404 from the API and fails the whole deploy.
+          enablement: true
 
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
