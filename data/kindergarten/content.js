@@ -875,6 +875,9 @@
             {id:'sn3',broken:'the dog runs fast',correct:'The dog runs fast.',options:['The dog runs fast.','the dog runs fast.','The dog runs fast','the dog runs fast']},
             {id:'sn4',broken:'we play outside',correct:'We play outside.',options:['We play outside.','we play outside.','We play outside','we play outside']},
             {id:'sn5',broken:'she is happy',correct:'She is happy.',options:['She is happy.','she is happy.','She is happy','she is happy']},
+            {id:'sn16',broken:'i see the cat',correct:'I see the cat.',options:['I see the cat.','i see the cat.','I see the cat','i see the cat']},
+            {id:'sn17',broken:'the dog is big',correct:'The dog is big.',options:['The dog is big.','the dog is big.','The dog is big','the dog is big']},
+            {id:'sn18',broken:'we can jump',correct:'We can jump.',options:['We can jump.','we can jump.','We can jump','we can jump']},
         ],
         [ // Level 2 — Period at end
             {id:'sn6',broken:'the dog runs.',correct:'The dog runs.',options:['The dog runs.','the dog runs.','The dog runs','the dog runs']},
@@ -882,6 +885,9 @@
             {id:'sn8',broken:'we sing a song.',correct:'We sing a song.',options:['We sing a song.','we sing a song.','We sing a song','we sing a song']},
             {id:'sn9',broken:'they jump high.',correct:'They jump high.',options:['They jump high.','they jump high.','They jump high','they jump high']},
             {id:'sn10',broken:'he reads a book.',correct:'He reads a book.',options:['He reads a book.','he reads a book.','He reads a book','he reads a book']},
+            {id:'sn19',broken:'the bus is big.',correct:'The bus is big.',options:['The bus is big.','the bus is big.','The bus is big','the bus is big']},
+            {id:'sn20',broken:'my mom smiles.',correct:'My mom smiles.',options:['My mom smiles.','my mom smiles.','My mom smiles','my mom smiles']},
+            {id:'sn21',broken:'they swim fast.',correct:'They swim fast.',options:['They swim fast.','they swim fast.','They swim fast','they swim fast']},
         ],
         [ // Level 3 — Both capital + period
             {id:'sn11',broken:'the bird sings',correct:'The bird sings.',options:['The bird sings.','the bird sings.','The bird sings','the bird sings']},
@@ -889,6 +895,9 @@
             {id:'sn13',broken:'we eat lunch',correct:'We eat lunch.',options:['We eat lunch.','we eat lunch.','We eat lunch','we eat lunch']},
             {id:'sn14',broken:'the sun is bright',correct:'The sun is bright.',options:['The sun is bright.','the sun is bright.','The sun is bright','the sun is bright']},
             {id:'sn15',broken:'she walks to school',correct:'She walks to school.',options:['She walks to school.','she walks to school.','She walks to school','she walks to school']},
+            {id:'sn22',broken:'birds fly in the sky',correct:'Birds fly in the sky.',options:['Birds fly in the sky.','birds fly in the sky.','Birds fly in the sky','birds fly in the sky']},
+            {id:'sn23',broken:'the flowers are pretty',correct:'The flowers are pretty.',options:['The flowers are pretty.','the flowers are pretty.','The flowers are pretty','the flowers are pretty']},
+            {id:'sn24',broken:'we read books together',correct:'We read books together.',options:['We read books together.','we read books together.','We read books together','we read books together']},
         ],
     ];
 
