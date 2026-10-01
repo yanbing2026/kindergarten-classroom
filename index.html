@@ -2214,6 +2214,50 @@
             return doShuffle([...wrongSet]);
         }
 
+        // CCSS K.CC.B.5 Object counting with emojis (Level 1: 1-10 objects)
+        const allowCount = (lvNum === 1 && Math.random() < 0.35);
+        if (allowCount) {
+            const countObjects = [
+                { emoji: '🍎', singular: 'apple', plural: 'apples' },
+                { emoji: '🐛', singular: 'caterpillar', plural: 'caterpillars' },
+                { emoji: '⭐', singular: 'star', plural: 'stars' },
+                { emoji: '🚗', singular: 'car', plural: 'cars' },
+                { emoji: '🌸', singular: 'flower', plural: 'flowers' },
+                { emoji: '🎈', singular: 'balloon', plural: 'balloons' },
+                { emoji: '🐱', singular: 'cat', plural: 'cats' },
+                { emoji: '🐶', singular: 'dog', plural: 'dogs' },
+                { emoji: '🍕', singular: 'pizza slice', plural: 'pizza slices' },
+                { emoji: '🐸', singular: 'frog', plural: 'frogs' },
+                { emoji: '🍪', singular: 'cookie', plural: 'cookies' },
+                { emoji: '🐟', singular: 'fish', plural: 'fish' }
+            ];
+            const item = countObjects[Math.floor(Math.random() * countObjects.length)];
+            const answer = 1 + Math.floor(Math.random() * 10);
+            const name = answer === 1 ? item.singular : item.plural;
+            const choices = buildChoices(answer, 1);
+            const promptHTML = `<div class="math-row" style="flex-direction:column;gap:12px;">
+                <div class="prompt-word" style="font-size:1.5rem;font-weight:700;">How many?</div>
+                <div class="math-count-emojis" style="font-size:2.8rem;line-height:1.35;max-width:320px;text-align:center;letter-spacing:6px;word-break:break-word;">${Array(answer).fill(item.emoji).join(' ')}</div>
+            </div>`;
+            const speakText = `How many ${name}? Count them!`;
+            const praiseText = `Correct! There ${answer === 1 ? 'is 1 ' + name : 'are ' + answer + ' ' + name}!`;
+            const retryText = `Not quite — count the ${name} again!`;
+            return {
+                type: 'count',
+                op: 'add',
+                a: answer,
+                b: 0,
+                answer,
+                choices,
+                promptHTML,
+                speakText,
+                praiseText,
+                retryText,
+                awaitingNext: false,
+                firstAttempt: true
+            };
+        }
+
         // CCSS K.OA.A.4 missing addend fill-in-the-blank (e.g. 3 + ? = 7 or ? + 4 = 9)
         const allowMissingAddend = (lvNum <= 4 && Math.random() < 0.5) || (lvNum > 4 && Math.random() < 0.25);
         if (allowMissingAddend) {
