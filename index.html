@@ -2214,8 +2214,110 @@
             return doShuffle([...wrongSet]);
         }
 
+        function renderTenFrameHTML(dots, total, color) {
+            total = total || 10;
+            color = color || 'var(--mc-redstone, #e04040)';
+            let cells = '';
+            for (let i = 0; i < total; i++) {
+                if (i < dots) {
+                    cells += `<div style="display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid var(--mc-border,#4a3728);border-radius:6px;width:38px;height:38px;"><span style="display:inline-block;width:22px;height:22px;border-radius:50%;background:${color};"></span></div>`;
+                } else {
+                    cells += `<div style="display:flex;align-items:center;justify-content:center;background:#fff;border:2px dashed #bbb;border-radius:6px;width:38px;height:38px;"></div>`;
+                }
+            }
+            return `<div style="display:grid;grid-template-columns:repeat(5, 38px);grid-template-rows:repeat(2, 38px);gap:6px;padding:8px;background:var(--mc-sand,#efe7d3);border:3px solid var(--mc-border,#4a3728);border-radius:10px;">${cells}</div>`;
+        }
+
+        // CCSS K.OA.A.4 / K.CC.B.5 Ten-frame counting and make-10 (Level 1 & Level 2)
+        const allowTenFrame = (lvNum === 1 && Math.random() < 0.28) || (lvNum === 2 && Math.random() < 0.2);
+        if (allowTenFrame) {
+            if (lvNum === 1) {
+                const isMake10 = Math.random() < 0.5;
+                if (isMake10) {
+                    const given = 1 + Math.floor(Math.random() * 9);
+                    const answer = 10 - given;
+                    const choices = buildChoices(answer, 1);
+                    const promptHTML = `<div class="math-row" style="flex-direction:column;gap:10px;">
+                        <div class="prompt-word" style="font-size:1.4rem;font-weight:700;">How many more to make 10?</div>
+                        ${renderTenFrameHTML(given)}
+                        <div class="math-eq" style="font-size:1.6rem;margin-top:4px;"><span>${given}</span><span class="op">+</span><span class="qm">?</span><span>=</span><span>10</span></div>
+                    </div>`;
+                    const speakText = `There are ${given} dots. How many more to make 10?`;
+                    const praiseText = `Correct! ${given} plus ${answer} makes 10!`;
+                    const retryText = `Not quite — count the empty spaces to make 10!`;
+                    return {
+                        type: 'ten_frame',
+                        op: 'add',
+                        a: given,
+                        b: answer,
+                        answer,
+                        choices,
+                        promptHTML,
+                        speakText,
+                        praiseText,
+                        retryText,
+                        awaitingNext: false,
+                        firstAttempt: true
+                    };
+                } else {
+                    const answer = 1 + Math.floor(Math.random() * 10);
+                    const choices = buildChoices(answer, 1);
+                    const promptHTML = `<div class="math-row" style="flex-direction:column;gap:10px;">
+                        <div class="prompt-word" style="font-size:1.4rem;font-weight:700;">How many dots?</div>
+                        ${renderTenFrameHTML(answer)}
+                    </div>`;
+                    const speakText = `How many dots are in the ten-frame?`;
+                    const praiseText = (answer === 1 ? `Correct! There is 1 dot in the ten-frame!` : `Correct! There are ${answer} dots in the ten-frame!`);
+                    const retryText = `Not quite — count the dots in the ten-frame again!`;
+                    return {
+                        type: 'ten_frame',
+                        op: 'add',
+                        a: answer,
+                        b: 0,
+                        answer,
+                        choices,
+                        promptHTML,
+                        speakText,
+                        praiseText,
+                        retryText,
+                        awaitingNext: false,
+                        firstAttempt: true
+                    };
+                }
+            } else {
+                // Level 2: CCSS K.NBT.A.1 teen numbers compose 10 + N (11-20)
+                const extra = 1 + Math.floor(Math.random() * 10);
+                const answer = 10 + extra;
+                const choices = buildChoices(answer, minAnswer);
+                const promptHTML = `<div class="math-row" style="flex-direction:column;gap:10px;">
+                    <div class="prompt-word" style="font-size:1.4rem;font-weight:700;">10 + ${extra} = ?</div>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+                        ${renderTenFrameHTML(10)}
+                        ${renderTenFrameHTML(extra, 10, 'var(--mc-emerald, #3fbf5f)')}
+                    </div>
+                </div>`;
+                const speakText = `Ten plus ${extra}. How many in all?`;
+                const praiseText = `Correct! 10 plus ${extra} is ${answer}!`;
+                const retryText = `Not quite — what is 10 plus ${extra}?`;
+                return {
+                    type: 'ten_frame',
+                    op: 'add',
+                    a: 10,
+                    b: extra,
+                    answer,
+                    choices,
+                    promptHTML,
+                    speakText,
+                    praiseText,
+                    retryText,
+                    awaitingNext: false,
+                    firstAttempt: true
+                };
+            }
+        }
+
         // CCSS K.CC.B.5 Object counting with emojis (Level 1: 1-10 objects)
-        const allowCount = (lvNum === 1 && Math.random() < 0.35);
+        const allowCount = (lvNum === 1 && Math.random() < 0.25);
         if (allowCount) {
             const countObjects = [
                 { emoji: '🍎', singular: 'apple', plural: 'apples' },
