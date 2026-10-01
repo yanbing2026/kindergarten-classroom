@@ -72,7 +72,7 @@
     <script src="./js/blipola-runtime.js"></script>
     <script>
     // ---------- App version ----------
-    const APP_VERSION = 'v2-20260930-n3-css';
+    const APP_VERSION = 'v2-20260930-math-variety';
 
     // ---------- Debug / Dev Mode ----------
     // Hidden diagnostic screen for parents and developers.
@@ -1026,7 +1026,8 @@
     // Builds an item-aware confirmation instead of a random "Good job!".
     function descriptivePraise(key, q) {
         if (key === 'math') {
-            const word = MATH_WORD[q.op];
+            if (q && q.praiseText) return q.praiseText;
+            const word = (typeof MATH_WORD !== 'undefined' && MATH_WORD[q.op]) || 'plus';
             return `Correct! ${q.a} ${word} ${q.b} is ${q.answer}!`;
         }
         if (key === 'letters') {
@@ -1051,7 +1052,9 @@
     }
     function descriptiveRetry(key, q) {
         if (key === 'math') {
-            return `Not quite — try again! ${q.a} ${MATH_WORD[q.op]} ${q.b}?`;
+            if (q && q.retryText) return q.retryText;
+            const word = (typeof MATH_WORD !== 'undefined' && MATH_WORD[q.op]) || 'plus';
+            return `Not quite — try again! ${q.a} ${word} ${q.b}?`;
         }
         return RETRY[Math.floor(Math.random() * RETRY.length)];
     }
@@ -2174,82 +2177,385 @@
     const MATH_WORD = { add: 'plus', sub: 'minus', mul: 'times', div: 'divided by' };
     function buildMathQuestion(level) {
         const lvNum = parseInt(String(level).replace(/\D/g, ''), 10) || 1;
-        const solved = progress.mathCorrect[level] || 0;
-        const ops = opsForLevel(lvNum);
-        const op = ops[Math.floor(Math.random() * ops.length)];
-        // Answer range: Level 1 = 1-10, Level 2 = 11-20, Level 3 = 21-30, etc.
+        const solved = (typeof progress !== 'undefined' && progress && progress.mathCorrect && progress.mathCorrect[level]) || 0;
         const minAnswer = (lvNum - 1) * 10 + 1;
         const maxAnswer = lvNum * 10;
+        const symbols = (typeof MATH_SYMBOL !== 'undefined' && MATH_SYMBOL) || { add: '+', sub: '−', mul: '×', div: '÷' };
+        const words = (typeof MATH_WORD !== 'undefined' && MATH_WORD) || { add: 'plus', sub: 'minus', mul: 'times', div: 'divided by' };
+        const doShuffle = (typeof shuffle === 'function') ? shuffle : function(arr) {
+            const a = arr.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        };
+
+        function buildChoices(ans, minVal, pool) {
+            minVal = (minVal !== undefined) ? minVal : 0;
+            const wrongSet = new Set([ans]);
+            if (pool && pool.length) {
+                for (let i = 0; i < pool.length; i++) {
+                    const item = pool[i];
+                    if (item !== ans && item >= minVal) wrongSet.add(item);
+                    if (wrongSet.size >= 4) break;
+                }
+            }
+            let delta = 1;
+            while (wrongSet.size < 4) {
+                const cand = ans + delta;
+                if (cand >= minVal && cand !== ans) wrongSet.add(cand);
+                if (wrongSet.size < 4) {
+                    const cand2 = ans - delta;
+                    if (cand2 >= minVal && cand2 !== ans) wrongSet.add(cand2);
+                }
+                delta++;
+            }
+            return doShuffle([...wrongSet]);
+        }
+
+        function renderTenFrameHTML(dots, total, color) {
+            total = total || 10;
+            color = color || 'var(--mc-redstone, #e04040)';
+            let cells = '';
+            for (let i = 0; i < total; i++) {
+                if (i < dots) {
+                    cells += `<div style="display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid var(--mc-border,#4a3728);border-radius:6px;width:38px;height:38px;"><span style="display:inline-block;width:22px;height:22px;border-radius:50%;background:${color};"></span></div>`;
+                } else {
+                    cells += `<div style="display:flex;align-items:center;justify-content:center;background:#fff;border:2px dashed #bbb;border-radius:6px;width:38px;height:38px;"></div>`;
+                }
+            }
+            return `<div style="display:grid;grid-template-columns:repeat(5, 38px);grid-template-rows:repeat(2, 38px);gap:6px;padding:8px;background:var(--mc-sand,#efe7d3);border:3px solid var(--mc-border,#4a3728);border-radius:10px;">${cells}</div>`;
+        }
+
+        // Select question type based on pedagogical progression
+        let allowedTypes;
+        if (lvNum === 1) {
+            // Kindergarten: balanced mix of ten-frame, object counting, comparing, missing addend, and addition
+            allowedTypes = ['ten_frame', 'count', 'compare', 'missing_addend', 'add'];
+        } else if (lvNum === 2) {
+            allowedTypes = ['ten_frame', 'compare', 'missing_addend', 'add'];
+        } else if (lvNum <= 4) {
+            allowedTypes = ['compare', 'missing_addend', 'add'];
+        } else {
+            allowedTypes = ['compare', 'missing_addend', 'arithmetic', 'arithmetic'];
+        }
+        const selectedType = allowedTypes[Math.floor(Math.random() * allowedTypes.length)];
+
+        // CCSS K.OA.A.4 / K.CC.B.5 Ten-frame counting and make-10 (Level 1 & Level 2)
+        if (selectedType === 'ten_frame') {
+            if (lvNum === 1) {
+                const isMake10 = Math.random() < 0.5;
+                if (isMake10) {
+                    const given = 1 + Math.floor(Math.random() * 9);
+                    const answer = 10 - given;
+                    const choices = buildChoices(answer, 1);
+                    const promptHTML = `<div class="math-row" style="flex-direction:column;gap:10px;">
+                        <div class="prompt-word" style="font-size:1.4rem;font-weight:700;">How many more to make 10?</div>
+                        ${renderTenFrameHTML(given)}
+                        <div class="math-eq" style="font-size:1.6rem;margin-top:4px;"><span>${given}</span><span class="op">+</span><span class="qm">?</span><span>=</span><span>10</span></div>
+                    </div>`;
+                    const speakText = `There are ${given} dots. How many more to make 10?`;
+                    const praiseText = `Correct! ${given} plus ${answer} makes 10!`;
+                    const retryText = `Not quite — count the empty spaces to make 10!`;
+                    return {
+                        type: 'ten_frame',
+                        op: 'add',
+                        a: given,
+                        b: answer,
+                        answer,
+                        choices,
+                        promptHTML,
+                        speakText,
+                        praiseText,
+                        retryText,
+                        awaitingNext: false,
+                        firstAttempt: true
+                    };
+                } else {
+                    const answer = 1 + Math.floor(Math.random() * 10);
+                    const choices = buildChoices(answer, 1);
+                    const promptHTML = `<div class="math-row" style="flex-direction:column;gap:10px;">
+                        <div class="prompt-word" style="font-size:1.4rem;font-weight:700;">How many dots?</div>
+                        ${renderTenFrameHTML(answer)}
+                    </div>`;
+                    const speakText = `How many dots are in the ten-frame?`;
+                    const praiseText = (answer === 1 ? `Correct! There is 1 dot in the ten-frame!` : `Correct! There are ${answer} dots in the ten-frame!`);
+                    const retryText = `Not quite — count the dots in the ten-frame again!`;
+                    return {
+                        type: 'ten_frame',
+                        op: 'add',
+                        a: answer,
+                        b: 0,
+                        answer,
+                        choices,
+                        promptHTML,
+                        speakText,
+                        praiseText,
+                        retryText,
+                        awaitingNext: false,
+                        firstAttempt: true
+                    };
+                }
+            } else {
+                // Level 2: CCSS K.NBT.A.1 teen numbers compose 10 + N (11-20)
+                const extra = 1 + Math.floor(Math.random() * 10);
+                const answer = 10 + extra;
+                const choices = buildChoices(answer, minAnswer);
+                const promptHTML = `<div class="math-row" style="flex-direction:column;gap:10px;">
+                    <div class="prompt-word" style="font-size:1.4rem;font-weight:700;">10 + ${extra} = ?</div>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+                        ${renderTenFrameHTML(10)}
+                        ${renderTenFrameHTML(extra, 10, 'var(--mc-emerald, #3fbf5f)')}
+                    </div>
+                </div>`;
+                const speakText = `Ten plus ${extra}. How many in all?`;
+                const praiseText = `Correct! 10 plus ${extra} is ${answer}!`;
+                const retryText = `Not quite — what is 10 plus ${extra}?`;
+                return {
+                    type: 'ten_frame',
+                    op: 'add',
+                    a: 10,
+                    b: extra,
+                    answer,
+                    choices,
+                    promptHTML,
+                    speakText,
+                    praiseText,
+                    retryText,
+                    awaitingNext: false,
+                    firstAttempt: true
+                };
+            }
+        }
+
+        // CCSS K.CC.B.5 Object counting with emojis (Level 1: 1-10 objects)
+        if (selectedType === 'count') {
+            const countObjects = [
+                { emoji: '🍎', singular: 'apple', plural: 'apples' },
+                { emoji: '🐛', singular: 'caterpillar', plural: 'caterpillars' },
+                { emoji: '⭐', singular: 'star', plural: 'stars' },
+                { emoji: '🚗', singular: 'car', plural: 'cars' },
+                { emoji: '🌸', singular: 'flower', plural: 'flowers' },
+                { emoji: '🎈', singular: 'balloon', plural: 'balloons' },
+                { emoji: '🐱', singular: 'cat', plural: 'cats' },
+                { emoji: '🐶', singular: 'dog', plural: 'dogs' },
+                { emoji: '🍕', singular: 'pizza slice', plural: 'pizza slices' },
+                { emoji: '🐸', singular: 'frog', plural: 'frogs' },
+                { emoji: '🍪', singular: 'cookie', plural: 'cookies' },
+                { emoji: '🐟', singular: 'fish', plural: 'fish' }
+            ];
+            const item = countObjects[Math.floor(Math.random() * countObjects.length)];
+            const answer = 1 + Math.floor(Math.random() * 10);
+            const name = answer === 1 ? item.singular : item.plural;
+            const choices = buildChoices(answer, 1);
+            const promptHTML = `<div class="math-row" style="flex-direction:column;gap:12px;">
+                <div class="prompt-word" style="font-size:1.5rem;font-weight:700;">How many?</div>
+                <div class="math-count-emojis" style="font-size:2.8rem;line-height:1.35;max-width:320px;text-align:center;letter-spacing:6px;word-break:break-word;">${Array(answer).fill(item.emoji).join(' ')}</div>
+            </div>`;
+            const speakText = `How many ${name}? Count them!`;
+            const praiseText = `Correct! There ${answer === 1 ? 'is 1 ' + name : 'are ' + answer + ' ' + name}!`;
+            const retryText = `Not quite — count the ${name} again!`;
+            return {
+                type: 'count',
+                op: 'add',
+                a: answer,
+                b: 0,
+                answer,
+                choices,
+                promptHTML,
+                speakText,
+                praiseText,
+                retryText,
+                awaitingNext: false,
+                firstAttempt: true
+            };
+        }
+
+        // CCSS K.CC.C.6 / K.CC.C.7 Number comparison (which is greater / which is less)
+        if (selectedType === 'compare') {
+            const n1 = minAnswer + Math.floor(Math.random() * (maxAnswer - minAnswer + 1));
+            let n2 = minAnswer + Math.floor(Math.random() * (maxAnswer - minAnswer + 1));
+            while (n2 === n1) {
+                n2 = minAnswer + Math.floor(Math.random() * (maxAnswer - minAnswer + 1));
+            }
+            const isGreater = Math.random() < 0.5;
+            const answer = isGreater ? Math.max(n1, n2) : Math.min(n1, n2);
+            const other = isGreater ? Math.min(n1, n2) : Math.max(n1, n2);
+            const phrase = isGreater ? 'Which number is greater?' : 'Which number is less?';
+            const speakWord = isGreater ? 'greater' : 'less';
+            const choices = buildChoices(answer, minAnswer, [other]);
+            const promptHTML = `<div class="math-row" style="flex-direction:column;gap:12px;">
+                <div class="prompt-word" style="font-size:1.5rem;font-weight:700;">${phrase}</div>
+                <div class="math-eq" style="gap:24px;">
+                    <span style="display:inline-block;padding:8px 18px;background:var(--mc-sand,#efe7d3);border:2px solid var(--mc-border,#4a3728);border-radius:12px;font-size:2.2rem;font-weight:800;">${n1}</span>
+                    <span style="font-size:1.6rem;color:#888;font-weight:600;">vs</span>
+                    <span style="display:inline-block;padding:8px 18px;background:var(--mc-sand,#efe7d3);border:2px solid var(--mc-border,#4a3728);border-radius:12px;font-size:2.2rem;font-weight:800;">${n2}</span>
+                </div>
+            </div>`;
+            const speakText = `Which number is ${speakWord}: ${n1} or ${n2}?`;
+            const praiseText = `Correct! ${answer} is ${speakWord} than ${other}!`;
+            const retryText = `Not quite — try again! Which number is ${speakWord}: ${n1} or ${n2}?`;
+            return {
+                type: 'compare',
+                op: 'add',
+                a: n1,
+                b: n2,
+                answer,
+                choices,
+                promptHTML,
+                speakText,
+                praiseText,
+                retryText,
+                awaitingNext: false,
+                firstAttempt: true
+            };
+        }
+
+        // CCSS K.OA.A.4 missing addend fill-in-the-blank (e.g. 3 + ? = 7 or ? + 4 = 9)
+        if (selectedType === 'missing_addend') {
+            let answer, sum, a, b;
+            const pos = Math.random() < 0.5 ? 'second' : 'first';
+            if (lvNum === 1) {
+                sum = 2 + Math.floor(Math.random() * 9); // 2..10
+                const known = 1 + Math.floor(Math.random() * (sum - 1));
+                answer = sum - known;
+                if (pos === 'second') {
+                    a = known;
+                    b = answer;
+                } else {
+                    a = answer;
+                    b = known;
+                }
+            } else {
+                answer = minAnswer + Math.floor(Math.random() * (maxAnswer - minAnswer + 1));
+                const known = 1 + Math.floor(Math.random() * 9);
+                sum = known + answer;
+                if (pos === 'second') {
+                    a = known;
+                    b = answer;
+                } else {
+                    a = answer;
+                    b = known;
+                }
+            }
+            const choices = buildChoices(answer, minAnswer);
+            let promptHTML, speakText, praiseText, retryText;
+            if (pos === 'second') {
+                promptHTML = `<div class="math-row"><div class="math-eq"><span>${a}</span><span class="op">+</span><span class="qm">?</span><span>=</span><span>${sum}</span></div></div>`;
+                speakText = `${a} plus what equals ${sum}?`;
+                praiseText = `Correct! ${a} plus ${answer} is ${sum}!`;
+                retryText = `Not quite — try again! ${a} plus what equals ${sum}?`;
+            } else {
+                promptHTML = `<div class="math-row"><div class="math-eq"><span class="qm">?</span><span class="op">+</span><span>${b}</span><span>=</span><span>${sum}</span></div></div>`;
+                speakText = `What plus ${b} equals ${sum}?`;
+                praiseText = `Correct! ${answer} plus ${b} is ${sum}!`;
+                retryText = `Not quite — try again! What plus ${b} equals ${sum}?`;
+            }
+            return {
+                type: 'missing_addend',
+                op: 'add',
+                a,
+                b,
+                answer,
+                choices,
+                promptHTML,
+                speakText,
+                praiseText,
+                retryText,
+                awaitingNext: false,
+                firstAttempt: true
+            };
+        }
+
+        // Standard arithmetic operations according to opsForLevel
+        const getOps = (typeof opsForLevel === 'function') ? opsForLevel : function(lv) {
+            if (lv <= 4) return ['add'];
+            if (lv <= 7) return ['add', 'sub'];
+            if (lv <= 9) return ['add', 'sub', 'mul'];
+            return ['add', 'sub', 'mul', 'div'];
+        };
+        const ops = getOps(lvNum);
+        const op = ops[Math.floor(Math.random() * ops.length)];
         let a, b, answer;
         if (op === 'add') {
-            a = 1 + Math.floor(Math.random() * (maxAnswer - 1));
-            b = Math.max(1, minAnswer - a + Math.floor(Math.random() * Math.min(a, maxAnswer - minAnswer + 1)));
-            answer = a + b;
-            // Ensure answer is in range
-            while (answer < minAnswer || answer > maxAnswer) {
-                a = 1 + Math.floor(Math.random() * (maxAnswer - 1));
-                b = 1 + Math.floor(Math.random() * Math.min(a, maxAnswer - 1));
-                answer = a + b;
-            }
+            const minA = Math.max(2, minAnswer);
+            answer = minA + Math.floor(Math.random() * (maxAnswer - minA + 1));
+            a = 1 + Math.floor(Math.random() * (answer - 1));
+            b = answer - a;
         } else if (op === 'sub') {
-            // For subtraction, start with a number that gives answer in range
-            a = minAnswer + Math.floor(Math.random() * (maxAnswer - minAnswer + 1));
-            b = Math.floor(Math.random() * Math.min(a - 1, maxAnswer - minAnswer));
-            answer = a - b;
-            // Ensure answer is in range
-            while (answer < minAnswer || answer > maxAnswer) {
-                a = minAnswer + Math.floor(Math.random() * (maxAnswer - minAnswer + 1));
-                b = Math.floor(Math.random() * Math.min(a - 1, maxAnswer - minAnswer));
-                answer = a - b;
-            }
+            answer = minAnswer + Math.floor(Math.random() * (maxAnswer - minAnswer + 1));
+            b = 1 + Math.floor(Math.random() * Math.min(20, Math.max(9, Math.floor(maxAnswer / 2))));
+            a = answer + b;
         } else if (op === 'mul') {
-            // Keep factors small and friendly for early learners.
-            const maxFactor = Math.min(10, 2 + Math.floor(maxAnswer / 5));
-            a = 1 + Math.floor(Math.random() * maxFactor);
-            b = 1 + Math.floor(Math.random() * maxFactor);
-            answer = a * b;
-            // Ensure answer is in range
-            while (answer < minAnswer || answer > maxAnswer) {
-                a = 1 + Math.floor(Math.random() * maxFactor);
-                b = 1 + Math.floor(Math.random() * maxFactor);
-                answer = a * b;
+            const factors = [];
+            for (let fa = 1; fa <= 10; fa++) {
+                for (let fb = 1; fb <= 10; fb++) {
+                    const prod = fa * fb;
+                    if (prod >= minAnswer && prod <= maxAnswer) {
+                        factors.push([fa, fb, prod]);
+                    }
+                }
+            }
+            if (factors.length > 0) {
+                const pair = factors[Math.floor(Math.random() * factors.length)];
+                a = pair[0];
+                b = pair[1];
+                answer = pair[2];
+            } else {
+                answer = minAnswer;
+                a = 1;
+                b = minAnswer;
             }
         } else { // div — always clean (no remainders)
-            b = 1 + Math.floor(Math.random() * Math.min(10, maxAnswer / 5));
-            answer = minAnswer + Math.floor(Math.random() * (maxAnswer - minAnswer + 1));
-            a = b * answer;
-            // Ensure answer is in range
-            while (answer < minAnswer || answer > maxAnswer || a > 100) {
-                b = 1 + Math.floor(Math.random() * Math.min(10, maxAnswer / 5));
-                answer = minAnswer + Math.floor(Math.random() * (maxAnswer - minAnswer + 1));
-                a = b * answer;
+            const candAnswers = [];
+            for (let q = minAnswer; q <= maxAnswer; q++) {
+                for (let d = 2; d <= 10; d++) {
+                    if (d * q <= 100) candAnswers.push([d * q, d, q]);
+                }
+            }
+            if (candAnswers.length > 0) {
+                const pair = candAnswers[Math.floor(Math.random() * candAnswers.length)];
+                a = pair[0];
+                b = pair[1];
+                answer = pair[2];
+            } else {
+                answer = minAnswer;
+                a = minAnswer;
+                b = 1;
             }
         }
-        // Build 4 distinct answer choices around the correct value.
-        const wrongSet = new Set([answer]);
-        let delta = 1;
-        while (wrongSet.size < 4) {
-            const cand = answer + delta;
-            if (cand >= 0 && cand !== answer) wrongSet.add(cand);
-            if (wrongSet.size < 4) {
-                const cand2 = answer - delta;
-                if (cand2 >= 0 && cand2 !== answer) wrongSet.add(cand2);
-            }
-            delta++;
-        }
-        const choices = shuffle([...wrongSet]);
-        return { op, a, b, answer, choices, awaitingNext: false, firstAttempt: true };
+
+        const choices = buildChoices(answer, minAnswer);
+        const sym = symbols[op] || '+';
+        const word = words[op] || 'plus';
+        const promptHTML = `<div class="math-row"><div class="math-eq"><span>${a}</span><span class="op">${sym}</span><span>${b}</span><span>=</span><span class="qm">?</span></div></div>`;
+        const speakText = `${a} ${word} ${b}. What is the answer?`;
+        const praiseText = `Correct! ${a} ${word} ${b} is ${answer}!`;
+        const retryText = `Not quite — try again! ${a} ${word} ${b}?`;
+        return {
+            type: op,
+            op,
+            a,
+            b,
+            answer,
+            choices,
+            promptHTML,
+            speakText,
+            praiseText,
+            retryText,
+            awaitingNext: false,
+            firstAttempt: true
+        };
     }
     function renderMathPlay() {
         const q = mathState.questions[mathState.idx];
         const choicesHTML = q.choices.map(n => `
             <button class="choice-btn" data-id="${n}" onclick="handleMathChoice(${n}, this)">${n}</button>
         `).join('');
-        const sym = MATH_SYMBOL[q.op];
+        const sym = (typeof MATH_SYMBOL !== 'undefined' && MATH_SYMBOL[q.op]) || '+';
         const lvNum = parseInt(String(mathState.level).replace(/\D/g, ''), 10) || 1;
-        return `${topbar(true)}
-        <div class="center-col">
-            <div style="color:#999;margin-bottom:8px;">Level ${lvNum} · Question ${mathState.idx + 1} of ${ROUND_LENGTH}</div>
+        const promptContent = q.promptHTML || `
             <div class="math-row">
                 <div class="math-eq">
                     <span>${q.a}</span>
@@ -2258,13 +2564,21 @@
                     <span>=</span>
                     <span class="qm">?</span>
                 </div>
-            </div>
+            </div>`;
+        return `${topbar(true)}
+        <div class="center-col">
+            <div style="color:#999;margin-bottom:8px;">Level ${lvNum} · Question ${mathState.idx + 1} of ${ROUND_LENGTH}</div>
+            ${promptContent}
             <div class="choices">${choicesHTML}</div>
         </div>`;
     }
     function afterMathPlayRender() {
         const q = mathState.questions[mathState.idx];
-        const word = MATH_WORD[q.op];
+        if (q && q.speakText) {
+            speak(q.speakText);
+            return;
+        }
+        const word = (typeof MATH_WORD !== 'undefined' && MATH_WORD[q.op]) || 'plus';
         speak(`${q.a} ${word} ${q.b}. What is the answer?`);
     }
     function handleMathChoice(n, btnEl) {
