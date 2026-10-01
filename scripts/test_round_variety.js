@@ -300,26 +300,22 @@ function createQuizEnvironment(mockMastery = {}, mockDue = {}) {
 // (5) Sight words levels: every level has >= 8 items and all IDs are globally unique
 {
     assert.strictEqual(SIGHTWORDS_LEVELS.length, 5, 'SIGHTWORDS_LEVELS must have exactly 5 levels');
-    if (SIGHTWORDS_LEVELS[0].length >= 8) {
-        for (let i = 0; i < SIGHTWORDS_LEVELS.length; i++) {
-            const lv = SIGHTWORDS_LEVELS[i];
-            assert(lv.length >= 8, `Sight words Level ${i + 1} must have >= 8 items, found ${lv.length}`);
-            for (const item of lv) {
-                assert(item.id && typeof item.id === 'string', `Item in L${i + 1} must have a string id`);
-                assert(item.emoji && typeof item.emoji === 'string', `Item ${item.id} in L${i + 1} must have an emoji`);
-            }
+    for (let i = 0; i < SIGHTWORDS_LEVELS.length; i++) {
+        const lv = SIGHTWORDS_LEVELS[i];
+        assert(lv.length >= 8, `Sight words Level ${i + 1} must have >= 8 items, found ${lv.length}`);
+        for (const item of lv) {
+            assert(item.id && typeof item.id === 'string', `Item in L${i + 1} must have a string id`);
+            assert(item.emoji && typeof item.emoji === 'string', `Item ${item.id} in L${i + 1} must have an emoji`);
         }
-        const seenIds = new Set();
-        for (let i = 0; i < SIGHTWORDS_LEVELS.length; i++) {
-            for (const item of SIGHTWORDS_LEVELS[i]) {
-                assert(!seenIds.has(item.id), `Duplicate sight word ID across levels: "${item.id}"`);
-                seenIds.add(item.id);
-            }
-        }
-        console.log(`✓ (5) sightwords each level has >= 8 items (${seenIds.size} total) and all IDs are globally unique`);
-    } else {
-        console.log(`ℹ (5) SIGHTWORDS_LEVELS currently has ${SIGHTWORDS_LEVELS[0].length} items (pre-Commit B expansion check)`);
     }
+    const seenIds = new Set();
+    for (let i = 0; i < SIGHTWORDS_LEVELS.length; i++) {
+        for (const item of SIGHTWORDS_LEVELS[i]) {
+            assert(!seenIds.has(item.id), `Duplicate sight word ID across levels: "${item.id}"`);
+            seenIds.add(item.id);
+        }
+    }
+    console.log(`✓ (5) sightwords each level has >= 8 items (${seenIds.size} total) and all IDs are globally unique`);
 }
 
 console.log('\nAll round variety tests PASSED! ✅');
