@@ -965,6 +965,8 @@
             {id:'stc4',item:{emoji:'🍌',name:'banana'},correctCategory:'Food',categories:['Food','Animal','Clothing','Color']},
             {id:'stc5',item:{emoji:'🐶',name:'dog'},correctCategory:'Animal',categories:['Food','Animal','Clothing','Color']},
             {id:'stc6',item:{emoji:'🧣',name:'scarf'},correctCategory:'Clothing',categories:['Food','Animal','Clothing','Color']},
+            {id:'stc19',item:{emoji:'🧦',name:'sock'},correctCategory:'Clothing',categories:['Food','Animal','Clothing','Color']},
+            {id:'stc20',item:{emoji:'🍇',name:'grape'},correctCategory:'Food',categories:['Food','Animal','Clothing','Color']},
         ],
         [ // Level 2 — Furniture vs Vehicles vs Tools
             {id:'stc7',item:{emoji:'🪑',name:'chair'},correctCategory:'Furniture',categories:['Furniture','Vehicle','Tool','Food']},
@@ -973,6 +975,8 @@
             {id:'stc10',item:{emoji:'🛏️',name:'bed'},correctCategory:'Furniture',categories:['Furniture','Vehicle','Tool','Food']},
             {id:'stc11',item:{emoji:'🚌',name:'bus'},correctCategory:'Vehicle',categories:['Furniture','Vehicle','Tool','Food']},
             {id:'stc12',item:{emoji:'🪛',name:'screwdriver'},correctCategory:'Tool',categories:['Furniture','Vehicle','Tool','Food']},
+            {id:'stc21',item:{emoji:'🛋️',name:'sofa'},correctCategory:'Furniture',categories:['Furniture','Vehicle','Tool','Food']},
+            {id:'stc22',item:{emoji:'✈️',name:'airplane'},correctCategory:'Vehicle',categories:['Furniture','Vehicle','Tool','Food']},
         ],
         [ // Level 3 — Mixed categories
             {id:'stc13',item:{emoji:'📚',name:'book'},correctCategory:'School',categories:['Food','Animal','School','Nature']},
@@ -981,6 +985,8 @@
             {id:'stc16',item:{emoji:'🥕',name:'carrot'},correctCategory:'Food',categories:['Food','Animal','School','Nature']},
             {id:'stc17',item:{emoji:'✏️',name:'pencil'},correctCategory:'School',categories:['Food','Animal','School','Nature']},
             {id:'stc18',item:{emoji:'🌊',name:'water'},correctCategory:'Nature',categories:['Food','Animal','School','Nature']},
+            {id:'stc23',item:{emoji:'🎒',name:'backpack'},correctCategory:'School',categories:['Food','Animal','School','Nature']},
+            {id:'stc24',item:{emoji:'🌻',name:'sunflower'},correctCategory:'Nature',categories:['Food','Animal','School','Nature']},
         ],
     ];
 
