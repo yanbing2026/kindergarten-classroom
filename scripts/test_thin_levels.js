@@ -32,7 +32,17 @@ assert(Array.isArray(CATEGORIES), 'CATEGORIES must be loaded from content.js');
 console.log('Testing thin kindergarten categories for ROUND_LENGTH >= 8 items per level...');
 
 // Categories to verify as they are expanded.
-const ACTIVE_CATEGORIES = ['sentences', 'decompose', 'printconcepts', 'begendsounds', 'prepositions', 'sortcategory'];
+const ACTIVE_CATEGORIES = [
+    'sentences',
+    'decompose',
+    'printconcepts',
+    'begendsounds',
+    'prepositions',
+    'sortcategory',
+    'words',
+    'chinese',
+    'spanish'
+];
 
 for (const catKey of ACTIVE_CATEGORIES) {
     const cat = CATEGORIES.find(c => c.key === catKey);
@@ -99,13 +109,13 @@ for (const catKey of ACTIVE_CATEGORIES) {
                 assert(!seenItems.has(item.item.name), `SortCategory item "${item.item.name}" duplicated across levels`);
                 seenItems.add(item.item.name);
             } else if (catKey === 'words' || catKey === 'chinese' || catKey === 'spanish') {
-                for (const vocab of lv.items) {
-                    assert(vocab.emoji, `${catKey} ${vocab.id} missing emoji`);
-                    if (catKey === 'chinese') {
-                        assert(vocab.hanzi && typeof vocab.hanzi === 'string', `Chinese ${vocab.id} missing hanzi`);
-                    } else if (catKey === 'spanish') {
-                        assert(vocab.es && typeof vocab.es === 'string', `Spanish ${vocab.id} missing es`);
-                    }
+                assert(item.emoji, `${catKey} ${item.id} missing emoji`);
+                if (catKey === 'chinese') {
+                    assert(item.hanzi && typeof item.hanzi === 'string', `Chinese ${item.id} missing hanzi`);
+                    assert(item.en && typeof item.en === 'string', `Chinese ${item.id} missing en`);
+                } else if (catKey === 'spanish') {
+                    assert(item.es && typeof item.es === 'string', `Spanish ${item.id} missing es`);
+                    assert(item.en && typeof item.en === 'string', `Spanish ${item.id} missing en`);
                 }
             }
         }

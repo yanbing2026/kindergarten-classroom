@@ -202,6 +202,9 @@
             {id:'understand',emoji:'💡',en:'Understand',zh:{hanzi:'理解'},es:'Entender'},
             {id:'wondering',emoji:'🤔',en:'Wondering',zh:{hanzi:'思考'},es:'Preguntándose'},
             {id:'youngster',emoji:'🧒',en:'Youngster',zh:{hanzi:'小朋友'},es:'Niño'},
+            {id:'astronaut',emoji:'👨‍🚀',en:'Astronaut',zh:{hanzi:'宇航员'},es:'Astronauta'},
+            {id:'telescope',emoji:'🔭',en:'Telescope',zh:{hanzi:'望远镜'},es:'Telescopio'},
+            {id:'universe',emoji:'🌌',en:'Universe',zh:{hanzi:'宇宙'},es:'Universo'},
         ],
     ];
 
@@ -217,6 +220,8 @@
         id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i],
         items: entries.map(v => ({ id:v.id, emoji:v.emoji, img:v.img, es:v.es, en:v.en }))
     }));
+    const CHINESE = CHINESE_LEVELS.flatMap(l => l.items);
+    const SPANISH = SPANISH_LEVELS.flatMap(l => l.items);
 
     // ---------- Math (10 levels; difficulty ramps with level + solved count) ----------
     const MATH_LEVELS = Array.from({length:10}, (_, i) => ({
