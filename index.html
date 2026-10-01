@@ -1116,7 +1116,9 @@
         quiz = { key: 'review', level: 'mixed', items: [], questions: [], idx: 0, correctFirstTry: 0, firstAttempt: true, awaitingNext: false, stars: 0, streak: 0, retryQueue: [], reviewMode: true, reviewItems: due, reviewStats: { attempted: 0, correct: 0, firstTry: 0, skills: {}, needsPractice: [] } };
         const first = due[0];
         const items = first.cat.levels.find(lv => lv.id === first.level.id).items;
-        quiz.questions.push(buildQuestion(first.cat.key, items, first.level.id, first.item.id));
+        const q0 = buildQuestion(first.cat.key, items, first.level.id, first.item.id);
+        if (!q0) return;
+        quiz.questions.push(q0);
         quiz.questions[0].sourceKey = first.cat.key;
         quiz.questions[0].sourceLevel = first.level.id;
         quiz.questions[0].sourceCatKey = first.catKey;
@@ -1555,14 +1557,26 @@
     let gradeQuiz = null;
     function startQuiz(key, level, targetId) {
         const items = getCategoryItems(key, level);
-        quiz = { key, level, items, questions: [], idx: 0, correctFirstTry: 0, firstAttempt: true, awaitingNext: false, stars: 0, streak: 0, retryQueue: [], wrongAttempts: 0 };
+        if (!items || items.length === 0) {
+            goHome();
+            return;
+        }
+        quiz = { key, level, items, questions: [], idx: 0, correctFirstTry: 0, firstAttempt: true, awaitingNext: false, stars: 0, streak: 0, retryQueue: [], wrongAttempts: 0, usedItemIds: [] };
         // Generate one question at a time so recent performance can affect the next question.
-        quiz.questions.push(buildQuestion(key, items, level, targetId));
+        const q0 = buildQuestion(key, items, level, targetId, quiz.usedItemIds);
+        if (!q0) {
+            goHome();
+            return;
+        }
+        quiz.questions.push(q0);
+        const usedId = q0.sourceItemId || q0.itemId;
+        if (usedId) quiz.usedItemIds.push(usedId);
         quiz.blipolaContext = blipola.startQuestion(quiz.questions[0]);
         quiz.blipolaRecommendation = blipola.recommend(key, targetId || quiz.questions[0].itemId);
         go('play', { key, level });
     }
-    function buildQuestion(key, items, level, targetId) {
+    function buildQuestion(key, items, level, targetId, excludeIds = []) {
+        if (!items || items.length === 0) return null;
         // Adaptive weighting (research C) + spaced repetition (B):
         // weight each item by how much it needs practice — weak / due items
         // get a higher chance of being selected; already-mastered-and-not-due
@@ -1578,13 +1592,19 @@
             else w = 0.4;                       // mastered & not due — low
             return { it, w };
         });
-        const totalW = weighted.reduce((a, x) => a + x.w, 0);
-        let r = Math.random() * totalW, correct = weighted[0].it;
-        for (const x of weighted) { r -= x.w; if (r <= 0) { correct = x.it; break; } }
+        const excludeSet = (typeof excludeIds !== 'undefined' && excludeIds) ? (excludeIds instanceof Set ? excludeIds : new Set(excludeIds)) : null;
+        const available = (excludeSet && excludeSet.size > 0) ? weighted.filter(x => !excludeSet.has(x.it.id)) : [];
+        const active = available.length > 0 ? available : weighted;
+        const totalW = active.reduce((a, x) => a + x.w, 0);
+        let r = Math.random() * totalW, correct = active[0] ? active[0].it : null;
+        for (const x of active) { r -= x.w; if (r <= 0) { correct = x.it; break; } }
         if (targetId) {
-            const target = items.find(it => it.id === targetId);
+            const targetKey = (typeof targetId === 'object' && targetId) ? targetId.itemId : targetId;
+            const target = items.find(it => it.id === targetId || it.id === targetKey);
             if (target) correct = target;
         }
+        if (!correct) return null;
+        const q = (() => {
         if (key === 'letters') {
             if (Math.random() < 0.5) {
                 const choices = pickChoices(items, correct, 4);
@@ -1984,6 +2004,12 @@
                 choices: shuffle(choices)
             };
         }
+            return null;
+        })();
+        if (q) {
+            q.sourceItemId = correct.id;
+        }
+        return q;
     }
     function soundOutCurrentWord() {
         const q = quiz.questions[quiz.idx];
@@ -2002,7 +2028,7 @@
         return `${topbar(true)}
         <div class="center-col">
             <div id="blipolaBuddy" style="display:flex;align-items:center;gap:10px;margin:0 auto 10px;max-width:720px;padding:9px 12px;border:2px solid #333;border-radius:14px;background:#fff;font-weight:800;">🤖 <span>Blipola</span><span id="blipolaMessage" aria-live="polite" style="font-weight:600;opacity:.78;">Think first. You can ask me for a clue.</span><button class="choice-btn" type="button" onclick="blipolaHint()" style="margin-left:auto;padding:7px 10px;">💡 Hint</button></div>
-            <div style="color:#999;margin-bottom:8px;">Question ${quiz.idx + 1} of ${quiz.reviewMode ? ROUND_LENGTH : quiz.questions.length}</div>
+            <div style="color:#999;margin-bottom:8px;">Question ${quiz.idx + 1} of ${ROUND_LENGTH}</div>
             <div id="streakBadge" class="streak-badge" aria-live="polite"></div>
             <div class="prompt-box">${q.promptHTML}</div>
             <div class="choices">${choicesHTML}</div>
@@ -2109,16 +2135,29 @@
             if (target) target = quiz.reviewItems.find(x => x.catKey === target.catKey && x.item.id === target.itemId) || quiz.reviewItems.find(x => x.item.id === target.itemId);
             if (!target) target = quiz.reviewItems[quiz.idx % quiz.reviewItems.length];
             const items = target.cat.levels.find(lv => lv.id === target.level.id).items;
-            quiz.questions[quiz.idx] = buildQuestion(target.cat.key, items, target.level.id, target.item.id);
-            quiz.questions[quiz.idx].sourceKey = target.cat.key;
-            quiz.questions[quiz.idx].sourceLevel = target.level.id;
-            quiz.blipolaContext = blipola.startQuestion(quiz.questions[quiz.idx]);
-            quiz.blipolaRecommendation = blipola.recommend(target.cat.key, target.item.id);
-            quiz.blipolaRecommendation = blipola.recommend(target.cat.key, target.item.id);
-            quiz.questions[quiz.idx].sourceCatKey = target.catKey;
+            const q = buildQuestion(target.cat.key, items, target.level.id, target.item.id);
+            if (q) {
+                quiz.questions[quiz.idx] = q;
+                quiz.questions[quiz.idx].sourceKey = target.cat.key;
+                quiz.questions[quiz.idx].sourceLevel = target.level.id;
+                quiz.blipolaContext = blipola.startQuestion(quiz.questions[quiz.idx]);
+                quiz.blipolaRecommendation = blipola.recommend(target.cat.key, target.item.id);
+                quiz.questions[quiz.idx].sourceCatKey = target.catKey;
+            }
         } else {
-            const retryId = quiz.retryQueue.length ? quiz.retryQueue.shift() : null;
-            quiz.questions[quiz.idx] = buildQuestion(quiz.key, quiz.items, quiz.level, retryId);
+            const retry = quiz.retryQueue.length ? quiz.retryQueue.shift() : null;
+            const retryId = retry ? (retry.itemId || retry) : null;
+            if (quiz.items && quiz.usedItemIds && quiz.usedItemIds.length >= quiz.items.length) {
+                quiz.usedItemIds = [];
+            }
+            const q = buildQuestion(quiz.key, quiz.items, quiz.level, retryId, quiz.usedItemIds);
+            if (q) {
+                quiz.questions[quiz.idx] = q;
+                const usedId = q.sourceItemId || q.itemId;
+                if (usedId && !retryId) {
+                    quiz.usedItemIds.push(usedId);
+                }
+            }
         }
         render();
     }
@@ -3274,8 +3313,10 @@ return `${topbar(true)}
         const questions = [];
         for (let i = 0; i < target; i++) {
             const pick = pool[Math.floor(Math.random() * pool.length)];
-            questions.push(buildQuestion(pick.key, [pick.item], pick.level));
+            const q = buildQuestion(pick.key, [pick.item], pick.level);
+            if (q) questions.push(q);
         }
+        if (questions.length === 0) { goHome(); return; }
         timedState = { questions, idx: 0, score: 0, target, streak: 0, awaitingNext: false };
         go('timed', {});
     }
