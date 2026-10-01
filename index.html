@@ -2258,6 +2258,47 @@
             };
         }
 
+        // CCSS K.CC.C.6 / K.CC.C.7 Number comparison (which is greater / which is less)
+        const allowCompare = (lvNum <= 4 && Math.random() < 0.25) || (lvNum > 4 && Math.random() < 0.15);
+        if (allowCompare) {
+            const n1 = minAnswer + Math.floor(Math.random() * (maxAnswer - minAnswer + 1));
+            let n2 = minAnswer + Math.floor(Math.random() * (maxAnswer - minAnswer + 1));
+            while (n2 === n1) {
+                n2 = minAnswer + Math.floor(Math.random() * (maxAnswer - minAnswer + 1));
+            }
+            const isGreater = Math.random() < 0.5;
+            const answer = isGreater ? Math.max(n1, n2) : Math.min(n1, n2);
+            const other = isGreater ? Math.min(n1, n2) : Math.max(n1, n2);
+            const phrase = isGreater ? 'Which number is greater?' : 'Which number is less?';
+            const speakWord = isGreater ? 'greater' : 'less';
+            const choices = buildChoices(answer, minAnswer, [other]);
+            const promptHTML = `<div class="math-row" style="flex-direction:column;gap:12px;">
+                <div class="prompt-word" style="font-size:1.5rem;font-weight:700;">${phrase}</div>
+                <div class="math-eq" style="gap:24px;">
+                    <span style="display:inline-block;padding:8px 18px;background:var(--mc-sand,#efe7d3);border:2px solid var(--mc-border,#4a3728);border-radius:12px;font-size:2.2rem;font-weight:800;">${n1}</span>
+                    <span style="font-size:1.6rem;color:#888;font-weight:600;">vs</span>
+                    <span style="display:inline-block;padding:8px 18px;background:var(--mc-sand,#efe7d3);border:2px solid var(--mc-border,#4a3728);border-radius:12px;font-size:2.2rem;font-weight:800;">${n2}</span>
+                </div>
+            </div>`;
+            const speakText = `Which number is ${speakWord}: ${n1} or ${n2}?`;
+            const praiseText = `Correct! ${answer} is ${speakWord} than ${other}!`;
+            const retryText = `Not quite — try again! Which number is ${speakWord}: ${n1} or ${n2}?`;
+            return {
+                type: 'compare',
+                op: 'add',
+                a: n1,
+                b: n2,
+                answer,
+                choices,
+                promptHTML,
+                speakText,
+                praiseText,
+                retryText,
+                awaitingNext: false,
+                firstAttempt: true
+            };
+        }
+
         // CCSS K.OA.A.4 missing addend fill-in-the-blank (e.g. 3 + ? = 7 or ? + 4 = 9)
         const allowMissingAddend = (lvNum <= 4 && Math.random() < 0.5) || (lvNum > 4 && Math.random() < 0.25);
         if (allowMissingAddend) {
