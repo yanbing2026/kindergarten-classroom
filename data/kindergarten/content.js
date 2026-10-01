@@ -931,6 +931,8 @@
             {id:'pr4',scene:'🐱📦',answer:'on',options:['in','on','under','next to']},
             {id:'pr5',scene:'📦⬇️🐱',answer:'under',options:['in','on','under','in front of']},
             {id:'pr6',scene:'📦🐱',answer:'in',options:['in','on','under','behind']},
+            {id:'pr19',scene:'🐱📥📦',answer:'in',options:['in','on','under','next to']},
+            {id:'pr20',scene:'🐱🔝📦',answer:'on',options:['in','on','under','behind']},
         ],
         [ // Level 2 — behind, in front of, between
             {id:'pr7',scene:'🪑🐱📦',answer:'between',options:['behind','in front of','between','next to']},
@@ -939,6 +941,8 @@
             {id:'pr10',scene:'📦🐱📦',answer:'between',options:['behind','in front of','between','on']},
             {id:'pr11',scene:'📦🐱',answer:'behind',options:['behind','in front of','on','under']},
             {id:'pr12',scene:'🐱📦',answer:'in front of',options:['behind','in front of','on','under']},
+            {id:'pr21',scene:'🌳🐱📦',answer:'between',options:['behind','in front of','between','next to']},
+            {id:'pr22',scene:'🐱⬅️📦',answer:'in front of',options:['behind','in front of','between','on']},
         ],
         [ // Level 3 — above, below, next to
             {id:'pr13',scene:'🐱⬆️📦',answer:'above',options:['above','below','next to','in']},
@@ -947,6 +951,8 @@
             {id:'pr16',scene:'📦⬆️🐱',answer:'above',options:['above','below','next to','under']},
             {id:'pr17',scene:'📦⬇️🐱',answer:'below',options:['above','below','next to','over']},
             {id:'pr18',scene:'📦🐱',answer:'next to',options:['above','below','next to','behind']},
+            {id:'pr23',scene:'🐱↔️📦',answer:'next to',options:['above','below','next to','in']},
+            {id:'pr24',scene:'🐱🔼📦',answer:'above',options:['above','below','next to','under']},
         ],
     ];
 
