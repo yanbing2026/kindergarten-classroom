@@ -863,6 +863,8 @@
             {id:'bes4',word:'Fish',emoji:'🐟',position:'beginning',answer:'f',options:['f','s','p','h']},
             {id:'bes5',word:'Sun',emoji:'☀️',position:'beginning',answer:'s',options:['s','h','b','m']},
             {id:'bes6',word:'Tree',emoji:'🌳',position:'beginning',answer:'t',options:['t','r','l','e']},
+            {id:'bes19',word:'Bear',emoji:'🐻',position:'beginning',answer:'b',options:['b','d','p','m']},
+            {id:'bes20',word:'Pig',emoji:'🐷',position:'beginning',answer:'p',options:['p','b','d','q']},
         ],
         [ // Level 2 — Ending sounds
             {id:'bes7',word:'Cat',emoji:'🐱',position:'ending',answer:'t',options:['t','c','a','s']},
@@ -871,6 +873,8 @@
             {id:'bes10',word:'Bus',emoji:'🚌',position:'ending',answer:'s',options:['s','b','u','z']},
             {id:'bes11',word:'Hand',emoji:'✋',position:'ending',answer:'d',options:['d','h','n','t']},
             {id:'bes12',word:'Bike',emoji:'🚲',position:'ending',answer:'k',options:['k','b','i','e']},
+            {id:'bes21',word:'Fox',emoji:'🦊',position:'ending',answer:'x',options:['x','s','k','f']},
+            {id:'bes22',word:'Bat',emoji:'🦇',position:'ending',answer:'t',options:['t','b','d','p']},
         ],
         [ // Level 3 — Mixed review
             {id:'bes13',word:'Map',emoji:'🗺️',position:'beginning',answer:'m',options:['m','p','a','d']},
@@ -879,6 +883,8 @@
             {id:'bes16',word:'Jump',emoji:'🦘',position:'ending',answer:'p',options:['p','j','u','m']},
             {id:'bes17',word:'Cup',emoji:'☕',position:'beginning',answer:'c',options:['c','u','p','k']},
             {id:'bes18',word:'Bed',emoji:'🛏️',position:'ending',answer:'d',options:['d','b','e','t']},
+            {id:'bes23',word:'Duck',emoji:'🦆',position:'beginning',answer:'d',options:['d','b','k','t']},
+            {id:'bes24',word:'Hen',emoji:'🐔',position:'ending',answer:'n',options:['n','h','m','t']},
         ],
     ];
 
