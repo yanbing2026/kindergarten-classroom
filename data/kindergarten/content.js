@@ -202,6 +202,9 @@
             {id:'understand',emoji:'💡',en:'Understand',zh:{hanzi:'理解'},es:'Entender'},
             {id:'wondering',emoji:'🤔',en:'Wondering',zh:{hanzi:'思考'},es:'Preguntándose'},
             {id:'youngster',emoji:'🧒',en:'Youngster',zh:{hanzi:'小朋友'},es:'Niño'},
+            {id:'astronaut',emoji:'👨‍🚀',en:'Astronaut',zh:{hanzi:'宇航员'},es:'Astronauta'},
+            {id:'telescope',emoji:'🔭',en:'Telescope',zh:{hanzi:'望远镜'},es:'Telescopio'},
+            {id:'universe',emoji:'🌌',en:'Universe',zh:{hanzi:'宇宙'},es:'Universo'},
         ],
     ];
 
@@ -217,6 +220,8 @@
         id: 'L' + (i+1), label: 'Level ' + (i+1), icon: LEVEL_ICONS[i],
         items: entries.map(v => ({ id:v.id, emoji:v.emoji, img:v.img, es:v.es, en:v.en }))
     }));
+    const CHINESE = CHINESE_LEVELS.flatMap(l => l.items);
+    const SPANISH = SPANISH_LEVELS.flatMap(l => l.items);
 
     // ---------- Math (10 levels; difficulty ramps with level + solved count) ----------
     const MATH_LEVELS = Array.from({length:10}, (_, i) => ({
@@ -744,6 +749,9 @@
             {id:'dc3',number:4,answer:[2,2],options:[[2,2],[1,3],[0,4],[3,1]]},
             {id:'dc4',number:5,answer:[2,3],options:[[2,3],[1,4],[0,5],[3,3]]},
             {id:'dc5',number:1,answer:[0,1],options:[[0,1],[1,0],[0,2],[2,0]]},
+            {id:'dc16',number:3,answer:[0,3],options:[[0,3],[1,3],[2,2],[0,4]]},
+            {id:'dc17',number:4,answer:[1,3],options:[[1,3],[0,3],[2,3],[1,4]]},
+            {id:'dc18',number:5,answer:[1,4],options:[[1,4],[1,3],[2,4],[0,4]]},
         ],
         [ // Level 2 — Decompose 6-10
             {id:'dc6',number:6,answer:[3,3],options:[[3,3],[2,4],[1,5],[0,6]]},
@@ -751,6 +759,9 @@
             {id:'dc8',number:8,answer:[4,4],options:[[4,4],[3,5],[2,6],[1,7]]},
             {id:'dc9',number:9,answer:[4,5],options:[[4,5],[3,6],[2,7],[5,5]]},
             {id:'dc10',number:10,answer:[5,5],options:[[5,5],[4,6],[3,7],[2,8]]},
+            {id:'dc19',number:6,answer:[2,4],options:[[2,4],[2,3],[3,4],[1,4]]},
+            {id:'dc20',number:8,answer:[3,5],options:[[3,5],[2,5],[4,5],[3,4]]},
+            {id:'dc21',number:10,answer:[4,6],options:[[4,6],[3,6],[5,6],[4,5]]},
         ],
         [ // Level 3 — Multiple ways
             {id:'dc11',number:5,answer:[1,4],options:[[1,4],[2,3],[0,5],[3,3]]},
@@ -758,6 +769,9 @@
             {id:'dc13',number:10,answer:[3,7],options:[[3,7],[4,6],[5,5],[2,8]]},
             {id:'dc14',number:8,answer:[1,7],options:[[1,7],[2,6],[3,5],[4,4]]},
             {id:'dc15',number:6,answer:[0,6],options:[[0,6],[1,5],[2,4],[3,3]]},
+            {id:'dc22',number:4,answer:[0,4],options:[[0,4],[0,3],[1,4],[2,3]]},
+            {id:'dc23',number:9,answer:[2,7],options:[[2,7],[1,7],[3,7],[2,6]]},
+            {id:'dc24',number:10,answer:[2,8],options:[[2,8],[1,8],[3,8],[2,7]]},
         ],
     ];
 
@@ -829,6 +843,9 @@
             {id:'pc3',scenario:'📚',question:'What do you read first?',answer:'Front cover',options:['Front cover','Last page','Back cover','Middle']},
             {id:'pc4',scenario:'📖',question:'Where are the pages?',answer:'Inside',options:['Inside','Front cover','Back cover','Spine']},
             {id:'pc5',scenario:'✍️',question:'Who writes a book?',answer:'Author',options:['Author','Reader','Teacher','Student']},
+            {id:'pc11',scenario:'🎨',question:'Who draws the pictures in a book?',answer:'Illustrator',options:['Illustrator','Author','Reader','Publisher']},
+            {id:'pc12',scenario:'🏷️',question:'What tells you the name of a book?',answer:'Title',options:['Title','Page number','Cover','Spine']},
+            {id:'pc13',scenario:'📚',question:'What holds the pages together?',answer:'Spine',options:['Spine','Front cover','Back cover','Bookmark']},
         ],
         [ // Level 2 — Reading direction
             {id:'pc6',scenario:'➡️',question:'Which way do you read words on a page?',answer:'Left to right',options:['Left to right','Right to left','Top to bottom','Bottom to top']},
@@ -836,6 +853,9 @@
             {id:'pc8',scenario:'📖',question:'Which page comes first in a book?',answer:'Front',options:['Front','Back','Middle','It doesn\'t matter']},
             {id:'pc9',scenario:'➡️➡️',question:'After the first page, where do you go?',answer:'Next page',options:['Next page','Previous page','Last page','Back cover']},
             {id:'pc10',scenario:'📖✅',question:'When you finish a book, what comes last?',answer:'Back cover',options:['Back cover','Front cover','First page','Title page']},
+            {id:'pc14',scenario:'␣',question:'What goes between words when you write?',answer:'Space',options:['Space','Period','Comma','Letter']},
+            {id:'pc15',scenario:'🔤',question:'What letter starts a sentence?',answer:'Capital letter',options:['Capital letter','Lowercase letter','Number','Symbol']},
+            {id:'pc16',scenario:'❓',question:'What mark ends an asking sentence?',answer:'Question mark',options:['Question mark','Period','Comma','Space']},
         ],
     ];
 
@@ -848,6 +868,8 @@
             {id:'bes4',word:'Fish',emoji:'🐟',position:'beginning',answer:'f',options:['f','s','p','h']},
             {id:'bes5',word:'Sun',emoji:'☀️',position:'beginning',answer:'s',options:['s','h','b','m']},
             {id:'bes6',word:'Tree',emoji:'🌳',position:'beginning',answer:'t',options:['t','r','l','e']},
+            {id:'bes19',word:'Bear',emoji:'🐻',position:'beginning',answer:'b',options:['b','d','p','m']},
+            {id:'bes20',word:'Pig',emoji:'🐷',position:'beginning',answer:'p',options:['p','b','d','q']},
         ],
         [ // Level 2 — Ending sounds
             {id:'bes7',word:'Cat',emoji:'🐱',position:'ending',answer:'t',options:['t','c','a','s']},
@@ -856,6 +878,8 @@
             {id:'bes10',word:'Bus',emoji:'🚌',position:'ending',answer:'s',options:['s','b','u','z']},
             {id:'bes11',word:'Hand',emoji:'✋',position:'ending',answer:'d',options:['d','h','n','t']},
             {id:'bes12',word:'Bike',emoji:'🚲',position:'ending',answer:'k',options:['k','b','i','e']},
+            {id:'bes21',word:'Fox',emoji:'🦊',position:'ending',answer:'x',options:['x','s','k','f']},
+            {id:'bes22',word:'Bat',emoji:'🦇',position:'ending',answer:'t',options:['t','b','d','p']},
         ],
         [ // Level 3 — Mixed review
             {id:'bes13',word:'Map',emoji:'🗺️',position:'beginning',answer:'m',options:['m','p','a','d']},
@@ -864,6 +888,8 @@
             {id:'bes16',word:'Jump',emoji:'🦘',position:'ending',answer:'p',options:['p','j','u','m']},
             {id:'bes17',word:'Cup',emoji:'☕',position:'beginning',answer:'c',options:['c','u','p','k']},
             {id:'bes18',word:'Bed',emoji:'🛏️',position:'ending',answer:'d',options:['d','b','e','t']},
+            {id:'bes23',word:'Duck',emoji:'🦆',position:'beginning',answer:'d',options:['d','b','k','t']},
+            {id:'bes24',word:'Hen',emoji:'🐔',position:'ending',answer:'n',options:['n','h','m','t']},
         ],
     ];
 
@@ -875,6 +901,9 @@
             {id:'sn3',broken:'the dog runs fast',correct:'The dog runs fast.',options:['The dog runs fast.','the dog runs fast.','The dog runs fast','the dog runs fast']},
             {id:'sn4',broken:'we play outside',correct:'We play outside.',options:['We play outside.','we play outside.','We play outside','we play outside']},
             {id:'sn5',broken:'she is happy',correct:'She is happy.',options:['She is happy.','she is happy.','She is happy','she is happy']},
+            {id:'sn16',broken:'i see the cat',correct:'I see the cat.',options:['I see the cat.','i see the cat.','I see the cat','i see the cat']},
+            {id:'sn17',broken:'the dog is big',correct:'The dog is big.',options:['The dog is big.','the dog is big.','The dog is big','the dog is big']},
+            {id:'sn18',broken:'we can jump',correct:'We can jump.',options:['We can jump.','we can jump.','We can jump','we can jump']},
         ],
         [ // Level 2 — Period at end
             {id:'sn6',broken:'the dog runs.',correct:'The dog runs.',options:['The dog runs.','the dog runs.','The dog runs','the dog runs']},
@@ -882,6 +911,9 @@
             {id:'sn8',broken:'we sing a song.',correct:'We sing a song.',options:['We sing a song.','we sing a song.','We sing a song','we sing a song']},
             {id:'sn9',broken:'they jump high.',correct:'They jump high.',options:['They jump high.','they jump high.','They jump high','they jump high']},
             {id:'sn10',broken:'he reads a book.',correct:'He reads a book.',options:['He reads a book.','he reads a book.','He reads a book','he reads a book']},
+            {id:'sn19',broken:'the bus is big.',correct:'The bus is big.',options:['The bus is big.','the bus is big.','The bus is big','the bus is big']},
+            {id:'sn20',broken:'my mom smiles.',correct:'My mom smiles.',options:['My mom smiles.','my mom smiles.','My mom smiles','my mom smiles']},
+            {id:'sn21',broken:'they swim fast.',correct:'They swim fast.',options:['They swim fast.','they swim fast.','They swim fast','they swim fast']},
         ],
         [ // Level 3 — Both capital + period
             {id:'sn11',broken:'the bird sings',correct:'The bird sings.',options:['The bird sings.','the bird sings.','The bird sings','the bird sings']},
@@ -889,6 +921,9 @@
             {id:'sn13',broken:'we eat lunch',correct:'We eat lunch.',options:['We eat lunch.','we eat lunch.','We eat lunch','we eat lunch']},
             {id:'sn14',broken:'the sun is bright',correct:'The sun is bright.',options:['The sun is bright.','the sun is bright.','The sun is bright','the sun is bright']},
             {id:'sn15',broken:'she walks to school',correct:'She walks to school.',options:['She walks to school.','she walks to school.','She walks to school','she walks to school']},
+            {id:'sn22',broken:'birds fly in the sky',correct:'Birds fly in the sky.',options:['Birds fly in the sky.','birds fly in the sky.','Birds fly in the sky','birds fly in the sky']},
+            {id:'sn23',broken:'the flowers are pretty',correct:'The flowers are pretty.',options:['The flowers are pretty.','the flowers are pretty.','The flowers are pretty','the flowers are pretty']},
+            {id:'sn24',broken:'we read books together',correct:'We read books together.',options:['We read books together.','we read books together.','We read books together','we read books together']},
         ],
     ];
 
@@ -901,6 +936,8 @@
             {id:'pr4',scene:'🐱📦',answer:'on',options:['in','on','under','next to']},
             {id:'pr5',scene:'📦⬇️🐱',answer:'under',options:['in','on','under','in front of']},
             {id:'pr6',scene:'📦🐱',answer:'in',options:['in','on','under','behind']},
+            {id:'pr19',scene:'🐱📥📦',answer:'in',options:['in','on','under','next to']},
+            {id:'pr20',scene:'🐱🔝📦',answer:'on',options:['in','on','under','behind']},
         ],
         [ // Level 2 — behind, in front of, between
             {id:'pr7',scene:'🪑🐱📦',answer:'between',options:['behind','in front of','between','next to']},
@@ -909,6 +946,8 @@
             {id:'pr10',scene:'📦🐱📦',answer:'between',options:['behind','in front of','between','on']},
             {id:'pr11',scene:'📦🐱',answer:'behind',options:['behind','in front of','on','under']},
             {id:'pr12',scene:'🐱📦',answer:'in front of',options:['behind','in front of','on','under']},
+            {id:'pr21',scene:'🌳🐱📦',answer:'between',options:['behind','in front of','between','next to']},
+            {id:'pr22',scene:'🐱⬅️📦',answer:'in front of',options:['behind','in front of','between','on']},
         ],
         [ // Level 3 — above, below, next to
             {id:'pr13',scene:'🐱⬆️📦',answer:'above',options:['above','below','next to','in']},
@@ -917,6 +956,8 @@
             {id:'pr16',scene:'📦⬆️🐱',answer:'above',options:['above','below','next to','under']},
             {id:'pr17',scene:'📦⬇️🐱',answer:'below',options:['above','below','next to','over']},
             {id:'pr18',scene:'📦🐱',answer:'next to',options:['above','below','next to','behind']},
+            {id:'pr23',scene:'🐱↔️📦',answer:'next to',options:['above','below','next to','in']},
+            {id:'pr24',scene:'🐱🔼📦',answer:'above',options:['above','below','next to','under']},
         ],
     ];
 
@@ -929,6 +970,8 @@
             {id:'stc4',item:{emoji:'🍌',name:'banana'},correctCategory:'Food',categories:['Food','Animal','Clothing','Color']},
             {id:'stc5',item:{emoji:'🐶',name:'dog'},correctCategory:'Animal',categories:['Food','Animal','Clothing','Color']},
             {id:'stc6',item:{emoji:'🧣',name:'scarf'},correctCategory:'Clothing',categories:['Food','Animal','Clothing','Color']},
+            {id:'stc19',item:{emoji:'🧦',name:'sock'},correctCategory:'Clothing',categories:['Food','Animal','Clothing','Color']},
+            {id:'stc20',item:{emoji:'🍇',name:'grape'},correctCategory:'Food',categories:['Food','Animal','Clothing','Color']},
         ],
         [ // Level 2 — Furniture vs Vehicles vs Tools
             {id:'stc7',item:{emoji:'🪑',name:'chair'},correctCategory:'Furniture',categories:['Furniture','Vehicle','Tool','Food']},
@@ -937,6 +980,8 @@
             {id:'stc10',item:{emoji:'🛏️',name:'bed'},correctCategory:'Furniture',categories:['Furniture','Vehicle','Tool','Food']},
             {id:'stc11',item:{emoji:'🚌',name:'bus'},correctCategory:'Vehicle',categories:['Furniture','Vehicle','Tool','Food']},
             {id:'stc12',item:{emoji:'🪛',name:'screwdriver'},correctCategory:'Tool',categories:['Furniture','Vehicle','Tool','Food']},
+            {id:'stc21',item:{emoji:'🛋️',name:'sofa'},correctCategory:'Furniture',categories:['Furniture','Vehicle','Tool','Food']},
+            {id:'stc22',item:{emoji:'✈️',name:'airplane'},correctCategory:'Vehicle',categories:['Furniture','Vehicle','Tool','Food']},
         ],
         [ // Level 3 — Mixed categories
             {id:'stc13',item:{emoji:'📚',name:'book'},correctCategory:'School',categories:['Food','Animal','School','Nature']},
@@ -945,6 +990,8 @@
             {id:'stc16',item:{emoji:'🥕',name:'carrot'},correctCategory:'Food',categories:['Food','Animal','School','Nature']},
             {id:'stc17',item:{emoji:'✏️',name:'pencil'},correctCategory:'School',categories:['Food','Animal','School','Nature']},
             {id:'stc18',item:{emoji:'🌊',name:'water'},correctCategory:'Nature',categories:['Food','Animal','School','Nature']},
+            {id:'stc23',item:{emoji:'🎒',name:'backpack'},correctCategory:'School',categories:['Food','Animal','School','Nature']},
+            {id:'stc24',item:{emoji:'🌻',name:'sunflower'},correctCategory:'Nature',categories:['Food','Animal','School','Nature']},
         ],
     ];
 
