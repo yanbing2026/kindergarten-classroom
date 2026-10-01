@@ -9,7 +9,7 @@
 |---|---|---|---|
 | #1 | PR (open since 2026-09-06) | P0: PWA offline reliability + content validation tooling | Unmerged. Proposes dynamic runtime image caching in `sw.js`, shared `APP_VERSION`, hidden debug panel (`?debug=1`), `tools/validate_content.py`. |
 | #2 | PR (open since 2026-09-06) | P1: Mastery tiers, Review Due, Daily Adventure, Parent Dashboard | Unmerged, branches from #1's branch. jsdom-verified only; author recommends manual device testing. |
-| #34 | Issue | Add semantic Grade 1 Math interactions (data-bar selection, place-value tens/ones feedback; restrict number-line/count/compare to suitable prompts) | Open task. Effectively blocked by P0-1 below. |
+| #34 | Issue | Add semantic Grade 1 Math interactions (data-bar selection, place-value tens/ones feedback; restrict number-line/count/compare to suitable prompts) | **Done** — bank now carries semantic tags (`skill`, `comparePair`, `dataValues`, `placeValue`), the diversifier assigns interactions by meaning instead of lesson index, and `scripts/test_g1_math_interactions.js` guards it. |
 
 ## Cross-reference: existing `IMPROVEMENT_PLAN.md`
 
@@ -51,7 +51,7 @@ It instructs downloading BlockQuest sprites into `images/words/` and adding an `
 **P1-10. Confirm server-side login throttling.**
 The publishable key is committed to the public repo (by design for Supabase; probed anonymously — direct `players` SELECT is correctly denied 42501, so RLS holds). But login rate-limiting exists only as in-memory client state (`LOGIN_MAX_ATTEMPTS`, `index.html`); migration `005_login_throttling.sql` suggests a server control — verify it's real and effective, and confirm `create_player`/`login_player`/`get_player_salt` can't be abused beyond the intended name+PIN flow. PBKDF2-120k PIN verifier design is sound. *Effort:* S (review, not code).
 
-**P1-11. Issue #34 (Grade 1 math interactions).** Data-bar selection + tens/ones place-value feedback; scope number-line/count/compare interactions to fitting prompts. Do after P0-1 (the bank it refines is currently broken). *Effort:* M.
+**P1-11. Issue #34 (Grade 1 math interactions).** **Done.** Number-line/count now only attach to tagged add-sub prompts (the line spans 0-20, so it can reach the answer); `compare` moved onto the prompts that name two numbers; read-data prompts get a bar chart; place-value questions get a read-only tens/ones model. Fixed alongside: 7 unanswerable expanded-form items, duplicate "Compare length" choices. *Effort:* M.
 
 ## P2 — Nice to have
 
