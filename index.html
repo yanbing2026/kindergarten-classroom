@@ -2228,9 +2228,22 @@
             return `<div style="display:grid;grid-template-columns:repeat(5, 38px);grid-template-rows:repeat(2, 38px);gap:6px;padding:8px;background:var(--mc-sand,#efe7d3);border:3px solid var(--mc-border,#4a3728);border-radius:10px;">${cells}</div>`;
         }
 
+        // Select question type based on pedagogical progression
+        let allowedTypes;
+        if (lvNum === 1) {
+            // Kindergarten: balanced mix of ten-frame, object counting, comparing, missing addend, and addition
+            allowedTypes = ['ten_frame', 'count', 'compare', 'missing_addend', 'add'];
+        } else if (lvNum === 2) {
+            allowedTypes = ['ten_frame', 'compare', 'missing_addend', 'add'];
+        } else if (lvNum <= 4) {
+            allowedTypes = ['compare', 'missing_addend', 'add'];
+        } else {
+            allowedTypes = ['compare', 'missing_addend', 'arithmetic', 'arithmetic'];
+        }
+        const selectedType = allowedTypes[Math.floor(Math.random() * allowedTypes.length)];
+
         // CCSS K.OA.A.4 / K.CC.B.5 Ten-frame counting and make-10 (Level 1 & Level 2)
-        const allowTenFrame = (lvNum === 1 && Math.random() < 0.28) || (lvNum === 2 && Math.random() < 0.2);
-        if (allowTenFrame) {
+        if (selectedType === 'ten_frame') {
             if (lvNum === 1) {
                 const isMake10 = Math.random() < 0.5;
                 if (isMake10) {
@@ -2317,8 +2330,7 @@
         }
 
         // CCSS K.CC.B.5 Object counting with emojis (Level 1: 1-10 objects)
-        const allowCount = (lvNum === 1 && Math.random() < 0.25);
-        if (allowCount) {
+        if (selectedType === 'count') {
             const countObjects = [
                 { emoji: '🍎', singular: 'apple', plural: 'apples' },
                 { emoji: '🐛', singular: 'caterpillar', plural: 'caterpillars' },
@@ -2361,8 +2373,7 @@
         }
 
         // CCSS K.CC.C.6 / K.CC.C.7 Number comparison (which is greater / which is less)
-        const allowCompare = (lvNum <= 4 && Math.random() < 0.25) || (lvNum > 4 && Math.random() < 0.15);
-        if (allowCompare) {
+        if (selectedType === 'compare') {
             const n1 = minAnswer + Math.floor(Math.random() * (maxAnswer - minAnswer + 1));
             let n2 = minAnswer + Math.floor(Math.random() * (maxAnswer - minAnswer + 1));
             while (n2 === n1) {
@@ -2402,8 +2413,7 @@
         }
 
         // CCSS K.OA.A.4 missing addend fill-in-the-blank (e.g. 3 + ? = 7 or ? + 4 = 9)
-        const allowMissingAddend = (lvNum <= 4 && Math.random() < 0.5) || (lvNum > 4 && Math.random() < 0.25);
-        if (allowMissingAddend) {
+        if (selectedType === 'missing_addend') {
             let answer, sum, a, b;
             const pos = Math.random() < 0.5 ? 'second' : 'first';
             if (lvNum === 1) {
