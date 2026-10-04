@@ -189,8 +189,6 @@ global.window = {
     location: { search: '' }
 };
 global.debugMode = false;
-global.isExemptScreen = () => true;
-global.isTimeUp = () => false;
 global.state = { screen: 'home', stack: [], params: null };
 global.renderHome = () => '<div class="home">Home</div>';
 global.renderDebugPanel = () => '';

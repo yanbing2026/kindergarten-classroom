@@ -16,7 +16,6 @@
 | 候选来源 | 代码实现现状 | 判定 | 结论与分析依据 |
 |---|---|---|---|
 | **TTS 回调** | `speak()`、`playBrowserUtterance()` 均基于 `SpeechSynthesisUtterance`，事件监听 `u.onend` 与 `u.onerror` 仅执行 Promise 的 `resolve()`，无任何 `render()` 调用。 | **By-Design / 无问题** | 朗读结束不会触发页面重渲染，画布与交互状态不受 TTS 影响。 |
-| **活跃计时器** | 页面每 5 秒的 `setInterval` 定时器仅通过 `ensureUsageBanner()` 更新固定的 `#usageBanner` DOM 节点，除非时间用尽进入 `timeUp`，否则不调用 `render()`。 | **By-Design / 无问题** | 定时器在正常游戏停留期间不会触发重绘。 |
 | **星星动画与奖励 (`awardStar`)** | `awardStar()` 负责钻石累加与世界解锁特效 `mcWorldUnlockBurst`，不触发全量 `render()`。做题答对时的星数更新此前由局部函数 `renderTopbarStarsOnly()` 完成。 | **By-Design / 无问题** | 动画与奖励系统本身未调用全量 `render()`。 |
 | **页面导航 (`go`, `goBack`, `goHome`)** | 路由切换时设置 `state.screen` 并调用 `render()`。 | **By-Design / 正常** | 换屏重绘属于预期设计，不应改动。 |
 | **下一题切换 (`nextQuestion`, `nextMathQuestion`, `nextTraceItem`, `nextGradeQuestion`)** | 答对后延迟推进题目序号并调用 `render()`。 | **By-Design / 正常** | 题目完成出下一题重渲染属于预期设计，不应改动。 |
