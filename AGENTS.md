@@ -21,9 +21,14 @@ CI：`.github/workflows/validate.yml`（push + PR 自动跑；内容校验告警
 ## 发布
 `.github/workflows/pages.yml`：push 到 `main` → `actions/deploy-pages`，artifact 为整仓（`.`）。
 合并进 `main` 即上线。
-**已核实（2026-09-27）**：线上 `index.html` 与 `main` 逐字节一致（sha256 相同），发布确实走 Actions；
-`gh api .../pages` 里显示的那条 legacy 源（`improvement/p1-learning-experience`，2026-09-06 停更）
-是**残留配置，不是发布源**，别被它误导，也不用去改。
+- 线上 `index.html` 应与 `main` 逐字节一致（`curl -s <线上>/index.html | sha256sum` == 本地文件的 sha256；
+  Pages 可能短暂服务旧构建，等一两分钟再比）。
+- **站点（site 配置）丢了就什么都发不出去**：`gh api .../pages` 返回 404 + 工作流在 Configure Pages 步骤失败。
+  **已核实（2026-10-01）**：清理 origin 旧分支时删掉了 Pages source 指向的
+  `improvement/p1-learning-experience`，整个站点随之消失。旧版本节曾写"那只是残留配置、不用去改"——
+  **那句是错的，别再照着做**。现在 `configure-pages` 带 `enablement: true`，站点会在下次 push 到 `main` 时自动重建。
+- **删分支前先看 `gh api repos/yanbing2026/kindergarten-classroom/pages` 的 `source.branch`**：它指向的分支不能删。
+- 故障排查与手动重建步骤：`docs/pages-recovery.md`。
 
 ## 绝不手改的生成文件
 本仓库**没有生成文件**，全部是手写源。但有两条硬约束：
