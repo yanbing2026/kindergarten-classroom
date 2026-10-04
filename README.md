@@ -7,7 +7,7 @@ Open `index.html` in a browser — no build step required. For the installable/o
 ## Features
 
 - **Levels**: Letters and Numbers open directly (no levels). English, Chinese, Spanish, and Math use a 10-level picker (Level 1–10). Difficulty and vocabulary ramp by level: English/Chinese/Spanish levels are grouped by word length (3–4 letters up to 12–15 letters), and Math difficulty scales as your child improves. Progress and mastery are tracked separately per level.
-- **Shared vocabulary (one source of truth)** — English, Chinese (hanzi), and Spanish all come from a single `VOCAB_LEVELS` array in `index.html`. Add one word there and it appears in all three languages automatically, with its emoji illustration.
+- **Shared vocabulary (one source of truth)** — English, Chinese (hanzi), and Spanish all come from a single `VOCAB_LEVELS` array in `data/kindergarten/content.js`. Add one word there and it appears in all three languages automatically, with its emoji illustration.
 - **Learn mode** for Letters, Numbers, English, Chinese, and Spanish — tap a card to hear it read aloud (uses the browser's built-in text-to-speech):
   - Letters: letter shown, then "X is for Apple" with the picture word.
   - Numbers: spoken number.
@@ -46,11 +46,13 @@ English, Chinese, and Spanish vocabulary is organized into **10 levels** grouped
 
 ## Data Sources
 
-All vocabulary, images, and translations are sourced from the [BlockQuest Wiki](https://original learning assets).
+All vocabulary, images, and translations are sourced from the BlockQuest Wiki (a Minecraft-style
+asset catalog). The wiki links in this README are placeholder text, not working URLs — search the
+wiki for the item name instead of following a link.
 
 ### Vocabulary & Images
 
-The `VOCAB_LEVELS` array in `index.html` contains every word used across English, Chinese, and Spanish sections. Each entry includes:
+The `VOCAB_LEVELS` array in `data/kindergarten/content.js` contains every word used across English, Chinese, and Spanish sections. Each entry includes:
 
 - `id` — the English word (lowercase)
 - `emoji` — the emoji illustration shown for the word
@@ -64,21 +66,23 @@ Words use emoji illustrations so the app works fully offline with no image downl
 
 Chinese translations use Simplified Chinese hanzi (简体中文). Sources for reference:
 
-- [BlockQuest Wiki — Chinese-language pages](https://original learning assets) (Simplified Chinese wiki)
+- BlockQuest Wiki — Chinese-language pages (Simplified Chinese wiki; link is a placeholder here)
 - In-game item/mob names as they appear in BlockQuest's Simplified Chinese localization
 
 ### Spanish Translations
 
 Spanish translations use the localization names from BlockQuest's Spanish language files. Sources for reference:
 
-- [BlockQuest Wiki — Spanish-language pages](https://original learning assets) (Spanish wiki)
+- BlockQuest Wiki — Spanish-language pages (Spanish wiki; link is a placeholder here)
 - BlockQuest's `es_es.lang` / `es_mx.lang` translation files for item and mob names
 
 ### Adding New Words
 
 1. Pick an emoji that illustrates the word.
-2. Add one entry to `VOCAB_LEVELS` in `index.html` with `id`, `emoji`, `en`, `zh.hanzi`, and `es`.
+2. Add one entry to `VOCAB_LEVELS` in `data/kindergarten/content.js` with `id`, `emoji`, `en`, `zh.hanzi`, and `es`
+   (append it to the level matching the English word's letter count — see "Level Structure" above).
 3. The word automatically appears in English, Chinese, and Spanish sections.
+4. Run `python3 tools/validate_content.py` — it fails on a missing required field and prints `⚠` warnings for duplicate ids (warnings, not failures).
 
 ## Blipola learning buddy
 
