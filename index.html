@@ -72,7 +72,7 @@
     <script src="./js/blipola-runtime.js"></script>
     <script>
     // ---------- App version ----------
-    const APP_VERSION = 'v2-20261004-remove-timed-and-freelimit';
+    const APP_VERSION = 'v2-20261004-a11y-buttons';
 
     // ---------- Debug / Dev Mode ----------
     // Hidden diagnostic screen for parents and developers.
@@ -976,11 +976,11 @@
                 const m = categoryMasteredCount(`${key}_${lv.id}`, lv.items);
                 sub = `${m}/${lv.items.length} mastered`;
             }
-            return `<div class="card" onclick="go('category', {key:'${key}', level:'${lv.id}'})">
+            return `<button type="button" class="card" onclick="go('category', {key:'${key}', level:'${lv.id}'})">
                 <div class="icon">${lv.icon}</div>
                 <div class="label">${lv.label}</div>
                 <div class="sublabel">${sub}</div>
-            </div>`;
+            </button>`;
         }).join('');
         return `${topbar(true)}
         <h2>${cat.icon} ${cat.name}</h2>
@@ -996,7 +996,7 @@
                 <button class="icon-btn" onclick="goHome()" aria-label="Home">🏠</button>
             </div>
             <div class="topbar-right">
-                <div class="star-badge" id="topbarStarBadge" onclick="handleDebugTap()" style="cursor:pointer;" title="App version">💎 ${progress.stars} <span style="font-size:0.65rem;opacity:0.7;">${APP_VERSION}</span></div>
+                <button type="button" class="star-badge" id="topbarStarBadge" onclick="handleDebugTap()" style="cursor:pointer;" title="App version">💎 ${progress.stars} <span style="font-size:0.65rem;opacity:0.7;">${APP_VERSION}</span></button>
                 <button class="icon-btn" onclick="blipolaVoiceAction()" title="Blipola Voice" aria-label="Blipola Voice">🎤</button>
                 <button class="icon-btn" id="muteBtn" onclick="toggleMute()" aria-label="${muted ? 'Unmute sound' : 'Mute sound'}">${muted ? '🔇' : '🔊'}</button>
             </div>
@@ -1165,11 +1165,11 @@
                 visual = `<div style="font-size:3rem;">${it.item.emoji}</div>`;
                 label = `<div style="font-size:1.2rem;font-weight:700;">${it.item.name}</div><div style="font-size:0.75rem;color:rgba(43,27,14,0.55);">${it.correctCategory}</div>`;
             }
-            return `<div class="card" onclick="learnTap('${key}','${it.id}','${level}')">
+            return `<button type="button" class="card" onclick="learnTap('${key}','${it.id}','${level}')">
                 ${mastered ? '<div class="mastered-check">✓</div>' : ''}
                 ${visual}
                 <div class="label">${label}</div>
-            </div>`;
+            </button>`;
         }).join('');
         return `${topbar(true)}
         <h2>${cat.icon} ${cat.name}${cat.leveled ? ' — ' + (cat.levels.find(l => l.id === level) || {}).label : ''} — Learn</h2>
@@ -2480,7 +2480,7 @@
                 <canvas id="traceCanvas" class="trace-canvas"></canvas>
             </div>
             <div class="color-picker" id="colorPicker">
-                ${TRACE_COLORS.map(c => `<div class="color-swatch${c.hex === traceColor ? ' active' : ''}" style="background:${c.hex};" onclick="pickTraceColor('${c.hex}')" title="${c.name}"></div>`).join('')}
+                ${TRACE_COLORS.map(c => `<button type="button" class="color-swatch${c.hex === traceColor ? ' active' : ''}" style="background:${c.hex};" onclick="pickTraceColor('${c.hex}')" title="${c.name}"></button>`).join('')}
             </div>
             <div class="trace-controls">
                 <button class="icon-btn" onclick="replayTrace()" aria-label="Hear pronunciation">🔊</button>
@@ -4243,7 +4243,7 @@ function gradeStageFor(index,total){if(index===0)return {name:'LESSON',copy:'Lea
                 : interactiveReady
                     ? "go('gradeCourse',{grade:'"+grade.id+"',courseIndex:"+i+"})"
                     : "go('gradeCourse',{grade:'"+grade.id+"',courseIndex:"+i+"})";
-            return '<div class="course-card'+(ready?'':' planned')+'" onclick="'+action+'"><div class="course-icon">'+c.icon+'</div><div class="course-info"><div class="course-name">'+c.name+'</div><div class="course-desc">'+c.desc+'</div></div><div class="course-status">'+(ready?'READY ▶':'COMING NEXT')+'</div></div>';
+            return '<button type="button" class="course-card'+(ready?'':' planned')+'" onclick="'+action+'"><div class="course-icon">'+c.icon+'</div><div class="course-info"><div class="course-name">'+c.name+'</div><div class="course-desc">'+c.desc+'</div></div><div class="course-status">'+(ready?'READY ▶':'COMING NEXT')+'</div></button>';
         }).join('');
         return topbar(true)+'<h2>'+grade.icon+' '+grade.label+' Courses</h2>'+(GRADE_PAGE_SHELL ? '<div class="grade-page-banner"><strong>'+grade.label+'</strong><span>'+grade.subtitle+'</span></div>' : '<div class="grade-tabs">'+tabs+'</div><div class="grade-subtitle">'+grade.icon+' '+grade.label+' — '+grade.subtitle+'</div>')+'<div class="course-section"><div class="course-section-title">COURSES</div>'+courses+'</div><div class="footer">'+(GRADE_PAGE_SHELL ? 'This grade has its own learning page. Choose a subject to begin.' : 'Pre-K through Grade 8 curriculum is organized here. New grade content can be added without changing the learning engine.')+'</div>';
     }
@@ -4398,12 +4398,12 @@ function recordRuntimeError(report){
             <h2>✏️ Draw</h2>
             <canvas id="drawCanvas" class="draw-canvas"></canvas>
             <div class="draw-toolbar">
-                ${DRAW_COLORS.map(c => `<div class="draw-swatch${c.hex === drawColor ? ' active' : ''}" style="background:${c.hex};" onclick="pickDrawColor('${c.hex}')" title="${c.name}"></div>`).join('')}
+                ${DRAW_COLORS.map(c => `<button type="button" class="draw-swatch${c.hex === drawColor ? ' active' : ''}" style="background:${c.hex};" onclick="pickDrawColor('${c.hex}')" title="${c.name}"></button>`).join('')}
                 <div class="draw-size">
-                    ${DRAW_SIZES.map(s => `<div class="draw-size-btn${s === drawSize ? ' active' : ''}" onclick="pickDrawSize(${s})" title="Size ${s}"><div class="draw-dot" style="width:${Math.min(s, 20)}px;height:${Math.min(s, 20)}px;"></div></div>`).join('')}
+                    ${DRAW_SIZES.map(s => `<button type="button" class="draw-size-btn${s === drawSize ? ' active' : ''}" onclick="pickDrawSize(${s})" title="Size ${s}"><div class="draw-dot" style="width:${Math.min(s, 20)}px;height:${Math.min(s, 20)}px;"></div></button>`).join('')}
                 </div>
-                <div class="draw-tool-btn${drawEraser ? ' active' : ''}" id="eraserBtn" onclick="toggleEraser()" title="Eraser">🧽</div>
-                <div class="draw-tool-btn" id="undoBtn" onclick="undoDraw()" title="Undo">↩️</div>
+                <button type="button" class="draw-tool-btn${drawEraser ? ' active' : ''}" id="eraserBtn" onclick="toggleEraser()" title="Eraser">🧽</button>
+                <button type="button" class="draw-tool-btn" id="undoBtn" onclick="undoDraw()" title="Undo">↩️</button>
                 <button class="icon-btn" onclick="clearDrawCanvas()" title="Clear" aria-label="Clear canvas">🧹</button>
             </div>
         </div>`;
@@ -4563,10 +4563,10 @@ function recordRuntimeError(report){
                 visual = `<div class="icon">${wordMediaHTML(it, 56)}</div>`;
                 label = `<div style="font-size:1.4rem;">${it.es}</div><div style="font-size:0.75rem;color:rgba(43,27,14,0.55);font-weight:400;">${it.en}</div>`;
             }
-            return `<div class="card" onclick="learnTap('${g.key}','${g.id}','${g.level}')">
+            return `<button type="button" class="card" onclick="learnTap('${g.key}','${g.id}','${g.level}')">
                 ${visual}
                 <div class="label">${label}</div>
-            </div>`;
+            </button>`;
         }).join('');
 
         const filterButtons = `
