@@ -72,7 +72,7 @@
     <script src="./js/blipola-runtime.js"></script>
     <script>
     // ---------- App version ----------
-    const APP_VERSION = 'v2-20261004-manifest-desc';
+    const APP_VERSION = 'v2-20261004-ci-and-shuffle';
 
     // ---------- Debug / Dev Mode ----------
     // Hidden diagnostic screen for parents and developers.
@@ -2221,15 +2221,6 @@
         const maxAnswer = lvNum * 10;
         const symbols = (typeof MATH_SYMBOL !== 'undefined' && MATH_SYMBOL) || { add: '+', sub: '−', mul: '×', div: '÷' };
         const words = (typeof MATH_WORD !== 'undefined' && MATH_WORD) || { add: 'plus', sub: 'minus', mul: 'times', div: 'divided by' };
-        const doShuffle = (typeof shuffle === 'function') ? shuffle : function(arr) {
-            const a = arr.slice();
-            for (let i = a.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [a[i], a[j]] = [a[j], a[i]];
-            }
-            return a;
-        };
-
         function buildChoices(ans, minVal, pool) {
             minVal = (minVal !== undefined) ? minVal : 0;
             const wrongSet = new Set([ans]);
@@ -2250,7 +2241,7 @@
                 }
                 delta++;
             }
-            return doShuffle([...wrongSet]);
+            return shuffle([...wrongSet]);
         }
 
         function renderTenFrameHTML(dots, total, color) {
