@@ -350,15 +350,6 @@
         .learn-display-letter { font-size: 6rem; font-family: var(--font-clear); font-weight: 800; color: var(--mc-ink); min-height: 100px; display: flex; align-items: center; justify-content: center; transition: opacity 0.15s; }
         .learn-display-word { font-size: 2.5rem; font-family: var(--font-clear); font-weight: 700; color: var(--mc-ink); margin-top: 10px; }
         .learn-display-sub { font-size: 1.2rem; color: #888; margin-top: 8px; }
-        /* Timed Challenge */
-        .card.cat-timed { background: #e74c3c; }
-        .timer-ring { position: relative; width: 80px; height: 80px; margin: 0 auto 10px; }
-        .timer-ring svg { transform: rotate(-90deg); }
-        .timer-ring circle { fill: none; stroke-width: 6; }
-        .timer-ring .track { stroke: var(--mc-stone-dark); }
-        .timer-ring .fill { stroke: var(--mc-emerald); stroke-dasharray: 220; stroke-dashoffset: 0; transition: stroke-dashoffset 0.4s ease; }
-        .timer-ring .fill.urgent { stroke: var(--mc-redstone); }
-        .timer-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-pixel); font-size: 1.4rem; color: var(--mc-ink); }
         /* Streak */
         .streak-badge {
             font-family: var(--font-pixel);

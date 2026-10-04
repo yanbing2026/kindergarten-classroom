@@ -994,12 +994,6 @@
     function cancelNavigationTasks() {
         navigationTimers.forEach(timer => clearTimeout(timer));
         navigationTimers.clear();
-        // Guard optional timer state so navigation never fails if the timer
-        // variable has not been initialized yet on a fresh page load.
-        if (typeof timedInterval !== 'undefined' && timedInterval) {
-            clearInterval(timedInterval);
-            timedInterval = null;
-        }
         stopAllAudio();
     }
     function go(screen, params) {
@@ -1182,7 +1176,7 @@
         renderTodayReview()+
         '<div class="today-card" onclick="'+todayAction+'"><div class="today-icon">⭐</div><div class="today-copy"><div class="today-kicker">TODAY\'S ADVENTURE</div><div class="today-title">'+lesson.cat.icon+' '+lesson.cat.name+'</div><div class="today-sub">'+lesson.reason+(lesson.item ? ' • '+lessonLabel : '')+'</div></div><button class="big-btn play">START ▶</button></div>'+
         '<h2 class="home-section-title">📚 Grades Pre-K–8</h2><div class="home-grade-menu">'+gradeCards+'</div>'+
-        '<h2 class="home-section-title">🎮 More Learning</h2><div class="home-tools"><button class="home-tool" onclick="go(\'category\',{key:\'chinese\',level:\'L1\'})">🇨🇳 Chinese</button><button class="home-tool" onclick="go(\'category\',{key:\'spanish\',level:\'L1\'})">🇪🇸 Spanish</button><button class="home-tool" onclick="go(\'freeplay\')">🎨 Free Play</button><button class="home-tool" onclick="go(\'draw\')">✏️ Draw</button><button class="home-tool" onclick="go(\'worksheets\')">🖨️ Worksheets</button><button class="home-tool" onclick="startTimedChallenge()">🎯 Challenge</button><button class="home-tool" onclick="go(\'progress\')">🏆 Progress</button></div>'+
+        '<h2 class="home-section-title">🎮 More Learning</h2><div class="home-tools"><button class="home-tool" onclick="go(\'category\',{key:\'chinese\',level:\'L1\'})">🇨🇳 Chinese</button><button class="home-tool" onclick="go(\'category\',{key:\'spanish\',level:\'L1\'})">🇪🇸 Spanish</button><button class="home-tool" onclick="go(\'freeplay\')">🎨 Free Play</button><button class="home-tool" onclick="go(\'draw\')">✏️ Draw</button><button class="home-tool" onclick="go(\'worksheets\')">🖨️ Worksheets</button><button class="home-tool" onclick="go(\'progress\')">🏆 Progress</button></div>'+
         '<div class="footer">💎 '+progress.stars+' diamonds · Pick a grade to explore its courses.</div>';
     }
 
@@ -3285,111 +3279,6 @@ return `${topbar(true)}
         URL.revokeObjectURL(url);
     }
 
-    // ---------- Timed Challenge Mode (count-up rapid-fire, no time pressure) ----------
-    let timedState = null;
-    let timedInterval = null;
-    function startTimedChallenge() {
-        // Collect all items from all mastered categories (non-math)
-        const pool = [];
-        for (const cat of CATEGORIES) {
-            if (cat.key === 'math') continue;
-            for (const lv of cat.levels) {
-                for (const it of lv.items) {
-                    pool.push({ key: cat.key, item: it, level: lv.id });
-                }
-            }
-        }
-        if (pool.length === 0) { goHome(); return; }
-        const target = 10;
-        const questions = [];
-        for (let i = 0; i < target; i++) {
-            const pick = pool[Math.floor(Math.random() * pool.length)];
-            const q = buildQuestion(pick.key, [pick.item], pick.level);
-            if (q) questions.push(q);
-        }
-        if (questions.length === 0) { goHome(); return; }
-        timedState = { questions, idx: 0, score: 0, target, streak: 0, awaitingNext: false };
-        go('timed', {});
-    }
-    function renderTimed() {
-        if (!timedState || timedState.idx >= timedState.questions.length || timedState.score >= (timedState.target || 10)) return renderTimedEnd();
-        const q = timedState.questions[timedState.idx];
-        const target = timedState.target || 10;
-        const pct = Math.min(100, Math.round((timedState.score / target) * 100));
-        const circ = 2 * Math.PI * 35;
-        const offset = circ - (pct / 100) * circ;
-        const choicesHTML = q.choices.map(c =>
-            `<button class="choice-btn ${c.cls || ''}" data-id="${esc(c.id)}" onclick="handleTimedChoice('${esc(c.id)}', this)">${c.html}</button>`
-        ).join('');
-        return `${topbar(true)}
-        <div class="center-col">
-            <div class="timer-ring">
-                <svg width="80" height="80" viewBox="0 0 80 80"><circle class="track" cx="40" cy="40" r="35"/><circle class="fill" cx="40" cy="40" r="35" style="stroke-dasharray:${circ};stroke-dashoffset:${offset};"/></svg>
-                <div class="timer-text" style="font-size:1rem;">${timedState.score}/${target}</div>
-            </div>
-            <div style="color:#666;margin-bottom:8px;font-weight:600;">🎯 ${timedState.score} of ${target} correct</div>
-            <div class="prompt-box">${q.promptHTML}</div>
-            <div class="choices">${choicesHTML}</div>
-        </div>`;
-    }
-    function afterTimedRender() {
-        if (!timedState || !timedState.questions[timedState.idx]) return;
-        const q = timedState.questions[timedState.idx];
-        if (q.speakText) speak(q.speakText, { lang: q.lang });
-    }
-    function handleTimedChoice(id, btnEl) {
-        if (!timedState || timedState.awaitingNext) return;
-        const q = timedState.questions[timedState.idx];
-        const correct = id === q.itemId;
-        if (correct) {
-            btnEl.classList.add('correct');
-            timedState.awaitingNext = true;
-            awardStar();
-            timedState.score++;
-            timedState.streak = (timedState.streak || 0) + 1;
-            if (timedState.streak >= 10) { progress.stars += 10; }
-            else if (timedState.streak >= 5) { progress.stars += 5; }
-            else if (timedState.streak >= 3) { progress.stars += 2; }
-            saveProgress();
-            renderTopbarStarsOnly();
-            speak(descriptivePraise('timed', q));
-            scheduleNavigation(nextTimedQuestion, 600);
-        } else {
-            btnEl.classList.add('incorrect');
-            btnEl.disabled = true;
-            timedState.streak = 0;
-            speak(RETRY[Math.floor(Math.random() * RETRY.length)]);
-        }
-    }
-    function nextTimedQuestion() {
-        if (!timedState) return;
-        timedState.idx++;
-        timedState.awaitingNext = false;
-        if (timedState.idx >= timedState.questions.length || timedState.score >= (timedState.target || 10)) {
-            if (timedInterval) { clearInterval(timedInterval); timedInterval = null; }
-            const best = parseInt(localStorage.getItem('kc_timed_best') || '0', 10);
-            if (timedState.score > best) localStorage.setItem('kc_timed_best', String(timedState.score));
-            go('timedEnd', { score: timedState.score, best: Math.max(best, timedState.score) });
-        } else {
-            render();
-        }
-    }
-    function renderTimedEnd() {
-        if (timedInterval) { clearInterval(timedInterval); timedInterval = null; }
-        const score = (state.params && typeof state.params.score === 'number') ? state.params.score : (timedState ? timedState.score : 0);
-        const best = parseInt(localStorage.getItem('kc_timed_best') || '0', 10);
-        timedState = null;
-        return `${topbar(false)}
-        <div class="center-col">
-            <div style="font-size:4rem;">🎯</div>
-            <h2>Challenge Complete!</h2>
-            <p style="font-size:1.4rem;color:#0e6b7a;font-weight:700;margin-bottom:8px;">Score: ${score} correct</p>
-            <p style="font-size:1rem;color:#888;margin-bottom:20px;">Best: ${best} 💎</p>
-            <button class="big-btn play" onclick="startTimedChallenge()">🔁 Play Again</button>
-            <button class="big-btn home" onclick="goHome()">🏠 Home</button>
-        </div>`;
-    }
-
     // ---------- Worksheets (printable) ----------
     function renderWorksheets() {
         return `${topbar(true)}
@@ -4686,8 +4575,6 @@ function recordRuntimeError(report){
         else if (state.screen === 'parentDashboard') html = renderParentDashboard();
         else if (state.screen === 'freeplay') html = renderFreeplay();
         else if (state.screen === 'draw') html = renderDraw();
-        else if (state.screen === 'timed') html = renderTimed();
-        else if (state.screen === 'timedEnd') html = renderTimedEnd();
         else if (state.screen === 'worksheets') html = renderWorksheets();
         else if (state.screen === 'progress') html = renderProgress();
         app.innerHTML = html + renderDebugPanel();
@@ -4699,7 +4586,6 @@ function recordRuntimeError(report){
         if (state.screen === 'mathPlay') afterMathPlayRender();
         if (state.screen === 'trace') afterTraceRender();
         if (state.screen === 'draw') afterDrawRender();
-        if (state.screen === 'timed') afterTimedRender();
         if (state.screen === 'parentDashboard') loadCloudParentDashboard();
         if (app) {
             if (!app.hasAttribute('tabindex')) {
