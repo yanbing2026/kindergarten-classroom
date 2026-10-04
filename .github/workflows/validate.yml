@@ -118,6 +118,8 @@ jobs:
             "scripts/test_freeplay_filter.js"
             "scripts/test_round_variety.js"
             "scripts/test_thin_levels.js"
+            "scripts/test_choice_order.js"
+            "scripts/test_g1_math_interactions.js"
           )
           for test_script in "${TEST_SCRIPTS[@]}"; do
             safe_name=$(echo "$test_script" | tr '/' '_' | tr ' ' '_')
