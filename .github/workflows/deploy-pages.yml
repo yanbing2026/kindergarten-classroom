@@ -1,0 +1,41 @@
+# Deploy to Cloudflare Pages (blockquest-classroom)
+#
+# This repository is a pure static site with no build step.
+# Publishing deploys the entire repository root ('.').
+# The legacy GitHub Pages workflow has been removed; see docs/pages-recovery.md for operational details.
+#
+# Fail loudly when the secrets are missing: a silent skip would make "merge = live" a lie.
+
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy . --project-name blockquest-classroom --branch main
