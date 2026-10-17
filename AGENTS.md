@@ -19,16 +19,20 @@ node --check <file>                   # 对 js/、shared/、data/*.js 与 sw.js 
 CI：`.github/workflows/validate.yml`（push + PR 自动跑；内容校验告警不阻断）。
 
 ## 发布
-`.github/workflows/pages.yml`：push 到 `main` → `actions/deploy-pages`，artifact 为整仓（`.`）。
-合并进 `main` 即上线。
-- 线上 `index.html` 应与 `main` 逐字节一致（`curl -s <线上>/index.html | sha256sum` == 本地文件的 sha256；
-  Pages 可能短暂服务旧构建，等一两分钟再比）。
-- **站点（site 配置）丢了就什么都发不出去**：`gh api .../pages` 返回 404 + 工作流在 Configure Pages 步骤失败。
-  **已核实（2026-10-01）**：清理 origin 旧分支时删掉了 Pages source 指向的
-  `improvement/p1-learning-experience`，整个站点随之消失。旧版本节曾写"那只是残留配置、不用去改"——
-  **那句是错的，别再照着做**。现在 `configure-pages` 带 `enablement: true`，站点会在下次 push 到 `main` 时自动重建。
-- **删分支前先看 `gh api repos/yanbing2026/kindergarten-classroom/pages` 的 `source.branch`**：它指向的分支不能删。
-- 故障排查与手动重建步骤：`docs/pages-recovery.md`。
+
+线上：**Cloudflare Pages 项目 `blockquest-classroom`**（生产分支 `main`）→ https://blockquest-classroom.pages.dev/
+- 部署命令（需要本机 `~/.hermes/.env` 里的账户级 token；只在单条命令上注入，**不要全局 export**）：
+  ```bash
+  CLOUDFLARE_API_TOKEN=$(grep -m1 '^KINDERGARTEN_CLASSROOM_CF_API_TOKEN=' ~/.hermes/.env | cut -d= -f2-) \
+  CLOUDFLARE_ACCOUNT_ID=$(grep -m1 '^KINDERGARTEN_CLASSROOM_CF_ACCOUNT_ID=' ~/.hermes/.env | cut -d= -f2-) \
+    npx wrangler pages deploy . --project-name blockquest-classroom --branch main
+  ```
+- **从仓库工作树部署**（不要从 `git archive` 解出的副本）：否则部署记录里没有 commit，答不出"线上是哪个提交"。
+- 旧的 GitHub Pages 工作流已删除；`https://yanbing2026.github.io/kindergarten-classroom/` 仍能打开但**不再更新**。
+- 验证：全站逐路径比对（`pages_deploy.py verify` 退出码 0）且与 `origin/main` 对树无差异。
+  **"部署成功"那行字不算证据**；**`200` 也不代表文件存在**（Cloudflare Pages 把未知路径回落到 `index.html`）。
+- **换 origin 是有代价的**：已安装的 PWA 仍指旧 origin，localStorage 进度不跨 origin。再迁移时先让用户导出进度。
+- 完整手册（部署/验证/已知故障/Git 集成状态/2026-10-01 GH Pages 事故教训）：`docs/pages-recovery.md`。
 
 ## 绝不手改的生成文件
 本仓库**没有生成文件**，全部是手写源。但有两条硬约束：
