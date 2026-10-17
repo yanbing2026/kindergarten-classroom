@@ -1,78 +1,67 @@
 # BlockQuest Classroom — Improvement Plan
 
-**Reviewed:** 2026-09-24 · **Scope:** `main` @ `315d03d` · **Lens:** a 5-year-old on a tablet
-**Read:** README.md, IMPROVEMENT_PLAN.md, index.html (~6,000 lines / 440 KB), `js/` (data-layer, skill-engine, blipola-runtime), `shared/`, `data/` (schema-level), `supabase/` (README, schema, 6 migrations), `sw.js`, `manifest.json`, both GitHub workflows. **Not read exhaustively:** per-word vocab entries; `images/`/`icons/` binaries (sizes noted).
+**基准：** `main` @ `5b19d74`（2026-10-04，PR #62） · **本次核实：** 2026-10-17
+**怎么核实的：** 全新克隆 + 15 个 `scripts/test_*.js` 全跑 + `python3 tools/validate_content.py` + 逐文件 `node --check` + 线上 `index.html` sha256 比对（命令见 §2 表格右列）。
+**先读这一句：** 旧版（2026-09-24，基准 `315d03d`）把 9/30–10/4 期间**已经修掉**的条目列为 P0 待办，还把 2026-09-24 就已 **CLOSED** 的 PR #1/#2 写成"未合并"。它过期了，别照着做 —— 原文归档在 `docs/archive/improvement-plan-2026-09-24.md`。
 
-## Open GitHub issues / PRs (context)
+## 1. 当前状态
 
-| # | Type | Title | Status |
+- `main` 与线上**逐字节一致**：sha256 `eef77b08ee326ea43ac2dc750f750a5a35454c5690ca20ac4a2716612b32df1d`，`APP_VERSION = v2-20261004-a11y-buttons`（`index.html` 与 `sw.js` 两处一致）
+- CI（`Validate` + `Deploy to GitHub Pages`）最近运行全部 success；**本地 15 个测试 + 内容校验全 PASS**
+- **没有开着的 PR / issue**（62 个 PR：59 merged、3 closed；issue #34 已 CLOSED）
+- 体积现状：`index.html` **312,895 字节 / 4,607 行**（一个内联 `<script>` 还是主体）；`js/` 已有 3 个模块（data-layer / skill-engine / blipola-runtime）；`data/` 下 13 个 `*.js` 题库；全仓（不含 `.git`/`node_modules`）约 4.0 MB
+- **结论：没有在飞的线头。** 下面是确认过仍然成立的事项。
+
+## 2. 仍然成立的事项
+
+### 2.1 已核实"确实还没做"
+
+| 项 | 事实 | 核实方式 | 量级 |
 |---|---|---|---|
-| #1 | PR (open since 2026-09-06) | P0: PWA offline reliability + content validation tooling | Unmerged. Proposes dynamic runtime image caching in `sw.js`, shared `APP_VERSION`, hidden debug panel (`?debug=1`), `tools/validate_content.py`. |
-| #2 | PR (open since 2026-09-06) | P1: Mastery tiers, Review Due, Daily Adventure, Parent Dashboard | Unmerged, branches from #1's branch. jsdom-verified only; author recommends manual device testing. |
-| #34 | Issue | Add semantic Grade 1 Math interactions (data-bar selection, place-value tens/ones feedback; restrict number-line/count/compare to suitable prompts) | **Done** — bank now carries semantic tags (`skill`, `comparePair`, `dataValues`, `placeValue`), the diversifier assigns interactions by meaning instead of lesson index, and `scripts/test_g1_math_interactions.js` guards it. |
+| **首页宣称大于事实** | `index.html:961` 渲染 `📚 Grades Pre-K–8`，而 3–8 年级其实是占位（`course framework ready` 共 7 处） | `grep -n 'Grades Pre-K–8' index.html`；`grep -c 'course framework ready' index.html` → 7 | XS |
+| **年级页仍走 iframe** | `shared/grade-page.js:9` 动态建 `iframe`（`src=config.engineUrl`），高度 `calc(100vh - 100px)`、`min-height:720px`，另有 7 秒"起不来"兜底 | 读 `shared/grade-page.js`（24 行）；全仓 `iframe` 命中 **1 处** | M |
+| **服务端登录限流未核实** | 仓库里有 `supabase/migrations/005_login_throttling.sql`，但**没人验证它真的拦得住**；客户端那层只是内存计数（`LOGIN_MAX_ATTEMPTS`） | 列 `supabase/migrations/`；需要 review 迁移 + RPC 实际行为 | S（审，不是写） |
+| **进度 schema 尚未收敛** | `__blipola` 已消失（0 处），现存 `mastery`（51 处）+ `due{}`（5 处）+ `KCData`（16 处）—— 两套半并行 | `grep -c` 这三个键 | M（先决定，再动） |
+| **`index.html` 仍是单体** | 312 KB / 4,607 行，主体仍是一个内联 script | `wc -c`、`wc -l` | L（增量） |
+| **身份/年级文案分散在多处** | 年级名到 slug 的映射在 `index.html` 里手写多处（`g1/g2/k/prek` → `grade-1/...`），改一处容易漏 | `grep -n "grade-1':'Grade 1'" index.html` | S |
 
-## Cross-reference: existing `IMPROVEMENT_PLAN.md`
+### 2.2 已核实"其实已经修了"（旧版把它们列为待办）
 
-- It's **stale**: mapped to `main` @ `fe978dd`, describing a 1,407-line `index.html`. The repo has since gained the Blipola runtime, Supabase accounts, grade pages, `data/` banks, and CI. Its "Open questions" reference `sync_claude_branch.sh` / a native Android app that don't exist in the repo.
-- Its "ALL COMPLETE ✅" claim for items A–G **checks out on current main** (verified): descriptive praise in `handleChoice()`, audio on trace completion in `renderTrace()`, retry celebration, spaced-repetition `due{}` map + "Today's Review" card (`index.html:2507`, `startReview()` at `:2491`, "Review Complete!" screen at `:3822`), adaptive weighting (`:2934`), free-play screen (`renderFreeplay()`, `:5634`), parent JSON export (`exportProgress()`, `:4233`).
-- **Overlap warning:** PRs #1/#2 re-implement adjacent ideas (Review Due tile, Daily Adventure, Parent Dashboard) that the old plan partially covers. Merging #2 without reconciling will create duplicate review/daily features. Recommend: merge #1/#2, then reconcile old-plan items B/D/G against the new implementations (keep one of each).
+| 旧条目 | 当时的问题 | 核实方式 | 结论 |
+|---|---|---|---|
+| P0-1 | `data/grade-1/math.js` 截断 → 一年级数学内容静默消失 | `node --check data/grade-1/math.js` 通过；文件 7.1 KB | **已修** |
+| P0-2 | `sw.js` precache 了不存在的 `js/blipola-voice.js` → `cache.addAll` 原子失败、SW 装不上 | `grep blipola-voice sw.js` 无命中；`node scripts/test_app_shell.js` PASS（断言每个 APP_SHELL 路径都存在） | **已修** |
+| P0-3 | Supabase CDN 不可达 → 顶层 `ReferenceError` → 整页白屏 | `index.html:244 let supa = null` + `initSupabase()` 幂等，CDN 失败时 `supa` 保持 null | **已修** |
+| P0-4 | PR #1 / #2 悬着待合并 | 两个都于 **2026-09-24 CLOSED**（不是合并） | **已了结** |
+| P1-5 | `window.supa` 从不赋值 → 规范化同步层是死代码 | `index.html` 现有 2 处 `window.supa =` | **前提已不成立** |
+| P1-6 | Grade 2 只有 5 道题循环 6 次、提示全是套话 | `data/grade-2/core.js` 305 行 / 207 个不重复字符串字面量 | **已修** |
+| P1-7 | `images/words/` 1.2 MB 死图且被 precache | 目录已删；`node scripts/test_image_references.js` PASS（零引用） | **已修** |
+| P1-9 | CI 只检查 2 个 JS 文件，所以才漏掉 P0-1 | `validate.yml` 循环 `node --check` 每个 JS + 内联块 + `TEST_SCRIPTS` 数组（现 15 个测试） | **已修** |
+| P1-11 | issue #34 语义化 G1 数学交互 | `gh issue view 34` → CLOSED；`scripts/test_g1_math_interactions.js` 守着 | **已完成** |
+| P2-17 | 本文件过期 | 本次刷新 | **本次完成** |
 
-## P0 — Critical (fix now)
+> 核实过程的教训：`iframe` 那项我第一次只 grep 了年级目录和 `index.html`，得出"已修"的错结论；grep 全仓（含 `shared/*.js`）才看到真身。**判定"已修"必须覆盖全部实现位置**，这条同样适用于 §5 的"别动"清单。
 
-**P0-1. `data/grade-1/math.js` is truncated — syntax error on `main`, Grade 1 Math interactive content silently missing.**
-The file is 51 lines and ends mid-function (`Unexpected end of input`; confirmed identical on remote, so it's committed broken, not a clone artifact). The `<script src>` fails to parse → `window.KC_G1_MATH` never set → `index.html:4952` (`GRADE1_INTERACTIVE.math = window.KC_G1_MATH`) assigns `undefined` → Grade 1 Math course falls into the "CURRICULUM IN PROGRESS" placeholder branch. An entire subject's authored content is invisibly absent. Worse, the file's builder references the main-script const `GRADE1_INTERACTIVE` at data-file parse time (before the main script runs) — it would throw `ReferenceError` even with the brace fixed. *Fix:* restore the complete file, make it self-contained (inline unit names, no main-script dependency). *Effort:* S. *Why it shipped:* `validate.yml` only syntax-checks `blipola-runtime.js` + inline script (see P1-9).
+## 3. 动手前必读（抄自 `AGENTS.md`，别绕开）
 
-**P0-2. `sw.js` precaches `js/blipola-voice.js`, which doesn't exist → service worker install fails.**
-`sw.js:8` lists `./js/blipola-voice.js` in `APP_SHELL`; the file isn't in the repo. `cache.addAll()` is atomic — one 404 rejects the whole install, so `kc-shell-v12` never activates and users stay on a stale worker. Offline PWA is broken at the install step. *Fix:* delete the line (the voice button at `index.html:751` uses `blipolaVoiceAction()` from `blipola-runtime.js`, so nothing needs the file). *Effort:* XS.
+- `main` 受保护：**分支 → PR → squash merge**，**合并即上线**；不要直推 `main`
+- **文档（prose）由 Hermes 写；代码改动走 agy**（见 `plan-delegate-verify`）
+- **版本号规则**：只有 `sw.js` 的 `APP_SHELL` 里那 8 个资源（`'./'`、`index.html`、`manifest.json`、`sw.js`、4 个图标）**内容变化**时才需要 bump `APP_VERSION`（两处同步）。**纯文档/测试改动不需要 bump** —— 它们不在预缓存清单里，bump 只会让所有已安装用户白重下一遍缓存
+- 收尾必做：改动文件逐个 `node --check`、跑相关 `scripts/test_*.js`、`python3 tools/validate_content.py`；合并后等一两分钟再比线上 `index.html` 的 sha256
+- 站点曾因删分支而消失（2026-10-01）：**删任何分支前先看 `gh api repos/yanbing2026/kindergarten-classroom/pages` 的 `source.branch`**；恢复手册 `docs/pages-recovery.md`
 
-**P0-3. Unguarded Supabase CDN load can kill the entire app.**
-`index.html:756` loads `supabase-js` from jsDelivr; `:1882` runs `const supa = supabase.createClient(...)` unconditionally at the top level of the main script. If the CDN is unreachable (offline, ad-blocker, jsDelivr outage), `supabase` is undefined → `ReferenceError` → the whole ~6,000-line script halts → blank app. *Fix:* `const supa = window.supabase ? supabase.createClient(...) : null` and null-guard uses. *Effort:* S.
+## 4. 建议顺序
 
-**P0-4. Merge (or close) PRs #1 and #2 before they bit-rot.**
-#1 fixes real offline gaps (only ~30 of 268 images precached today; everything else 404s offline with an uncaught fetch rejection) and adds the content validator that would have caught P0-1. #2 adds the headline learning features. Both open since Sept 6; #2 branches from #1. *Effort:* M (review + merge + the manual device testing both PRs still need).
+1. **首页宣称/占位一致**（2.1 第 1 项，XS，代码 → agy；改文案不改资源 → 无需 bump）
+2. **服务端限流核实**（S，纯 review）→ 有结论再决定要不要动 `005` 迁移
+3. **年级页去 iframe**（M，代码 → agy；注意 `?grade=X&pageShell=1` 壳模式与 iframe 内的 TTS/自动播放行为，改动后要在真机上验一次）
+4. **进度 schema 收敛的"决定"**（M）→ 决定了再动代码
+5. **`index.html` 拆模块**（L，增量：一次拆一个模块，每次保持 15 个测试全绿）
 
-## P1 — High value
+## 5. 什么别动（本次复核仍然成立）
 
-**P1-5. The normalized Supabase sync layer is dead code — wire it up or delete it.**
-`ensureNormalizedAuth()` (`index.html:1943`) bails on `!window.supa`, but nothing ever assigns `window.supa` — so `KCData.flushNormalized / fetchNormalizedProgress / fetchRecentActivity / fetchSkillActivity` always return "not linked." Six migrations built `players / player_progress / activity_events / daily_goals`, but the normalized tables are never written. (Name+PIN login itself works — `cloudLogin` uses the `supa` const directly.) *Fix:* decide — either assign `window.supa = supa` and test the anonymous-auth + `claim_player_auth` flow end-to-end, or remove the dead layer and migrations' client expectations. *Effort:* M. *Note:* #2's Parent Dashboard reads these endpoints, so this blocks #2's value.
+TTS 层（`playBrowserUtterance` / `getBestVoice`：特性探测 + `voiceschanged` + 出错也 resolve，不会卡住）、trace 画布的触摸处理（`touch-action:none`、去 tap 高亮）、emoji `onerror` 兜底、账号名 `esc()` 转义、PBKDF2（120k）PIN 校验流程（不传/不存明文 PIN）、离线优先 localStorage + 不阻塞课程的异步云同步、PWA 安装/更新管道（`skipWaiting`、缓存版本、network-first 导航）。
 
-**P1-6. Grade 2 banks: 5 unique questions repeated 6×, with filler hints.**
-`data/grade-2/core.js` builds 30 "lessons" per unit by cycling 5 defs (`d[1][n % d[1].length]`); every hint is "Use the clues and think about the skill in this unit." and every explanation is "The correct answer is X." The course footer claims "30+ practice questions" per unit. A 5-year-old will see repeats within one sitting. *Fix:* author ~25–30 unique questions/unit with real hints, or correct the claim. *Effort:* L (content) / S (claim fix).
+---
 
-**P1-7. 1.2 MB of dead images ship to every user.**
-`images/words/` (170 PNGs, 1.2 MB) is unreferenced — vocab migrated to emoji (`VOCAB_LEVELS` entries carry `emoji`, not `img`; rendering falls back to emoji at `index.html:2475`), yet `sw.js` still precaches 30 of the PNGs. Also 2 orphan webp files (`download_imag`, `download_via_a`). *Fix:* delete `images/words/`, drop from `sw.js`, remove orphans. *Effort:* S.
-
-**P1-8. README "Adding New Words" documents a workflow the code no longer uses.**
-It instructs downloading BlockQuest sprites into `images/words/` and adding an `img` field — the code ignores `img` for vocab. A parent/dev following it gets silently ignored work. *Fix:* rewrite for the emoji-entry format (or decide sprites return). *Effort:* S. (Same class: `manifest.json` description advertises "colors, shapes, animals" — no such categories exist.)
-
-**P1-9. CI doesn't check most of the JavaScript.**
-`validate.yml` checks `js/blipola-runtime.js` + the inline script only — not `data-layer.js`, `skill-engine.js`, `grade-page.js`, or any `data/*.js`. That's how P0-1 shipped. *Fix:* `node --check` every JS file; adopt `tools/validate_content.py` from PR #1. *Effort:* S.
-
-**P1-10. Confirm server-side login throttling.**
-The publishable key is committed to the public repo (by design for Supabase; probed anonymously — direct `players` SELECT is correctly denied 42501, so RLS holds). But login rate-limiting exists only as in-memory client state (`LOGIN_MAX_ATTEMPTS`, `index.html`); migration `005_login_throttling.sql` suggests a server control — verify it's real and effective, and confirm `create_player`/`login_player`/`get_player_salt` can't be abused beyond the intended name+PIN flow. PBKDF2-120k PIN verifier design is sound. *Effort:* S (review, not code).
-
-**P1-11. Issue #34 (Grade 1 math interactions).** **Done.** Number-line/count now only attach to tagged add-sub prompts (the line spans 0-20, so it can reach the answer); `compare` moved onto the prompts that name two numbers; read-data prompts get a bar chart; place-value questions get a read-only tens/ones model. Fixed alongside: 7 unanswerable expanded-form items, duplicate "Compare length" choices. *Effort:* M.
-
-## P2 — Nice to have
-
-- **P2-12. Decompose the 440 KB monolith.** `index.html` is one ~6,000-line script; extracting config/renderers into `js/` modules (as started with `data-layer.js`/`skill-engine.js`) would make review and testing feasible. *Effort:* L, incremental.
-- **P2-13. Grades 3–8 are gated ("BUILDING") but the footer claims "Pre-K through Grade 8 curriculum is organized here."** Either hide unfinished grades from home or soften the claim. *Effort:* S.
-- **P2-14. Progress-schema sprawl.** Three parallel systems: `mastery` counters, `due{}` map, `progress.__blipola` (+ the `KCData` queue). Document the canonical schema; converge over time. *Effort:* M.
-- **P2-15. Grade pages use iframes** (`pre-k/`, `kindergarten/`, `grade-1/`, `grade-2/` embed `index.html?grade=X&pageShell=1` in a fixed `calc(100vh - 100px)` frame). Nested scrolling and iframe TTS/autoplay quirks on tablets; consider plain links. *Effort:* M.
-- **P2-16. Timed mode vs. no-pressure ethos.** `kc_timed_best` countdown exists while PR #2 deliberately avoided streak pressure — decide if timed challenge fits a 5-year-old; consider gating behind a parent setting. *Effort:* S (decision).
-- **P2-17. Refresh `IMPROVEMENT_PLAN.md`** to the current architecture; archive the `fe978dd`-era status block. *Effort:* S.
-
-## Quick wins (smallest first)
-
-1. Remove `./js/blipola-voice.js` from `sw.js` precache — 1 line, unbreaks SW install (P0-2).
-2. Null-guard `supabase.createClient` — ~5 lines, app survives CDN failure (P0-3).
-3. Extend `validate.yml` to `node --check` all JS files — prevents the next P0-1 (P1-9).
-4. Delete `images/words/` + orphan webp; drop from `sw.js` — saves 1.2 MB (P1-7).
-5. Restore + decouple `data/grade-1/math.js` — restores Grade 1 Math (P0-1).
-6. Rewrite README "Adding New Words" + fix `manifest.json` description (P1-8).
-
-## What's solid (don't "fix")
-
-TTS layer (`playBrowserUtterance`/`getBestVoice`: feature-detects, handles `voiceschanged`, resolves on error — no hangs), trace-canvas touch handling (`touch-action: none`, tap-highlight removed), emoji `onerror` fallbacks on images, account-name XSS escaping (`esc()` at render), PBKDF2 PIN-verifier flow (never sends/stores raw PIN), offline-first localStorage with async cloud sync that never blocks lessons, and the PWA install/update plumbing (`skipWaiting`, cache versioning, network-first navigations).
-
-**Suggested order:** P0-2 + P0-3 + P1-9 (one small PR, unbreaks offline/CI) → P0-1 (restore Grade 1 math) → P0-4 (merge #1, then #2, reconciling review/daily features with old-plan B/D/G) → P1-5 (decide normalized sync fate — gates #2's dashboard value) → P1-6/P1-11 (content) → P2 as appetite allows.
+**归档：** 2026-09-24 版（基准 `315d03d`）→ `docs/archive/improvement-plan-2026-09-24.md`。
