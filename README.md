@@ -2,7 +2,7 @@
 
 A single-page supplemental learning app for kindergarten-age kids (built for a 5-year-old), optimized for touchscreens (tablet/phone). Themed around a BlockQuest block/mob catalog to make letters, numbers, words, and beginner Chinese & Spanish feel like play.
 
-Open `index.html` in a browser — no build step required. For the installable/offline features below, the site needs to be hosted (e.g. GitHub Pages) rather than opened as a local file — browsers require a real `http(s)` origin for service workers and "Add to Home Screen."
+Open `index.html` in a browser — no build step required. For the installable/offline features below, the site needs to be hosted (a real `http(s)` origin) rather than opened as a local file — browsers require one for service workers and "Add to Home Screen." The site is hosted on **Cloudflare Pages: <https://blockquest-classroom.pages.dev/>** (deploy/verify steps in `docs/pages-recovery.md`).
 
 ## Features
 

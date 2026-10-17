@@ -1,10 +1,10 @@
 # Supabase architecture
 
-The classroom uses Supabase as the cloud data layer while GitHub Pages remains the static web host.
+The classroom uses Supabase as the cloud data layer while Cloudflare Pages hosts the static site.
 
 ## Responsibilities
 
-- **GitHub Pages:** UI, lesson rendering, interactive question engine, Blipola client runtime.
+- **Cloudflare Pages (static host):** UI, lesson rendering, interactive question engine, Blipola client runtime.
 - **Supabase:** student account data, curriculum metadata, normalized progress, activity events, daily goals.
 - **localStorage:** offline-first cache and compatibility with the existing classroom app.
 - **RPC account layer:** current name + PIN account flow. PINs are never stored as plaintext by the browser.

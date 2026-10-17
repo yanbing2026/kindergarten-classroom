@@ -7,8 +7,8 @@
 ## 1. 当前状态
 
 - `main` 与线上**逐字节一致**：sha256 `eef77b08ee326ea43ac2dc750f750a5a35454c5690ca20ac4a2716612b32df1d`，`APP_VERSION = v2-20261004-a11y-buttons`（`index.html` 与 `sw.js` 两处一致）
-- CI（`Validate` + `Deploy to GitHub Pages`）最近运行全部 success；**本地 15 个测试 + 内容校验全 PASS**
-- **没有开着的 PR / issue**（62 个 PR：59 merged、3 closed；issue #34 已 CLOSED）
+- CI（`Validate`）最近运行全部 success；**本地 15 个测试 + 内容校验全 PASS**（发布已迁到 Cloudflare Pages，GH Pages 工作流已移除，见 `docs/pages-recovery.md`）
+- **没有开着的 PR / issue**（63 个 PR：60 merged、3 closed；当前 0 个 open issue）
 - 体积现状：`index.html` **312,895 字节 / 4,607 行**（一个内联 `<script>` 还是主体）；`js/` 已有 3 个模块（data-layer / skill-engine / blipola-runtime）；`data/` 下 13 个 `*.js` 题库；全仓（不含 `.git`/`node_modules`）约 4.0 MB
 - **结论：没有在飞的线头。** 下面是确认过仍然成立的事项。
 
