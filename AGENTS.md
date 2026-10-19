@@ -5,7 +5,7 @@
 ## 这是什么
 面向平板的**单页幼儿园/一年级补充学习 PWA**（字母、数字、英语、中文、西语、数学），离线优先，
 朗读用浏览器内置 TTS，**无外部 AI API、无服务器**。
-线上：https://yanbing2026.github.io/kindergarten-classroom/
+线上：https://blockquest-classroom.pages.dev/（Cloudflare Pages；旧 GitHub Pages 地址 `yanbing2026.github.io/kindergarten-classroom/` 已退役）。
 
 ## 构建
 **没有构建步骤**（no build、no npm、no generator）：`index.html`、`js/`、`data/`、`shared/`、
@@ -19,15 +19,15 @@ node --check <file>                   # 对 js/、shared/、data/*.js 与 sw.js 
 CI：`.github/workflows/validate.yml`（push + PR 自动跑；内容校验告警不阻断）。
 
 ## 发布
-`.github/workflows/pages.yml`：push 到 `main` → `actions/deploy-pages`，artifact 为整仓（`.`）。
-合并进 `main` 即上线。
+`.github/workflows/deploy-pages.yml`：push 到 `main` → 先跑 JS 语法/内联脚本/单测门禁（不过不发），
+再 `git archive` 出 main 的跟踪文件树（不含 `.git`）直传 Cloudflare Pages 项目 `blockquest-classroom`。
+合并进 `main` 即上线；凭据用 secrets `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID`（仓库里不放密钥）。
 - 线上 `index.html` 应与 `main` 逐字节一致（`curl -s <线上>/index.html | sha256sum` == 本地文件的 sha256；
   Pages 可能短暂服务旧构建，等一两分钟再比）。
-- **站点（site 配置）丢了就什么都发不出去**：`gh api .../pages` 返回 404 + 工作流在 Configure Pages 步骤失败。
-  **已核实（2026-10-01）**：清理 origin 旧分支时删掉了 Pages source 指向的
-  `improvement/p1-learning-experience`，整个站点随之消失。旧版本节曾写"那只是残留配置、不用去改"——
-  **那句是错的，别再照着做**。现在 `configure-pages` 带 `enablement: true`，站点会在下次 push 到 `main` 时自动重建。
-- **删分支前先看 `gh api repos/yanbing2026/kindergarten-classroom/pages` 的 `source.branch`**：它指向的分支不能删。
+- **workflow_dispatch 只能从 main 跑**（工作流会拒绝其他 ref）：`--branch main` 是生产分支。
+- 历史（GitHub Pages 时代，2026-10-01）：清理 origin 旧分支删掉了站点 source 指向的分支，整个站点随之消失。
+  教训与当年详情见 `docs/pages-recovery.md` 的历史事故一节；`--branch`/生产分支现在是 Cloudflare 侧的概念，
+  改项目配置前先弄清"谁指向谁"。
 - 故障排查与手动重建步骤：`docs/pages-recovery.md`。
 
 ## 绝不手改的生成文件
