@@ -1,0 +1,102 @@
+# Deploy to Cloudflare Pages (blockquest-classroom)
+#
+# This repository is a pure static site with no build step.
+# We deploy the tracked tree of the commit being built (git archive → $RUNNER_TEMP/_site),
+# so .git, .github, tools/ etc. are never uploaded. That is the exact same tree the
+# manual process in docs/pages-recovery.md stages, so "deployed" and "verified"
+# always refer to the same set of bytes.
+#
+# Fail loudly when the secrets are missing: an empty token reaches Cloudflare as
+# an opaque AUTHENTICATION_ERROR, so we check for them explicitly first.
+# The legacy GitHub Pages workflow has been removed; see docs/pages-recovery.md.
+
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fail loudly when deploy secrets are missing
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          missing=0
+          [ -z "$CLOUDFLARE_API_TOKEN" ]   && { echo "::error::CLOUDFLARE_API_TOKEN 未配置（repo Settings → Secrets and variables → Actions）"; missing=1; }
+          [ -z "$CLOUDFLARE_ACCOUNT_ID" ]  && { echo "::error::CLOUDFLARE_ACCOUNT_ID 未配置（repo Settings → Secrets and variables → Actions）"; missing=1; }
+          exit $missing
+
+      - name: Refuse to deploy a non-main tree to production
+        if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+        run: |
+          echo "::error::workflow_dispatch 只能从 main 运行（本次 ref: ${GITHUB_REF}）；"
+          echo "::error::--branch main 是生产分支，把非 main 的树推上去会覆盖线上。"
+          exit 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Blocking gate before anything ships (mirrors the blocking parts of validate.yml;
+      # the curriculum content validator stays informational per AGENTS.md).
+      - name: Gate on JS syntax, inline scripts and unit tests
+        shell: bash
+        run: |
+          set +e
+          overall=0
+
+          JS_FILES=$(find js shared data -type f -name "*.js" 2>/dev/null | sort)
+          [ -f sw.js ] && JS_FILES="$JS_FILES sw.js"
+          for jsfile in $JS_FILES; do
+            node --check "$jsfile" || overall=1
+          done
+
+          # index.html's inline scripts are shipped front-end code; check them too.
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+          html = Path("index.html").read_text(encoding="utf-8")
+          scripts = re.findall(r"<script(?![^>]*src=)[^>]*>(.*?)</script>", html, re.S | re.I)
+          Path("index-inline.js").write_text("\n\n".join(scripts), encoding="utf-8")
+          PY
+          node --check index-inline.js || overall=1
+          rm -f index-inline.js
+
+          for test_script in scripts/test_*.js; do
+            [ -f "$test_script" ] || continue
+            node "$test_script" || overall=1
+          done
+
+          python3 tools/validate_content.py || \
+            echo "::notice::content validator reported issues (informational, not blocking — see AGENTS.md)"
+
+          exit $overall
+
+      - name: Stage deployment tree (tracked files only, no .git)
+        run: |
+          mkdir -p "$RUNNER_TEMP/_site"
+          git archive HEAD | tar -x -C "$RUNNER_TEMP/_site"
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy ${{ runner.temp }}/_site --project-name blockquest-classroom --branch main --commit-hash ${{ github.sha }} --commit-dirty
