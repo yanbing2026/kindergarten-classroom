@@ -6,7 +6,14 @@
 - 历史：2026-10-17 之前托管在 GitHub Pages（`https://yanbing2026.github.io/kindergarten-classroom/`）。
   该站点仍在线，但**已不是发布目标**，`pages.yml` 已移除。
 
-## 为什么现在是"手动部署"（2026-10-17 起）
+## 部署现状（2026-10 更新：CI 已接手自动部署）
+
+`.github/workflows/deploy-pages.yml` 现在会在 push 到 `main` 时自动直传 Cloudflare Pages
+（`git archive` 出跟踪文件树 → `wrangler pages deploy`，凭据用 secrets `CLOUDFLARE_API_TOKEN` /
+`CLOUDFLARE_ACCOUNT_ID`，工作流会显式拒绝缺失/非 main 触发）。**本节以下的手动流程退化为
+"CI 挂了/需要重推时的兜底"**，与当年 Git 集成的预期一致。
+
+## 为什么当年是"手动部署"（2026-10-17 起）
 
 Cloudflare 侧的 Git 集成本仓库接不上：
 
