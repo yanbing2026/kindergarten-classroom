@@ -625,6 +625,165 @@ function createHarness(seedStorage = {}) {
       pass('_setFetch returns previous fetch and allows restoration');
     }
 
+    // -------------------------------------------------------------
+    // Test 21: sendRows with 450 rows -> exactly 3 requests (200, 200, 50), accepted: 450
+    // -------------------------------------------------------------
+    {
+      const { KCCloud } = createHarness({ kc_cloud_token_v1: 'token-rows-450' });
+      const requests = [];
+
+      KCCloud._setFetch(async (url, opts) => {
+        const body = JSON.parse(opts.body);
+        requests.push({ url, method: opts.method, headers: opts.headers, body });
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ ok: true, saved: body.rows.length })
+        };
+      });
+
+      const rows450 = Array.from({ length: 450 }, (_, i) => ({
+        gradeLevel: 'k',
+        subjectKey: 'math',
+        unitKey: `unit_${i + 1}`,
+        mastery: 80,
+        stars: 3,
+        attempts: 1,
+        correct: 1,
+        firstTryCorrect: 1,
+        metadata: { index: i }
+      }));
+
+      const res = await KCCloud.sendRows(rows450);
+
+      assert.strictEqual(requests.length, 3, 'Must make exactly 3 requests for 450 rows');
+      assert.strictEqual(requests[0].body.rows.length, 200, 'Batch 1 must contain 200 rows');
+      assert.strictEqual(requests[1].body.rows.length, 200, 'Batch 2 must contain 200 rows');
+      assert.strictEqual(requests[2].body.rows.length, 50, 'Batch 3 must contain 50 rows');
+      assert.strictEqual(requests[0].url, 'https://blockquest-api.yanbing2004.workers.dev/rows');
+      assert.strictEqual(requests[0].method, 'POST');
+      assert.strictEqual(requests[0].headers['Authorization'], 'Bearer token-rows-450');
+      assert.strictEqual(requests[1].headers['Authorization'], 'Bearer token-rows-450');
+      assert.strictEqual(requests[2].headers['Authorization'], 'Bearer token-rows-450');
+      assert(Array.isArray(requests[0].body.rows), 'Body must contain rows array');
+      assert.strictEqual(res.ok, true);
+      assert.strictEqual(res.accepted, 450);
+
+      pass('sendRows with 450 rows batches into 200/200/50 and returns accepted:450');
+    }
+
+    // -------------------------------------------------------------
+    // Test 22: sendGoals with 120 goals -> exactly 3 requests (50, 50, 20), accepted: 120
+    // -------------------------------------------------------------
+    {
+      const { KCCloud } = createHarness({ kc_cloud_token_v1: 'token-goals-120' });
+      const requests = [];
+
+      KCCloud._setFetch(async (url, opts) => {
+        const body = JSON.parse(opts.body);
+        requests.push({ url, method: opts.method, headers: opts.headers, body });
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ ok: true, saved: body.goals.length })
+        };
+      });
+
+      const goals120 = Array.from({ length: 120 }, (_, i) => ({
+        goalDate: `2026-11-${String((i % 28) + 1).padStart(2, '0')}`,
+        targetQuestions: 20,
+        completedQuestions: 15,
+        completed: false,
+        metadata: { idx: i }
+      }));
+
+      const res = await KCCloud.sendGoals(goals120);
+
+      assert.strictEqual(requests.length, 3, 'Must make exactly 3 requests for 120 goals');
+      assert.strictEqual(requests[0].body.goals.length, 50, 'Batch 1 must contain 50 goals');
+      assert.strictEqual(requests[1].body.goals.length, 50, 'Batch 2 must contain 50 goals');
+      assert.strictEqual(requests[2].body.goals.length, 20, 'Batch 3 must contain 20 goals');
+      assert.strictEqual(requests[0].url, 'https://blockquest-api.yanbing2004.workers.dev/goals');
+      assert.strictEqual(requests[0].method, 'POST');
+      assert.strictEqual(requests[0].headers['Authorization'], 'Bearer token-goals-120');
+      assert.strictEqual(requests[1].headers['Authorization'], 'Bearer token-goals-120');
+      assert.strictEqual(requests[2].headers['Authorization'], 'Bearer token-goals-120');
+      assert(Array.isArray(requests[0].body.goals), 'Body must contain goals array');
+      assert.strictEqual(res.ok, true);
+      assert.strictEqual(res.accepted, 120);
+
+      pass('sendGoals with 120 goals batches into 50/50/20 and returns accepted:120');
+    }
+
+    // -------------------------------------------------------------
+    // Test 23: Empty array does not send request and returns {ok:true, accepted:0}
+    // -------------------------------------------------------------
+    {
+      const { KCCloud } = createHarness();
+      let fetchCalls = 0;
+
+      KCCloud._setFetch(async () => {
+        fetchCalls++;
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ ok: true })
+        };
+      });
+
+      const rowsRes = await KCCloud.sendRows([]);
+      assert.strictEqual(fetchCalls, 0, 'sendRows([]) must not call fetch');
+      assert.strictEqual(rowsRes.ok, true);
+      assert.strictEqual(rowsRes.accepted, 0);
+
+      const goalsRes = await KCCloud.sendGoals([]);
+      assert.strictEqual(fetchCalls, 0, 'sendGoals([]) must not call fetch');
+      assert.strictEqual(goalsRes.ok, true);
+      assert.strictEqual(goalsRes.accepted, 0);
+
+      pass('empty arrays for sendRows and sendGoals do not call fetch and return {ok:true, accepted:0}');
+    }
+
+    // -------------------------------------------------------------
+    // Test 24: sendRows 500 rows, second batch failure -> {ok:false, accepted:200}
+    // -------------------------------------------------------------
+    {
+      const { KCCloud } = createHarness();
+      let callCount = 0;
+
+      KCCloud._setFetch(async (url, opts) => {
+        callCount++;
+        const body = JSON.parse(opts.body);
+        if (callCount === 1) {
+          return {
+            ok: true,
+            status: 200,
+            json: async () => ({ ok: true, saved: body.rows.length })
+          };
+        }
+        return {
+          ok: false,
+          status: 500,
+          json: async () => ({ ok: false, error: 'd1_insert_failed' })
+        };
+      });
+
+      const rows500 = Array.from({ length: 500 }, (_, i) => ({
+        gradeLevel: '1',
+        subjectKey: 'math',
+        unitKey: `unit_${i + 1}`
+      }));
+
+      const res = await KCCloud.sendRows(rows500);
+
+      assert.strictEqual(callCount, 2, 'Must stop sending after second batch fails');
+      assert.strictEqual(res.ok, false);
+      assert.strictEqual(res.error, 'd1_insert_failed');
+      assert.strictEqual(res.accepted, 200, 'Must report accepted: 200 from batch 1');
+
+      pass('sendRows 500 rows partial failure on batch 2 returns {ok:false, error, accepted:200}');
+    }
+
     console.log('\nAll tests passed successfully.');
     process.exit(0);
   } catch (err) {

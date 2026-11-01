@@ -260,6 +260,56 @@
     return { ok: true, accepted: totalAccepted };
   }
 
+  async function sendRows(rows) {
+    if (!Array.isArray(rows) || rows.length === 0) {
+      return { ok: true, accepted: 0 };
+    }
+    var totalAccepted = 0;
+    var batchSize = 200;
+    for (var i = 0; i < rows.length; i += batchSize) {
+      var batch = rows.slice(i, i + batchSize);
+      var res = await request('/rows', {
+        method: 'POST',
+        body: { rows: batch }
+      });
+      if (!res || !res.ok) {
+        return {
+          ok: false,
+          error: (res && res.error) ? res.error : 'server_error',
+          accepted: totalAccepted
+        };
+      }
+      var count = (typeof res.saved === 'number') ? res.saved : ((typeof res.accepted === 'number') ? res.accepted : batch.length);
+      totalAccepted += count;
+    }
+    return { ok: true, accepted: totalAccepted };
+  }
+
+  async function sendGoals(goals) {
+    if (!Array.isArray(goals) || goals.length === 0) {
+      return { ok: true, accepted: 0 };
+    }
+    var totalAccepted = 0;
+    var batchSize = 50;
+    for (var i = 0; i < goals.length; i += batchSize) {
+      var batch = goals.slice(i, i + batchSize);
+      var res = await request('/goals', {
+        method: 'POST',
+        body: { goals: batch }
+      });
+      if (!res || !res.ok) {
+        return {
+          ok: false,
+          error: (res && res.error) ? res.error : 'server_error',
+          accepted: totalAccepted
+        };
+      }
+      var count = (typeof res.saved === 'number') ? res.saved : ((typeof res.accepted === 'number') ? res.accepted : batch.length);
+      totalAccepted += count;
+    }
+    return { ok: true, accepted: totalAccepted };
+  }
+
   async function report(days) {
     var d = 30;
     if (typeof days === 'number' && days > 0) {
@@ -291,6 +341,8 @@
     rotatePin: rotatePin,
     deletePlayer: deletePlayer,
     sendEvents: sendEvents,
+    sendRows: sendRows,
+    sendGoals: sendGoals,
     report: report
   };
 
