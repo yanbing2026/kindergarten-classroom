@@ -27,15 +27,16 @@
 | §5.3 21 KB 死代码 | ✅ | 内联 G1 数学题库已删；`test_content_depth.js` 防回潮 |
 | §5.4 校验器 / CI | ✅ | 按文件查重、跳过 `L\d+`、纳入 G1/G2；CI 自动发现全部 `scripts/test_*.js`，内容校验改为阻断 |
 | §6.2 年级题库按需加载 | ✅（部分） | `index.html` 不再同步加载 G1/G2 题库；进入课程时 `ensureGradeData()` 注入脚本，先渲染加载态，失败可重试；`test_offline_shell.js` 验证懒加载题库仍在离线缓存 |
-| §6.3 标题可读性 / manifest | ✅（部分） | 年级题目标题改用 clear 字体；manifest 增加 `id`、横竖屏自适应、年级 shortcuts |
+| §6.3 标题可读性 / manifest | ✅（部分） | 年级题目标题改用 clear 字体；首页今日冒险改为原生 `<button>`；manifest 增加 `id`、横竖屏自适应、年级 shortcuts |
+| §9 PR-G 家长自助账号管理 | ✅ | 家长面板接入 `rotate_pin` / `delete_player`；支持导出 + 导入备份；`test_parent_account_security.js` 覆盖改 PIN、错 PIN、删号清理与导入合并 |
 
 仍需人工 / 后续处理：
 
 - **§2.1 实际重新部署**：本机没有 Cloudflare 连接器凭据，无法执行 `pages_deploy.py` + 创建 deployment；
   必须由有权限的人按 `docs/pages-recovery.md` 部署并贴出 4 个哈希。
 - **线上 Supabase 迁移 008 / 009**：需要在 Supabase SQL Editor 执行并确认匿名登录已开启；仓库内无法验证。
-- **§6.2 CSS 拆分**：题库按需加载已完成，但首屏 CSS 仍未拆分；**§6.3 可访问性细化**同样留作后续。
-- **§9 PR-G 家长自助改 PIN / 删号 UI**：RPC 已在 009 就绪，界面尚未接入。
+- **§6.2 CSS 拆分 / §6.3 读屏播报**：题库按需加载已完成；首屏 CSS 仍未拆分，答题时 TTS 与
+  `aria-live` 仍可能重复播报，留作后续小步优化。
 
 ---
 

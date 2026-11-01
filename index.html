@@ -61,7 +61,7 @@
     <script src="./js/blipola-runtime.js"></script>
     <script>
     // ---------- App version ----------
-    const APP_VERSION = 'v2-20261101-lazy-banks';
+    const APP_VERSION = 'v2-20261101-audit-final';
 
     // ---------- Debug / Dev Mode ----------
     // Hidden diagnostic screen for parents and developers.
@@ -531,6 +531,75 @@
         progress=loadProgress();
         blipola=window.BlipolaClassroom.create(progress);
         render();
+    }
+    function openAccountSecurityModal(mode){
+        const m=document.getElementById('accountModal');
+        if(!m)return;
+        const name=getCurrentAccountName();
+        if(!name){openAccountModal('login');return;}
+        const remove=mode==='delete';
+        m.style.display='grid';
+        m.innerHTML=`<div class="account-box"><h2>${remove?'🗑️ Delete account':'🔑 Change PIN'}</h2>
+            <p>${remove
+                ? `This deletes the cloud copy and this device's saved copy of <strong>${esc(name)}</strong>. Export a backup first if you need one.`
+                : `Enter the current PIN, then choose a new 4–6 digit PIN for <strong>${esc(name)}</strong>.`}</p>
+            <input id="accountOldPin" maxlength="6" inputmode="numeric" type="password" placeholder="Current 4–6 digit PIN" autocomplete="current-password">
+            ${remove?'':'<input id="accountNewPin" maxlength="6" inputmode="numeric" type="password" placeholder="New 4–6 digit PIN" autocomplete="new-password"><input id="accountNewPin2" maxlength="6" inputmode="numeric" type="password" placeholder="Repeat new PIN" autocomplete="new-password">'}
+            <div class="account-actions"><button id="accountSecuritySubmit" type="button">${remove?'Delete account':'Change PIN'}</button><button id="accountCancel" type="button">Cancel</button></div>
+            <div id="accountStatus" class="account-status" aria-live="polite"></div></div>`;
+        document.getElementById('accountSecuritySubmit').onclick=()=>submitAccountSecurity(mode);
+        document.getElementById('accountCancel').onclick=closeAccountModal;
+        document.getElementById('accountOldPin').focus();
+    }
+    async function submitAccountSecurity(mode){
+        const status=document.getElementById('accountStatus');
+        const btn=document.getElementById('accountSecuritySubmit');
+        const name=getCurrentAccountName();
+        if(!name||!supa){if(status)status.textContent='Cloud accounts need an internet connection.';return;}
+        const oldPin=(document.getElementById('accountOldPin')?.value||'').trim();
+        if(!/^\d{4,6}$/.test(oldPin)){if(status)status.textContent='Enter the current 4–6 digit PIN.';return;}
+        let newPin='';
+        if(mode==='rotate'){
+            newPin=(document.getElementById('accountNewPin')?.value||'').trim();
+            const repeat=(document.getElementById('accountNewPin2')?.value||'').trim();
+            if(!/^\d{4,6}$/.test(newPin)){if(status)status.textContent='The new PIN must be 4–6 digits.';return;}
+            if(newPin!==repeat){if(status)status.textContent='The new PINs do not match.';return;}
+            if(newPin===oldPin){if(status)status.textContent='Choose a different PIN.';return;}
+        }
+        if(btn)btn.disabled=true;
+        if(status)status.textContent='Checking…';
+        try{
+            const oldHash=await derivePinVerifier(oldPin,await getPinSaltForLogin(name));
+            if(mode==='delete'){
+                const {data,error}=await supa.rpc('delete_player',{p_name:name,p_pin_hash:oldHash});
+                if(error||data!==true)throw new Error(error?.message||'PIN is incorrect');
+                const key=getCurrentAccount();
+                if(key){
+                    try{const accounts=getAccounts();delete accounts[key];localStorage.setItem('kc_accounts_v1',JSON.stringify(accounts));}catch(_){}
+                    try{localStorage.removeItem(accountProgressKey(key));}catch(_){}
+                }
+                localStorage.removeItem('kc_current_account');
+                setPinVerifier('');
+                if(window.KCData)window.KCData.setPlayerId('');
+                try{if(supa)await supa.auth.signOut();}catch(_){}
+                closeAccountModal();renderAccountBar();progress=loadProgress();blipola=window.BlipolaClassroom.create(progress);render();
+                alert('Account deleted. Progress for this account was removed from this device.');
+                return;
+            }
+            const newSalt=makePinSalt();
+            const newHash=await derivePinVerifier(newPin,newSalt);
+            const {data,error}=await supa.rpc('rotate_pin',{p_name:name,p_old_pin_hash:oldHash,p_new_pin_hash:newHash,p_new_pin_salt:newSalt});
+            if(error||data!==true)throw new Error(error?.message||'Current PIN is incorrect');
+            // rotate_pin clears auth_user_id, so re-claim this browser with the
+            // new verifier or cloud sync would stop until the next login.
+            setPinVerifier(newHash);
+            await ensureNormalizedAuth(name);
+            closeAccountModal();
+            alert('PIN changed. Use the new PIN next time you log in.');
+        }catch(error){
+            if(status)status.textContent=String(error?.message||'Could not update the account.');
+            if(btn)btn.disabled=false;
+        }
     }
     function renderAccountBar(){const el=document.getElementById('accountBar');if(!el)return;const key=getCurrentAccount(),acct=key?(getAccounts()[key]||{name:key}):null;if(acct){el.innerHTML='<span class="account-name">👤 '+esc(acct.name)+'</span><span class="account-sync" id="accountSyncStatus" aria-live="polite">☁️ Saved</span><button class="account-btn" id="logoutBtn">Log out</button>';document.getElementById('logoutBtn').onclick=logoutAccount;setCloudSyncStatus('saved');}else{el.innerHTML='<button class="account-btn" id="loginBtn">👤 Log in</button><button class="account-btn" id="createBtn">➕ Create account</button>';document.getElementById('loginBtn').onclick=()=>openAccountModal('login');document.getElementById('createBtn').onclick=()=>openAccountModal('create');}}
 
@@ -1059,7 +1128,7 @@
         '<div class="home-hero"><div class="home-kicker">⛏️ BLOCKQUEST CLASSROOM</div><h1>Choose your grade</h1><p>Your learning journey starts here.</p></div>'+
         renderDailyMissions()+
         renderTodayReview()+
-        '<div class="today-card" onclick="'+todayAction+'"><div class="today-icon">⭐</div><div class="today-copy"><div class="today-kicker">TODAY\'S ADVENTURE</div><div class="today-title">'+lesson.cat.icon+' '+lesson.cat.name+'</div><div class="today-sub">'+lesson.reason+(lesson.item ? ' • '+lessonLabel : '')+'</div></div><button class="big-btn play">START ▶</button></div>'+
+        '<button type="button" class="today-card" onclick="'+todayAction+'"><span class="today-icon">⭐</span><span class="today-copy"><span class="today-kicker">TODAY\'S ADVENTURE</span><span class="today-title">'+lesson.cat.icon+' '+lesson.cat.name+'</span><span class="today-sub">'+lesson.reason+(lesson.item ? ' • '+lessonLabel : '')+'</span></span><span class="big-btn play">START ▶</span></button>'+
         '<h2 class="home-section-title">📚 Grades Pre-K–2 (Grades 3–8 in Planning)</h2><div class="home-grade-menu">'+gradeCards+'</div>'+
         '<h2 class="home-section-title">🎮 More Learning</h2><div class="home-tools"><button class="home-tool" onclick="go(\'category\',{key:\'chinese\',level:\'L1\'})">🇨🇳 Chinese</button><button class="home-tool" onclick="go(\'category\',{key:\'spanish\',level:\'L1\'})">🇪🇸 Spanish</button><button class="home-tool" onclick="go(\'freeplay\')">🎨 Free Play</button><button class="home-tool" onclick="go(\'draw\')">✏️ Draw</button><button class="home-tool" onclick="go(\'worksheets\')">🖨️ Worksheets</button><button class="home-tool" onclick="go(\'progress\')">🏆 Progress</button></div>'+
         '<div class="footer">💎 '+progress.stars+' diamonds · Pick a grade to explore its courses.</div>';
@@ -3096,6 +3165,12 @@
         const recoveryCard=recoveryRows?'<div class="parent-card"><h3>🛠️ Skill recovery</h3><div class="parent-progress-label">These skills needed extra practice. Transfer checks help confirm the idea works in a new problem.</div>'+recoveryRows+'</div>':'';
         const recoveryTimeline=renderSkillRecoveryTimeline(recoveryStats);
         const recoveryTimelineCard=recoveryTimeline?'<div class="parent-card"><h3>🕒 Recovery timeline</h3><div class="parent-progress-label">A simple view of how each skill moved from a mistake to practice, transfer, and review.</div>'+recoveryTimeline+'</div>':'';
+        const signedIn=!!getCurrentAccount();
+        const accountCard='<div class="parent-card"><h3>🔐 Parent account</h3>'
+            +(signedIn
+                ? '<div class="parent-progress-label">Signed in as <strong>'+esc(getCurrentAccountName())+'</strong>. Cloud sync keeps this profile on every device.</div><div class="account-actions" style="margin-top:10px"><button class="choice-btn" type="button" onclick="openAccountSecurityModal(\'rotate\')">🔑 Change PIN</button><button class="choice-btn" type="button" onclick="openAccountSecurityModal(\'delete\')" style="background:#f7c9c2">🗑️ Delete account</button></div>'
+                : '<div class="parent-progress-label">Cloud sync is off. Progress stays on this device.</div><div class="account-actions" style="margin-top:10px"><button class="choice-btn" type="button" onclick="openAccountModal(\'login\')">👤 Log in</button><button class="choice-btn" type="button" onclick="openAccountModal(\'create\')">➕ Create account</button></div>')
+            +'</div>';
 return `${topbar(true)}
         <div class="parent-dashboard">
             <div class="parent-header"><div><div class="parent-kicker">FOR PARENTS</div><h2>📋 Learning Snapshot</h2><div class="parent-date">${new Date().toLocaleDateString()}</div></div><div class="parent-diamond">💎 ${progress.stars}</div></div>
@@ -3106,6 +3181,7 @@ return `${topbar(true)}
             ${recoveryTimelineCard}
             <div class="parent-card"><h3>📚 Overall progress</h3><div class="parent-progress"><div class="parent-progress-fill" style="width:${pct}%"></div></div><div class="parent-progress-label">${stats.mastered} of ${stats.total} learning items mastered</div></div>
             <div class="parent-card"><h3>📈 Skills practiced this week</h3>${recentSkills || '<div class="parent-good">No activity yet this week.</div>'}</div>
+            ${accountCard}
             ${renderCloudParentProgress()}
             <div class="parent-card"><h3>💎 Learning rewards</h3><div class="parent-progress-label">${progress.stars} diamonds earned · ${Object.values(progress.mathCorrect).reduce((a,b)=>a+(b||0),0)} math problems solved</div></div>
             <button class="big-btn home" onclick="go('progress')">← Back to Progress</button>
@@ -3140,6 +3216,8 @@ return `${topbar(true)}
         <div class="trophy-grid">${trophies}</div>
         <div style="text-align:center;margin-top:18px;">
             <button class="choice-btn" style="padding:12px 20px;font-size:1rem;" onclick="exportProgress()">📤 Export progress (for parents)</button>
+            <button class="choice-btn" style="padding:12px 20px;font-size:1rem;" onclick="document.getElementById('progressImportFile').click()">📥 Import backup</button>
+            <input type="file" id="progressImportFile" accept="application/json,.json" style="display:none" onchange="importProgressFile(this)">
         </div>`;
     }
     // Parent export (research G): dump the progress object as a downloadable JSON file.
@@ -3165,6 +3243,38 @@ return `${topbar(true)}
         a.click();
         a.remove();
         URL.revokeObjectURL(url);
+    }
+    function importProgressFile(input) {
+        const file = input.files && input.files[0];
+        input.value = '';
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            try {
+                const data = JSON.parse(String(reader.result || ''));
+                if (!data || typeof data !== 'object' || Array.isArray(data)) {
+                    throw new Error('This is not a BlockQuest progress file.');
+                }
+                // Keep existing work: import merges the higher scores instead of
+                // replacing a child's progress with an older backup.
+                const merged = mergeProgress(progress, data);
+                if (data.skillStats && typeof data.skillStats === 'object') {
+                    merged.skillStats = Object.assign({}, progress.skillStats || {}, data.skillStats);
+                }
+                if (Array.isArray(data.remediationHistory)) {
+                    merged.remediationHistory = data.remediationHistory.slice(-300);
+                }
+                merged.mathStreak = Math.max(Number(progress.mathStreak) || 0, Number(data.mathStreak) || 0);
+                progress = merged;
+                saveProgress();
+                render();
+                alert('Backup imported. Your existing progress was kept and the higher scores were merged in.');
+            } catch (error) {
+                alert('Could not import this file: ' + (error && error.message ? error.message : error));
+            }
+        };
+        reader.onerror = () => alert('Could not read this file.');
+        reader.readAsText(file);
     }
 
     // ---------- Worksheets (printable) ----------
