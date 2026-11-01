@@ -433,6 +433,74 @@ export function createApp({ store, now = () => Date.now(), secret = 'default-sec
         return jsonResponse({ ok: true, accepted }, 200);
       }
 
+      // POST /rows
+      if (method === 'POST' && path === '/rows') {
+        const auth = await authenticate();
+        if (auth.error) {
+          return jsonResponse({ ok: false, error: auth.error }, auth.status);
+        }
+
+        let body;
+        try {
+          body = await request.json();
+        } catch {
+          return jsonResponse({ ok: false, error: 'bad_request' }, 400);
+        }
+
+        const { rows } = body || {};
+        if (!rows || !Array.isArray(rows) || rows.length < 1 || rows.length > 200) {
+          return jsonResponse({ ok: false, error: 'bad_request' }, 400);
+        }
+
+        for (const r of rows) {
+          if (!r || typeof r !== 'object' || Array.isArray(r)) {
+            return jsonResponse({ ok: false, error: 'bad_request' }, 400);
+          }
+          const grade = r.gradeLevel ?? r.grade_level;
+          const subject = r.subjectKey ?? r.subject_key;
+          if (grade === undefined || grade === null || grade === '' ||
+              subject === undefined || subject === null || subject === '') {
+            return jsonResponse({ ok: false, error: 'bad_request' }, 400);
+          }
+        }
+
+        await store.upsertProgressRows(auth.player.id, rows, getNow());
+        return jsonResponse({ ok: true, saved: rows.length }, 200);
+      }
+
+      // POST /goals
+      if (method === 'POST' && path === '/goals') {
+        const auth = await authenticate();
+        if (auth.error) {
+          return jsonResponse({ ok: false, error: auth.error }, auth.status);
+        }
+
+        let body;
+        try {
+          body = await request.json();
+        } catch {
+          return jsonResponse({ ok: false, error: 'bad_request' }, 400);
+        }
+
+        const { goals } = body || {};
+        if (!goals || !Array.isArray(goals) || goals.length < 1 || goals.length > 50) {
+          return jsonResponse({ ok: false, error: 'bad_request' }, 400);
+        }
+
+        for (const g of goals) {
+          if (!g || typeof g !== 'object' || Array.isArray(g)) {
+            return jsonResponse({ ok: false, error: 'bad_request' }, 400);
+          }
+          const date = g.goalDate ?? g.goal_date;
+          if (date === undefined || date === null || date === '') {
+            return jsonResponse({ ok: false, error: 'bad_request' }, 400);
+          }
+        }
+
+        await store.upsertGoals(auth.player.id, goals, getNow());
+        return jsonResponse({ ok: true, saved: goals.length }, 200);
+      }
+
       // GET /report?days=30
       if (method === 'GET' && path === '/report') {
         const auth = await authenticate();
@@ -449,8 +517,9 @@ export function createApp({ store, now = () => Date.now(), secret = 'default-sec
 
         const events = await store.listEvents(auth.player.id, sinceTs);
         const progress = await store.listProgress(auth.player.id);
+        const goals = await store.listGoals(auth.player.id);
 
-        return jsonResponse({ ok: true, progress, events }, 200);
+        return jsonResponse({ ok: true, progress, events, goals }, 200);
       }
 
       return jsonResponse({ ok: false, error: 'not_found' }, 404);

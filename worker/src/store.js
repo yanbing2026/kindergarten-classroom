@@ -91,6 +91,43 @@ export function createStore(db) {
       await db.batch(stmts);
     },
 
+    async upsertGoals(playerId, goals, now) {
+      if (!goals || goals.length === 0) return 0;
+      const stmts = goals.map(g => {
+        const metadataStr = typeof g.metadata === 'object' && g.metadata !== null
+          ? JSON.stringify(g.metadata)
+          : (g.metadata || null);
+        const goalDate = g.goal_date || g.goalDate;
+        const target = g.target_questions !== undefined
+          ? (g.target_questions !== null ? Number(g.target_questions) : null)
+          : (g.targetQuestions !== undefined && g.targetQuestions !== null ? Number(g.targetQuestions) : null);
+        const completedCount = g.completed_questions !== undefined
+          ? (g.completed_questions !== null ? Number(g.completed_questions) : null)
+          : (g.completedQuestions !== undefined && g.completedQuestions !== null ? Number(g.completedQuestions) : null);
+        const completed = g.completed !== undefined ? (g.completed ? 1 : 0) : 0;
+
+        return db.prepare(`
+          INSERT INTO daily_goals (
+            player_id, goal_date, target_questions, completed_questions, completed, metadata
+          ) VALUES (?, ?, ?, ?, ?, ?)
+          ON CONFLICT(player_id, goal_date) DO UPDATE SET
+            target_questions = excluded.target_questions,
+            completed_questions = excluded.completed_questions,
+            completed = excluded.completed,
+            metadata = excluded.metadata
+        `).bind(
+          playerId,
+          goalDate,
+          target,
+          completedCount,
+          completed,
+          metadataStr
+        );
+      });
+      await db.batch(stmts);
+      return goals.length;
+    },
+
     async insertEvents(playerId, events, now) {
       if (!events || events.length === 0) return 0;
       const stmts = events.map(e => {
@@ -132,6 +169,13 @@ export function createStore(db) {
     async listProgress(playerId) {
       const result = await db.prepare(
         'SELECT * FROM player_progress WHERE player_id = ? ORDER BY grade_level, subject_key, unit_key'
+      ).bind(playerId).all();
+      return result?.results || [];
+    },
+
+    async listGoals(playerId) {
+      const result = await db.prepare(
+        'SELECT * FROM daily_goals WHERE player_id = ? ORDER BY goal_date ASC'
       ).bind(playerId).all();
       return result?.results || [];
     },

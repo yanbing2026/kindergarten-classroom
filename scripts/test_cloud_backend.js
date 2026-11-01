@@ -841,6 +841,25 @@ function pass(name) {
     assert.strictEqual(progressList.length, 1);
     assert.strictEqual(progressList[0].mastery, 80);
 
+    // upsertGoals and listGoals
+    await d1Store.upsertGoals(1, [
+      { goalDate: '2026-11-01', targetQuestions: 10, completedQuestions: 5, completed: false, metadata: { topic: 'math' } }
+    ], now);
+    const goalsList = await d1Store.listGoals(1);
+    assert.strictEqual(goalsList.length, 1);
+    assert.strictEqual(goalsList[0].target_questions, 10);
+    assert.strictEqual(goalsList[0].completed, 0);
+
+    // update same goal_date
+    await d1Store.upsertGoals(1, [
+      { goalDate: '2026-11-01', targetQuestions: 15, completedQuestions: 15, completed: true, metadata: 'done' }
+    ], now);
+    const updatedGoals = await d1Store.listGoals(1);
+    assert.strictEqual(updatedGoals.length, 1);
+    assert.strictEqual(updatedGoals[0].target_questions, 15);
+    assert.strictEqual(updatedGoals[0].completed, 1);
+    assert.strictEqual(updatedGoals[0].metadata, 'done');
+
     // insertEvents and listEvents
     await d1Store.insertEvents(1, [
       { clientEventId: 'sql_evt_1', score: 100, createdAt: now + 50 },
@@ -863,8 +882,287 @@ function pass(name) {
     assert.strictEqual(await d1Store.getById(1), null);
     assert.strictEqual((await d1Store.listEvents(1, 0)).length, 0);
     assert.strictEqual((await d1Store.listProgress(1)).length, 0);
+    assert.strictEqual((await d1Store.listGoals(1)).length, 0);
 
     pass('worker/src/store.js executes cleanly against SQLite schema.sql');
+  }
+
+  // -------------------------------------------------------------
+  // Test 14: POST /rows saves progress rows, injects clock, updates on duplicate (grade, subject, unit)
+  // -------------------------------------------------------------
+  {
+    let currentTime = 1700000000000;
+    const store = createMemoryStore();
+    const app = createApp({
+      store,
+      now: () => currentTime,
+      secret: SECRET,
+      allowedOrigins: ALLOWED_ORIGINS
+    });
+
+    const createRes = await app(new Request('http://localhost/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'RowUser', pinVerifier: 'row_pin', salt: 'row_salt' })
+    }));
+    const { token } = await createRes.json();
+
+    // Save 2 rows
+    const saveRes1 = await app(new Request('http://localhost/rows', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        rows: [
+          { gradeLevel: 'k', subjectKey: 'math', unitKey: 'counting', mastery: 80, stars: 3 },
+          { grade_level: '1', subject_key: 'reading', unit_key: 'phonics', mastery: 60, stars: 2 }
+        ]
+      })
+    }));
+    assert.strictEqual(saveRes1.status, 200);
+    const saveBody1 = await saveRes1.json();
+    assert.strictEqual(saveBody1.ok, true);
+    assert.strictEqual(saveBody1.saved, 2);
+
+    // GET /report reads same 2 rows, updated_at is injected clock
+    const report1 = await app(new Request('http://localhost/report', {
+      headers: { Authorization: `Bearer ${token}` }
+    }));
+    assert.strictEqual(report1.status, 200);
+    const reportBody1 = await report1.json();
+    assert.strictEqual(reportBody1.ok, true);
+    assert.strictEqual(Array.isArray(reportBody1.progress), true);
+    assert.strictEqual(reportBody1.progress.length, 2);
+    assert.strictEqual(reportBody1.progress[0].updated_at, currentTime);
+    assert.strictEqual(reportBody1.progress[1].updated_at, currentTime);
+
+    // Advance clock, write same (grade, subject, unit) again
+    currentTime += 50000;
+    const saveRes2 = await app(new Request('http://localhost/rows', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        rows: [
+          { gradeLevel: 'k', subjectKey: 'math', unitKey: 'counting', mastery: 95, stars: 5 }
+        ]
+      })
+    }));
+    assert.strictEqual(saveRes2.status, 200);
+    const saveBody2 = await saveRes2.json();
+    assert.strictEqual(saveBody2.ok, true);
+    assert.strictEqual(saveBody2.saved, 1);
+
+    // GET /report verifies count is still 2 and updated_at is new clock
+    const report2 = await app(new Request('http://localhost/report', {
+      headers: { Authorization: `Bearer ${token}` }
+    }));
+    assert.strictEqual(report2.status, 200);
+    const reportBody2 = await report2.json();
+    assert.strictEqual(reportBody2.progress.length, 2, 'Count must remain 2 after updating existing (grade, subject, unit)');
+    const updatedRow = reportBody2.progress.find(p => p.grade_level === 'k' && p.subject_key === 'math' && p.unit_key === 'counting');
+    assert.strictEqual(updatedRow.mastery, 95);
+    assert.strictEqual(updatedRow.stars, 5);
+    assert.strictEqual(updatedRow.updated_at, currentTime);
+
+    pass('POST /rows saves progress rows, injects clock, and updates on duplicate (grade, subject, unit)');
+  }
+
+  // -------------------------------------------------------------
+  // Test 15: POST /goals saves 2 rows, GET /report.goals returns 2 rows, duplicate goal_date updates
+  // -------------------------------------------------------------
+  {
+    let currentTime = 1700000000000;
+    const store = createMemoryStore();
+    const app = createApp({
+      store,
+      now: () => currentTime,
+      secret: SECRET,
+      allowedOrigins: ALLOWED_ORIGINS
+    });
+
+    const createRes = await app(new Request('http://localhost/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'GoalUser', pinVerifier: 'goal_pin', salt: 'goal_salt' })
+    }));
+    const { token } = await createRes.json();
+
+    // Save 2 goals
+    const saveRes1 = await app(new Request('http://localhost/goals', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        goals: [
+          { goalDate: '2026-11-01', targetQuestions: 10, completedQuestions: 5, completed: false, metadata: { topic: 'math' } },
+          { goal_date: '2026-11-02', target_questions: 15, completed_questions: 15, completed: true, metadata: 'all-done' }
+        ]
+      })
+    }));
+    assert.strictEqual(saveRes1.status, 200);
+    const saveBody1 = await saveRes1.json();
+    assert.strictEqual(saveBody1.ok, true);
+    assert.strictEqual(saveBody1.saved, 2);
+
+    // GET /report.goals returns 2 rows
+    const report1 = await app(new Request('http://localhost/report', {
+      headers: { Authorization: `Bearer ${token}` }
+    }));
+    assert.strictEqual(report1.status, 200);
+    const reportBody1 = await report1.json();
+    assert.strictEqual(Array.isArray(reportBody1.goals), true);
+    assert.strictEqual(reportBody1.goals.length, 2);
+    assert.strictEqual(reportBody1.goals[0].goal_date, '2026-11-01');
+    assert.strictEqual(reportBody1.goals[0].target_questions, 10);
+    assert.strictEqual(reportBody1.goals[0].completed_questions, 5);
+    assert.strictEqual(reportBody1.goals[0].completed, 0);
+    assert.strictEqual(reportBody1.goals[1].goal_date, '2026-11-02');
+    assert.strictEqual(reportBody1.goals[1].target_questions, 15);
+    assert.strictEqual(reportBody1.goals[1].completed_questions, 15);
+    assert.strictEqual(reportBody1.goals[1].completed, 1);
+
+    // Write same goal_date again to update
+    const saveRes2 = await app(new Request('http://localhost/goals', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        goals: [
+          { goalDate: '2026-11-01', targetQuestions: 12, completedQuestions: 12, completed: true, metadata: 'all-done-updated' }
+        ]
+      })
+    }));
+    assert.strictEqual(saveRes2.status, 200);
+    const saveBody2 = await saveRes2.json();
+    assert.strictEqual(saveBody2.ok, true);
+    assert.strictEqual(saveBody2.saved, 1);
+
+    // GET /report.goals still returns 2 rows with updated content
+    const report2 = await app(new Request('http://localhost/report', {
+      headers: { Authorization: `Bearer ${token}` }
+    }));
+    assert.strictEqual(report2.status, 200);
+    const reportBody2 = await report2.json();
+    assert.strictEqual(reportBody2.goals.length, 2, 'Count must remain 2 after updating existing goal_date');
+    const updatedGoal = reportBody2.goals.find(g => g.goal_date === '2026-11-01');
+    assert.strictEqual(updatedGoal.target_questions, 12);
+    assert.strictEqual(updatedGoal.completed_questions, 12);
+    assert.strictEqual(updatedGoal.completed, 1);
+    assert.strictEqual(updatedGoal.metadata, 'all-done-updated');
+
+    pass('POST /goals saves daily goals and updates on duplicate goal_date');
+  }
+
+  // -------------------------------------------------------------
+  // Test 16: POST /rows validation (201 items -> 400, non-array -> 400, no token -> 401)
+  // -------------------------------------------------------------
+  {
+    let currentTime = 1700000000000;
+    const store = createMemoryStore();
+    const app = createApp({
+      store,
+      now: () => currentTime,
+      secret: SECRET,
+      allowedOrigins: ALLOWED_ORIGINS
+    });
+
+    const createRes = await app(new Request('http://localhost/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'ValRowsUser', pinVerifier: 'val_rows_pin', salt: 'val_rows_salt' })
+    }));
+    const { token } = await createRes.json();
+
+    // 1. Missing token -> 401
+    const noTokenRes = await app(new Request('http://localhost/rows', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rows: [{ gradeLevel: 'k', subjectKey: 'math' }] })
+    }));
+    assert.strictEqual(noTokenRes.status, 401);
+    const noTokenBody = await noTokenRes.json();
+    assert.strictEqual(noTokenBody.error, 'unauthorized');
+
+    // 2. Non-array -> 400
+    const nonArrayRes = await app(new Request('http://localhost/rows', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ rows: 'not-an-array' })
+    }));
+    assert.strictEqual(nonArrayRes.status, 400);
+    const nonArrayBody = await nonArrayRes.json();
+    assert.strictEqual(nonArrayBody.error, 'bad_request');
+
+    // 3. 201 items -> 400
+    const over200 = [];
+    for (let i = 0; i < 201; i++) {
+      over200.push({ gradeLevel: 'k', subjectKey: 'math', unitKey: `unit_${i}` });
+    }
+    const over200Res = await app(new Request('http://localhost/rows', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ rows: over200 })
+    }));
+    assert.strictEqual(over200Res.status, 400);
+    const over200Body = await over200Res.json();
+    assert.strictEqual(over200Body.error, 'bad_request');
+
+    pass('POST /rows validates token, array type, and 200 item maximum limit');
+  }
+
+  // -------------------------------------------------------------
+  // Test 17: POST /goals validation (51 items -> 400)
+  // -------------------------------------------------------------
+  {
+    let currentTime = 1700000000000;
+    const store = createMemoryStore();
+    const app = createApp({
+      store,
+      now: () => currentTime,
+      secret: SECRET,
+      allowedOrigins: ALLOWED_ORIGINS
+    });
+
+    const createRes = await app(new Request('http://localhost/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'ValGoalsUser', pinVerifier: 'val_goals_pin', salt: 'val_goals_salt' })
+    }));
+    const { token } = await createRes.json();
+
+    // 51 items -> 400
+    const over50 = [];
+    for (let i = 0; i < 51; i++) {
+      over50.push({ goalDate: `2026-11-${String(i + 1).padStart(2, '0')}`, targetQuestions: 10 });
+    }
+    const over50Res = await app(new Request('http://localhost/goals', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ goals: over50 })
+    }));
+    assert.strictEqual(over50Res.status, 400);
+    const over50Body = await over50Res.json();
+    assert.strictEqual(over50Body.error, 'bad_request');
+
+    pass('POST /goals validates 50 item maximum limit');
   }
 
   console.log('\nAll Cloudflare Worker + D1 backend tests PASSED! ✅');

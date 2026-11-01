@@ -120,6 +120,35 @@ export function createMemoryStore() {
       }
     },
 
+    async upsertGoals(playerId, goals, now) {
+      if (!goals || goals.length === 0) return 0;
+      for (const g of goals) {
+        const goalDate = g.goal_date || g.goalDate;
+        const key = `${playerId}:${goalDate}`;
+        const metadataStr = typeof g.metadata === 'object' && g.metadata !== null
+          ? JSON.stringify(g.metadata)
+          : (g.metadata || null);
+
+        const target = g.target_questions !== undefined
+          ? (g.target_questions !== null ? Number(g.target_questions) : null)
+          : (g.targetQuestions !== undefined && g.targetQuestions !== null ? Number(g.targetQuestions) : null);
+        const completedCount = g.completed_questions !== undefined
+          ? (g.completed_questions !== null ? Number(g.completed_questions) : null)
+          : (g.completedQuestions !== undefined && g.completedQuestions !== null ? Number(g.completedQuestions) : null);
+        const completed = g.completed !== undefined ? (g.completed ? 1 : 0) : 0;
+
+        dailyGoals.set(key, {
+          player_id: playerId,
+          goal_date: goalDate,
+          target_questions: target,
+          completed_questions: completedCount,
+          completed,
+          metadata: metadataStr
+        });
+      }
+      return goals.length;
+    },
+
     async insertEvents(playerId, events, now) {
       if (!events || events.length === 0) return 0;
       for (const e of events) {
@@ -176,6 +205,28 @@ export function createMemoryStore() {
           list.push({ ...p });
         }
       }
+      list.sort((a, b) => {
+        const gA = a.grade_level || '';
+        const gB = b.grade_level || '';
+        if (gA !== gB) return gA.localeCompare(gB);
+        const sA = a.subject_key || '';
+        const sB = b.subject_key || '';
+        if (sA !== sB) return sA.localeCompare(sB);
+        const uA = a.unit_key || '';
+        const uB = b.unit_key || '';
+        return uA.localeCompare(uB);
+      });
+      return list;
+    },
+
+    async listGoals(playerId) {
+      const list = [];
+      for (const g of dailyGoals.values()) {
+        if (g.player_id === playerId) {
+          list.push({ ...g });
+        }
+      }
+      list.sort((a, b) => String(a.goal_date).localeCompare(String(b.goal_date)));
       return list;
     },
 
