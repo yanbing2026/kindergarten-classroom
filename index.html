@@ -43,19 +43,8 @@
   },5000);
 })();
 </script>
-    <script src="data/grade-2/math.js"></script>
-    <script src="data/grade-2/ela.js"></script>
-    <script src="data/grade-2/social-studies.js"></script>
-    <script src="data/grade-2/writing.js"></script>
-    <script src="data/grade-2/science.js"></script>
     <script src="data/kindergarten/core.js"></script>
     <script src="data/kindergarten/content.js"></script>
-    <script src="data/grade-2/core.js"></script>
-<script src="data/grade-1/science.js"></script>
-<script src="data/grade-1/social-studies.js"></script>
-<script src="data/grade-1/writing.js"></script>
-<script src="data/grade-1/ela.js"></script>
-<script src="data/grade-1/math.js"></script>
 </head>
 <body>
 <div id="accountBar" class="account-bar"></div>
@@ -72,7 +61,7 @@
     <script src="./js/blipola-runtime.js"></script>
     <script>
     // ---------- App version ----------
-    const APP_VERSION = 'v2-20261101-grade2-ready';
+    const APP_VERSION = 'v2-20261101-audit-final';
 
     // ---------- Debug / Dev Mode ----------
     // Hidden diagnostic screen for parents and developers.
@@ -293,7 +282,19 @@
     }
     // Cloud account API: direct players-table reads are blocked by RLS.
     // The browser sends only a PBKDF2 verifier to the RPCs, never the PIN itself.
+    // The verifier is a bearer credential for cloud writes, so it is kept in
+    // sessionStorage only (per tab, cleared when the tab closes) — never in
+    // localStorage, where it would outlive the login.
+    const PIN_VERIFIER_KEY='kc_pin_verifier_v1';
     let currentPinVerifier='';
+    try{currentPinVerifier=sessionStorage.getItem(PIN_VERIFIER_KEY)||'';}catch(_){currentPinVerifier='';}
+    function setPinVerifier(value){
+        currentPinVerifier=value||'';
+        try{
+            if(currentPinVerifier)sessionStorage.setItem(PIN_VERIFIER_KEY,currentPinVerifier);
+            else sessionStorage.removeItem(PIN_VERIFIER_KEY);
+        }catch(_){}
+    }
     const LOGIN_MAX_ATTEMPTS=5,LOGIN_LOCKOUT_MS=30000;
     const loginAttemptState={};
     function canAttemptLogin(key){
@@ -314,28 +315,40 @@
         const {data,error}=await supa.rpc('create_player',{
             p_name:name,p_pin_hash:pin_hash,p_pin_salt:pin_salt,p_progress:progressObj||{}
         });
-        if(data&&data[0]) currentPinVerifier=pin_hash;
+        if(data&&data[0]) setPinVerifier(pin_hash);
         return {data:data&&data[0]?data[0]:null,error};
     }
     async function cloudLogin(name,pin){
         const pin_hash=await derivePinVerifier(pin, await getPinSaltForLogin(name));
         const {data,error}=await supa.rpc('login_player',{p_name:name,p_pin_hash:pin_hash});
         if(error||!data||!data[0])return null;
-        currentPinVerifier=pin_hash;
+        setPinVerifier(pin_hash);
         return data[0];
     }
     async function ensureNormalizedAuth(name){
         if(!supa||!currentPinVerifier)return {ok:false,reason:'missing credentials'};
+        const claim=async()=>supa.rpc('claim_player_auth',{p_name:name,p_pin_hash:currentPinVerifier});
         try{
             const sessionResult=await supa.auth.getSession();
             let session=sessionResult.data?.session||null;
-            // Each player account gets its own anonymous Auth identity. This
-            // prevents one browser session from becoming the owner of
-            // multiple player accounts under the RLS ownership model.
-            if(session){ await supa.auth.signOut(); session=null; }
-            const anon=await supa.auth.signInAnonymously();
-            if(anon.error||!anon.data?.session)return {ok:false,reason:anon.error?.message||'anonymous auth unavailable'};
-            const {data,error}=await supa.rpc('claim_player_auth',{p_name:name,p_pin_hash:currentPinVerifier});
+            // Reuse the existing anonymous identity first: it is what makes a
+            // second login on the same device succeed. Only create a new
+            // identity when there is no session at all, or when the current
+            // one is already bound to a different player.
+            if(!session){
+                const anon=await supa.auth.signInAnonymously();
+                if(anon.error||!anon.data?.session)return {ok:false,reason:anon.error?.message||'anonymous auth unavailable'};
+            }
+            let {data,error}=await claim();
+            if(error&&/already linked|another player/i.test(error.message||'')){
+                // Shared tablet: this browser is bound to someone else. Start a
+                // clean identity and try once more. The previous player keeps
+                // their data; only this browser's ownership link is replaced.
+                try{ await supa.auth.signOut(); }catch(_){}
+                const anon=await supa.auth.signInAnonymously();
+                if(anon.error||!anon.data?.session)return {ok:false,reason:anon.error?.message||'anonymous auth unavailable'};
+                ({data,error}=await claim());
+            }
             if(error||!data)return {ok:false,reason:error?.message||'claim failed'};
             if(window.KCData) window.KCData.setPlayerId(data);
             if(window.KCData) await window.KCData.flushNormalized();
@@ -348,13 +361,14 @@
         return data[0].pin_salt;
     }
     async function cloudSaveProgress(name,progressObj){
-        if(!supa||!name||!currentPinVerifier)return false;
+        if(!supa||!name)return {ok:false,reason:'unavailable'};
+        if(!currentPinVerifier)return {ok:false,reason:'reauth'};
         try{
             const {data,error}=await supa.rpc('save_player_progress',{
                 p_name:name,p_pin_hash:currentPinVerifier,p_progress:progressObj||{}
             });
-            return !error&&data===true;
-        }catch(_){return false;}
+            return error?{ok:false,reason:error.message||'save failed'}:{ok:data===true};
+        }catch(error){return {ok:false,reason:error?.message||String(error)};}
     }
     let cloudSyncTimer=null;
     let cloudSyncRetryTimer=null;
@@ -363,11 +377,14 @@
     function setCloudSyncStatus(state){
         const el=document.getElementById('accountSyncStatus');
         if(!el)return;
-        const labels={syncing:'☁️ Syncing…',saved:'☁️ Saved',offline:'⚠️ Saved locally'};
+        const labels={syncing:'☁️ Syncing…',saved:'☁️ Saved',offline:'⚠️ Saved locally',reauth:'🔑 Log in to sync'};
         el.textContent=labels[state]||labels.saved;
     }
     function scheduleCloudProgressSync(delay=600){
         if(!getCurrentAccount()||typeof cloudSaveProgress!=='function')return;
+        // Without a verifier the RPC would fail every time. Ask for a fresh
+        // login instead of starting a retry loop that can never succeed.
+        if(!currentPinVerifier){setCloudSyncStatus('reauth');return;}
         cloudSyncPending=true;
         clearTimeout(cloudSyncTimer);
         cloudSyncTimer=setTimeout(syncCloudProgress,delay);
@@ -378,34 +395,83 @@
         cloudSyncPending=false;
         cloudSyncInFlight=true;
         setCloudSyncStatus('syncing');
-        const ok=await cloudSaveProgress(getCurrentAccountName(),progress);
+        const result=await cloudSaveProgress(getCurrentAccountName(),progress);
         cloudSyncInFlight=false;
-        if(ok){
-            clearTimeout(cloudSyncRetryTimer);
+        clearTimeout(cloudSyncRetryTimer);
+        if(result&&result.ok){
             setCloudSyncStatus('saved');
+        }else if(result&&result.reason==='reauth'){
+            setCloudSyncStatus('reauth');
         }else{
             setCloudSyncStatus('offline');
-            clearTimeout(cloudSyncRetryTimer);
             cloudSyncRetryTimer=setTimeout(()=>scheduleCloudProgressSync(0),5000);
         }
     }
     window.addEventListener('online',()=>{if(getCurrentAccount())scheduleCloudProgressSync(0);});
     document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&getCurrentAccount())syncCloudProgress();});
+    // ---------- Account progress merge ----------
+    // Cloud is the source of truth, but a device can hold progress that was
+    // never synced (offline answers, a crashed tab, or the fix in this change).
+    // Merge only when it is safe: same account, or first-time anonymous data
+    // being adopted by a brand-new empty cloud account.
+    function progressHasData(p){
+        if(!p||typeof p!=='object')return false;
+        return (Number(p.stars)||0)>0
+            || Object.keys(p.mastery||{}).length>0
+            || Object.keys(p.gradeMastery||{}).length>0
+            || Object.keys(p.mathCorrect||{}).length>0;
+    }
+    function mergeProgress(localP,cloudP){
+        const isObj=v=>v&&typeof v==='object'&&!Array.isArray(v);
+        if(!isObj(cloudP)||!Object.keys(cloudP).length)return localP;
+        if(!isObj(localP))return cloudP;
+        const merged=Object.assign({},cloudP,localP);
+        merged.stars=Math.max(Number(localP.stars)||0,Number(cloudP.stars)||0);
+        ['mastery','gradeMastery','mathCorrect'].forEach(field=>{
+            const out=Object.assign({},isObj(cloudP[field])?cloudP[field]:{});
+            Object.entries(isObj(localP[field])?localP[field]:{}).forEach(([k,v])=>{
+                out[k]=Math.max(Number(out[k])||0,Number(v)||0);
+            });
+            merged[field]=out;
+        });
+        const due=Object.assign({},isObj(cloudP.due)?cloudP.due:{});
+        Object.entries(isObj(localP.due)?localP.due:{}).forEach(([k,v])=>{
+            if(!due[k]||String(v)<String(due[k]))due[k]=v;
+        });
+        merged.due=due;
+        const log=[].concat(Array.isArray(cloudP.activityLog)?cloudP.activityLog:[],Array.isArray(localP.activityLog)?localP.activityLog:[]);
+        const seen=new Set();
+        merged.activityLog=log.filter(x=>{
+            const id=[x&&x.at,x&&x.type,x&&x.key,x&&x.itemId].join('|');
+            if(seen.has(id))return false;
+            seen.add(id);return true;
+        }).sort((a,b)=>(a&&a.at||0)-(b&&b.at||0)).slice(-300);
+        if(isObj(localP.daily)&&isObj(cloudP.daily)){
+            merged.daily=String(localP.daily.date||'')>=String(cloudP.daily.date||'')?localP.daily:cloudP.daily;
+        }
+        return merged;
+    }
     function closeAccountModal(){const m=document.getElementById('accountModal');if(m)m.style.display='none';}
     function openAccountModal(mode){const m=document.getElementById('accountModal');if(!m)return;const create=mode==='create';m.style.display='grid';m.innerHTML='<div class="account-box"><h2>⛏️ '+(create?'Create Your BlockQuest Account':'Welcome Back!')+'</h2><p>'+(create?'Create a child profile in the cloud.':'Log in to load this profile from the cloud.')+'</p><input id="accountName" maxlength="24" placeholder="Player name"><input id="accountPin" maxlength="6" inputmode="numeric" type="password" placeholder="4–6 digit PIN"><div class="account-actions"><button id="accountSubmit">'+(create?'Create':'Log In')+'</button><button id="accountCancel">Cancel</button></div><div id="accountStatus" class="account-status"></div><div class="account-switch"><button id="accountSwitch">'+(create?'Already have an account? Log in':'New player? Create an account')+'</button></div></div>';document.getElementById('accountSubmit').onclick=()=>submitAccount(mode);document.getElementById('accountCancel').onclick=closeAccountModal;document.getElementById('accountSwitch').onclick=()=>openAccountModal(create?'login':'create');}
     function submitAccount(mode){const name=(document.getElementById('accountName')?.value||'').trim(),pin=(document.getElementById('accountPin')?.value||'').trim(),status=document.getElementById('accountStatus'),btn=document.getElementById('accountSubmit');if(!/^[A-Za-z0-9 _-]{2,24}$/.test(name)){status.textContent='Use 2–24 letters, numbers, spaces, _ or -.';return;}if(!/^\d{4,6}$/.test(pin)){status.textContent='PIN must be 4–6 digits.';return;}if(!supa){status.textContent='Cloud accounts need an internet connection. Your progress stays saved on this device.';return;}btn.disabled=true;status.textContent='Checking…';
     (async()=>{
         const key=name.toLowerCase();
+        const hadAccount=getCurrentAccount();
         if(mode==='create'){
-            const result=await cloudCreate(name,pin,{});
+            // Upload whatever the child already earned on this device; sending
+            // {} here used to erase local progress two lines later.
+            const localProgress=mergeProgress(progress,null);
+            const result=await cloudCreate(name,pin,localProgress);
             if(result.error){
                 const duplicate=result.error.code==='23505' || /duplicate|unique/i.test(result.error.message||'');
                 status.textContent=duplicate?'That player name already exists on another device.':'Network error, try again.';
                 btn.disabled=false;return;
             }
             cacheAccount(result.data?.name||name);
-            await ensureNormalizedAuth(result.data?.name||name);
-            try{localStorage.setItem(accountProgressKey(key),JSON.stringify(result.data?.progress||{}));}catch(_){}
+            const normalized=await ensureNormalizedAuth(result.data?.name||name);
+            const created=mergeProgress(localProgress,result.data?.progress||{});
+            try{localStorage.setItem(accountProgressKey(key),JSON.stringify(created));}catch(_){}
+            if(!normalized.ok)status.textContent='Account created. Cloud sync will finish after the next login.';
         }else{
             const attemptKey=name.toLowerCase();
             if(!canAttemptLogin(attemptKey)){
@@ -421,8 +487,24 @@
                 }
                 clearLoginFailures(attemptKey);
                 cacheAccount(acct.name||name);
-                await ensureNormalizedAuth(acct.name||name);
-                try{localStorage.setItem(accountProgressKey(key),JSON.stringify(acct.progress||{}));}catch(_){}
+                const normalized=await ensureNormalizedAuth(acct.name||name);
+                const cloudProgress=acct.progress||{};
+                const sameAccount=String(hadAccount||'')===key;
+                const localIsAnonymous=!hadAccount;
+                let chosen;
+                if(progressHasData(cloudProgress)){
+                    // A different child's anonymous progress must never be
+                    // merged into an existing account.
+                    chosen=sameAccount?mergeProgress(progress,cloudProgress):cloudProgress;
+                }else{
+                    chosen=(localIsAnonymous||sameAccount)?mergeProgress(progress,cloudProgress):cloudProgress;
+                }
+                try{localStorage.setItem(accountProgressKey(key),JSON.stringify(chosen));}catch(_){}
+                if(JSON.stringify(chosen)!==JSON.stringify(cloudProgress)){
+                    const pushed=await cloudSaveProgress(acct.name||name,chosen);
+                    if(!pushed.ok&&pushed.reason!=='reauth')setCloudSyncStatus('offline');
+                }
+                if(!normalized.ok)status.textContent='Signed in. Cloud sync is temporarily unavailable.';
             }catch(_){
                 status.textContent='Player name or PIN is incorrect.';
                 recordLoginFailure(attemptKey);
@@ -434,14 +516,90 @@
     })();
     }
     async function logoutAccount(){
+        // Release this browser's ownership link (009) so another child can log
+        // in on the same tablet without hitting "already linked".
+        try{
+            if(supa&&currentPinVerifier&&typeof supa.rpc==='function'){
+                await supa.rpc('release_player_auth',{p_name:getCurrentAccountName(),p_pin_hash:currentPinVerifier});
+            }
+        }catch(_){}
         localStorage.removeItem('kc_current_account');
-        currentPinVerifier='';
+        setPinVerifier('');
         if(window.KCData) window.KCData.setPlayerId('');
         try { if(supa) await supa.auth.signOut(); } catch (_) {}
         renderAccountBar();
         progress=loadProgress();
         blipola=window.BlipolaClassroom.create(progress);
         render();
+    }
+    function openAccountSecurityModal(mode){
+        const m=document.getElementById('accountModal');
+        if(!m)return;
+        const name=getCurrentAccountName();
+        if(!name){openAccountModal('login');return;}
+        const remove=mode==='delete';
+        m.style.display='grid';
+        m.innerHTML=`<div class="account-box"><h2>${remove?'🗑️ Delete account':'🔑 Change PIN'}</h2>
+            <p>${remove
+                ? `This deletes the cloud copy and this device's saved copy of <strong>${esc(name)}</strong>. Export a backup first if you need one.`
+                : `Enter the current PIN, then choose a new 4–6 digit PIN for <strong>${esc(name)}</strong>.`}</p>
+            <input id="accountOldPin" maxlength="6" inputmode="numeric" type="password" placeholder="Current 4–6 digit PIN" autocomplete="current-password">
+            ${remove?'':'<input id="accountNewPin" maxlength="6" inputmode="numeric" type="password" placeholder="New 4–6 digit PIN" autocomplete="new-password"><input id="accountNewPin2" maxlength="6" inputmode="numeric" type="password" placeholder="Repeat new PIN" autocomplete="new-password">'}
+            <div class="account-actions"><button id="accountSecuritySubmit" type="button">${remove?'Delete account':'Change PIN'}</button><button id="accountCancel" type="button">Cancel</button></div>
+            <div id="accountStatus" class="account-status" aria-live="polite"></div></div>`;
+        document.getElementById('accountSecuritySubmit').onclick=()=>submitAccountSecurity(mode);
+        document.getElementById('accountCancel').onclick=closeAccountModal;
+        document.getElementById('accountOldPin').focus();
+    }
+    async function submitAccountSecurity(mode){
+        const status=document.getElementById('accountStatus');
+        const btn=document.getElementById('accountSecuritySubmit');
+        const name=getCurrentAccountName();
+        if(!name||!supa){if(status)status.textContent='Cloud accounts need an internet connection.';return;}
+        const oldPin=(document.getElementById('accountOldPin')?.value||'').trim();
+        if(!/^\d{4,6}$/.test(oldPin)){if(status)status.textContent='Enter the current 4–6 digit PIN.';return;}
+        let newPin='';
+        if(mode==='rotate'){
+            newPin=(document.getElementById('accountNewPin')?.value||'').trim();
+            const repeat=(document.getElementById('accountNewPin2')?.value||'').trim();
+            if(!/^\d{4,6}$/.test(newPin)){if(status)status.textContent='The new PIN must be 4–6 digits.';return;}
+            if(newPin!==repeat){if(status)status.textContent='The new PINs do not match.';return;}
+            if(newPin===oldPin){if(status)status.textContent='Choose a different PIN.';return;}
+        }
+        if(btn)btn.disabled=true;
+        if(status)status.textContent='Checking…';
+        try{
+            const oldHash=await derivePinVerifier(oldPin,await getPinSaltForLogin(name));
+            if(mode==='delete'){
+                const {data,error}=await supa.rpc('delete_player',{p_name:name,p_pin_hash:oldHash});
+                if(error||data!==true)throw new Error(error?.message||'PIN is incorrect');
+                const key=getCurrentAccount();
+                if(key){
+                    try{const accounts=getAccounts();delete accounts[key];localStorage.setItem('kc_accounts_v1',JSON.stringify(accounts));}catch(_){}
+                    try{localStorage.removeItem(accountProgressKey(key));}catch(_){}
+                }
+                localStorage.removeItem('kc_current_account');
+                setPinVerifier('');
+                if(window.KCData)window.KCData.setPlayerId('');
+                try{if(supa)await supa.auth.signOut();}catch(_){}
+                closeAccountModal();renderAccountBar();progress=loadProgress();blipola=window.BlipolaClassroom.create(progress);render();
+                alert('Account deleted. Progress for this account was removed from this device.');
+                return;
+            }
+            const newSalt=makePinSalt();
+            const newHash=await derivePinVerifier(newPin,newSalt);
+            const {data,error}=await supa.rpc('rotate_pin',{p_name:name,p_old_pin_hash:oldHash,p_new_pin_hash:newHash,p_new_pin_salt:newSalt});
+            if(error||data!==true)throw new Error(error?.message||'Current PIN is incorrect');
+            // rotate_pin clears auth_user_id, so re-claim this browser with the
+            // new verifier or cloud sync would stop until the next login.
+            setPinVerifier(newHash);
+            await ensureNormalizedAuth(name);
+            closeAccountModal();
+            alert('PIN changed. Use the new PIN next time you log in.');
+        }catch(error){
+            if(status)status.textContent=String(error?.message||'Could not update the account.');
+            if(btn)btn.disabled=false;
+        }
     }
     function renderAccountBar(){const el=document.getElementById('accountBar');if(!el)return;const key=getCurrentAccount(),acct=key?(getAccounts()[key]||{name:key}):null;if(acct){el.innerHTML='<span class="account-name">👤 '+esc(acct.name)+'</span><span class="account-sync" id="accountSyncStatus" aria-live="polite">☁️ Saved</span><button class="account-btn" id="logoutBtn">Log out</button>';document.getElementById('logoutBtn').onclick=logoutAccount;setCloudSyncStatus('saved');}else{el.innerHTML='<button class="account-btn" id="loginBtn">👤 Log in</button><button class="account-btn" id="createBtn">➕ Create account</button>';document.getElementById('loginBtn').onclick=()=>openAccountModal('login');document.getElementById('createBtn').onclick=()=>openAccountModal('create');}}
 
@@ -494,8 +652,21 @@
         recent.forEach(x => { if (!byKey[x.key]) byKey[x.key] = { key: x.key, attempts: 0, correct: 0, firstTry: 0 }; byKey[x.key].attempts++; if (x.correct) byKey[x.key].correct++; if (x.correct && x.firstTry) byKey[x.key].firstTry++; });
         return { attempts: recent.length, correct: recent.filter(x => x.correct).length, firstTry: recent.filter(x => x.correct && x.firstTry).length, days: new Set(recent.map(x => new Date(x.at).toLocaleDateString())).size, skills: Object.values(byKey).sort((a,b) => b.correct - a.correct || b.attempts - a.attempts) };
     }
+    let storageFullNoticeShown=false;
     function saveProgress() {
-        localStorage.setItem(getCurrentAccount() ? accountProgressKey(getCurrentAccount()) : 'kc_progress_v1', JSON.stringify(progress));
+        try {
+            localStorage.setItem(getCurrentAccount() ? accountProgressKey(getCurrentAccount()) : 'kc_progress_v1', JSON.stringify(progress));
+        } catch (error) {
+            // Quota errors used to throw out of every answer handler and stop
+            // the round. Keep the in-memory progress and tell the grown-up once.
+            if (!storageFullNoticeShown) {
+                storageFullNoticeShown = true;
+                const el = document.getElementById('accountSyncStatus');
+                if (el) el.textContent = '⚠️ Device storage full — progress is saved in this tab only';
+                try { speak('Device storage is full.'); } catch (_) {}
+            }
+            console.warn('Could not save progress to localStorage', error);
+        }
         if (window.KCData) { window.KCData.localSnapshot(progress); window.KCData.flushNormalized().catch(()=>{}); }
         if(getCurrentAccount()&&typeof cloudSaveProgress==='function') scheduleCloudProgressSync();
     }
@@ -957,7 +1128,7 @@
         '<div class="home-hero"><div class="home-kicker">⛏️ BLOCKQUEST CLASSROOM</div><h1>Choose your grade</h1><p>Your learning journey starts here.</p></div>'+
         renderDailyMissions()+
         renderTodayReview()+
-        '<div class="today-card" onclick="'+todayAction+'"><div class="today-icon">⭐</div><div class="today-copy"><div class="today-kicker">TODAY\'S ADVENTURE</div><div class="today-title">'+lesson.cat.icon+' '+lesson.cat.name+'</div><div class="today-sub">'+lesson.reason+(lesson.item ? ' • '+lessonLabel : '')+'</div></div><button class="big-btn play">START ▶</button></div>'+
+        '<button type="button" class="today-card" onclick="'+todayAction+'"><span class="today-icon">⭐</span><span class="today-copy"><span class="today-kicker">TODAY\'S ADVENTURE</span><span class="today-title">'+lesson.cat.icon+' '+lesson.cat.name+'</span><span class="today-sub">'+lesson.reason+(lesson.item ? ' • '+lessonLabel : '')+'</span></span><span class="big-btn play">START ▶</span></button>'+
         '<h2 class="home-section-title">📚 Grades Pre-K–2 (Grades 3–8 in Planning)</h2><div class="home-grade-menu">'+gradeCards+'</div>'+
         '<h2 class="home-section-title">🎮 More Learning</h2><div class="home-tools"><button class="home-tool" onclick="go(\'category\',{key:\'chinese\',level:\'L1\'})">🇨🇳 Chinese</button><button class="home-tool" onclick="go(\'category\',{key:\'spanish\',level:\'L1\'})">🇪🇸 Spanish</button><button class="home-tool" onclick="go(\'freeplay\')">🎨 Free Play</button><button class="home-tool" onclick="go(\'draw\')">✏️ Draw</button><button class="home-tool" onclick="go(\'worksheets\')">🖨️ Worksheets</button><button class="home-tool" onclick="go(\'progress\')">🏆 Progress</button></div>'+
         '<div class="footer">💎 '+progress.stars+' diamonds · Pick a grade to explore its courses.</div>';
@@ -2994,6 +3165,12 @@
         const recoveryCard=recoveryRows?'<div class="parent-card"><h3>🛠️ Skill recovery</h3><div class="parent-progress-label">These skills needed extra practice. Transfer checks help confirm the idea works in a new problem.</div>'+recoveryRows+'</div>':'';
         const recoveryTimeline=renderSkillRecoveryTimeline(recoveryStats);
         const recoveryTimelineCard=recoveryTimeline?'<div class="parent-card"><h3>🕒 Recovery timeline</h3><div class="parent-progress-label">A simple view of how each skill moved from a mistake to practice, transfer, and review.</div>'+recoveryTimeline+'</div>':'';
+        const signedIn=!!getCurrentAccount();
+        const accountCard='<div class="parent-card"><h3>🔐 Parent account</h3>'
+            +(signedIn
+                ? '<div class="parent-progress-label">Signed in as <strong>'+esc(getCurrentAccountName())+'</strong>. Cloud sync keeps this profile on every device.</div><div class="account-actions" style="margin-top:10px"><button class="choice-btn" type="button" onclick="openAccountSecurityModal(\'rotate\')">🔑 Change PIN</button><button class="choice-btn" type="button" onclick="openAccountSecurityModal(\'delete\')" style="background:#f7c9c2">🗑️ Delete account</button></div>'
+                : '<div class="parent-progress-label">Cloud sync is off. Progress stays on this device.</div><div class="account-actions" style="margin-top:10px"><button class="choice-btn" type="button" onclick="openAccountModal(\'login\')">👤 Log in</button><button class="choice-btn" type="button" onclick="openAccountModal(\'create\')">➕ Create account</button></div>')
+            +'</div>';
 return `${topbar(true)}
         <div class="parent-dashboard">
             <div class="parent-header"><div><div class="parent-kicker">FOR PARENTS</div><h2>📋 Learning Snapshot</h2><div class="parent-date">${new Date().toLocaleDateString()}</div></div><div class="parent-diamond">💎 ${progress.stars}</div></div>
@@ -3004,6 +3181,7 @@ return `${topbar(true)}
             ${recoveryTimelineCard}
             <div class="parent-card"><h3>📚 Overall progress</h3><div class="parent-progress"><div class="parent-progress-fill" style="width:${pct}%"></div></div><div class="parent-progress-label">${stats.mastered} of ${stats.total} learning items mastered</div></div>
             <div class="parent-card"><h3>📈 Skills practiced this week</h3>${recentSkills || '<div class="parent-good">No activity yet this week.</div>'}</div>
+            ${accountCard}
             ${renderCloudParentProgress()}
             <div class="parent-card"><h3>💎 Learning rewards</h3><div class="parent-progress-label">${progress.stars} diamonds earned · ${Object.values(progress.mathCorrect).reduce((a,b)=>a+(b||0),0)} math problems solved</div></div>
             <button class="big-btn home" onclick="go('progress')">← Back to Progress</button>
@@ -3038,6 +3216,8 @@ return `${topbar(true)}
         <div class="trophy-grid">${trophies}</div>
         <div style="text-align:center;margin-top:18px;">
             <button class="choice-btn" style="padding:12px 20px;font-size:1rem;" onclick="exportProgress()">📤 Export progress (for parents)</button>
+            <button class="choice-btn" style="padding:12px 20px;font-size:1rem;" onclick="document.getElementById('progressImportFile').click()">📥 Import backup</button>
+            <input type="file" id="progressImportFile" accept="application/json,.json" style="display:none" onchange="importProgressFile(this)">
         </div>`;
     }
     // Parent export (research G): dump the progress object as a downloadable JSON file.
@@ -3063,6 +3243,38 @@ return `${topbar(true)}
         a.click();
         a.remove();
         URL.revokeObjectURL(url);
+    }
+    function importProgressFile(input) {
+        const file = input.files && input.files[0];
+        input.value = '';
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            try {
+                const data = JSON.parse(String(reader.result || ''));
+                if (!data || typeof data !== 'object' || Array.isArray(data)) {
+                    throw new Error('This is not a BlockQuest progress file.');
+                }
+                // Keep existing work: import merges the higher scores instead of
+                // replacing a child's progress with an older backup.
+                const merged = mergeProgress(progress, data);
+                if (data.skillStats && typeof data.skillStats === 'object') {
+                    merged.skillStats = Object.assign({}, progress.skillStats || {}, data.skillStats);
+                }
+                if (Array.isArray(data.remediationHistory)) {
+                    merged.remediationHistory = data.remediationHistory.slice(-300);
+                }
+                merged.mathStreak = Math.max(Number(progress.mathStreak) || 0, Number(data.mathStreak) || 0);
+                progress = merged;
+                saveProgress();
+                render();
+                alert('Backup imported. Your existing progress was kept and the higher scores were merged in.');
+            } catch (error) {
+                alert('Could not import this file: ' + (error && error.message ? error.message : error));
+            }
+        };
+        reader.onerror = () => alert('Could not read this file.');
+        reader.readAsText(file);
     }
 
     // ---------- Worksheets (printable) ----------
@@ -3275,365 +3487,11 @@ ${html}
             {name:'Research & Writing',icon:'📝',desc:'Independent research, citations, argument, and presentation'}]}
     ];
     // ---------- Grade 1 interactive course content ----------
-    // Grade 1 is the first fully interactive upper-grade release. Each unit
-    // contains four short, answerable lessons so the same engine can expand
-    // to Grades 2-8 without changing the course browser.
-    const GRADE1_INTERACTIVE = {
-        "ela": window.KC_G1_ELA,
-        "math": [
-                {
-                        "unit": "Addition & Subtraction Within 20",
-                        "lessons": [
-                                {
-                                        "title": "Make a ten",
-                                        "prompt": "What is 7 + 3?",
-                                        "choices": [
-                                                "9",
-                                                "10",
-                                                "11",
-                                                "12"
-                                        ],
-                                        "answer": "10",
-                                        "hint": "Think about how many more 7 needs to make 10.",
-                                        "explanation": "7 plus 3 equals 10."
-                                },
-                                {
-                                        "title": "Add within 20",
-                                        "prompt": "What is 8 + 6?",
-                                        "choices": [
-                                                "12",
-                                                "13",
-                                                "14",
-                                                "15"
-                                        ],
-                                        "answer": "14",
-                                        "hint": "Make a ten: 8 + 2, then add the 4 left.",
-                                        "explanation": "8 plus 6 equals 14."
-                                },
-                                {
-                                        "title": "Subtract within 20",
-                                        "prompt": "What is 15 − 7?",
-                                        "choices": [
-                                                "6",
-                                                "7",
-                                                "8",
-                                                "9"
-                                        ],
-                                        "answer": "8",
-                                        "hint": "Count back 7 from 15.",
-                                        "explanation": "15 minus 7 equals 8."
-                                },
-                                {
-                                        "title": "Quiz: choose the answer",
-                                        "prompt": "Mia has 12 blocks and gives away 5. How many blocks are left?",
-                                        "choices": [
-                                                "5",
-                                                "6",
-                                                "7",
-                                                "8"
-                                        ],
-                                        "answer": "7",
-                                        "hint": "Giving away means subtract.",
-                                        "explanation": "12 minus 5 equals 7."
-                                }
-                        ]
-                },
-                {
-                        "unit": "Numbers to 120",
-                        "lessons": [
-                                {
-                                        "title": "Count forward",
-                                        "prompt": "What number comes after 79?",
-                                        "choices": [
-                                                "78",
-                                                "80",
-                                                "89",
-                                                "70"
-                                        ],
-                                        "answer": "80",
-                                        "hint": "Count one more than 79.",
-                                        "explanation": "80 comes after 79."
-                                },
-                                {
-                                        "title": "Compare numbers",
-                                        "prompt": "Which number is greater?",
-                                        "choices": [
-                                                "46",
-                                                "64",
-                                                "54",
-                                                "44"
-                                        ],
-                                        "answer": "64",
-                                        "hint": "Compare the tens digits first.",
-                                        "explanation": "64 has 6 tens, more than 4 or 5 tens."
-                                },
-                                {
-                                        "title": "Find the number",
-                                        "prompt": "Which number is between 58 and 60?",
-                                        "choices": [
-                                                "57",
-                                                "59",
-                                                "61",
-                                                "68"
-                                        ],
-                                        "answer": "59",
-                                        "hint": "Count one number after 58.",
-                                        "explanation": "59 is between 58 and 60."
-                                },
-                                {
-                                        "title": "Quiz: count by tens",
-                                        "prompt": "What comes after 90 when counting by tens?",
-                                        "choices": [
-                                                "91",
-                                                "95",
-                                                "100",
-                                                "110"
-                                        ],
-                                        "answer": "100",
-                                        "hint": "Add one group of ten.",
-                                        "explanation": "90 plus 10 equals 100."
-                                }
-                        ]
-                },
-                {
-                        "unit": "Place Value: Tens & Ones",
-                        "lessons": [
-                                {
-                                        "title": "Tens and ones",
-                                        "prompt": "How many tens are in 47?",
-                                        "choices": [
-                                                "4",
-                                                "7",
-                                                "40",
-                                                "47"
-                                        ],
-                                        "answer": "4",
-                                        "hint": "Look at the first digit.",
-                                        "explanation": "47 has 4 tens and 7 ones."
-                                },
-                                {
-                                        "title": "Expanded form",
-                                        "prompt": "Which is the expanded form of 62?",
-                                        "choices": [
-                                                "6 + 2",
-                                                "60 + 2",
-                                                "60 + 20",
-                                                "6 + 20"
-                                        ],
-                                        "answer": "60 + 2",
-                                        "hint": "The 6 is worth six tens.",
-                                        "explanation": "62 is 60 plus 2."
-                                },
-                                {
-                                        "title": "Build a number",
-                                        "prompt": "Which number has 5 tens and 3 ones?",
-                                        "choices": [
-                                                "35",
-                                                "53",
-                                                "503",
-                                                "58"
-                                        ],
-                                        "answer": "53",
-                                        "hint": "Five tens is 50.",
-                                        "explanation": "50 plus 3 equals 53."
-                                },
-                                {
-                                        "title": "Quiz: place value",
-                                        "prompt": "In 84, what is the value of the 8?",
-                                        "choices": [
-                                                "8",
-                                                "4",
-                                                "80",
-                                                "84"
-                                        ],
-                                        "answer": "80",
-                                        "hint": "The 8 is in the tens place.",
-                                        "explanation": "The 8 in 84 represents 80."
-                                }
-                        ]
-                },
-                {
-                        "unit": "Measurement, Time & Data",
-                        "lessons": [
-                                {
-                                        "title": "Measure length",
-                                        "prompt": "Which tool is best for measuring a pencil?",
-                                        "choices": [
-                                                "Ruler",
-                                                "Clock",
-                                                "Thermometer",
-                                                "Scale"
-                                        ],
-                                        "answer": "Ruler",
-                                        "hint": "Choose the tool with length marks.",
-                                        "explanation": "A ruler measures length."
-                                },
-                                {
-                                        "title": "Tell time",
-                                        "prompt": "The minute hand is on 12 and the hour hand is on 4. What time is it?",
-                                        "choices": [
-                                                "4:00",
-                                                "12:04",
-                                                "4:30",
-                                                "3:00"
-                                        ],
-                                        "answer": "4:00",
-                                        "hint": "When the minute hand is on 12, it is exactly the hour.",
-                                        "explanation": "The clock shows four o'clock."
-                                },
-                                {
-                                        "title": "Compare lengths",
-                                        "prompt": "A 9-inch ribbon and a 6-inch ribbon: which is longer?",
-                                        "choices": [
-                                                "6-inch",
-                                                "9-inch",
-                                                "They are equal",
-                                                "Cannot tell"
-                                        ],
-                                        "answer": "9-inch",
-                                        "hint": "Compare 9 and 6.",
-                                        "explanation": "9 inches is longer than 6 inches."
-                                },
-                                {
-                                        "title": "Quiz: read data",
-                                        "prompt": "A chart shows 5 red blocks and 3 blue blocks. How many more red blocks are there?",
-                                        "choices": [
-                                                "1",
-                                                "2",
-                                                "3",
-                                                "8"
-                                        ],
-                                        "answer": "2",
-                                        "hint": "Subtract the smaller group from the larger group.",
-                                        "explanation": "5 minus 3 equals 2 more red blocks."
-                                }
-                        ]
-                },
-                {
-                        "unit": "Geometry",
-                        "lessons": [
-                                {
-                                        "title": "Name a shape",
-                                        "prompt": "Which shape has 3 sides?",
-                                        "choices": [
-                                                "Circle",
-                                                "Triangle",
-                                                "Square",
-                                                "Rectangle"
-                                        ],
-                                        "answer": "Triangle",
-                                        "hint": "Tri means three.",
-                                        "explanation": "A triangle has 3 sides."
-                                },
-                                {
-                                        "title": "Describe shapes",
-                                        "prompt": "Which shape has 4 equal sides?",
-                                        "choices": [
-                                                "Triangle",
-                                                "Rectangle",
-                                                "Square",
-                                                "Circle"
-                                        ],
-                                        "answer": "Square",
-                                        "hint": "Think of a shape with four matching sides.",
-                                        "explanation": "A square has 4 equal sides."
-                                },
-                                {
-                                        "title": "Solid shapes",
-                                        "prompt": "Which solid shape can roll like a ball?",
-                                        "choices": [
-                                                "Cube",
-                                                "Sphere",
-                                                "Cone",
-                                                "Rectangular prism"
-                                        ],
-                                        "answer": "Sphere",
-                                        "hint": "Think of a round solid with no flat faces.",
-                                        "explanation": "A sphere is round and can roll."
-                                },
-                                {
-                                        "title": "Quiz: compose shapes",
-                                        "prompt": "Two triangles can be put together to make which shape?",
-                                        "choices": [
-                                                "Square",
-                                                "Circle",
-                                                "Oval",
-                                                "Cone"
-                                        ],
-                                        "answer": "Square",
-                                        "hint": "Imagine two equal triangles sharing a side.",
-                                        "explanation": "Two matching right triangles can form a square."
-                                }
-                        ]
-                },
-                {
-                        "unit": "Word Problems & Problem Solving",
-                        "lessons": [
-                                {
-                                        "title": "Choose an operation",
-                                        "prompt": "Sam has 5 apples and gets 3 more. What should you do?",
-                                        "choices": [
-                                                "Add",
-                                                "Subtract",
-                                                "Multiply",
-                                                "Divide"
-                                        ],
-                                        "answer": "Add",
-                                        "hint": "He gets more apples.",
-                                        "explanation": "Adding finds the total when more are added."
-                                },
-                                {
-                                        "title": "Solve a story",
-                                        "prompt": "There are 9 birds. 4 fly away. How many remain?",
-                                        "choices": [
-                                                "4",
-                                                "5",
-                                                "6",
-                                                "13"
-                                        ],
-                                        "answer": "5",
-                                        "hint": "Flying away means the number gets smaller.",
-                                        "explanation": "9 minus 4 equals 5."
-                                },
-                                {
-                                        "title": "Two-step thinking",
-                                        "prompt": "Lina has 4 red blocks and 3 blue blocks. She gets 2 more blue blocks. How many blocks now?",
-                                        "choices": [
-                                                "7",
-                                                "8",
-                                                "9",
-                                                "10"
-                                        ],
-                                        "answer": "9",
-                                        "hint": "First find 4 + 3, then add 2.",
-                                        "explanation": "4 + 3 + 2 equals 9."
-                                },
-                                {
-                                        "title": "Quiz: explain the operation",
-                                        "prompt": "Which equation matches “3 more than 6 is 9”?",
-                                        "choices": [
-                                                "6 − 3 = 9",
-                                                "6 + 3 = 9",
-                                                "9 + 3 = 6",
-                                                "3 − 6 = 9"
-                                        ],
-                                        "answer": "6 + 3 = 9",
-                                        "hint": "“More than” means add.",
-                                        "explanation": "Adding 3 to 6 gives 9."
-                                }
-                        ]
-                }
-        ]
-};
+    // Banks are lazy-loaded by ensureGradeData('g1'); this object is filled
+    // after data/grade-1/*.js arrives. Keeping the build out of the initial
+    // parse removes ~87 KB of question-bank JavaScript from first paint.
+    let GRADE1_INTERACTIVE = {math:[],ela:[],science:[],social:[],writing:[]};
 
-    // ---------- Grade 1-8 course content framework ----------
-    const GRADE_SUBJECT_UNITS = {ela:['Reading Foundations','Reading Comprehension','Vocabulary & Language','Grammar','Writing','Research & Communication'],math:['Number Sense & Operations','Place Value & Computation','Fractions & Decimals','Measurement & Geometry','Expressions & Equations','Problem Solving'],science:['Scientific Thinking','Life Science','Earth & Space Science','Physical Science','Engineering & Design','Data & Investigation'],social:['Communities & Civics','Geography','History','Government','Economics','Culture & Society'],writing:['Sentence Craft','Paragraph Writing','Narrative Writing','Informative Writing','Opinion & Argument','Revision & Editing']};
-    const GRADE_SUBJECT_LESSONS = {ela:['Learn the key skill','Read and identify evidence','Practice with examples','Show what you know'],math:['Build the concept','See a worked example','Practice step by step','Solve a challenge'],science:['Ask a question','Observe and explain','Test the idea','Record what you learned'],social:['Learn the people and places','Explore a map or source','Connect cause and effect','Check your understanding'],writing:['Study a model','Plan your ideas','Write your response','Revise and publish']};
-    // ---------- Grade 1 Math question bank ----------
-    // The bank is aligned to the Grade 1 scope used here and inspired by
-    // openly licensed Grade 1 task structures from Illustrative Mathematics.
-    // We author our own wording/values rather than copying source questions.
-    GRADE1_INTERACTIVE.math = window.KC_G1_MATH;
     function diversifyGrade1MathBank(bank){
         const shapePool=[{name:'triangle',symbol:'△',sides:3},{name:'square',symbol:'□',sides:4},{name:'rectangle',symbol:'▭',sides:4},{name:'hexagon',symbol:'⬡',sides:6}];
         const clockTimes=['1:00','2:00','3:00','4:00','5:00','6:00','7:00','8:00','9:00','10:00','11:00','12:00'];
@@ -3794,27 +3652,113 @@ ${html}
         }
         return diversified;
     }
-    const GRADE1_MATH_BANK = buildGrade1MathBank();
-    GRADE1_INTERACTIVE.math = GRADE1_MATH_BANK;
 
-    // ---------- Grade 1 core-subject interactive banks ----------
-    const GRADE1_CORE_BANKS = {
-        ela: window.KC_G1_ELA || [],
-        science: window.KC_G1_SCIENCE || [],
-        social: window.KC_G1_SOCIAL || [],
-        writing: window.KC_G1_WRITING || []
+    function buildGrade1Interactive(){
+        return {
+            math: buildGrade1MathBank(),
+            ela: window.KC_G1_ELA || [],
+            science: window.KC_G1_SCIENCE || [],
+            social: window.KC_G1_SOCIAL || [],
+            writing: window.KC_G1_WRITING || []
+        };
+    }
+    function initGrade1Interactive(){ GRADE1_INTERACTIVE = buildGrade1Interactive(); }
+
+    // ---------- Lazy grade banks ----------
+    // Kindergarten still loads eagerly because the home screen needs it.
+    // Grade 1/2 banks are fetched the first time a school-grade lesson is
+    // opened, then cached by the service worker for offline use.
+    const GRADE_DATA_SCRIPTS = {
+        g1: [
+            'data/grade-1/science.js',
+            'data/grade-1/social-studies.js',
+            'data/grade-1/writing.js',
+            'data/grade-1/ela.js',
+            'data/grade-1/math.js',
+            'data/grade-1/extra.js',
+            'data/grade-1/core.js'
+        ],
+        g2: [
+            'data/grade-2/math.js',
+            'data/grade-2/ela.js',
+            'data/grade-2/social-studies.js',
+            'data/grade-2/writing.js',
+            'data/grade-2/science.js',
+            'data/grade-2/core.js'
+        ]
     };
-    GRADE1_INTERACTIVE.ela = GRADE1_CORE_BANKS.ela;
-    GRADE1_INTERACTIVE.science = GRADE1_CORE_BANKS.science;
-    GRADE1_INTERACTIVE.social = GRADE1_CORE_BANKS.social;
-    GRADE1_INTERACTIVE.writing = GRADE1_CORE_BANKS.writing;
+    const gradeDataState = {
+        g1: { loaded:false, promise:null },
+        g2: { loaded:false, promise:null }
+    };
+    function loadScriptOnce(src){
+        return new Promise((resolve,reject)=>{
+            const existing=document.querySelector('script[data-kc-lazy="'+src+'"]');
+            if(existing){
+                if(existing.dataset.kcLoaded==='1'){resolve();return;}
+                existing.addEventListener('load',resolve,{once:true});
+                existing.addEventListener('error',()=>reject(new Error('Could not load '+src)),{once:true});
+                return;
+            }
+            const script=document.createElement('script');
+            script.src=src;
+            script.async=false;
+            script.dataset.kcLazy=src;
+            script.onload=()=>{script.dataset.kcLoaded='1';resolve();};
+            script.onerror=()=>reject(new Error('Could not load '+src));
+            document.head.appendChild(script);
+        });
+    }
+    function ensureGradeData(gradeId){
+        const slot=gradeDataState[gradeId];
+        if(!slot) return Promise.resolve();
+        if(slot.loaded) return Promise.resolve();
+        if(slot.promise) return slot.promise;
+        slot.promise=(GRADE_DATA_SCRIPTS[gradeId]||[]).reduce(
+            (chain,src)=>chain.then(()=>loadScriptOnce(src)),
+            Promise.resolve()
+        ).then(()=>{
+            if(gradeId==='g1') initGrade1Interactive();
+            if(gradeId==='g2') GRADE2_INTERACTIVE=window.KC_G2_INTERACTIVE||{math:[],ela:[],science:[],social:[],writing:[]};
+            slot.loaded=true;
+        }).catch((error)=>{
+            slot.promise=null;
+            console.warn('[kc] grade bank load failed',gradeId,error);
+            throw error;
+        });
+        return slot.promise;
+    }
+    function prewarmGradeData(){
+        const run=()=>{ensureGradeData('g1').catch(()=>{});ensureGradeData('g2').catch(()=>{});};
+        if('requestIdleCallback' in window) window.requestIdleCallback(run,{timeout:6000});
+        else setTimeout(run,3000);
+    }
+    window.addEventListener('load',prewarmGradeData,{once:true});
+    function gradeDataReady(gradeId){return !gradeId||gradeId==='k'||!gradeDataState[gradeId]||gradeDataState[gradeId].loaded;}
+    function retryGradeData(gradeId){
+        const slot=gradeDataState[gradeId];
+        if(slot){slot.loaded=false;slot.promise=null;}
+        render();
+    }
+    function renderGradeLoading(gradeId){
+        const app=document.getElementById('app');
+        const label=gradeId==='g2'?'Grade 2':'Grade 1';
+        if(app){
+            app.innerHTML=topbar(true)+'<div class="center-col"><div class="grade-loading" role="status" aria-live="polite"><div class="grade-loading-icon" aria-hidden="true">⏳</div><h2>Loading '+label+' lessons…</h2><p>Fetching the question bank once. After this it works offline.</p></div></div>'+renderDebugPanel();
+        }
+        ensureGradeData(gradeId).then(()=>render()).catch((error)=>{
+            const box=document.getElementById('app');
+            if(!box)return;
+            box.innerHTML=topbar(true)+'<div class="center-col"><div class="grade-loading" role="alert"><div class="grade-loading-icon" aria-hidden="true">⚠️</div><h2>'+label+' lessons could not load</h2><p>'+esc(String(error&&error.message||'Network error'))+'. Check the connection and try again.</p><div class="grade-end-actions"><button type="button" onclick="retryGradeData(\''+gradeId+'\')">↻ Try again</button><button type="button" onclick="go(\'grades\')">← Back to grades</button></div></div></div>';
+        });
+    }
 
-    const GRADE2_INTERACTIVE = window.KC_G2_INTERACTIVE || {math:[],ela:[],science:[],social:[],writing:[]};
+    let GRADE2_INTERACTIVE = {math:[],ela:[],science:[],social:[],writing:[]};
     const KINDERGARTEN_INTERACTIVE = window.KC_KINDERGARTEN_INTERACTIVE || {math:[],ela:[],science:[],social:[],writing:[]};
     function courseSubjectType(name){const n=name.toLowerCase();if(n.includes('english')||n.includes('ela'))return'ela';if(n.includes('math')||n.includes('algebra'))return'math';if(n.includes('science'))return'science';if(n.includes('social'))return'social';return'writing';}
     function gradeInteractiveKey(course){const type=courseSubjectType(course.name);return ['ela','math','science','social','writing'].includes(type)?type:null;}
     function gradeUnitProgress(gradeId,courseIndex,unitIndex){const key=gradeId+'_'+courseIndex+'_'+unitIndex;const m=progress.gradeMastery&&progress.gradeMastery[key]||0;const bank=gradeId==='k'?KINDERGARTEN_INTERACTIVE:gradeId==='g2'?GRADE2_INTERACTIVE:GRADE1_INTERACTIVE;const total=bank[gradeInteractiveKey(GRADE_CURRICULUM.find(g=>g.id===gradeId).courses[courseIndex])]?.[unitIndex]?.lessons.length||4;return {correct:m,total};}
-    function renderGradeCourse(){const p=state.params||{},grade=GRADE_CURRICULUM.find(g=>g.id===p.grade),course=grade&&grade.courses[p.courseIndex];if(!course)return topbar(true)+'<h2>Course not found</h2>';const type=gradeInteractiveKey(course),bank=grade.id==='k'?KINDERGARTEN_INTERACTIVE:grade.id==='g2'?GRADE2_INTERACTIVE:GRADE1_INTERACTIVE,interactive=(grade.id==='k'||grade.id==='g1'||grade.id==='g2')&&type&&bank[type];if(!interactive){const units=GRADE_SUBJECT_UNITS[courseSubjectType(course.name)]||GRADE_SUBJECT_UNITS.writing,unitCards=units.map((u,i)=>'<div class="course-unit"><div class="course-unit-head"><span>UNIT '+(i+1)+'</span><strong>'+u+'</strong></div><div class="course-lessons"><span>6 learning skills</span></div></div>').join('');return topbar(true)+'<div class="course-overview"><div class="course-overview-icon">'+course.icon+'</div><div class="course-overview-grade">'+grade.label+'</div><h2>'+course.name+'</h2><p>'+course.desc+'</p><div class="course-badge">CURRICULUM IN PROGRESS</div></div><div class="course-units">'+unitCards+'</div><div class="footer">Interactive lessons will be added course by course.</div>';}const unitCards=interactive.map((u,i)=>{const progress=gradeUnitProgress(grade.id,p.courseIndex,i),total=u.lessons.length;return '<div class="course-unit"><div class="course-unit-head"><span>UNIT '+(i+1)+'</span><strong>'+u.unit+'</strong></div><div class="grade-unit-summary"><span>'+total+' practice questions in the bank</span><span>'+progress.correct+'/'+progress.total+' first-try correct</span></div><button class="grade-unit-start" onclick="startGradeUnit(\''+grade.id+'\','+p.courseIndex+','+i+')">START UNIT ▶</button></div>';}).join('');return topbar(true)+'<div class="course-overview"><div class="course-overview-icon">'+course.icon+'</div><div class="course-overview-grade">'+grade.label+'</div><h2>'+course.name+'</h2><p>'+course.desc+'</p><div class="course-badge">INTERACTIVE · LESSON → PRACTICE → QUIZ</div></div><div class="course-units">'+unitCards+'</div><div class="footer">Kindergarten, Grade 1, and Grade 2 have interactive core-subject banks; each unit draws a fresh randomized 4-question session from 30+ practice questions.</div>'}function getAdaptiveDailyMission(){if(!window.KCSkillEngine)return null;return window.KCSkillEngine.buildDailyMission(progress,{limit:4});}function syncAdaptiveDailyGoal(completedOverride){if(!window.KCSkillEngine||!window.KCData)return;const mission=window.KCSkillEngine.buildDailyMission(progress,{limit:3});if(!mission)return;const d=ensureDailyState();const target=Math.max(1,Number(mission.target)||3);const completed=completedOverride!=null?Math.min(target,Math.max(0,Number(completedOverride)||0)):Math.min(target,Number(d.adaptiveCompletedQuestions)||0);d.adaptiveMission=mission;d.adaptiveTarget=target;d.adaptiveCompletedQuestions=completed;const done=completed>=target;d.adaptiveCompleted=done;window.KCData.recordDailyGoal({goalDate:d.date,targetQuestions:target,completedQuestions:completed,completed:done,metadata:{source:'skill-engine',skills:(mission.skills||[]).map(s=>({skillId:s.skillId,mastery:s.mastery,action:s.action}))}});window.KCData.flushNormalized().catch(()=>{});}
+    function renderGradeCourse(){const p=state.params||{},grade=GRADE_CURRICULUM.find(g=>g.id===p.grade),course=grade&&grade.courses[p.courseIndex];if(!course)return topbar(true)+'<h2>Course not found</h2>';const type=gradeInteractiveKey(course),bank=grade.id==='k'?KINDERGARTEN_INTERACTIVE:grade.id==='g2'?GRADE2_INTERACTIVE:GRADE1_INTERACTIVE,interactive=(grade.id==='k'||grade.id==='g1'||grade.id==='g2')&&type&&bank[type];if(!interactive){const units=GRADE_SUBJECT_UNITS[courseSubjectType(course.name)]||GRADE_SUBJECT_UNITS.writing,unitCards=units.map((u,i)=>'<div class="course-unit"><div class="course-unit-head"><span>UNIT '+(i+1)+'</span><strong>'+u+'</strong></div><div class="course-lessons"><span>6 learning skills</span></div></div>').join('');return topbar(true)+'<div class="course-overview"><div class="course-overview-icon">'+course.icon+'</div><div class="course-overview-grade">'+grade.label+'</div><h2>'+course.name+'</h2><p>'+course.desc+'</p><div class="course-badge">CURRICULUM IN PROGRESS</div></div><div class="course-units">'+unitCards+'</div><div class="footer">Interactive lessons will be added course by course.</div>';}const unitCards=interactive.map((u,i)=>{const progress=gradeUnitProgress(grade.id,p.courseIndex,i),total=u.lessons.length;return '<div class="course-unit"><div class="course-unit-head"><span>UNIT '+(i+1)+'</span><strong>'+u.unit+'</strong></div><div class="grade-unit-summary"><span>'+total+' practice questions in the bank</span><span>'+progress.correct+'/'+progress.total+' first-try correct</span></div><button class="grade-unit-start" onclick="startGradeUnit(\''+grade.id+'\','+p.courseIndex+','+i+')">START UNIT ▶</button></div>';}).join('');return topbar(true)+'<div class="course-overview"><div class="course-overview-icon">'+course.icon+'</div><div class="course-overview-grade">'+grade.label+'</div><h2>'+course.name+'</h2><p>'+course.desc+'</p><div class="course-badge">INTERACTIVE · LESSON → PRACTICE → QUIZ</div></div><div class="course-units">'+unitCards+'</div><div class="footer">Kindergarten, Grade 1, and Grade 2 have interactive core-subject banks; each unit draws a fresh randomized 4-question session from its practice bank.</div>'}function getAdaptiveDailyMission(){if(!window.KCSkillEngine)return null;return window.KCSkillEngine.buildDailyMission(progress,{limit:4});}function syncAdaptiveDailyGoal(completedOverride){if(!window.KCSkillEngine||!window.KCData)return;const mission=window.KCSkillEngine.buildDailyMission(progress,{limit:3});if(!mission)return;const d=ensureDailyState();const target=Math.max(1,Number(mission.target)||3);const completed=completedOverride!=null?Math.min(target,Math.max(0,Number(completedOverride)||0)):Math.min(target,Number(d.adaptiveCompletedQuestions)||0);d.adaptiveMission=mission;d.adaptiveTarget=target;d.adaptiveCompletedQuestions=completed;const done=completed>=target;d.adaptiveCompleted=done;window.KCData.recordDailyGoal({goalDate:d.date,targetQuestions:target,completedQuestions:completed,completed:done,metadata:{source:'skill-engine',skills:(mission.skills||[]).map(s=>({skillId:s.skillId,mastery:s.mastery,action:s.action}))}});window.KCData.flushNormalized().catch(()=>{});}
 function startGradeUnit(gradeId,courseIndex,unitIndex){const grade=GRADE_CURRICULUM.find(g=>g.id===gradeId),course=grade&&grade.courses[courseIndex],type=course&&gradeInteractiveKey(course),bank=gradeId==='k'?KINDERGARTEN_INTERACTIVE:gradeId==='g2'?GRADE2_INTERACTIVE:GRADE1_INTERACTIVE,unit=type&&bank[type]?.[unitIndex];if(!unit)return;const pool=[...(unit.lessons||[])];const limit=Math.min(4,pool.length);const recentQuestionIds=Object.values(progress?.skillStats||{}).flatMap(s=>(s?.recent||[]).map(r=>r?.questionId).filter(Boolean)).slice(-30); const recentSkillIds=Object.values(progress?.skillStats||{}).filter(s=>Array.isArray(s?.recent)&&s.recent.length).sort((a,b)=>String(b.lastAttemptAt||'').localeCompare(String(a.lastAttemptAt||''))).slice(0,12).map(s=>s.skillId).filter(Boolean); const context={gradeId,subjectKey:type,unitKey:unit.unitKey||unit.unit,unitTitle:unit.unit,progress,recentQuestionIds,recentSkillIds};let lessons;if(window.KCSkillEngine){lessons=window.KCSkillEngine.selectAdaptiveLessons(pool,context,limit);}else{for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}lessons=pool.slice(0,limit);}const sessionUnit={...unit,lessons};gradeQuiz={gradeId,courseIndex,unitIndex,type,unit:sessionUnit,fullPool:pool,sessionLimit:limit,usedQuestionIds:new Set(lessons.map(q=>String(q.id||q.lessonId||''))),idx:0,firstAttempt:true,wrongAttempts:0,correctFirstTry:0,stars:0,awaitingNext:false,sortPicked:[],graphPicked:[]};go('gradeLesson',{grade:gradeId,courseIndex,unitIndex});}
 function gradeStageFor(index,total){if(index===0)return {name:'LESSON',copy:'Learn the skill with Blipola.'};if(index===total-1)return {name:'QUIZ',copy:'Show what you know independently.'};return {name:'PRACTICE',copy:'Practice the skill with instant feedback.'};}
     function gradeQuizMessage(){const q=gradeQuiz?.unit?.lessons?.[gradeQuiz.idx];return q?'Think about the clue. You can ask Blipola for a hint.':'';}
@@ -4329,6 +4273,15 @@ function recordRuntimeError(report){
         if (!debugMode && window.location.search.includes('debug=1')) {
             debugMode = true;
         }
+        // Grade 1/2 banks are lazy-loaded, so guard the render until the first
+        // visit has fetched them. Kindergarten still renders immediately.
+        const lazyGradeId = (state.screen === 'gradeCourse' || state.screen === 'gradeLesson' || state.screen === 'gradeUnitEnd') && state.params
+            ? state.params.grade
+            : null;
+        if ((lazyGradeId === 'g1' || lazyGradeId === 'g2') && !gradeDataReady(lazyGradeId)) {
+            renderGradeLoading(lazyGradeId);
+            return;
+        }
         const app = document.getElementById('app');
         let html = '';
         if (state.screen === 'home') html = renderHome();
@@ -4598,7 +4551,38 @@ function recordRuntimeError(report){
     }
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js').catch(() => {});
+            const hadController = !!navigator.serviceWorker.controller;
+            navigator.serviceWorker.register('sw.js').then((registration) => {
+                // A waiting worker means a new shell is installed but this tab
+                // is still running old code. Ask once, then reload on demand.
+                const offerUpdate = (worker) => {
+                    if (!worker || document.getElementById('swUpdateBanner')) return;
+                    const banner = document.createElement('div');
+                    banner.id = 'swUpdateBanner';
+                    banner.setAttribute('role', 'status');
+                    banner.style.cssText = 'position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9999;background:#1f2937;color:#fff;padding:12px 16px;border-radius:12px;font:600 15px system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.25);display:flex;gap:12px;align-items:center;max-width:92vw;';
+                    banner.innerHTML = '<span>🔄 A new version is ready.</span><button type="button" style="border:0;border-radius:8px;padding:8px 12px;font:inherit;background:#5d9c2e;color:#fff;cursor:pointer;">Update now</button>';
+                    banner.querySelector('button').addEventListener('click', () => {
+                        banner.remove();
+                        worker.postMessage({ type: 'SKIP_WAITING' });
+                    });
+                    document.body.appendChild(banner);
+                };
+                if (registration.waiting) offerUpdate(registration.waiting);
+                registration.addEventListener('updatefound', () => {
+                    const worker = registration.installing;
+                    if (!worker) return;
+                    worker.addEventListener('statechange', () => {
+                        if (worker.state === 'installed' && navigator.serviceWorker.controller) offerUpdate(worker);
+                    });
+                });
+            }).catch(() => {});
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!hadController || refreshing) return;
+                refreshing = true;
+                window.location.reload();
+            });
         });
     }
     

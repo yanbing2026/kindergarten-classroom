@@ -9,14 +9,28 @@
   const QUEUE_KEY = 'kc_data_queue_v1';
   const SNAPSHOT_KEY = 'kc_data_snapshot_v1';
   const ACCOUNT_KEY = 'kc_current_account';
+  const ACCOUNTS_KEY = 'kc_accounts_v1';
   const PLAYER_ID_KEY = 'kc_normalized_player_id_v1';
 
   const safeJson = (value, fallback) => {
     try { return JSON.parse(value); } catch (_) { return fallback; }
   };
 
+  // `kc_current_account` is written by index.html as a lowercase account key,
+  // while older builds wrote a JSON object. Accept both shapes: the queue and
+  // the normalized sync are scoped by account name, so this must never be null
+  // when an account is selected.
   function currentAccount() {
-    return safeJson(localStorage.getItem(ACCOUNT_KEY) || '', null);
+    const raw = String(localStorage.getItem(ACCOUNT_KEY) || '').trim();
+    if (!raw) return null;
+    if (raw.charAt(0) === '{') {
+      const parsed = safeJson(raw, null);
+      if (parsed && parsed.name) return { key: String(parsed.key || parsed.name).toLowerCase(), name: String(parsed.name) };
+    }
+    const key = raw.toLowerCase();
+    const accounts = safeJson(localStorage.getItem(ACCOUNTS_KEY) || '{}', {});
+    const stored = accounts && accounts[key];
+    return { key, name: stored && stored.name ? String(stored.name) : key };
   }
 
   function loadQueue() {
@@ -74,7 +88,12 @@
     }
     try {
       const account = currentAccount();
-      const result = account?.name ? await window.cloudSaveProgress(account.name, progress) : false;
+      if (!account?.name) return { ok:false, skipped:true, reason:'no account selected' };
+      const result = await window.cloudSaveProgress(account.name, progress);
+      // cloudSaveProgress returns { ok, reason } in current builds and a plain
+      // boolean in older ones; both must not be read as "true" when the RPC
+      // failed, or a failed sync would be reported as saved.
+      if (result && typeof result === 'object') return { ok:!!result.ok, reason:result.reason, legacy:true };
       return { ok:result !== false, legacy:true };
     } catch (error) {
       enqueue('legacy-progress-sync', { message:error?.message || String(error) });

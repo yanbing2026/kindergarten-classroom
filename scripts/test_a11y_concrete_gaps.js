@@ -237,16 +237,16 @@ const startTodayAdventureSrc = extractFunction(html, 'startTodayAdventure');
 
 // Assert structural contracts from renderHome source
 assert(
-    renderHomeSrc.includes('<button class="big-btn play">START ▶</button>'),
-    'renderHome must render START as a native <button> (ensuring keyboard Tab reachability)'
+    renderHomeSrc.includes('<button type="button" class="today-card" onclick="'),
+    'today-card must be a native <button> so the whole card is keyboard reachable'
 );
 assert(
-    !renderHomeSrc.includes('<button class="big-btn play" onclick='),
-    'START button must NOT have an inline onclick (to prevent double go() trigger when event bubbles)'
+    renderHomeSrc.includes('<span class="big-btn play">START ▶</span>'),
+    'START must be a styled span inside the card button, not a nested <button>'
 );
 assert(
-    renderHomeSrc.includes('<div class="today-card" onclick="'),
-    'today-card container must have onclick handler to catch clicks and bubbled button activations'
+    !renderHomeSrc.includes('<button class="big-btn play">START ▶</button>'),
+    'today-card must not nest a second button inside the card button'
 );
 
 // Dynamic execution of extracted functions with mock DOM & event propagation:
@@ -291,42 +291,20 @@ const evalRenderHome = eval(`(${renderHomeSrc})`);
 const homeHTML = evalRenderHome();
 
 // Extract the today-card segment from the truly evaluated homeHTML
-const cardMatch = homeHTML.match(/<div class="today-card" onclick="([^"]+)">([\s\S]*?<button class="big-btn play"[^>]*>START ▶<\/button>[\s\S]*?)<\/div>/);
-assert(cardMatch, 'Rendered home HTML must contain .today-card with onclick');
+const cardMatch = homeHTML.match(/<button type="button" class="today-card" onclick="([^"]+)">([\s\S]*?)<\/button>/);
+assert(cardMatch, 'Rendered home HTML must contain a .today-card button with onclick');
 const cardOnclickAttr = cardMatch[1];
 const cardInner = cardMatch[2];
 
-assert(cardInner.includes('<button class="big-btn play">START ▶</button>'), 'START button must be inside today-card');
-assert(!cardInner.includes('<button class="big-btn play" onclick='), 'START button inside today-card must not have inline onclick');
+assert(cardInner.includes('<span class="big-btn play">START ▶</span>'), 'START span must be inside today-card');
+assert(!cardInner.includes('<button'), 'today-card button must not contain a nested button');
 
-// Test event propagation model matching browser dispatch:
-// Native <button> inside a clickable parent div bubbles click to parent
-function simulateButtonClickOnTodayCard(cardHandlerCode, buttonHandlerCode) {
-    // If button has handler, button fires first
-    if (buttonHandlerCode) {
-        eval(buttonHandlerCode);
-    }
-    // Event bubbles to parent container
-    if (cardHandlerCode) {
-        eval(cardHandlerCode);
-    }
-}
-
-// 1) Test button click (must trigger navigation exactly 1 time)
-goCalls = 0;
-const btnOnclickMatch = cardInner.match(/<button class="big-btn play"[^>]*onclick="([^"]+)"/);
-const btnOnclickAttr = btnOnclickMatch ? btnOnclickMatch[1] : null;
-assert.strictEqual(btnOnclickAttr, null, 'Extracted button onclick must be null');
-
-simulateButtonClickOnTodayCard(cardOnclickAttr, btnOnclickAttr);
-assert.strictEqual(goCalls, 1, `Single click on START button must trigger navigation exactly once, got ${goCalls}`);
-
-// 2) Test card click directly (must trigger navigation exactly 1 time)
+// 1) One activation of the card button must navigate exactly once.
 goCalls = 0;
 eval(cardOnclickAttr);
-assert.strictEqual(goCalls, 1, `Direct click on today-card must trigger navigation exactly once, got ${goCalls}`);
+assert.strictEqual(goCalls, 1, `Single activation of today-card must trigger navigation exactly once, got ${goCalls}`);
 
-console.log('✓ Main flow button single-trigger navigation and keyboard reachability verified');
+console.log('✓ Main flow card is a single native button with one navigation trigger');
 
 console.log('\nAll N10 a11y concrete gap tests PASSED! ✅');
 

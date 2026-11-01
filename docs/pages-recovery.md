@@ -67,6 +67,14 @@ async () => {
 
 ## 验证（三步都要过，缺一步都别宣布发布成功）
 
+- **先单独比对 `index.html` 与 `sw.js`**（本次部分部署就是这两个漏了）：
+  ```bash
+  curl -sL https://blockquest-classroom.pages.dev/index.html | sha256sum
+  curl -sL https://blockquest-classroom.pages.dev/sw.js | sha256sum
+  git show origin/main:index.html | sha256sum
+  git show origin/main:sw.js | sha256sum
+  ```
+  四个哈希必须两两相等。`sw.js` 不一致 = 已安装 PWA 仍在跑旧缓存。
 - `pages_deploy.py verify` **退出码 0**：全站每个路径 HTTP 200 且与本地/`origin/main` 逐字节一致。
 - 与 `origin/main` 对树：只在本地的文件、只在远端的文件、内容不同的文件**三者都必须为空**。
 - `/x/index.html` 会 **308** 跳到 `/x/`：`curl` 必须加 `-L`，否则会把好页面误判成"哈希不一致"。

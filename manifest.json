@@ -1,14 +1,20 @@
 {
+  "id": "./",
   "name": "BlockQuest Classroom",
   "short_name": "BlockQuest",
-  "description": "A supplemental kindergarten learning PWA: letters, numbers, English, Chinese, Spanish, math, science, patterns, sight words, and more — offline, no account required.",
+  "description": "Supplemental Pre-K to Grade 2 learning PWA: letters, numbers, English, Chinese, Spanish, math, science, social studies, and writing — offline, no account required.",
   "categories": ["education", "kids"],
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "any",
   "background_color": "#7ec8e3",
   "theme_color": "#5d9c2e",
+  "shortcuts": [
+    { "name": "Grade 2", "short_name": "Grade 2", "url": "./grade-2/", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Grade 1", "short_name": "Grade 1", "url": "./grade-1/", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Kindergarten", "short_name": "K", "url": "./kindergarten/", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ],
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
