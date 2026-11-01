@@ -30,11 +30,26 @@
 | §6.3 标题可读性 / manifest | ✅（部分） | 年级题目标题改用 clear 字体；首页今日冒险改为原生 `<button>`；manifest 增加 `id`、横竖屏自适应、年级 shortcuts |
 | §9 PR-G 家长自助账号管理 | ✅ | 家长面板接入 `rotate_pin` / `delete_player`；支持导出 + 导入备份；`test_parent_account_security.js` 覆盖改 PIN、错 PIN、删号清理与导入合并 |
 
-仍需人工 / 后续处理：
+## 0.1 部署记录（2026-11-01 已完成）
 
-- **§2.1 实际重新部署**：本机没有 Cloudflare 连接器凭据，无法执行 `pages_deploy.py` + 创建 deployment；
-  必须由有权限的人按 `docs/pages-recovery.md` 部署并贴出 4 个哈希。
-- **线上 Supabase 迁移 008 / 009**：需要在 Supabase SQL Editor 执行并确认匿名登录已开启；仓库内无法验证。
+- PR #69 于 2026-11-01 11:57Z 合并进 `main`（`1aa85a4`），`Validate` 绿。
+- 走**账号级 API token**（不需要 Cloudflare 连接器）：`GET …/upload-token` → `pages_deploy.py upload`
+  → `POST /accounts/{id}/pages/projects/blockquest-classroom/deployments`（multipart：`manifest` +
+  `branch=main` + `commit_hash`）。deployment `98212a38-57d2-464a-8c85-f8a981506d65`，stage `deploy: success`。
+- `pages_deploy.py verify`：**170/170 路径 200 且逐字节相同，anomalies 0**。
+- 四条哈希两两相等：`index.html` `38cc9219dfc843b9…df2920e`、`sw.js` `0bc2474621efee6e…0885197b`
+  （本地导出树 vs 线上实际取回）。
+- 线上实测：`APP_VERSION = 'v2-20261101-audit-final'`、Grade 2 显示 `PLAY NOW`、`/grade-2/` 返回
+  自己的文档（不再是 iframe）、SW 缓存 **33/33** 项、Grade 2 数学题可答且计分、控制台 0 错误。
+
+仍未完成 / 新发现：
+
+- **线上 Supabase 后端已不存在（2026-11-01 实测）**：`sjqhcpbdgaeapljbllhp.supabase.co` 在
+  `1.1.1.1`、`8.8.8.8` 上均 **NXDOMAIN**（`supabase.co` 本身正常解析），浏览器 `fetch` 直接
+  `TypeError: Failed to fetch`，线上创建账号显示 "Network error, try again."（应用不崩、本地进度不受影响）。
+  即：**008 / 009 迁移没有目标库可应用**。要恢复账号功能只能重建项目 → 先补基础 schema（仓库里缺
+  `001`，基础表 SQL 只在 Hermes 技能 `kindergarten-classroom-dev/references/supabase-accounts.md`）
+  → 按序跑 002–009 → 把新 URL + publishable key 写回 `index.html:237`。
 - **§6.2 CSS 拆分 / §6.3 读屏播报**：题库按需加载已完成；首屏 CSS 仍未拆分，答题时 TTS 与
   `aria-live` 仍可能重复播报，留作后续小步优化。
 
@@ -44,7 +59,7 @@
 
 | # | 结论 | 证据等级 |
 |---|---|---|
-| 1 | **线上 HTML 层不是 `main`**：`index.html`、`sw.js`、4 个年级页、`shared/grade-page.js` 都是旧版（`v2-20261004-a11y-buttons`），而 `data/`、`js/`、CSS 是新版 —— 典型的**部分部署**。Grade 2 仍显示 `BUILDING`，年级页仍是 iframe | 已复核（逐文件 sha256） |
+| 1 | **线上 HTML 层不是 `main`**：`index.html`、`sw.js`、4 个年级页、`shared/grade-page.js` 都是旧版（`v2-20261004-a11y-buttons`），而 `data/`、`js/`、CSS 是新版 —— 典型的**部分部署**。Grade 2 仍显示 `BUILDING`，年级页仍是 iframe（**2026-11-01 已修复：见 §0.1**） | 已复核（逐文件 sha256） |
 | 2 | **创建账号会清空孩子本地进度**（`cloudCreate(name,pin,{})` + 用云端 `{}` 覆盖本地） | 静态（代码路径确定） |
 | 3 | **归一化云端同步从未工作过**：`kc_current_account` 存的是纯字符串，`data-layer.js` 却按 JSON 对象解析 | 静态（可写测试复现） |
 | 4 | **同一设备第二次登录必然绑定失败**（每次 `signOut` + 新建匿名用户，`claim_player_auth` 因 uid 不匹配报错），且错误被吞掉 | 静态 + 008 逻辑 |
