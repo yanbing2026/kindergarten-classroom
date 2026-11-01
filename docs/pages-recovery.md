@@ -20,10 +20,44 @@ Cloudflare 侧的 Git 集成本仓库接不上：
 **Workers & Pages → 连接 Git** 重连一次账户级连接。接通后 push 到 `main` 即自动部署，
 本节的步骤退化为"只在需要手工重推时使用"。
 
+## 已验证的备用部署路径（账号级 API token，2026-11-01 实测）
+
+连接器不是唯一路径：`~/.hermes/.env` 里的账号级 token（`KINDERGARTEN_CLASSROOM_CF_API_TOKEN` /
+`..._CF_ACCOUNT_ID`）可以独自完成上传 **和** 创建 deployment —— 不需要连接器，也不需要人工去取
+upload token（上传阶段仍要用它换一个 JWT，见下）。
+
+```bash
+set -a; source <(grep -E '^KINDERGARTEN_CLASSROOM_CF_(API_TOKEN|ACCOUNT_ID)=' ~/.hermes/.env); set +a
+A=$KINDERGARTEN_CLASSROOM_CF_ACCOUNT_ID
+cd ~/projects/kindergarten-classroom && git fetch origin
+rm -rf /tmp/kc-deploy && mkdir -p /tmp/kc-deploy && git archive origin/main | tar -x -C /tmp/kc-deploy
+
+# 1) 换 upload JWT 并推资产
+curl -s -H "Authorization: Bearer $KINDERGARTEN_CLASSROOM_CF_API_TOKEN" \
+  "https://api.cloudflare.com/client/v4/accounts/$A/pages/projects/blockquest-classroom/upload-token" > /tmp/ut.json
+JWT=$(python3 -c "import json;print(json.load(open('/tmp/ut.json'))['result']['jwt'])")
+CF_UPLOAD_JWT="$JWT" CF_PROJECT=blockquest-classroom python3 ~/.hermes/scripts/pages_deploy.py upload /tmp/kc-deploy
+
+# 2) 用 API token 直接建 deployment（manifest 是 {"/path": "32位 sha256"} 的 JSON 文件）
+python3 ~/.hermes/scripts/pages_deploy.py manifest /tmp/kc-deploy > /tmp/kc-manifest.json
+curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/$A/pages/projects/blockquest-classroom/deployments" \
+  -H "Authorization: Bearer $KINDERGARTEN_CLASSROOM_CF_API_TOKEN" \
+  -F "manifest=</tmp/kc-manifest.json;type=application/json" -F "branch=main" \
+  -F "commit_hash=$(git rev-parse origin/main)"
+
+# 3) 等 latest_stage=deploy/success，再验字节
+python3 ~/.hermes/scripts/pages_deploy.py verify /tmp/kc-deploy https://blockquest-classroom.pages.dev
+```
+
+两个 token 的判据不同：upload JWT 只能打 `/pages/assets/*`（拿它建 deployment 会 9106）；
+**账号级 token 会让 `/user/tokens/verify` 返回 `1000 Invalid API Token`，这是预期的**，只要
+`GET /accounts` 返回 200 且 `GET /accounts/{id}/pages/projects/blockquest-classroom` 返回 200 就可用。
+
 ## 部署（手动，无需长期凭据）
 
 工具：Hermes 主机上的 `~/.hermes/scripts/pages_deploy.py`（`manifest` / `upload` / `verify` 三个子命令）
-+ `cloudflare_mcp` 连接器（它才有建 deployment 的权限）。**本机没有 Cloudflare 长期凭据，全程不需要 API token。**
++ `cloudflare_mcp` 连接器（它才有建 deployment 的权限）。**这条路径不需要 API token。** 若本机
+`~/.hermes/.env` 有账号级 token，走上节的 token 路径更快；两者都能建 deployment，择一即可。
 
 ```bash
 cd ~/projects/kindergarten-classroom && git fetch origin

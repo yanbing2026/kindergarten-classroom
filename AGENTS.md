@@ -26,7 +26,9 @@ CI：`.github/workflows/validate.yml`（push + PR 自动跑；**所有** `script
 （`pages.yml` / `deploy-pages.yml` 都已移除）。完整步骤、连接器调用形状和故障表见
 **`docs/pages-recovery.md`**；这里只留结论：
 
-1. 从 `origin/main` 导出树 → 用 `pages_deploy.py` 上传 → 由 Cloudflare 连接器创建 deployment。
+1. 从 `origin/main` 导出树 → 用 `pages_deploy.py` 上传 → 创建 deployment；创建者可以是
+   Cloudflare 连接器，也可以是本机 `~/.hermes/.env` 里的账号级 API token（2026-11-01 两条都实测过，
+   token 路径见 `docs/pages-recovery.md`「已验证的备用部署路径」）。
 2. 部署后必须跑 `pages_deploy.py verify`，并**单独比对 `index.html` 与 `sw.js` 的 sha256**：
    ```bash
    curl -sL https://blockquest-classroom.pages.dev/index.html | sha256sum
@@ -39,6 +41,18 @@ CI：`.github/workflows/validate.yml`（push + PR 自动跑；**所有** `script
    `data/`、`js/`、CSS 是新的，`index.html`、`sw.js`、4 个年级页仍是旧版，Grade 2 在线上仍显示 `BUILDING`。
 4. GitHub Pages 站点配置与旧分支的故事只作历史教训保留在 `docs/pages-recovery.md`，
    **不要**再把 `gh api .../pages` 当成当前发布机制。
+
+## 账号后端（Supabase）
+账号 / 云同步走 Supabase（项目 URL 与 publishable key 写死在 `index.html` 的 `initSupabase()` 里；
+表结构与 RPC 在 `supabase/migrations/002–009`，其中 009 是枚举防护 + 限流 + `rotate_pin` /
+`delete_player` / `release_player_auth`）。**注意仓库里没有 `001`**：`players` 表 + `kc_current_account`
+相关基础 SQL 只存在于 Hermes 技能 `kindergarten-classroom-dev` 的 `references/supabase-accounts.md`，
+重建项目时必须先从那里取基础 schema，再按序跑 002–009。
+
+**2026-11-01 实测：`sjqhcpbdgaeapljbllhp.supabase.co` 已不解析（NXDOMAIN），账号功能在线上不可用。**
+线上表现：创建/登录返回 "Network error, try again."，应用本身不崩、本地进度（`kc_progress_v1`）不受影响。
+恢复顺序：重建项目 → 依次执行 001–009 → 把新的 project URL + publishable key 替换进 `initSupabase()` →
+bump `APP_VERSION`（PostgREST 端点变了，缓存必须换）。
 
 ## 绝不手改的生成文件
 本仓库**没有生成文件**，全部是手写源。但有两条硬约束：
