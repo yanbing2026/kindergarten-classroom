@@ -3,7 +3,7 @@
 
   // BlockQuest Classroom data layer.
   // This is deliberately a compatibility-first layer: localStorage remains the
-  // source of truth for the existing app while normalized Supabase tables are
+  // source of truth for the existing app while cloud tables are
   // adopted incrementally. It never stores a PIN.
   const VERSION = 1;
   const QUEUE_KEY = 'kc_data_queue_v1';
@@ -81,8 +81,7 @@
 
   async function syncLegacyProgress(progress) {
     // Existing account RPC remains the compatibility cloud path.
-    // Normalized tables are not written here because the current name+PIN flow
-    // does not establish a Supabase Auth session for RLS ownership.
+    // Normalized tables are not written here.
     if (typeof window.cloudSaveProgress !== 'function') {
       return { ok:false, skipped:true, reason:'legacy cloud bridge unavailable' };
     }
@@ -152,9 +151,24 @@
     return raw.slice(0,8)+'-'+raw.slice(8,12)+'-4'+raw.slice(13,16)+'-8'+raw.slice(17,20)+'-'+raw.slice(20,32);
   }
 
+  function isCloudLinked() {
+    return !!(window.KCCloud && typeof window.KCCloud.hasToken === 'function' && window.KCCloud.hasToken());
+  }
+
+  function isAfterSince(createdAt, sinceMs, sinceIso) {
+    if (typeof createdAt === 'number') {
+      return createdAt >= sinceMs;
+    }
+    if (typeof createdAt === 'string') {
+      const parsed = Date.parse(createdAt);
+      if (!isNaN(parsed)) return parsed >= sinceMs;
+      return createdAt >= sinceIso;
+    }
+    return false;
+  }
+
   async function flushNormalized() {
-    const id = playerId();
-    if (!id || !window.supa) return { ok:false, skipped:true, reason:'normalized auth not linked' };
+    if (!isCloudLinked()) return { ok: false, skipped: true, reason: 'normalized auth not linked' };
     const queue = loadQueue();
     const accountKey = String(currentAccount()?.name || '').trim().toLowerCase();
     // Normalized events are account-scoped. Legacy queue entries without an
@@ -164,75 +178,137 @@
     const progressRows = scopedQueue.filter(x => x.type === 'progress');
     const goals = scopedQueue.filter(x => x.type === 'daily-goal');
     let sent = 0;
+
     if (activity.length) {
       const rows = activity.map(x => ({
-        player_id:id,
-        client_event_id: isUuid(x.id) ? x.id : uuidFromLegacyQueueId(x.id),
-        ...x.payload
+        clientEventId: isUuid(x.id) ? x.id : uuidFromLegacyQueueId(x.id),
+        gradeLevel: x.payload?.gradeLevel ?? null,
+        subjectKey: x.payload?.subjectKey ?? null,
+        unitKey: x.payload?.unitKey ?? null,
+        eventType: x.payload?.eventType || 'question',
+        correct: typeof x.payload?.correct === 'boolean' ? x.payload.correct : null,
+        firstTry: typeof x.payload?.firstTry === 'boolean' ? x.payload.firstTry : null,
+        score: Number.isFinite(Number(x.payload?.score)) ? Number(x.payload.score) : null,
+        durationMs: Number.isFinite(Number(x.payload?.durationMs)) ? Number(x.payload.durationMs) : null,
+        metadata: x.payload?.metadata || {}
       }));
-      const { error } = await window.supa
-        .from('activity_events')
-        .upsert(rows, { onConflict:'player_id,client_event_id', ignoreDuplicates:true });
-      if (error) return { ok:false, error:error.message, sent };
+      let res;
+      try {
+        res = await window.KCCloud.sendEvents(rows);
+      } catch (err) {
+        return { ok: false, error: err?.message || 'network_error', sent };
+      }
+      if (!res || !res.ok) {
+        return { ok: false, error: res?.error || 'server_error', sent };
+      }
+      const sentIds = new Set(activity.map(x => x.id));
+      saveQueue(loadQueue().filter(x => !sentIds.has(x.id)));
       sent += activity.length;
     }
+
     if (progressRows.length) {
-      const rows = progressRows.map(x => ({ player_id:id, ...x.payload }));
-      const { error } = await window.supa.from('player_progress').upsert(rows, { onConflict:'player_id,grade_level,subject_key,unit_key' });
-      if (error) return { ok:false, error:error.message, sent };
+      const rows = progressRows.map(x => ({
+        gradeLevel: x.payload?.gradeLevel ?? null,
+        subjectKey: x.payload?.subjectKey ?? null,
+        unitKey: x.payload?.unitKey ?? null,
+        mastery: Number.isFinite(Number(x.payload?.mastery)) ? Number(x.payload.mastery) : 0,
+        stars: Number.isFinite(Number(x.payload?.stars)) ? Number(x.payload.stars) : 0,
+        attempts: Number.isFinite(Number(x.payload?.attempts)) ? Number(x.payload.attempts) : 0,
+        correct: Number.isFinite(Number(x.payload?.correct)) ? Number(x.payload.correct) : 0,
+        firstTryCorrect: Number.isFinite(Number(x.payload?.firstTryCorrect)) ? Number(x.payload.firstTryCorrect) : 0,
+        metadata: x.payload?.metadata || {}
+      }));
+      let res;
+      try {
+        res = await window.KCCloud.sendRows(rows);
+      } catch (err) {
+        return { ok: false, error: err?.message || 'network_error', sent };
+      }
+      if (!res || !res.ok) {
+        return { ok: false, error: res?.error || 'server_error', sent };
+      }
+      const sentIds = new Set(progressRows.map(x => x.id));
+      saveQueue(loadQueue().filter(x => !sentIds.has(x.id)));
       sent += progressRows.length;
     }
+
     if (goals.length) {
-      const rows = goals.map(x => ({ player_id:id, goal_date:x.payload.goalDate, target_questions:x.payload.targetQuestions, completed_questions:x.payload.completedQuestions, completed:x.payload.completed, metadata:x.payload.metadata || {} }));
-      const { error } = await window.supa.from('daily_goals').upsert(rows, { onConflict:'player_id,goal_date' });
-      if (error) return { ok:false, error:error.message, sent };
+      const rows = goals.map(x => ({
+        goalDate: x.payload?.goalDate || new Date().toISOString().slice(0, 10),
+        targetQuestions: Number.isFinite(Number(x.payload?.targetQuestions)) ? Number(x.payload.targetQuestions) : 0,
+        completedQuestions: Number.isFinite(Number(x.payload?.completedQuestions)) ? Number(x.payload.completedQuestions) : 0,
+        completed: !!x.payload?.completed,
+        metadata: x.payload?.metadata || {}
+      }));
+      let res;
+      try {
+        res = await window.KCCloud.sendGoals(rows);
+      } catch (err) {
+        return { ok: false, error: err?.message || 'network_error', sent };
+      }
+      if (!res || !res.ok) {
+        return { ok: false, error: res?.error || 'server_error', sent };
+      }
+      const sentIds = new Set(goals.map(x => x.id));
+      saveQueue(loadQueue().filter(x => !sentIds.has(x.id)));
       sent += goals.length;
     }
-    if (sent) {
-      const sentIds = new Set(scopedQueue.filter(x => ['activity','progress','daily-goal'].includes(x.type)).map(x => x.id));
-      saveQueue(queue.filter(x => !sentIds.has(x.id)));
-    }
-    return { ok:true, sent, remaining:loadQueue().length };
+
+    return { ok: true, sent, remaining: loadQueue().length };
   }
 
   async function fetchNormalizedProgress() {
-    const id = playerId();
-    if (!id || !window.supa) return { ok:false, rows:[], reason:'normalized auth not linked' };
-    const { data, error } = await window.supa
-      .from('player_progress')
-      .select('grade_level,subject_key,unit_key,mastery,stars,attempts,correct,first_try_correct,metadata,updated_at')
-      .eq('player_id', id)
-      .order('updated_at', { ascending:false });
-    return error ? { ok:false, rows:[], error:error.message } : { ok:true, rows:data || [] };
+    if (!isCloudLinked()) return { ok: false, rows: [], reason: 'normalized auth not linked', error: 'normalized auth not linked' };
+    try {
+      const res = await window.KCCloud.report(30);
+      if (!res || !res.ok) {
+        return { ok: false, rows: [], error: res?.error || 'server_error' };
+      }
+      return { ok: true, rows: res.progress || [] };
+    } catch (err) {
+      return { ok: false, rows: [], error: err?.message || 'server_error' };
+    }
   }
 
   async function fetchRecentActivity(days) {
-    const id = playerId();
-    if (!id || !window.supa) return { ok:false, rows:[], reason:'normalized auth not linked' };
-    const since = new Date(Date.now() - Math.max(1, Number(days) || 7) * 86400000).toISOString();
-    const { data, error } = await window.supa
-      .from('activity_events')
-      .select('client_event_id,grade_level,subject_key,unit_key,event_type,correct,first_try,score,duration_ms,metadata,created_at')
-      .eq('player_id', id)
-      .gte('created_at', since)
-      .order('created_at', { ascending:false })
-      .limit(500);
-    return error ? { ok:false, rows:[], error:error.message } : { ok:true, rows:data || [] };
+    if (!isCloudLinked()) return { ok: false, rows: [], reason: 'normalized auth not linked', error: 'normalized auth not linked' };
+    const d = Math.max(1, Number(days) || 7);
+    const sinceMs = Date.now() - d * 86400000;
+    const sinceIso = new Date(sinceMs).toISOString();
+    try {
+      const res = await window.KCCloud.report(d);
+      if (!res || !res.ok) {
+        return { ok: false, rows: [], error: res?.error || 'server_error' };
+      }
+      const rows = (res.events || []).filter(row => isAfterSince(row.created_at, sinceMs, sinceIso));
+      return { ok: true, rows };
+    } catch (err) {
+      return { ok: false, rows: [], error: err?.message || 'server_error' };
+    }
   }
 
   async function fetchSkillActivity(days) {
-    const id = playerId();
-    if (!id || !window.supa) return { ok:false, rows:[], reason:'normalized auth not linked' };
-    const since = new Date(Date.now() - Math.max(1, Number(days) || 30) * 86400000).toISOString();
-    const { data, error } = await window.supa
-      .from('activity_events')
-      .select('client_event_id,grade_level,subject_key,unit_key,event_type,correct,first_try,score,metadata,created_at')
-      .eq('player_id', id)
-      .gte('created_at', since)
-      .not('metadata->>skillId','is',null)
-      .order('created_at', { ascending:true })
-      .limit(2000);
-    return error ? { ok:false, rows:[], error:error.message } : { ok:true, rows:data || [] };
+    if (!isCloudLinked()) return { ok: false, rows: [], reason: 'normalized auth not linked', error: 'normalized auth not linked' };
+    const d = Math.max(1, Number(days) || 30);
+    const sinceMs = Date.now() - d * 86400000;
+    const sinceIso = new Date(sinceMs).toISOString();
+    try {
+      const res = await window.KCCloud.report(d);
+      if (!res || !res.ok) {
+        return { ok: false, rows: [], error: res?.error || 'server_error' };
+      }
+      const rows = [];
+      for (const row of (res.events || [])) {
+        if (!isAfterSince(row.created_at, sinceMs, sinceIso)) continue;
+        const meta = typeof row.metadata === 'string' ? safeJson(row.metadata, null) : row.metadata;
+        if (meta && typeof meta === 'object' && meta.skillId != null && meta.skillId !== '') {
+          rows.push(typeof row.metadata === 'string' ? Object.assign({}, row, { metadata: meta }) : row);
+        }
+      }
+      return { ok: true, rows };
+    } catch (err) {
+      return { ok: false, rows: [], error: err?.message || 'server_error' };
+    }
   }
 
   function status() {
@@ -240,7 +316,8 @@
     return {
       version: VERSION,
       online: navigator.onLine !== false,
-      hasSupabase: !!window.supa,
+      hasCloud: isCloudLinked(),
+      hasSupabase: false,
       account: account ? { name: account.name || null } : null,
       queuedEvents: loadQueue().length,
       snapshot: !!readSnapshot()
