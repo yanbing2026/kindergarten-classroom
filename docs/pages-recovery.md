@@ -45,16 +45,24 @@ curl -s -H "Authorization: Bearer $KINDERGARTEN_CLASSROOM_CF_API_TOKEN" \
 JWT=$(python3 -c "import json;print(json.load(open('/tmp/ut.json'))['result']['jwt'])")
 CF_UPLOAD_JWT="$JWT" CF_PROJECT=blockquest-classroom python3 ~/.hermes/scripts/pages_deploy.py upload /tmp/kc-deploy
 
-# 2) 用 API token 直接建 deployment（manifest 是 {"/path": "32位 sha256"} 的 JSON 文件）
-python3 ~/.hermes/scripts/pages_deploy.py manifest /tmp/kc-deploy > /tmp/kc-manifest.json
+# 2) 用 API token 直接建 deployment
+#    ⚠️ pages_deploy.py manifest 输出的是 {"branch":…,"manifest":{…}} 包装（给连接器 JS 片段用的）；
+#    REST deployments 端点要的是**裸的** {路径: 哈希} 映射。发包装会返回 success，
+#    但生成的 deployment 资产集为空："/" 仍服务上一个部署的字节，而所有直接路径 404。
+python3 ~/.hermes/scripts/pages_deploy.py manifest /tmp/kc-deploy \
+  | python3 -c "import json,sys;print(json.dumps(json.load(sys.stdin)['manifest'],separators=(',',':')))" \
+  > /tmp/kc-manifest.json
 curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/$A/pages/projects/blockquest-classroom/deployments" \
   -H "Authorization: Bearer $KINDERGARTEN_CLASSROOM_CF_API_TOKEN" \
   -F "manifest=</tmp/kc-manifest.json;type=application/json" -F "branch=main" \
   -F "commit_hash=$(git rev-parse origin/main)"
 
-# 3) 等 latest_stage=deploy/success，再验字节
+# 3) 等 latest_stage=deploy/success，再验字节（部署后约 45 秒内边缘可能仍给旧字节/404，复验一次）
 python3 ~/.hermes/scripts/pages_deploy.py verify /tmp/kc-deploy https://blockquest-classroom.pages.dev
 ```
+
+上面整套（含 `.github`/`.gitignore` 排除、轮询、复验、哈希比对）已封装成一条命令：
+**`~/.hermes/scripts/kc_deploy_pages.sh [ref]`**（默认 `origin/main`）。
 
 两个 token 的判据不同：upload JWT 只能打 `/pages/assets/*`（拿它建 deployment 会 9106）；
 **账号级 token 会让 `/user/tokens/verify` 返回 `1000 Invalid API Token`，这是预期的**，只要

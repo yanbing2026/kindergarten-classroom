@@ -84,19 +84,42 @@ jobs:
             node "$test_script" || overall=1
           done
 
-          python3 tools/validate_content.py || \
-            echo "::notice::content validator reported issues (informational, not blocking — see AGENTS.md)"
+          # Blocking, same contract as validate.yml: a green deploy must mean the
+          # curriculum contracts hold, not that a warning was printed and ignored.
+          python3 tools/validate_content.py || overall=1
 
           exit $overall
 
-      - name: Stage deployment tree (tracked files only, no .git)
+      - name: Stage deployment tree (tracked files only, no .git/.github)
         run: |
           mkdir -p "$RUNNER_TEMP/_site"
-          git archive HEAD | tar -x -C "$RUNNER_TEMP/_site"
+          git archive HEAD | tar -x -C "$RUNNER_TEMP/_site" --exclude='.github' --exclude='.gitignore'
+          echo "staged $(find "$RUNNER_TEMP/_site" -type f | wc -l) files"
 
       - name: Deploy to Cloudflare Pages
+        id: deploy
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy ${{ runner.temp }}/_site --project-name blockquest-classroom --branch main --commit-hash ${{ github.sha }} --commit-dirty
+
+      # A green wrangler run is not proof the site changed: verify the served bytes
+      # for the two files that decide what users actually run (HTML + SW cache id).
+      - name: Verify served bytes match the built tree
+        run: |
+          set -e
+          base=https://blockquest-classroom.pages.dev
+          for f in index.html sw.js; do
+            want=$(sha256sum "$RUNNER_TEMP/_site/$f" | cut -d' ' -f1)
+            for attempt in 1 2 3 4 5; do
+              got=$(curl -sL --max-time 20 "$base/$f" | sha256sum | cut -d' ' -f1)
+              [ "$got" = "$want" ] && break
+              echo "attempt $attempt: /$f mismatch (edge cache), retrying in 15s"; sleep 15
+            done
+            if [ "$got" != "$want" ]; then
+              echo "::error::/$f served bytes differ from the built tree (want $want got $got)"
+              exit 1
+            fi
+            echo "/$f OK $want"
+          done
