@@ -13,8 +13,9 @@
 
 | 件 | 位置 | 说明 |
 |---|---|---|
-| Worker | `worker/`（`src/index.js`、`src/auth.js`、`src/store.js`） | 唯一的 API 入口，`https://blockquest-api.yanbing2004.workers.dev` |
-| 数据库 | D1 `blockquest-classroom` | SQLite；schema 见 `worker/schema.sql` |
+| Worker | `worker/`（`src/index.js`、`src/auth.js`、`src/store.js`） | 唯一的 API 入口，`https://blockquest-api.yanbing2004.workers.dev`（已部署 2026-11-01） |
+| 数据库 | D1 `blockquest-classroom` | SQLite；`schema.sql` 已应用，database_id `d57c6538-1d80-4e27-9b16-10f44cf05f69` |
+| 密钥 | `wrangler secret put TOKEN_SECRET` | 本机副本 `~/.hermes/state/kc_worker_secret.txt`（600） |
 | 客户端 | `js/cloud-api.js`（新）+ `index.html` + `js/data-layer.js` | 用 `fetch` 替代 supabase-js |
 
 ## 不变的东西（务必保持）
@@ -43,7 +44,9 @@
 | POST | `/pin` | Bearer | `{oldVerifier,newVerifier,newSalt}` | `{ok:true,token}`（旧 token 立即失效） |
 | DELETE | `/player` | Bearer | `{pinVerifier}` | `{ok:true}` |
 | POST | `/events` | Bearer | `{events:[…]}`（≤50/次） | `{ok:true,accepted}` |
-| GET | `/report?days=30` | Bearer | — | `{ok:true,progress:[…],events:[…]}` |
+| POST | `/rows` | Bearer | `{rows:[…]}`（≤200/次，camelCase 字段） | `{ok:true,saved}` |
+| POST | `/goals` | Bearer | `{goals:[…]}`（≤50/次，camelCase 字段） | `{ok:true,saved}` |
+| GET | `/report?days=30` | Bearer | — | `{ok:true,progress:[…],events:[…],goals:[…]}` |
 
 - `name`：1–20 字符，大小写不敏感唯一（存 `name_key = lower(trim(name))`）。
 - `progress`：任意 JSON 对象（孩子进度包），服务端只做 `JSON.stringify` 存储与长度上限（64 KB）。
