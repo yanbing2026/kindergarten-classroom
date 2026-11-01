@@ -22,10 +22,11 @@
 | §3.4 刷新后云同步空转 | ✅ | PIN verifier 改为 `sessionStorage`；无凭据时显示"重新登录"，停止 5 秒重试 |
 | §3.5 `saveProgress` 兜底 | ✅ | `test_account_flow.js` 覆盖配额异常 + 只提示一次 |
 | §3.6 账号安全 | ✅（仓库侧） | `supabase/migrations/009_account_security.sql`：枚举防护、限流、不再回传凭据、`rotate_pin`、`delete_player`、`release_player_auth` |
-| §4 离线壳 | ✅ | `APP_SHELL` 31 项；按路径导航回退；`test_offline_shell.js`；图片缓存独立版本；更新提示 |
+| §4 离线壳 | ✅ | `APP_SHELL` 33 项（含按需加载的 G1/G2 题库）；按路径导航回退；`test_offline_shell.js`；图片缓存独立版本；更新提示 |
 | §5.2 G1 元数据 + 每单元 ≥8 题 | ✅ | `data/grade-1/{extra,core}.js`；G1 主科 192 题；`test_content_depth.js` |
 | §5.3 21 KB 死代码 | ✅ | 内联 G1 数学题库已删；`test_content_depth.js` 防回潮 |
 | §5.4 校验器 / CI | ✅ | 按文件查重、跳过 `L\d+`、纳入 G1/G2；CI 自动发现全部 `scripts/test_*.js`，内容校验改为阻断 |
+| §6.2 年级题库按需加载 | ✅（部分） | `index.html` 不再同步加载 G1/G2 题库；进入课程时 `ensureGradeData()` 注入脚本，先渲染加载态，失败可重试；`test_offline_shell.js` 验证懒加载题库仍在离线缓存 |
 | §6.3 标题可读性 / manifest | ✅（部分） | 年级题目标题改用 clear 字体；manifest 增加 `id`、横竖屏自适应、年级 shortcuts |
 
 仍需人工 / 后续处理：
@@ -33,8 +34,7 @@
 - **§2.1 实际重新部署**：本机没有 Cloudflare 连接器凭据，无法执行 `pages_deploy.py` + 创建 deployment；
   必须由有权限的人按 `docs/pages-recovery.md` 部署并贴出 4 个哈希。
 - **线上 Supabase 迁移 008 / 009**：需要在 Supabase SQL Editor 执行并确认匿名登录已开启；仓库内无法验证。
-- **§6.2 首屏按需加载 / CSS 拆分**：未在本次改动中重构（涉及路由与同步渲染，需浏览器回归）；
-  本次只删了 21 KB 死代码。**§6.3 可访问性细化**同样留作后续。
+- **§6.2 CSS 拆分**：题库按需加载已完成，但首屏 CSS 仍未拆分；**§6.3 可访问性细化**同样留作后续。
 - **§9 PR-G 家长自助改 PIN / 删号 UI**：RPC 已在 009 就绪，界面尚未接入。
 
 ---

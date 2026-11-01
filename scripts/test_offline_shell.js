@@ -64,6 +64,20 @@ for (const [file, dir] of pages) {
 }
 console.log('✓ every local script/stylesheet used by all five entry pages is precached');
 
+// 1b. Grade 1/2 banks are lazy-loaded, so they are not <script> tags in
+//     index.html. They must still be precached: the first offline visit to a
+//     lesson would otherwise fail after the service worker took control.
+const homeHtml = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+const lazyMatch = homeHtml.match(/const\s+GRADE_DATA_SCRIPTS\s*=\s*(\{[\s\S]*?\n\s*\});/);
+assert(lazyMatch, 'index.html must declare GRADE_DATA_SCRIPTS');
+const lazyScripts = [...lazyMatch[1].matchAll(/['"](data\/grade-[12]\/[^'"]+)['"]/g)].map((m) => m[1]);
+assert(lazyScripts.length >= 13, `expected >= 13 lazy grade scripts, found ${lazyScripts.length}`);
+for (const rel of lazyScripts) {
+    assert(shellSet.has(rel), `lazy bank "${rel}" is not in APP_SHELL; first offline lesson would fail`);
+    assert(fs.existsSync(path.join(ROOT, rel)), `lazy bank "${rel}" does not exist on disk`);
+}
+console.log(`✓ all ${lazyScripts.length} lazy grade banks are precached for offline lessons`);
+
 // 2. Every precached path exists on disk (catches typo-only shells).
 for (const entry of shell) {
     if (entry === './') continue;

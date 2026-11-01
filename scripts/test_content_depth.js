@@ -125,7 +125,14 @@ console.log('✓ no duplicate prompts within a Grade 1 unit');
 const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 assert(!html.includes('"unit": "Addition & Subtraction Within 20"'),
     'index.html still contains the dead inline Grade 1 math bank');
-assert(/const\s+GRADE1_INTERACTIVE\s*=\s*\{[\s\S]{0,400}?math:\s*window\.KC_G1_MATH/.test(html),
-    'GRADE1_INTERACTIVE.math must come from window.KC_G1_MATH');
+assert(/function\s+buildGrade1Interactive\(\)[\s\S]{0,400}?math:\s*buildGrade1MathBank\(\)/.test(html),
+    'GRADE1_INTERACTIVE.math must come from buildGrade1MathBank()');
+assert(/function\s+buildGrade1MathBank\(\)[\s\S]{0,400}?window\.KC_G1_MATH/.test(html),
+    'buildGrade1MathBank must read window.KC_G1_MATH');
+assert(!/<script[^>]+src=["']data\/grade-[12]\//.test(html),
+    'Grade 1/2 banks must be lazy-loaded, not eager <script> tags in index.html');
+assert(/const\s+GRADE_DATA_SCRIPTS\s*=\s*\{[\s\S]{0,900}?data\/grade-1\/core\.js[\s\S]{0,400}?data\/grade-2\/core\.js/.test(html),
+    'GRADE_DATA_SCRIPTS must list every lazy Grade 1/2 bank');
 console.log('✓ Grade 1 math has a single source (data/grade-1/math.js), no dead inline copy');
+console.log('✓ Grade 1/2 banks are lazy-loaded through GRADE_DATA_SCRIPTS');
 

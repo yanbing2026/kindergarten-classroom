@@ -1,6 +1,6 @@
 // App version — bump this whenever ANY precached resource changes (HTML,
 // JS, CSS, question banks). Keep identical to APP_VERSION in index.html.
-const APP_VERSION = 'v2-20261101-audit-complete';
+const APP_VERSION = 'v2-20261101-lazy-banks';
 const CACHE_NAME = `kc-${APP_VERSION}`;
 
 // Images have their own version so a code/content release does not force
