@@ -11,6 +11,8 @@ Validates educational data in index.html for:
 
 import re
 import os
+import shutil
+import subprocess
 from pathlib import Path
 from collections import defaultdict
 
@@ -260,6 +262,63 @@ def validate_math_levels(text):
     return []
 
 
+def validate_grade_banks():
+    """Validate Grade 1/2 question banks by running their runtime contract test.
+
+    The banks are JavaScript modules with a build layer (extra data + generated
+    ids), so regex-parsing them in Python would check the source shape rather
+    than what the app actually loads. Reuse the Node test when available; CI
+    always has Node, and local runs without Node get a clear skip message.
+    """
+    node = shutil.which("node")
+    if not node:
+        print("  ⚠ skipped: node not found (Grade 1/2 banks are validated in CI)")
+        return []
+    script = PROJECT_ROOT / "scripts" / "test_content_depth.js"
+    if not script.exists():
+        return [f"FATAL: {script.relative_to(PROJECT_ROOT)} not found"]
+    result = subprocess.run(
+        [node, str(script)],
+        cwd=PROJECT_ROOT,
+        text=True,
+        capture_output=True,
+    )
+    output = (result.stdout + result.stderr).strip()
+    if output:
+        for line in output.splitlines():
+            print(f"  {line}")
+    if result.returncode != 0:
+        return ["Grade 1/2 content depth test failed (see output above)"]
+    return []
+
+
+def duplicate_id_issues():
+    """Report duplicate ids per source file, ignoring level names such as L1.
+
+    The old check scanned index.html and every data file as one global pool,
+    so the letter "L" and level names like "L1" looked like duplicates. Scope
+    the check to each file and skip level-shaped ids; real duplicates inside
+    one bank are still reported.
+    """
+    sources = [INDEX_FILE]
+    for subdir in ("grade-1", "grade-2"):
+        sources.extend(sorted((PROJECT_ROOT / "data" / subdir).rglob("*.js")))
+    issues = []
+    for source in sources:
+        if not source.exists():
+            continue
+        ids = re.findall(r"id\s*:\s*'([^']+)'", source.read_text(encoding="utf-8"))
+        counts = {}
+        for item_id in ids:
+            if re.fullmatch(r"L\d+", item_id) or len(item_id) < 3:
+                continue
+            counts[item_id] = counts.get(item_id, 0) + 1
+        for item_id, count in counts.items():
+            if count > 1:
+                issues.append(f"{source.relative_to(PROJECT_ROOT)}: ID '{item_id}' appears {count} times")
+    return issues
+
+
 def main():
     print("=" * 60)
     print("Kindergarten Classroom — Content Validation")
@@ -316,21 +375,19 @@ def main():
 
     # Check for common data issues
     print("\n--- Common Issues ---")
-    issues = []
-    # Duplicate IDs across entire file
-    all_ids = re.findall(r"id\s*:\s*'([^']+)'", text)
-    id_counts = {}
-    for i in all_ids:
-        id_counts[i] = id_counts.get(i, 0) + 1
-    dups = {k: v for k, v in id_counts.items() if v > 1}
-    if dups:
-        for k, v in list(dups.items())[:10]:
-            issues.append(f"ID '{k}' appears {v} times")
+    issues = duplicate_id_issues()
     if issues:
-        for e in issues:
-            print(f"  ⚠ {e}")
+        for e in issues[:20]:
+            print(f"  ✗ {e}")
+        all_errors.extend(issues)
     else:
-        print("  ✓ No duplicate IDs")
+        print("  ✓ No duplicate IDs within a source file")
+
+    print("\n--- GRADE 1 / GRADE 2 BANKS ---")
+    errors = validate_grade_banks()
+    all_errors.extend(errors)
+    if not errors:
+        print("  ✓ OK")
 
     print("\n" + "=" * 60)
     if all_errors:

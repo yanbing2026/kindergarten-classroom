@@ -106,25 +106,9 @@ jobs:
           done
 
           echo "### Unit tests" | tee -a validation-report/summary.md
-          TEST_SCRIPTS=(
-            "scripts/test_data_extraction.js"
-            "scripts/test_math_adaptive.js"
-            "scripts/test_math_variety.js"
-            "scripts/test_build_question_weights.js"
-            "scripts/test_progress_stores.js"
-            "scripts/test_render_state_preservation.js"
-            "scripts/test_a11y_concrete_gaps.js"
-            "scripts/test_image_references.js"
-            "scripts/test_freeplay_filter.js"
-            "scripts/test_round_variety.js"
-            "scripts/test_thin_levels.js"
-            "scripts/test_choice_order.js"
-            "scripts/test_g1_math_interactions.js"
-            "scripts/test_app_shell.js"
-            "scripts/test_html_structure.js"
-            "scripts/test_grade2_curriculum_readiness.js"
-          )
-          for test_script in "${TEST_SCRIPTS[@]}"; do
+          # Auto-discover tests so a new scripts/test_*.js cannot be added
+          # without running in CI (the old hand-maintained list skipped them).
+          for test_script in scripts/test_*.js; do
             safe_name=$(echo "$test_script" | tr '/' '_' | tr ' ' '_')
             out="validation-report/${safe_name}.out"
             node "$test_script" >"$out" 2>&1
@@ -141,7 +125,9 @@ jobs:
             fi
           done
 
-          # Optional: curriculum content validator (non-blocking, informational)
+          # Curriculum content validator. Blocking: a green build must mean the
+          # curriculum contracts (duplicate ids, answer-in-choices, G1/G2
+          # depth) actually hold, not that a warning was printed and ignored.
           if [ -f tools/validate_content.py ]; then
             echo "### Curriculum content validator" | tee -a validation-report/summary.md
             python3 tools/validate_content.py >validation-report/content-validator.out 2>&1
@@ -151,7 +137,8 @@ jobs:
             tail -n 50 validation-report/content-validator.out >> validation-report/summary.md
             echo '```' >> validation-report/summary.md
             if [ $cstatus -ne 0 ]; then
-              echo "- ⚠️ content validator reported issues (informational, not failing build)" | tee -a validation-report/summary.md
+              overall=1
+              echo "- ❌ content validator reported issues" | tee -a validation-report/summary.md
             else
               echo "- ✅ content validator passed" | tee -a validation-report/summary.md
             fi
