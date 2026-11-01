@@ -118,62 +118,70 @@ console.log('✓ progressHasData ignores empty shells and detects real work');
     console.log('✓ first-time login into an empty cloud account adopts device progress');
 }
 
-// 6. second login on the same tablet must reuse the existing anonymous
-//    session instead of signing out and creating an identity that cannot be
-//    linked to the same player.
+// 6. second login on the same tablet links the new player identity
+//    and flushes normalized data.
 {
     const authSrc = 'async ' + extractFunction(html, 'ensureNormalizedAuth');
-    const makeAuth = (supa) => new Function(
-        'supa', 'currentPinVerifier', 'window',
+    const makeAuth = (cloudApi, currentPinVerifier, kcData) => new Function(
+        'cloudApi', 'currentPinVerifier', 'window',
         `${authSrc};return ensureNormalizedAuth;`
-    )(supa, 'verifier', {
-        KCData: { setPlayerId(id) { this.id = id; }, flushNormalized: async () => ({ ok: true }) }
+    )(cloudApi, currentPinVerifier || 'verifier', {
+        KCData: kcData || { id: '', flushed: 0, setPlayerId(id) { this.id = id; }, flushNormalized: async () => ({ ok: true }) }
     });
 
-    let signOuts = 0, anonCalls = 0, claims = 0;
-    const supa = {
-        auth: {
-            getSession: async () => ({ data: { session: { access_token: 'existing' } } }),
-            signOut: async () => { signOuts++; },
-            signInAnonymously: async () => { anonCalls++; return { data: { session: { access_token: 'new' } } }; }
-        },
-        rpc: async (name) => {
-            assert.strictEqual(name, 'claim_player_auth');
-            claims++;
-            return { data: 'player-1', error: null };
+    const cloudCalls = [];
+    let currentToken = 'token-player-1';
+    const kcData = {
+        id: '',
+        flushed: 0,
+        setPlayerId(id) { this.id = id; },
+        flushNormalized: async () => { kcData.flushed++; return { ok: true }; }
+    };
+    const cloudApi = {
+        hasToken: () => !!currentToken,
+        me: async () => {
+            cloudCalls.push({ method: 'me', token: currentToken });
+            return currentToken === 'token-player-1'
+                ? { ok: true, name: 'Kid1', playerId: 'player-1', progress: {} }
+                : { ok: true, name: 'Kid2', playerId: 'player-2', progress: {} };
         }
     };
-    makeAuth(supa)().then((result) => {
+
+    makeAuth({ hasToken: () => false }, 'verifier', kcData)('Kid1').then((res) => {
+        assert.strictEqual(res.ok, false);
+        assert.strictEqual(res.reason, 'missing credentials');
+        assert.strictEqual(cloudCalls.length, 0, 'must not call me() without token');
+
+        return makeAuth(cloudApi, 'verifier', kcData)('Kid1');
+    }).then((result) => {
         assert.strictEqual(result.ok, true);
         assert.strictEqual(result.playerId, 'player-1');
-        assert.strictEqual(anonCalls, 0, 'must reuse the existing anonymous session');
-        assert.strictEqual(signOuts, 0, 'must not sign out a linked session');
-        assert.strictEqual(claims, 1);
-        console.log('✓ second login reuses the existing anonymous session');
+        assert.strictEqual(kcData.id, 'player-1');
+        assert.strictEqual(kcData.flushed, 1);
+        assert.strictEqual(cloudCalls.length, 1);
+        console.log('✓ first login links player identity to KCData');
 
-        // Shared tablet: another player is linked. Retry once with a clean
-        // identity instead of silently failing.
-        let attempt = 0;
-        const shared = {
-            auth: {
-                getSession: async () => ({ data: { session: { access_token: 'existing' } } }),
-                signOut: async () => { signOuts++; },
-                signInAnonymously: async () => { anonCalls++; return { data: { session: { access_token: 'new' } } }; }
-            },
-            rpc: async () => {
-                attempt++;
-                return attempt === 1
-                    ? { data: null, error: { message: 'player account is already linked' } }
-                    : { data: 'player-2', error: null };
-            }
-        };
-        return makeAuth(shared)();
+        // Shared tablet: another player logs in. Updates player ID and flushes.
+        currentToken = 'token-player-2';
+        return makeAuth(cloudApi, 'verifier', kcData)('Kid2');
     }).then((result) => {
         assert.strictEqual(result.ok, true);
         assert.strictEqual(result.playerId, 'player-2');
-        assert.strictEqual(signOuts, 1, 'only the conflicting session is replaced');
-        assert.strictEqual(anonCalls, 1);
-        console.log('✓ conflicting shared-tablet session is replaced once, then linked');
+        assert.strictEqual(kcData.id, 'player-2', 'second login must update KCData playerId');
+        assert.strictEqual(kcData.flushed, 2, 'second login must flush normalized events');
+        assert.strictEqual(cloudCalls.length, 2);
+        console.log('✓ second login on the same tablet links the new player identity');
+
+        // Expired token rejects auth
+        const expiredApi = {
+            hasToken: () => true,
+            me: async () => ({ ok: false, error: 'token_expired' })
+        };
+        return makeAuth(expiredApi, 'verifier', kcData)('Kid2');
+    }).then((result) => {
+        assert.strictEqual(result.ok, false);
+        assert.strictEqual(result.reason, 'token_expired');
+        console.log('✓ expired token rejection is preserved');
     }).catch((error) => {
         console.error(error);
         process.exitCode = 1;

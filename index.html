@@ -55,13 +55,13 @@
 
     <div class="container" id="app" tabindex="-1"></div>
 
-    <script id="supabaseScript" async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="window.__initSupabase&&window.__initSupabase()"></script>
+    <script src="./js/cloud-api.js"></script>
     <script src="./js/data-layer.js"></script>
     <script src="./js/skill-engine.js"></script>
     <script src="./js/blipola-runtime.js"></script>
     <script>
     // ---------- App version ----------
-    const APP_VERSION = 'v2-20261101-audit-final';
+    const APP_VERSION = 'v2-20261101-d1';
 
     // ---------- Debug / Dev Mode ----------
     // Hidden diagnostic screen for parents and developers.
@@ -229,30 +229,12 @@
     function getAccounts(){try{return JSON.parse(localStorage.getItem('kc_accounts_v1')||'{}')}catch(e){return {};}}
     function getCurrentAccount(){return localStorage.getItem('kc_current_account')||'';}
     function accountProgressKey(name){return 'kc_account_progress_v1_'+name.toLowerCase();}
-    // ---------- Supabase cloud accounts (name+PIN stored server-side) ----------
-    let supa = null;
-    function initSupabase(deferred) {
-        if (supa || !window.supabase) return;
-        try {
-            supa = window.supabase.createClient('https://sjqhcpbdgaeapljbllhp.supabase.co','sb_publishable_DMSaun0u7qH2pAQzupS8Ww_G780gpm9');
-            window.supa = supa;
-            if (deferred) {
-                if (window.KCData) window.KCData.flushNormalized().catch(() => {});
-            }
-        } catch (e) {
-            console.warn('Supabase init failed', e);
-        }
-    }
-    initSupabase(false);
-    window.supa = supa;
-    window.__initSupabase = () => initSupabase(true);
-    const supaScript = document.getElementById('supabaseScript') || document.querySelector('script[src*="supabase-js"]');
-    if (supaScript && !supa) {
-        supaScript.addEventListener('load', () => initSupabase(true));
-        supaScript.addEventListener('error', () => {
-            console.warn('Supabase CDN unreachable, running in offline mode');
-        });
-    }
+    // ---------- Cloud accounts (name+PIN stored server-side) ----------
+    let cloudApi = window.KCCloud || null;
+    function initCloud(){ cloudApi = window.KCCloud || null; if(cloudApi && window.KCData){ window.KCData.flushNormalized().catch(()=>{}); } }
+    initCloud();
+    window.__initCloud = initCloud;
+    window.supa = null;   // 兼容旧代码的探测；真实传输层是 cloudApi
     function getCurrentAccountName(){
         const key=getCurrentAccount();
         if(!key)return '';
@@ -266,7 +248,7 @@
         localStorage.setItem('kc_current_account',key);
         return key;
     }
-    // PIN protection: the PIN is never stored in localStorage or sent to Supabase as plaintext.
+    // PIN protection: the PIN is never stored in localStorage or sent to the cloud as plaintext.
     const PIN_HASH_ITERATIONS=120000;
     function bytesToBase64(bytes){let s='';for(let i=0;i<bytes.length;i+=0x8000)s+=String.fromCharCode(...bytes.subarray(i,i+0x8000));return btoa(s);}
     function base64ToBytes(value){const s=atob(value),out=new Uint8Array(s.length);for(let i=0;i<s.length;i++)out[i]=s.charCodeAt(i);return out;}
@@ -310,65 +292,65 @@
     }
     function clearLoginFailures(key){delete loginAttemptState[key];}
     async function cloudCreate(name,pin,progressObj){
-        const pin_salt=makePinSalt();
-        const pin_hash=await derivePinVerifier(pin,pin_salt);
-        const {data,error}=await supa.rpc('create_player',{
-            p_name:name,p_pin_hash:pin_hash,p_pin_salt:pin_salt,p_progress:progressObj||{}
-        });
-        if(data&&data[0]) setPinVerifier(pin_hash);
-        return {data:data&&data[0]?data[0]:null,error};
+        if(!cloudApi)return {ok:false,error:'offline'};
+        try{
+            const sRes=await cloudApi.salt(name);
+            if(!sRes||!sRes.ok)return {ok:false,error:sRes?.error||'offline'};
+            const verifier=await derivePinVerifier(pin,sRes.salt);
+            const res=await cloudApi.create(name,verifier,sRes.salt,progressObj);
+            if(!res||!res.ok)return {ok:false,error:res?.error||'offline'};
+            setPinVerifier(verifier);
+            return {ok:true,data:{name:res.name||name,playerId:res.playerId,progress:progressObj||{}}};
+        }catch(e){
+            return {ok:false,error:e?.message||'offline'};
+        }
     }
     async function cloudLogin(name,pin){
-        const pin_hash=await derivePinVerifier(pin, await getPinSaltForLogin(name));
-        const {data,error}=await supa.rpc('login_player',{p_name:name,p_pin_hash:pin_hash});
-        if(error||!data||!data[0])return null;
-        setPinVerifier(pin_hash);
-        return data[0];
+        if(!cloudApi)return {ok:false,error:'offline'};
+        try{
+            const sRes=await cloudApi.salt(name);
+            if(!sRes||!sRes.ok)return {ok:false,error:sRes?.error||'offline'};
+            const verifier=await derivePinVerifier(pin,sRes.salt);
+            const res=await cloudApi.login(name,verifier);
+            if(!res||!res.ok)return {ok:false,error:res?.error||'offline'};
+            setPinVerifier(verifier);
+            return {ok:true,acct:{name:res.name||name,playerId:res.playerId,progress:res.progress||{}}};
+        }catch(e){
+            return {ok:false,error:e?.message||'offline'};
+        }
     }
     async function ensureNormalizedAuth(name){
-        if(!supa||!currentPinVerifier)return {ok:false,reason:'missing credentials'};
-        const claim=async()=>supa.rpc('claim_player_auth',{p_name:name,p_pin_hash:currentPinVerifier});
+        if(!cloudApi||!cloudApi.hasToken())return {ok:false,reason:'missing credentials'};
         try{
-            const sessionResult=await supa.auth.getSession();
-            let session=sessionResult.data?.session||null;
-            // Reuse the existing anonymous identity first: it is what makes a
-            // second login on the same device succeed. Only create a new
-            // identity when there is no session at all, or when the current
-            // one is already bound to a different player.
-            if(!session){
-                const anon=await supa.auth.signInAnonymously();
-                if(anon.error||!anon.data?.session)return {ok:false,reason:anon.error?.message||'anonymous auth unavailable'};
+            const meRes=await cloudApi.me();
+            if(!meRes||!meRes.ok)return {ok:false,reason:meRes?.error||'me failed'};
+            if(window.KCData){
+                window.KCData.setPlayerId(meRes.playerId);
+                await window.KCData.flushNormalized();
             }
-            let {data,error}=await claim();
-            if(error&&/already linked|another player/i.test(error.message||'')){
-                // Shared tablet: this browser is bound to someone else. Start a
-                // clean identity and try once more. The previous player keeps
-                // their data; only this browser's ownership link is replaced.
-                try{ await supa.auth.signOut(); }catch(_){}
-                const anon=await supa.auth.signInAnonymously();
-                if(anon.error||!anon.data?.session)return {ok:false,reason:anon.error?.message||'anonymous auth unavailable'};
-                ({data,error}=await claim());
-            }
-            if(error||!data)return {ok:false,reason:error?.message||'claim failed'};
-            if(window.KCData) window.KCData.setPlayerId(data);
-            if(window.KCData) await window.KCData.flushNormalized();
-            return {ok:true,playerId:data};
-        }catch(error){ return {ok:false,reason:error?.message||String(error)}; }
+            return {ok:true,playerId:meRes.playerId};
+        }catch(error){
+            return {ok:false,reason:error?.message||String(error)};
+        }
     }
     async function getPinSaltForLogin(name){
-        const {data,error}=await supa.rpc('get_player_salt',{p_name:name});
-        if(error||!data||!data[0]||!data[0].pin_salt)throw new Error('Account not found');
-        return data[0].pin_salt;
+        if(!cloudApi)throw new Error('offline');
+        const res=await cloudApi.salt(name);
+        if(!res||!res.ok||!res.salt)throw new Error(res?.error||'offline');
+        return res.salt;
     }
     async function cloudSaveProgress(name,progressObj){
-        if(!supa||!name)return {ok:false,reason:'unavailable'};
+        if(!cloudApi||!name)return {ok:false,reason:'unavailable'};
         if(!currentPinVerifier)return {ok:false,reason:'reauth'};
         try{
-            const {data,error}=await supa.rpc('save_player_progress',{
-                p_name:name,p_pin_hash:currentPinVerifier,p_progress:progressObj||{}
-            });
-            return error?{ok:false,reason:error.message||'save failed'}:{ok:data===true};
-        }catch(error){return {ok:false,reason:error?.message||String(error)};}
+            const res=await cloudApi.saveProgress(progressObj);
+            if(res&&res.ok)return {ok:true};
+            const err=res?.error||'save failed';
+            if(err==='unauthorized'||err==='token_expired')return {ok:false,reason:'reauth'};
+            return {ok:false,reason:err};
+        }catch(error){
+            return {ok:false,reason:error?.message||String(error)};
+        }
     }
     let cloudSyncTimer=null;
     let cloudSyncRetryTimer=null;
@@ -453,7 +435,7 @@
     }
     function closeAccountModal(){const m=document.getElementById('accountModal');if(m)m.style.display='none';}
     function openAccountModal(mode){const m=document.getElementById('accountModal');if(!m)return;const create=mode==='create';m.style.display='grid';m.innerHTML='<div class="account-box"><h2>⛏️ '+(create?'Create Your BlockQuest Account':'Welcome Back!')+'</h2><p>'+(create?'Create a child profile in the cloud.':'Log in to load this profile from the cloud.')+'</p><input id="accountName" maxlength="24" placeholder="Player name"><input id="accountPin" maxlength="6" inputmode="numeric" type="password" placeholder="4–6 digit PIN"><div class="account-actions"><button id="accountSubmit">'+(create?'Create':'Log In')+'</button><button id="accountCancel">Cancel</button></div><div id="accountStatus" class="account-status"></div><div class="account-switch"><button id="accountSwitch">'+(create?'Already have an account? Log in':'New player? Create an account')+'</button></div></div>';document.getElementById('accountSubmit').onclick=()=>submitAccount(mode);document.getElementById('accountCancel').onclick=closeAccountModal;document.getElementById('accountSwitch').onclick=()=>openAccountModal(create?'login':'create');}
-    function submitAccount(mode){const name=(document.getElementById('accountName')?.value||'').trim(),pin=(document.getElementById('accountPin')?.value||'').trim(),status=document.getElementById('accountStatus'),btn=document.getElementById('accountSubmit');if(!/^[A-Za-z0-9 _-]{2,24}$/.test(name)){status.textContent='Use 2–24 letters, numbers, spaces, _ or -.';return;}if(!/^\d{4,6}$/.test(pin)){status.textContent='PIN must be 4–6 digits.';return;}if(!supa){status.textContent='Cloud accounts need an internet connection. Your progress stays saved on this device.';return;}btn.disabled=true;status.textContent='Checking…';
+    function submitAccount(mode){const name=(document.getElementById('accountName')?.value||'').trim(),pin=(document.getElementById('accountPin')?.value||'').trim(),status=document.getElementById('accountStatus'),btn=document.getElementById('accountSubmit');if(!/^[A-Za-z0-9 _-]{2,24}$/.test(name)){status.textContent='Use 2–24 letters, numbers, spaces, _ or -.';return;}if(!/^\d{4,6}$/.test(pin)){status.textContent='PIN must be 4–6 digits.';return;}if(!cloudApi){status.textContent='Cloud accounts need an internet connection. Your progress stays saved on this device.';return;}btn.disabled=true;status.textContent='Checking…';
     (async()=>{
         const key=name.toLowerCase();
         const hadAccount=getCurrentAccount();
@@ -462,8 +444,8 @@
             // {} here used to erase local progress two lines later.
             const localProgress=mergeProgress(progress,null);
             const result=await cloudCreate(name,pin,localProgress);
-            if(result.error){
-                const duplicate=result.error.code==='23505' || /duplicate|unique/i.test(result.error.message||'');
+            if(!result.ok||result.error){
+                const duplicate=result.error==='name_taken';
                 status.textContent=duplicate?'That player name already exists on another device.':'Network error, try again.';
                 btn.disabled=false;return;
             }
@@ -479,13 +461,20 @@
                 btn.disabled=false;return;
             }
             try{
-                const acct=await cloudLogin(name,pin);
-                if(acct===null){
+                const res=await cloudLogin(name,pin);
+                if(!res.ok){
                     recordLoginFailure(attemptKey);
-                    status.textContent='Player name or PIN is incorrect.';
+                    if(res.error==='locked_out'){
+                        status.textContent='Too many attempts. Please wait a minute.';
+                    }else if(res.error==='name_taken'){
+                        status.textContent='That player name already exists on another device.';
+                    }else{
+                        status.textContent='Player name or PIN is incorrect.';
+                    }
                     btn.disabled=false;return;
                 }
                 clearLoginFailures(attemptKey);
+                const acct=res.acct;
                 cacheAccount(acct.name||name);
                 const normalized=await ensureNormalizedAuth(acct.name||name);
                 const cloudProgress=acct.progress||{};
@@ -516,17 +505,10 @@
     })();
     }
     async function logoutAccount(){
-        // Release this browser's ownership link (009) so another child can log
-        // in on the same tablet without hitting "already linked".
-        try{
-            if(supa&&currentPinVerifier&&typeof supa.rpc==='function'){
-                await supa.rpc('release_player_auth',{p_name:getCurrentAccountName(),p_pin_hash:currentPinVerifier});
-            }
-        }catch(_){}
+        if(cloudApi) cloudApi.clearToken();
         localStorage.removeItem('kc_current_account');
         setPinVerifier('');
         if(window.KCData) window.KCData.setPlayerId('');
-        try { if(supa) await supa.auth.signOut(); } catch (_) {}
         renderAccountBar();
         progress=loadProgress();
         blipola=window.BlipolaClassroom.create(progress);
@@ -555,7 +537,7 @@
         const status=document.getElementById('accountStatus');
         const btn=document.getElementById('accountSecuritySubmit');
         const name=getCurrentAccountName();
-        if(!name||!supa){if(status)status.textContent='Cloud accounts need an internet connection.';return;}
+        if(!name||!cloudApi){if(status)status.textContent='Cloud accounts need an internet connection.';return;}
         const oldPin=(document.getElementById('accountOldPin')?.value||'').trim();
         if(!/^\d{4,6}$/.test(oldPin)){if(status)status.textContent='Enter the current 4–6 digit PIN.';return;}
         let newPin='';
@@ -571,8 +553,8 @@
         try{
             const oldHash=await derivePinVerifier(oldPin,await getPinSaltForLogin(name));
             if(mode==='delete'){
-                const {data,error}=await supa.rpc('delete_player',{p_name:name,p_pin_hash:oldHash});
-                if(error||data!==true)throw new Error(error?.message||'PIN is incorrect');
+                const r=await cloudApi.deletePlayer(oldHash);
+                if(!r.ok) throw new Error(r.error||'Could not delete');
                 const key=getCurrentAccount();
                 if(key){
                     try{const accounts=getAccounts();delete accounts[key];localStorage.setItem('kc_accounts_v1',JSON.stringify(accounts));}catch(_){}
@@ -581,17 +563,14 @@
                 localStorage.removeItem('kc_current_account');
                 setPinVerifier('');
                 if(window.KCData)window.KCData.setPlayerId('');
-                try{if(supa)await supa.auth.signOut();}catch(_){}
                 closeAccountModal();renderAccountBar();progress=loadProgress();blipola=window.BlipolaClassroom.create(progress);render();
                 alert('Account deleted. Progress for this account was removed from this device.');
                 return;
             }
             const newSalt=makePinSalt();
             const newHash=await derivePinVerifier(newPin,newSalt);
-            const {data,error}=await supa.rpc('rotate_pin',{p_name:name,p_old_pin_hash:oldHash,p_new_pin_hash:newHash,p_new_pin_salt:newSalt});
-            if(error||data!==true)throw new Error(error?.message||'Current PIN is incorrect');
-            // rotate_pin clears auth_user_id, so re-claim this browser with the
-            // new verifier or cloud sync would stop until the next login.
+            const r=await cloudApi.rotatePin(oldHash,newHash,newSalt);
+            if(!r.ok) throw new Error(r.error||'Current PIN is incorrect');
             setPinVerifier(newHash);
             await ensureNormalizedAuth(name);
             closeAccountModal();
