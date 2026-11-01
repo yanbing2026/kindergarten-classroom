@@ -1,6 +1,6 @@
 # BlockQuest Classroom
 
-A single-page supplemental learning app for kindergarten-age kids (built for a 5-year-old), optimized for touchscreens (tablet/phone). Themed around a BlockQuest block/mob catalog to make letters, numbers, words, and beginner Chinese & Spanish feel like play.
+A single-page supplemental learning app for Pre-K through Grade 2 (built for a 5-year-old), optimized for touchscreens (tablet/phone). Themed around a BlockQuest block/mob catalog to make letters, numbers, words, and beginner Chinese & Spanish feel like play, with interactive Grade 1/2 math, science, social studies, and writing units.
 
 Open `index.html` in a browser — no build step required. For the installable/offline features below, the site needs to be hosted (a real `http(s)` origin) rather than opened as a local file — browsers require one for service workers and "Add to Home Screen." The site is hosted on **Cloudflare Pages: <https://blockquest-classroom.pages.dev/>** (deploy/verify steps in `docs/pages-recovery.md`).
 
@@ -23,7 +23,7 @@ Open `index.html` in a browser — no build step required. For the installable/o
 - **Math**: problems shown as clear symbolic equations (e.g. `6 × 3 = ?`, `12 ÷ 4 = ?`) and spoken aloud. Operations are introduced progressively by level — **addition** (Levels 1–4), then **subtraction** added (Levels 5–7), then **multiplication** (Levels 8–9), then **division** plus all four operations mixed (Level 10). Number sizes ramp up as your child solves more problems at each level.
 - **Progress tracking**: stars (💎), per-category mastery bars (combined across all levels), and unlockable trophies at 10 / 25 / 50 / 100 / 200 diamonds — all saved locally in the browser (`localStorage`), no account needed. Older save formats are migrated automatically.
 - **Audio**: 🔊/🔇 toggle in the top bar to mute text-to-speech. Automatically picks the best available browser/system voice per language (preferring neural/premium voices when present) — no API key, no setup, works fully offline.
-- **Installable app (PWA)**: has a web app manifest and a service worker, so once hosted it can be added to a phone/tablet home screen (Android Chrome: menu → "Add to Home screen"; iOS Safari: share → "Add to Home Screen") and opens full-screen like a native app. After the first visit, the app shell is cached and the whole game works fully offline.
+- **Installable app (PWA)**: has a web app manifest and a service worker, so once hosted it can be added to a phone/tablet home screen (Android Chrome: menu → "Add to Home screen"; iOS Safari: share → "Add to Home Screen") and opens full-screen like a native app. The service worker precaches the app shell plus every HTML page, script, stylesheet, and question bank, so the learning engine works offline after the first successful load. Educational images are cached as they are used (emoji fallbacks cover the rest).
 
 ## Level Structure
 
