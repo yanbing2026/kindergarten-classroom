@@ -1,24 +1,23 @@
 /* Shared Grade Page bootstrap.
-   The legacy classroom engine remains the source of truth while pages migrate.
+   Directs entry from standalone grade URLs to the main classroom engine with grade pre-selected.
+   Using window.location.replace removes the nested iframe, enabling native touch gestures,
+   preventing iOS scroll/viewport conflicts, and ensuring Web Speech TTS works unrestricted.
 */
-window.KC_GRADE_PAGE={
-  mount:function(config){
-    const host=document.getElementById("kc-grade-app");
-    if(!host)return;
-    host.innerHTML='<div style="padding:24px;text-align:center"><strong>'+config.label+'</strong><p>Loading classroom…</p></div>';
-    const frame=document.createElement("iframe");
-    frame.title=config.label+" learning page";
-    frame.src=config.engineUrl;
-    frame.loading="eager";
-    frame.style="display:block;width:100%;height:calc(100vh - 100px);min-height:720px;border:0;background:transparent";
-    host.innerHTML="";
-    host.appendChild(frame);
-    let loaded=false;
-    frame.addEventListener("load",function(){loaded=true});
-    setTimeout(function(){
-      if(!loaded){
-        host.innerHTML='<div style="padding:28px;text-align:center"><h2>Learning page could not start</h2><p>'+config.label+' is isolated from the rest of the classroom.</p><button onclick="location.reload()">Reload</button></div>';
-      }
-    },7000);
+window.KC_GRADE_PAGE = {
+  mount: function (config) {
+    if (!config || !config.engineUrl) return;
+    const host = document.getElementById("kc-grade-app");
+    if (host) {
+      host.innerHTML = '<div style="padding:32px;text-align:center"><strong>' +
+        (config.label || 'Classroom') +
+        '</strong><p>Loading classroom…</p><p><a href="' +
+        config.engineUrl +
+        '">Click here if not redirected automatically.</a></p></div>';
+    }
+    try {
+      window.location.replace(config.engineUrl);
+    } catch (_) {
+      window.location.href = config.engineUrl;
+    }
   }
 };
