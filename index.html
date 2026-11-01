@@ -13,10 +13,19 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <script>
+    try {
+        const t = localStorage.getItem('kc_theme_v1') || 'cream';
+        document.documentElement.dataset.theme = t;
+    } catch (e) {
+        document.documentElement.dataset.theme = 'cream';
+    }
+    </script>
+    <!-- APP_VERSION: v2-20261102-cute1 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"></noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@700;800;900&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@700;800;900&display=swap"></noscript>
     <link rel="stylesheet" href="shared/main.css">
 
 <script>
@@ -52,6 +61,29 @@
 
 <button id="globalBlipolaVoice" class="global-blipola-voice" type="button" onclick="blipolaVoiceAction()" aria-label="Blipola voice">🎤<span>Blipola</span></button>
 <div id="accountModal" class="account-modal" style="display:none"></div>
+<div id="themeModal" class="theme-modal" style="display:none" role="dialog" aria-modal="true" aria-label="Theme">
+    <button type="button" class="theme-modal-backdrop" onclick="closeThemeModal()" aria-label="Close"></button>
+    <div class="theme-box">
+        <h2>🎨 Theme</h2>
+        <div class="theme-options">
+            <button type="button" class="theme-card" id="themeCardCream" onclick="setTheme('cream');closeThemeModal()">
+                <div class="theme-preview" style="background:#FFFBF4;border:2px solid #EFE7F7;">
+                    <div class="theme-preview-dot" style="background:#FF8256;"></div>
+                </div>
+                <span class="theme-name">奶油简约</span>
+            </button>
+            <button type="button" class="theme-card" id="themeCardSky" onclick="setTheme('sky');closeThemeModal()">
+                <div class="theme-preview" style="background:linear-gradient(180deg,#BEE8F6,#FFF7DE);border:2px solid #CBE4F0;">
+                    <div class="theme-preview-dot" style="background:#3FC295;"></div>
+                </div>
+                <span class="theme-name">天空小熊</span>
+            </button>
+        </div>
+        <div class="theme-actions">
+            <button type="button" class="theme-close-btn" onclick="closeThemeModal()">Close</button>
+        </div>
+    </div>
+</div>
 
     <div class="container" id="app" tabindex="-1"></div>
 
@@ -61,7 +93,7 @@
     <script src="./js/blipola-runtime.js"></script>
     <script>
     // ---------- App version ----------
-    const APP_VERSION = 'v2-20261101-d1';
+    const APP_VERSION = 'v2-20261102-cute1';
 
     // ---------- Debug / Dev Mode ----------
     // Hidden diagnostic screen for parents and developers.
@@ -1138,6 +1170,40 @@
         <div class="footer">Choose a level!</div>`;
     }
 
+    // ---------- Theme Switcher ----------
+    function getTheme() {
+        try {
+            return localStorage.getItem('kc_theme_v1') || 'cream';
+        } catch (_) {
+            return 'cream';
+        }
+    }
+    function setTheme(theme) {
+        if (theme !== 'cream' && theme !== 'sky') theme = 'cream';
+        try {
+            localStorage.setItem('kc_theme_v1', theme);
+        } catch (_) {}
+        document.documentElement.dataset.theme = theme;
+        const creamBtn = document.getElementById('themeCardCream');
+        const skyBtn = document.getElementById('themeCardSky');
+        if (creamBtn) creamBtn.className = 'theme-card' + (theme === 'cream' ? ' active' : '');
+        if (skyBtn) skyBtn.className = 'theme-card' + (theme === 'sky' ? ' active' : '');
+    }
+    function openThemeModal() {
+        const m = document.getElementById('themeModal');
+        if (!m) return;
+        const cur = getTheme();
+        const creamBtn = document.getElementById('themeCardCream');
+        const skyBtn = document.getElementById('themeCardSky');
+        if (creamBtn) creamBtn.className = 'theme-card' + (cur === 'cream' ? ' active' : '');
+        if (skyBtn) skyBtn.className = 'theme-card' + (cur === 'sky' ? ' active' : '');
+        m.style.display = 'grid';
+    }
+    function closeThemeModal() {
+        const m = document.getElementById('themeModal');
+        if (m) m.style.display = 'none';
+    }
+
     // ---------- Render: Level picker ----------
     function topbar(showBack) {
         return `<div class="topbar">
@@ -1146,9 +1212,11 @@
                 <button class="icon-btn" onclick="goHome()" aria-label="Home">🏠</button>
             </div>
             <div class="topbar-right">
-                <button type="button" class="star-badge" id="topbarStarBadge" onclick="handleDebugTap()" style="cursor:pointer;" title="App version">💎 ${progress.stars} <span style="font-size:0.65rem;opacity:0.7;">${APP_VERSION}</span></button>
-                <button class="icon-btn" onclick="blipolaVoiceAction()" title="Blipola Voice" aria-label="Blipola Voice">🎤</button>
+                <button type="button" class="star-badge" id="topbarStarBadge" onclick="handleDebugTap()" style="cursor:pointer;" title="App version">💎 ${progress.stars}<span style="display:none;">${APP_VERSION}</span></button>
+                <button class="icon-btn" onclick="openThemeModal()" title="Theme" aria-label="Theme">🎨</button>
                 <button class="icon-btn" id="muteBtn" onclick="toggleMute()" aria-label="${muted ? 'Unmute sound' : 'Mute sound'}">${muted ? '🔇' : '🔊'}</button>
+                <button class="icon-btn" onclick="openAccountModal('login')" title="Account" aria-label="Account">👤</button>
+                <button class="icon-btn" onclick="blipolaVoiceAction()" title="Blipola Voice" aria-label="Blipola Voice" style="display:none;">🎤</button>
             </div>
         </div>`;
     }
@@ -2042,7 +2110,7 @@
     }
     function renderTopbarStarsOnly() {
         const badge = document.getElementById('topbarStarBadge') || document.querySelector('.topbar .star-badge') || document.querySelector('.star-badge');
-        if (badge) badge.innerHTML = `💎 ${progress.stars} <span style="font-size:0.65rem;opacity:0.7;">${APP_VERSION}</span>`;
+        if (badge) badge.innerHTML = `💎 ${progress.stars}<span style="display:none;">${APP_VERSION}</span>`;
     }
     function nextQuestion() {
         quiz.idx += 1;
