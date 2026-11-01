@@ -22,24 +22,28 @@ for t in scripts/test_*.js; do node "$t" || exit 1; done
 CI：`.github/workflows/validate.yml`（push + PR 自动跑；**所有** `scripts/test_*.js` 与内容校验都阻断）。
 
 ## 发布
-**合并进 `main` 不等于上线。** 当前是 Cloudflare Pages 直传部署，没有 GitHub Actions 部署工作流
-（`pages.yml` / `deploy-pages.yml` 都已移除）。完整步骤、连接器调用形状和故障表见
-**`docs/pages-recovery.md`**；这里只留结论：
+**合并进 `main` = 上线。** `.github/workflows/deploy-pages.yml` 在 push 到 `main` 时用 wrangler
+把该提交的跟踪树直传到 Cloudflare Pages（项目 `blockquest-classroom`），部署前先跑与 `validate.yml`
+一致的阻断门（JS 语法、内联脚本、全部 `scripts/test_*.js`、内容校验）。需要 repo secrets
+`CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID`（缺任一，job 会在第一步显式失败）。
 
-1. 从 `origin/main` 导出树 → 用 `pages_deploy.py` 上传 → 创建 deployment；创建者可以是
-   Cloudflare 连接器，也可以是本机 `~/.hermes/.env` 里的账号级 API token（2026-11-01 两条都实测过，
-   token 路径见 `docs/pages-recovery.md`「已验证的备用部署路径」）。
-2. 部署后必须跑 `pages_deploy.py verify`，并**单独比对 `index.html` 与 `sw.js` 的 sha256**：
+1. **合并后必须看那次 run**：`gh run list --branch main`。部署失败 = 线上仍是上一个版本，
+   Actions 的红灯就是唯一的告警，merge 成功不代表上线。
+2. **线上的字节才是证据**，不是绿灯：
    ```bash
    curl -sL https://blockquest-classroom.pages.dev/index.html | sha256sum
    curl -sL https://blockquest-classroom.pages.dev/sw.js | sha256sum
    git show origin/main:index.html | sha256sum
    git show origin/main:sw.js | sha256sum
    ```
-   **HTTP 200 不算上线证据，四个哈希两两相等才算。** `/x/index.html` 会 308，`curl` 必须加 `-L`。
+   **HTTP 200 不算上线证据，四个哈希两两相等才算。** `/x/index.html` 会 308，`curl` 必须加 `-L`；
+   部署后约 45 秒内边缘可能仍返回旧字节，等一会儿再验。
 3. 只更新了 HTML 层而漏掉 `sw.js` / 年级页 = 部分部署。2026-11-01 就发生过一次：
    `data/`、`js/`、CSS 是新的，`index.html`、`sw.js`、4 个年级页仍是旧版，Grade 2 在线上仍显示 `BUILDING`。
-4. GitHub Pages 站点配置与旧分支的故事只作历史教训保留在 `docs/pages-recovery.md`，
+4. **手动兜底**：workflow 坏了或需要从别的 ref 重推时，跑 `~/.hermes/scripts/kc_deploy_pages.sh [ref]`
+   （upload-token → 资产上传 → 建 deployment → 轮询 → 逐路径 verify）。陷阱与两种 token 的判据见
+   `docs/pages-recovery.md`。
+5. GitHub Pages 站点配置与旧分支的故事只作历史教训保留在 `docs/pages-recovery.md`，
    **不要**再把 `gh api .../pages` 当成当前发布机制。
 
 ## 账号后端（Supabase）
