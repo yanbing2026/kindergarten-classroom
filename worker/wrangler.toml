@@ -1,0 +1,11 @@
+name = "blockquest-api"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+
+[vars]
+ALLOWED_ORIGINS = "https://blockquest-classroom.pages.dev,http://localhost:3000,http://localhost:8080"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "blockquest-classroom"
+database_id = "PLACEHOLDER_SET_AFTER_CREATE"
