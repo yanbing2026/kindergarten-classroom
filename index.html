@@ -13,10 +13,19 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <script>
+    try {
+        const t = localStorage.getItem('kc_theme_v1') || 'cream';
+        document.documentElement.dataset.theme = t;
+    } catch (e) {
+        document.documentElement.dataset.theme = 'cream';
+    }
+    </script>
+    <!-- APP_VERSION: v2-20261102-cute2 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"></noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@700;800;900&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@700;800;900&display=swap"></noscript>
     <link rel="stylesheet" href="shared/main.css">
 
 <script>
@@ -47,11 +56,66 @@
     <script src="data/kindergarten/content.js"></script>
 </head>
 <body>
-<div id="accountBar" class="account-bar"></div>
+<div id="accountBar" hidden><span class="account-sync" id="accountSyncStatus" aria-live="polite"></span><button class="account-btn" id="logoutBtn" type="button" onclick="logoutAccount()">Log out</button><button class="account-btn" id="loginBtn" type="button" onclick="openAccountModal('login')">👤 Log in</button><button class="account-btn" id="createBtn" type="button" onclick="openAccountModal('create')">➕ Create account</button></div>
 <button id="runtimeErrorBadge" class="runtime-error-badge" type="button" onclick="showRuntimeErrorPanel()" aria-label="Open error report">🐞 Error Report</button>
 
 <button id="globalBlipolaVoice" class="global-blipola-voice" type="button" onclick="blipolaVoiceAction()" aria-label="Blipola voice">🎤<span>Blipola</span></button>
 <div id="accountModal" class="account-modal" style="display:none"></div>
+<div id="themeModal" class="theme-modal" style="display:none" role="dialog" aria-modal="true" aria-label="Theme">
+    <button type="button" class="theme-modal-backdrop" onclick="closeThemeModal()" aria-label="Close"></button>
+    <div class="theme-box">
+        <h2>🎨 Theme</h2>
+        <div class="theme-options">
+            <button type="button" class="theme-card" id="themeCardCream" onclick="setTheme('cream');closeThemeModal()">
+                <div class="theme-preview" style="background:#FFFBF4;border:2px solid #EFE7F7;">
+                    <div class="theme-preview-dot" style="background:#FF8256;"></div>
+                </div>
+                <span class="theme-name">奶油简约</span>
+            </button>
+            <button type="button" class="theme-card" id="themeCardSky" onclick="setTheme('sky');closeThemeModal()">
+                <div class="theme-preview" style="background:linear-gradient(180deg,#BEE8F6,#FFF7DE);border:2px solid #CBE4F0;">
+                    <div class="theme-preview-dot" style="background:#3FC295;"></div>
+                </div>
+                <span class="theme-name">天空小熊</span>
+            </button>
+        </div>
+        <div class="theme-actions">
+            <button type="button" class="theme-close-btn" onclick="closeThemeModal()">Close</button>
+        </div>
+    </div>
+</div>
+<div id="languageModal" class="theme-modal" style="display:none" role="dialog" aria-modal="true" aria-label="Language">
+    <button type="button" class="theme-modal-backdrop" onclick="closeLanguageModal()" aria-label="Close"></button>
+    <div class="theme-box">
+        <h2>🌍 Language</h2>
+        <div class="theme-options">
+            <button type="button" class="theme-card" onclick="closeLanguageModal();go('category',{key:'chinese',level:'L1'})">
+                <div class="theme-preview" style="display:flex;align-items:center;justify-content:center;font-size:2.2rem;background:var(--kc-chip);">🇨🇳</div>
+                <span class="theme-name">Chinese</span>
+            </button>
+            <button type="button" class="theme-card" onclick="closeLanguageModal();go('category',{key:'spanish',level:'L1'})">
+                <div class="theme-preview" style="display:flex;align-items:center;justify-content:center;font-size:2.2rem;background:var(--kc-chip);">🇪🇸</div>
+                <span class="theme-name">Spanish</span>
+            </button>
+        </div>
+        <div class="theme-actions">
+            <button type="button" class="theme-close-btn" onclick="closeLanguageModal()">Close</button>
+        </div>
+    </div>
+</div>
+<div id="accountPopoverModal" class="theme-modal" style="display:none" role="dialog" aria-modal="true" aria-label="Account">
+    <button type="button" class="theme-modal-backdrop" onclick="closeAccountPopover()" aria-label="Close"></button>
+    <div class="theme-box">
+        <h2 id="accountPopoverTitle">👤 Account</h2>
+        <div style="margin: 16px 0; text-align: center;">
+            <div id="accountPopoverStatusText" class="account-sync" style="font-size:1.05rem;font-weight:700;">☁️ Saved</div>
+        </div>
+        <div class="theme-actions" style="display:flex;flex-direction:column;gap:10px;">
+            <button type="button" class="theme-close-btn" id="accountPopoverLogoutBtn" onclick="logoutAccount()" style="background:#FDE2E1;color:#9A2C2C;width:100%;min-height:44px;">Log out</button>
+            <button type="button" class="theme-close-btn" onclick="closeAccountPopover()" style="width:100%;min-height:44px;">Close</button>
+        </div>
+    </div>
+</div>
 
     <div class="container" id="app" tabindex="-1"></div>
 
@@ -61,7 +125,7 @@
     <script src="./js/blipola-runtime.js"></script>
     <script>
     // ---------- App version ----------
-    const APP_VERSION = 'v2-20261101-d1';
+    const APP_VERSION = 'v2-20261102-cute2';
 
     // ---------- Debug / Dev Mode ----------
     // Hidden diagnostic screen for parents and developers.
@@ -358,9 +422,11 @@
     let cloudSyncPending=false;
     function setCloudSyncStatus(state){
         const el=document.getElementById('accountSyncStatus');
-        if(!el)return;
+        const popEl=document.getElementById('accountPopoverStatusText');
         const labels={syncing:'☁️ Syncing…',saved:'☁️ Saved',offline:'⚠️ Saved locally',reauth:'🔑 Log in to sync'};
-        el.textContent=labels[state]||labels.saved;
+        const text=labels[state]||labels.saved;
+        if(el)el.textContent=text;
+        if(popEl)popEl.textContent=text;
     }
     function scheduleCloudProgressSync(delay=600){
         if(!getCurrentAccount()||typeof cloudSaveProgress!=='function')return;
@@ -509,6 +575,7 @@
         localStorage.removeItem('kc_current_account');
         setPinVerifier('');
         if(window.KCData) window.KCData.setPlayerId('');
+        closeAccountPopover();
         renderAccountBar();
         progress=loadProgress();
         blipola=window.BlipolaClassroom.create(progress);
@@ -580,7 +647,54 @@
             if(btn)btn.disabled=false;
         }
     }
-    function renderAccountBar(){const el=document.getElementById('accountBar');if(!el)return;const key=getCurrentAccount(),acct=key?(getAccounts()[key]||{name:key}):null;if(acct){el.innerHTML='<span class="account-name">👤 '+esc(acct.name)+'</span><span class="account-sync" id="accountSyncStatus" aria-live="polite">☁️ Saved</span><button class="account-btn" id="logoutBtn">Log out</button>';document.getElementById('logoutBtn').onclick=logoutAccount;setCloudSyncStatus('saved');}else{el.innerHTML='<button class="account-btn" id="loginBtn">👤 Log in</button><button class="account-btn" id="createBtn">➕ Create account</button>';document.getElementById('loginBtn').onclick=()=>openAccountModal('login');document.getElementById('createBtn').onclick=()=>openAccountModal('create');}}
+    function openAccountPopover(){
+        const key=getCurrentAccount();
+        const acct=key?(getAccounts()[key]||{name:key}):null;
+        if(!acct){
+            openAccountModal('login');
+            return;
+        }
+        const title=document.getElementById('accountPopoverTitle');
+        if(title)title.textContent='👤 '+acct.name;
+        const sync=document.getElementById('accountSyncStatus');
+        const pop=document.getElementById('accountPopoverStatusText');
+        if(sync&&pop)pop.textContent=sync.textContent||'☁️ Saved';
+        const m=document.getElementById('accountPopoverModal');
+        if(m)m.style.display='grid';
+    }
+    function closeAccountPopover(){
+        const m=document.getElementById('accountPopoverModal');
+        if(m)m.style.display='none';
+    }
+    function openLanguageModal(){
+        const m=document.getElementById('languageModal');
+        if(m)m.style.display='grid';
+    }
+    function closeLanguageModal(){
+        const m=document.getElementById('languageModal');
+        if(m)m.style.display='none';
+    }
+    function renderAccountBar(){
+        const key=getCurrentAccount();
+        const acct=key?(getAccounts()[key]||{name:key}):null;
+        const chip=document.getElementById('topbarAccountChip');
+        if(chip){
+            if(acct){
+                chip.innerHTML='👤 <span class="chip-name">'+esc(acct.name)+'</span>';
+                chip.onclick=openAccountPopover;
+                chip.title='Account: '+acct.name;
+                chip.setAttribute('aria-label','Account: '+acct.name);
+            }else{
+                chip.innerHTML='👤 Log in';
+                chip.onclick=()=>openAccountModal('login');
+                chip.title='Log in';
+                chip.setAttribute('aria-label','Log in');
+            }
+        }
+        if(acct){
+            setCloudSyncStatus('saved');
+        }
+    }
 
 
     // ---------- Progress storage ----------
@@ -1093,24 +1207,70 @@
         startQuiz(lesson.cat.key, lesson.level.id, lesson.item ? lesson.item.id : null);
     }
 
+    let showMoreGrades = false;
+    function toggleExtraGrades() {
+        showMoreGrades = !showMoreGrades;
+        render();
+    }
+
     function renderHome() {
         const lesson = getTodayLesson();
-        const mathSolved = Object.values(progress.mathCorrect).reduce((a, b) => a + (b || 0), 0);
         const todayAction = 'startTodayAdventure()';
         const lessonLabel = lesson.item ? (lesson.cat.key === 'letters' ? lesson.item.id : lesson.cat.key === 'numbers' ? lesson.item.n : lesson.item.id) : lesson.cat.name;
-        const gradeCards = GRADE_CURRICULUM.map(g => {
-            const ready = g.courses.some(c => c.ready);
-            const courseCount = g.courses.length;
-            return '<button class="home-grade-card '+(ready?'active-grade':'planned-grade')+'" onclick="go(\'grades\',{grade:\''+g.id+'\'})"><div class="home-grade-icon">'+g.icon+'</div><div class="home-grade-label">'+g.label+'</div><div class="home-grade-sub">'+courseCount+' courses · '+(ready?'PLAY NOW':'BUILDING')+'</div></button>';
+        const mission = typeof getDailyMissionSummary === 'function' ? getDailyMissionSummary() : { done: 0 };
+        const due = typeof getDueReviewItems === 'function' ? getDueReviewItems(4) : [];
+        const acctKey = typeof getCurrentAccount === 'function' ? getCurrentAccount() : null;
+        const acct = acctKey ? ((typeof getAccounts === 'function' ? getAccounts()[acctKey] : null) || { name: acctKey }) : null;
+        const greetName = acct ? 'Hi, ' + esc(acct.name) + '!' : 'Hi there!';
+
+        const isExpanded = Boolean(typeof showMoreGrades !== 'undefined' && showMoreGrades);
+        const visibleGrades = isExpanded ? GRADE_CURRICULUM : GRADE_CURRICULUM.slice(0, 4);
+        const gradeCards = visibleGrades.map(g => {
+            const ready = g.courses && g.courses.some(c => c.ready);
+            const courseCount = g.courses ? g.courses.length : 0;
+            return '<button type="button" class="home-grade-card '+(ready?'active-grade':'planned-grade')+'" onclick="go(\'grades\',{grade:\''+g.id+'\'})"><div class="home-grade-icon">'+g.icon+'</div><div class="home-grade-label">'+g.label+'</div><div class="home-grade-sub">'+courseCount+' courses · '+(ready?'PLAY NOW':'BUILDING')+'</div></button>';
         }).join('');
-        return topbar(false)+
-        '<div class="home-hero"><div class="home-kicker">⛏️ BLOCKQUEST CLASSROOM</div><h1>Choose your grade</h1><p>Your learning journey starts here.</p></div>'+
-        renderDailyMissions()+
-        renderTodayReview()+
-        '<button type="button" class="today-card" onclick="'+todayAction+'"><span class="today-icon">⭐</span><span class="today-copy"><span class="today-kicker">TODAY\'S ADVENTURE</span><span class="today-title">'+lesson.cat.icon+' '+lesson.cat.name+'</span><span class="today-sub">'+lesson.reason+(lesson.item ? ' • '+lessonLabel : '')+'</span></span><span class="big-btn play">START ▶</span></button>'+
-        '<h2 class="home-section-title">📚 Grades Pre-K–2 (Grades 3–8 in Planning)</h2><div class="home-grade-menu">'+gradeCards+'</div>'+
-        '<h2 class="home-section-title">🎮 More Learning</h2><div class="home-tools"><button class="home-tool" onclick="go(\'category\',{key:\'chinese\',level:\'L1\'})">🇨🇳 Chinese</button><button class="home-tool" onclick="go(\'category\',{key:\'spanish\',level:\'L1\'})">🇪🇸 Spanish</button><button class="home-tool" onclick="go(\'freeplay\')">🎨 Free Play</button><button class="home-tool" onclick="go(\'draw\')">✏️ Draw</button><button class="home-tool" onclick="go(\'worksheets\')">🖨️ Worksheets</button><button class="home-tool" onclick="go(\'progress\')">🏆 Progress</button></div>'+
-        '<div class="footer">💎 '+progress.stars+' diamonds · Pick a grade to explore its courses.</div>';
+
+        const reviewHtml = due.length
+            ? '<div class="home-review-wrap"><button type="button" class="review-pill" onclick="startReview()">🔄 Review ' + due.length + '</button></div>'
+            : '';
+
+        return topbar(false) +
+        '<div class="home-greet">' +
+            '<h1>' + greetName + '</h1><small>Pick one thing to play</small>' +
+        '</div>' +
+        '<button type="button" class="today-card" onclick="' + todayAction + '">' +
+            '<span class="today-copy">' +
+                '<span class="today-kicker">TODAY\'S ADVENTURE</span>' +
+                '<span class="today-title">' + lesson.cat.icon + ' ' + lesson.cat.name + '</span>' +
+                '<span class="today-sub">' + lesson.reason + ' · ' + lessonLabel + '</span>' +
+            '</span>' +
+            '<span class="big-btn play">START ▶</span>' +
+            '<div class="mission-dots">' +
+                '<span class="mission-dot' + (mission.done >= 1 ? ' done' : '') + '"></span>' +
+                '<span class="mission-dot' + (mission.done >= 2 ? ' done' : '') + '"></span>' +
+                '<span class="mission-dot' + (mission.done >= 3 ? ' done' : '') + '"></span>' +
+                '<span class="mission-text">' + mission.done + ' of 3</span>' +
+            '</div>' +
+        '</button>' +
+        reviewHtml +
+        '<section class="home-section">' +
+            '<h2 class="home-section-title">Grades Pre-K–2</h2>' +
+            '<div class="home-grade-menu">' + gradeCards + '</div>' +
+            '<div class="grades-expand-wrap">' +
+                '<button type="button" class="grades-expand-btn" onclick="toggleExtraGrades()">' + (isExpanded ? 'Grades 3–8 ▴' : 'Grades 3–8 ▾') + '</button>' +
+            '</div>' +
+        '</section>' +
+        '<section class="home-section">' +
+            '<h2 class="home-section-title">More</h2>' +
+            '<div class="home-more-row">' +
+                '<button type="button" class="home-more-card" onclick="go(\'freeplay\')"><span class="home-more-icon">🎨</span><span class="home-more-label">Free Play</span></button>' +
+                '<button type="button" class="home-more-card" onclick="go(\'draw\')"><span class="home-more-icon">✏️</span><span class="home-more-label">Draw</span></button>' +
+                '<button type="button" class="home-more-card" onclick="go(\'progress\')"><span class="home-more-icon">🏆</span><span class="home-more-label">Trophies</span></button>' +
+                '<button type="button" class="home-more-card" onclick="go(\'worksheets\')"><span class="home-more-icon">🖨️</span><span class="home-more-label">Worksheets</span></button>' +
+                '<button type="button" class="home-more-card" onclick="openLanguageModal()"><span class="home-more-icon">🌍</span><span class="home-more-label">Language</span></button>' +
+            '</div>' +
+        '</section>';
     }
 
     // ---------- Render: Level picker ----------
@@ -1138,17 +1298,60 @@
         <div class="footer">Choose a level!</div>`;
     }
 
+    // ---------- Theme Switcher ----------
+    function getTheme() {
+        try {
+            return localStorage.getItem('kc_theme_v1') || 'cream';
+        } catch (_) {
+            return 'cream';
+        }
+    }
+    function setTheme(theme) {
+        if (theme !== 'cream' && theme !== 'sky') theme = 'cream';
+        try {
+            localStorage.setItem('kc_theme_v1', theme);
+        } catch (_) {}
+        document.documentElement.dataset.theme = theme;
+        const creamBtn = document.getElementById('themeCardCream');
+        const skyBtn = document.getElementById('themeCardSky');
+        if (creamBtn) creamBtn.className = 'theme-card' + (theme === 'cream' ? ' active' : '');
+        if (skyBtn) skyBtn.className = 'theme-card' + (theme === 'sky' ? ' active' : '');
+    }
+    function openThemeModal() {
+        const m = document.getElementById('themeModal');
+        if (!m) return;
+        const cur = getTheme();
+        const creamBtn = document.getElementById('themeCardCream');
+        const skyBtn = document.getElementById('themeCardSky');
+        if (creamBtn) creamBtn.className = 'theme-card' + (cur === 'cream' ? ' active' : '');
+        if (skyBtn) skyBtn.className = 'theme-card' + (cur === 'sky' ? ' active' : '');
+        m.style.display = 'grid';
+    }
+    function closeThemeModal() {
+        const m = document.getElementById('themeModal');
+        if (m) m.style.display = 'none';
+    }
+
     // ---------- Render: Level picker ----------
     function topbar(showBack) {
+        const isHome = (state.screen === 'home');
+        const acctKey = typeof getCurrentAccount === 'function' ? getCurrentAccount() : null;
+        const acct = acctKey ? ((typeof getAccounts === 'function' ? getAccounts()[acctKey] : null) || { name: acctKey }) : null;
+        const chipHtml = acct
+            ? `<button type="button" class="topbar-chip" id="topbarAccountChip" onclick="openAccountPopover()" title="Account" aria-label="Account: ${esc(acct.name)}">👤 <span class="chip-name">${esc(acct.name)}</span></button>`
+            : `<button type="button" class="topbar-chip" id="topbarAccountChip" onclick="openAccountModal('login')" title="Log in" aria-label="Log in">👤 Log in</button>`;
+
         return `<div class="topbar">
             <div class="topbar-left">
                 ${showBack ? `<button class="icon-btn" onclick="goBack()" aria-label="Go back">⬅️</button>` : ''}
-                <button class="icon-btn" onclick="goHome()" aria-label="Home">🏠</button>
+                ${!isHome ? `<button class="icon-btn" onclick="goHome()" aria-label="Home">🏠</button>` : ''}
             </div>
             <div class="topbar-right">
-                <button type="button" class="star-badge" id="topbarStarBadge" onclick="handleDebugTap()" style="cursor:pointer;" title="App version">💎 ${progress.stars} <span style="font-size:0.65rem;opacity:0.7;">${APP_VERSION}</span></button>
-                <button class="icon-btn" onclick="blipolaVoiceAction()" title="Blipola Voice" aria-label="Blipola Voice">🎤</button>
+                <button type="button" class="star-badge" id="topbarStarBadge" onclick="handleDebugTap()" style="cursor:pointer;" title="App version">💎 ${progress.stars}<span style="display:none;">${APP_VERSION}</span></button>
+                <button class="icon-btn" onclick="openThemeModal()" title="Theme" aria-label="Theme">🎨</button>
                 <button class="icon-btn" id="muteBtn" onclick="toggleMute()" aria-label="${muted ? 'Unmute sound' : 'Mute sound'}">${muted ? '🔇' : '🔊'}</button>
+                ${chipHtml}
+                <button class="icon-btn" onclick="blipolaVoiceAction()" title="Blipola Voice" aria-label="Blipola Voice" style="display:none;">🎤</button>
             </div>
         </div>`;
     }
@@ -1192,7 +1395,7 @@
             <div class="center-col">
                 <div style="font-size:4rem;">➕</div>
                 <h2>Math — ${lvLabel}</h2>
-                <p style="color:#888;margin-bottom:20px;">${desc}</p>
+                <p style="color:var(--kc-ink-soft);margin-bottom:20px;">${desc}</p>
                 <button class="big-btn play" onclick="startMath('${level}')">🎮 Play</button>
             </div>`;
         }
@@ -1951,7 +2154,7 @@
         `).join('');
         return `${topbar(true)}
         <div class="center-col">
-            <div id="blipolaBuddy" style="display:flex;align-items:center;gap:10px;margin:0 auto 10px;max-width:720px;padding:9px 12px;border:2px solid #333;border-radius:14px;background:#fff;font-weight:800;">🤖 <span>Blipola</span><span id="blipolaMessage" aria-live="polite" style="font-weight:600;opacity:.78;">Think first. You can ask me for a clue.</span><button class="choice-btn" type="button" onclick="blipolaHint()" style="margin-left:auto;padding:7px 10px;">💡 Hint</button></div>
+            <div id="blipolaBuddy" style="display:flex;align-items:center;gap:10px;margin:0 auto 10px;max-width:720px;padding:9px 12px;border:0;box-shadow:var(--sh-1);background:var(--kc-surface);color:var(--kc-ink);border-radius:var(--r-md);font-weight:800;">🤖 <span>Blipola</span><span id="blipolaMessage" aria-live="polite" style="font-weight:600;opacity:.78;">Think first. You can ask me for a clue.</span><button class="choice-btn" type="button" onclick="blipolaHint()" style="margin-left:auto;padding:7px 10px;">💡 Hint</button></div>
             <div style="color:#999;margin-bottom:8px;">Question ${quiz.idx + 1} of ${ROUND_LENGTH}</div>
             <div id="streakBadge" class="streak-badge" aria-live="polite"></div>
             <div class="prompt-box">${q.promptHTML}</div>
@@ -2042,7 +2245,7 @@
     }
     function renderTopbarStarsOnly() {
         const badge = document.getElementById('topbarStarBadge') || document.querySelector('.topbar .star-badge') || document.querySelector('.star-badge');
-        if (badge) badge.innerHTML = `💎 ${progress.stars} <span style="font-size:0.65rem;opacity:0.7;">${APP_VERSION}</span>`;
+        if (badge) badge.innerHTML = `💎 ${progress.stars}<span style="display:none;">${APP_VERSION}</span>`;
     }
     function nextQuestion() {
         quiz.idx += 1;
