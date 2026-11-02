@@ -126,6 +126,7 @@ console.log('✓ Feedback areas aria-live="polite" verified');
 
 // 2. Icon button accessible names (aria-label) assertions
 const topbarSrc = extractFunction(html, 'topbar');
+const renderSettingsModalSrc = extractFunction(html, 'renderSettingsModal');
 const renderTopbarMuteOnlySrc = extractFunction(html, 'renderTopbarMuteOnly');
 const renderTraceSrc = extractFunction(html, 'renderTrace');
 const renderDrawSrc = extractFunction(html, 'renderDraw');
@@ -134,7 +135,7 @@ const renderDrawSrc = extractFunction(html, 'renderDraw');
 assert(topbarSrc.includes('onclick="goBack()" aria-label="Go back"'), 'topbar back button must have aria-label="Go back"');
 assert(topbarSrc.includes('onclick="goHome()" aria-label="Home"'), 'topbar home button must have aria-label="Home"');
 assert(topbarSrc.includes('onclick="blipolaVoiceAction()" title="Blipola Voice" aria-label="Blipola Voice"'), 'topbar Blipola voice button must have aria-label="Blipola Voice"');
-assert(topbarSrc.includes('id="muteBtn" onclick="toggleMute()" aria-label="${muted ? \'Unmute sound\' : \'Mute sound\'}"'), 'topbar mute button must have dynamic aria-label');
+assert(renderSettingsModalSrc.includes('id="muteBtn" onclick="toggleMute()" aria-label="${muted ? \'Unmute sound\' : \'Mute sound\'}"'), 'settings modal mute button must have dynamic aria-label');
 
 // Trace & Draw toolbar icon buttons
 assert(renderTraceSrc.includes('onclick="replayTrace()" aria-label="Hear pronunciation"'), 'renderTrace replay button must have aria-label="Hear pronunciation"');
