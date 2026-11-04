@@ -2,14 +2,21 @@
 
 **审查基准：** `main` @ `b1f2ca1`（2026-11-01） · **线上：** `https://blockquest-classroom.pages.dev/`
 **审查方式：** 逐文件读源码 + `python3 tools/validate_content.py` + 线上 sha256 实测 + Git 历史比对。
-**未能执行：** 本机没有 `node`（`command not found`），16 个 `scripts/test_*.js` 未在本地运行；Supabase 线上库状态无法读取（008 是否已应用未验证）；未做真机 iPad 测试。下文凡依赖这三项的地方都标了 **待验证**。
+**未能执行（2026-11-01）：** 本机没有 `node`（`command not found`），16 个 `scripts/test_*.js` 未在本地运行；Supabase 线上库状态无法读取（008 是否已应用未验证）；未做真机 iPad 测试。下文凡依赖这三项的地方都标了 **待验证**。
+**2026-11-03 补记：** node 已就绪（23/23 测试本地 PASS，见 §0.2/§11）；Supabase 库已确认 NXDOMAIN，
+以 Worker + D1 为准；真机测试仍未做。
 **上一版计划：** 已归档到 `docs/archive/improvement-plan-2026-11-01-pre-review.md`（其中"已完成"的表基本属实，但有 6 处数字/机制与现状不符，见 §7）。
 
 **一句话结论：** 功能在增加，但**发布链、账号数据链、离线承诺**这三处与文档和计划写的不一致。先把这三条修到"可证明"，再谈拆 `index.html`。
 
 ---
 
-## 0. 实施状态（2026-11-01，分支 `fix/p0-p1-audit`）
+## 0. 实施状态（2026-11-01，分支 `fix/p0-p1-audit`；PR #69 已合并）
+
+> 2026-11-03 更新：PR #69 已于 2026-11-01 合并（§0.1），之后 `main` 又合入 #67（`deploy-pages.yml`
+> 自动部署）、#70（部署记录 + Supabase 已死）、#71（Worker + D1 替代 Supabase）、#72（双主题）、
+> #73（设置面板 + 昵称）。本节 §0.1 之后的状态见新增的 §0.2；§7.2、§8 个别行、§9 路线表、§10、§11
+> 中与现状不符处已同步标注。
 
 已在本分支完成并验证：
 
@@ -52,6 +59,19 @@
   → 按序跑 002–009 → 把新 URL + publishable key 写回 `index.html:237`。
 - **§6.2 CSS 拆分 / §6.3 读屏播报**：题库按需加载已完成；首屏 CSS 仍未拆分，答题时 TTS 与
   `aria-live` 仍可能重复播报，留作后续小步优化。
+
+### 0.2 `main` 现状（2026-11-03，本机实测）
+
+- **部署链**：`main` = 线上。`index.html`（`ca977e8a…3dd06ab`）、`sw.js`（`4066f35f…5da55da`）
+  线上取回与 `origin/main` 逐字节一致；`/grade-2/` 返回自己的文档。依据以 `AGENTS.md` 为准：
+  push 到 `main` 即触发 `deploy-pages.yml`（先跑阻断门再直传），合并后看那次 run，线上字节为准。
+- **账号后端**：Supabase 已死（`sjqhcpbdgaeapljbllhp.supabase.co` NXDOMAIN），#71 已替换为
+  Cloudflare Worker + D1（`worker/`，`js/cloud-api.js`，`index.html` 里 `window.supa = null` 仅作兼容探测）。
+  Worker 存活：`POST /salt` 对不存在的用户名返回 `ok:true` 且两次 salt 不同（枚举防护生效）。
+- **本地验证**：`node --check`（全部 `git ls-files '*.js'`）OK；`scripts/test_*.js` **23/23** PASS；
+  `python3 tools/validate_content.py` PASSED（含 G1 192 题 / G2 900 题）。
+- **仍未做**：首屏 CSS 拆分（`shared/main.css` 83 KB、`index.html` 324 KB）；答题 TTS 与 `aria-live`
+  重复播报；`today-card` 语义已在 #69 修为原生 `<button>`（`test_html_structure` 显示 0 个 `<div onclick>`）。
 
 ---
 
@@ -307,7 +327,9 @@ iPad 上这是 1 秒级的解析/执行，且全部发生在首屏。**动作：
 ## 7. 上一版计划中的事实错误（已在归档版保留原样）
 
 1. "`main` 与线上逐字节一致" → 已不成立（§2.1）。
-2. "CI 部署：已迁移至 Cloudflare Pages（`deploy-pages.yml` …）" → **`main` 上没有这个文件**，只有 `validate.yml`；部署是手动的。
+2. "CI 部署：已迁移至 Cloudflare Pages（`deploy-pages.yml` …）" → **当时** `main` 上没有这个文件，
+   只有 `validate.yml`；部署是手动的。**2026-11-01 起已过时**：#67 新增了 `.github/workflows/deploy-pages.yml`
+  （push 到 `main` 自动跑阻断门 + 直传），`AGENTS.md` 改为"合并进 `main` = 上线"。
 3. "Grade 2 750 道题库" → 实际 900。
 4. "15 个自动化单测" → 实际 16。
 5. 文件体积/行数（312,895 B / 4,608 行）是旧版数字，当前 312,548 B / 4,606 行。
@@ -321,23 +343,23 @@ iPad 上这是 1 秒级的解析/执行，且全部发生在首屏。**动作：
 |---|---|
 | 合并 `mastery`/`due`/`gradeMastery`/`KCData`/`skillStats` | 已由 `docs/progress-stores.md` 论证，**不要再合并** |
 | 年级页去 iframe | 代码已改（`shared/grade-page.js` 用 `location.replace`），只需等部署 |
-| 交互块用真 `<button>` | 已完成，`test_html_structure` 有护栏 |
-| Supabase CDN 失败降级 | `initSupabase()` 幂等 + `supa=null` 兜底，保持 |
+| 交互块用真 `<button>` | 已完成，`test_html_structure` 有护栏（2026-11-03：0 个 `<div onclick>`） |
+| Supabase CDN 失败降级 | **已过时（#71 起）**：后端换成 Cloudflare Worker + D1，`index.html` 无 Supabase 脚本，`window.supa = null` 仅作旧代码探测；`js/cloud-api.js` 为唯一传输层，有 `test_cloud_backend.js` / `test_cloud_client.js` 覆盖 |
 | 图片动态缓存 | 思路对，只需把版本号从 `APP_VERSION` 解耦 |
 
 ---
 
 ## 9. 实施路线（按 PR 拆，先小后大）
 
-| 顺序 | PR | 内容 | 预估 | 必须的验证 |
-|---|---|---|---|---|
-| 1 | **PR-A 发布可信** | 重新部署 + verify；重写 `AGENTS.md` 发布段；修本计划事实错误 | 0.5 天 | 四条哈希相等；线上 `/grade-2/` 可交互 |
-| 2 | **PR-B 账号数据链** | §3.1–3.5：创建不清空、`currentAccount` 契约、二次登录、刷新凭据、`saveProgress` 兜底 + 3 个新测试 | 1–1.5 天 | 新测试；故意注回 bug 能红 |
-| 3 | **PR-C 离线** | §4：扩 `APP_SHELL`、导航按路径、更新提示、图片缓存解耦、改 `APP_VERSION` 规则 + 测试 | 0.5–1 天 | 离线冷启动首页/年级页；`test_offline_shell` |
-| 4 | **PR-D 内容深度** | §5.2–5.4：G1 元数据 + 每单元 ≥8 题；校验器按目录查重并纳入 G1/G2；CI 改阻断 | 1–2 天 | `test_content_depth`；`validate_content.py` 0 误报 |
-| 5 | **PR-E 账号安全** | §3.6 迁移 009 + 客户端配合 | 1 天 + DB 验证 | 枚举/限流/不返回凭据 |
-| 6 | **PR-F 性能/拆模块** | §6.2 按需加载；删 21 KB 死代码；CSS 拆分 | 2–3 天 | 首屏 JS ≤ 150 KB；16 个测试 + 新增全绿 |
-| 7 | **PR-G 产品/合规** | PIN 找回/改 PIN/删号/导入；manifest（`id`、解锁横屏、shortcuts）；迁移台账 | 按需 | 家长可自助恢复/删除 |
+| 顺序 | PR | 内容 | 预估 | 必须的验证 | 状态（2026-11-03） |
+|---|---|---|---|---|---|
+| 1 | **PR-A 发布可信** | 重新部署 + verify；重写 `AGENTS.md` 发布段；修本计划事实错误 | 0.5 天 | 四条哈希相等；线上 `/grade-2/` 可交互 | ✅ #69 + #67（`deploy-pages.yml` 自动部署；本机 2026-11-03 复核线上 = `main`） |
+| 2 | **PR-B 账号数据链** | §3.1–3.5：创建不清空、`currentAccount` 契约、二次登录、刷新凭据、`saveProgress` 兜底 + 3 个新测试 | 1–1.5 天 | 新测试；故意注回 bug 能红 | ✅ #69（#71 把传输层换成 Worker + D1，契约由 `test_cloud_*.js` 接管） |
+| 3 | **PR-C 离线** | §4：扩 `APP_SHELL`、导航按路径、更新提示、图片缓存解耦、改 `APP_VERSION` 规则 + 测试 | 0.5–1 天 | 离线冷启动首页/年级页；`test_offline_shell` | ✅ #69（33 项；`APP_VERSION` 同步有测试护栏） |
+| 4 | **PR-D 内容深度** | §5.2–5.4：G1 元数据 + 每单元 ≥8 题；校验器按目录查重并纳入 G1/G2；CI 改阻断 | 1–2 天 | `test_content_depth`；`validate_content.py` 0 误报 | ✅ #69 |
+| 5 | **PR-E 账号安全** | §3.6 迁移 009 + 客户端配合 | 1 天 + DB 验证 | 枚举/限流/不返回凭据 | ✅ 仓库侧 #69；线上侧由 #71 的 Worker + D1 实现（salt 探测已验证枚举防护） |
+| 6 | **PR-F 性能/拆模块** | §6.2 按需加载；删 21 KB 死代码；CSS 拆分 | 2–3 天 | 首屏 JS ≤ 150 KB；16 个测试 + 新增全绿 | ⚠️ 部分：按需加载 + 删死代码 ✅ #69；**CSS 拆分未做**（`shared/main.css` 83 KB） |
+| 7 | **PR-G 产品/合规** | PIN 找回/改 PIN/删号/导入；manifest（`id`、解锁横屏、shortcuts）；迁移台账 | 按需 | 家长可自助恢复/删除 | ✅ #69（改 PIN / 删号 / 导入）；#73 加设置面板 + 昵称 |
 
 **串行原因：** PR-B 会改账号流程，PR-E 会改 RPC 契约 —— 两者必须由同一个人按顺序做，否则客户端/服务端会对不上。PR-F 排在最后，避免在错误的基线上搬代码。
 
@@ -345,7 +367,7 @@ iPad 上这是 1 秒级的解析/执行，且全部发生在首屏。**动作：
 
 ## 10. 完成定义（DoD）
 
-每个 PR 合并前必须贴出：
+每个 PR 合并前必须贴出（以 `AGENTS.md` 为准，`validate.yml` 与部署工作流的阻断门一致）：
 
 ```bash
 python3 tools/validate_content.py                 # 0 error / 0 误报警告
@@ -353,22 +375,27 @@ for f in $(git ls-files '*.js'); do node --check "$f" || exit 1; done
 for t in scripts/test_*.js; do node "$t" || exit 1; done
 ```
 
-发布后必须贴出：
+合并到 `main` 后必须看那次 deploy run（`gh run list --branch main`），再验线上字节：
 
 ```bash
-curl -s https://blockquest-classroom.pages.dev/ | sha256sum
+curl -sL https://blockquest-classroom.pages.dev/index.html | sha256sum
 git show origin/main:index.html | sha256sum
-curl -s https://blockquest-classroom.pages.dev/sw.js | sha256sum
+curl -sL https://blockquest-classroom.pages.dev/sw.js | sha256sum
 git show origin/main:sw.js | sha256sum
 ```
 
-**"上线完成"的唯一标准是上面四个哈希两两相等，而不是 HTTP 200。**（`docs/pages-recovery.md` 已经写了这条，本次就是没执行。）
+**"上线完成"的唯一标准是上面四个哈希两两相等，而不是 HTTP 200，也不是 CI 绿灯。**
+（`curl` 必须加 `-L`；部署后约 45 秒内边缘可能仍返回旧字节，等一会儿再验。）
 
 ---
 
 ## 11. 本次审查的边界
 
-- 没有运行 16 个 `node` 测试（本机无 node）；结论来自读源码和线上实测，凡是"测试会不会红"的判断都需要在 CI 或装了 node 的机器上复核。
+- 2026-11-01 审查时本机无 node，16 个 `node` 测试未在本地运行；**2026-11-03 已补**：便携 node v22.14.0
+  下 `node --check`（全部 `git ls-files '*.js'`）OK，`scripts/test_*.js` 23/23 PASS，
+  `validate_content.py` PASSED。
 - 没有连 Supabase 线上库：`008` 是否已执行、匿名登录是否开启、`player_login_attempts` 现状都 **待验证**。
+  **2026-11-03 补充**：该库已 NXDOMAIN，无验证目标；账号后端以 #71 的 Worker + D1 为准，
+  `POST /salt` 枚举防护已在线上验证（见 §0.2）。
 - 没有真机：TTS、触摸、离线安装的体验结论来自代码与文档，不来自设备。
 - Grade 2 的 900 道题只做了**结构与重复**检查（发现 18 条同文件重复题干，多为模板化提问），没有逐题人工审校答案正确性。
