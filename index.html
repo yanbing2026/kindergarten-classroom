@@ -21,7 +21,7 @@
         document.documentElement.dataset.theme = 'cream';
     }
     </script>
-    <!-- APP_VERSION: v2-20261102-cute3 -->
+    <!-- APP_VERSION: v2-20261103-csssplit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@700;800;900&display=swap" media="print" onload="this.media='all'">
@@ -103,7 +103,7 @@
     <script src="./js/blipola-runtime.js"></script>
     <script>
     // ---------- App version ----------
-    const APP_VERSION = 'v2-20261102-cute3';
+    const APP_VERSION = 'v2-20261103-csssplit';
 
     // ---------- Debug / Dev Mode ----------
     // Hidden diagnostic screen for parents and developers.
@@ -3975,6 +3975,21 @@ ${html}
         else setTimeout(run,3000);
     }
     window.addEventListener('load',prewarmGradeData,{once:true});
+    // Grade lesson/course styles live in shared/grade.css and load on demand,
+    // so the first paint only parses the core shell (shared/main.css, now
+    // ~20 KB lighter). The loading/error chrome (.grade-loading/.grade-end)
+    // stays in main.css because renderGradeLoading paints before this loads.
+    let gradeCSSLoaded = false;
+    function ensureGradeCSS(){
+        if (gradeCSSLoaded || !document) return;
+        if (document.querySelector('link[data-kc-grade-css]')) { gradeCSSLoaded = true; return; }
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'shared/grade.css';
+        link.dataset.kcGradeCss = '1';
+        document.head.appendChild(link);
+        gradeCSSLoaded = true;
+    }
     function gradeDataReady(gradeId){return !gradeId||gradeId==='k'||!gradeDataState[gradeId]||gradeDataState[gradeId].loaded;}
     function retryGradeData(gradeId){
         const slot=gradeDataState[gradeId];
@@ -4520,9 +4535,11 @@ function recordRuntimeError(report){
             ? state.params.grade
             : null;
         if ((lazyGradeId === 'g1' || lazyGradeId === 'g2') && !gradeDataReady(lazyGradeId)) {
+            ensureGradeCSS();
             renderGradeLoading(lazyGradeId);
             return;
         }
+        if (lazyGradeId === 'g1' || lazyGradeId === 'g2' || lazyGradeId === 'k') ensureGradeCSS();
         const app = document.getElementById('app');
         let html = '';
         if (state.screen === 'home') html = renderHome();

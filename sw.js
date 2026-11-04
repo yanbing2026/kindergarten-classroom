@@ -1,6 +1,6 @@
 // App version — bump this whenever ANY precached resource changes (HTML,
-// JS, CSS, question banks). Keep identical to APP_VERSION in index.html (v2-20261102-cute3).
-const APP_VERSION = 'v2-20261102-cute3';
+// JS, CSS, question banks). Keep identical to APP_VERSION in index.html (v2-20261103-csssplit).
+const APP_VERSION = 'v2-20261103-csssplit';
 const CACHE_NAME = `kc-${APP_VERSION}`;
 
 // Images have their own version so a code/content release does not force
@@ -17,6 +17,7 @@ const APP_SHELL = [
   './manifest.json',
   './sw.js',
   './shared/main.css',
+  './shared/grade.css',
   './shared/app.css',
   './shared/grade-page.js',
   './js/cloud-api.js',
