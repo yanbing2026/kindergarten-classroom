@@ -111,12 +111,16 @@ assert(
     'renderGradeLesson must render gradeBlipolaMessage with aria-live="polite"'
 );
 assert(
-    renderPlaySrc.includes('id="streakBadge" class="streak-badge" aria-live="polite"'),
-    'renderPlay must render streakBadge with aria-live="polite"'
+    renderPlaySrc.includes('id="playFeedbackLive" class="sr-only" aria-live="polite"'),
+    'renderPlay must render one sr-only playFeedbackLive with aria-live="polite"'
 );
 assert(
-    renderPlaySrc.includes('id="blipolaMessage" aria-live="polite"'),
-    'renderPlay must render blipolaMessage with aria-live="polite"'
+    !renderPlaySrc.includes('id="streakBadge" class="streak-badge" aria-live'),
+    'visible streakBadge must not be a live region (streak status goes to playFeedbackLive)'
+);
+assert(
+    !renderPlaySrc.includes('id="blipolaMessage" aria-live'),
+    'visible blipolaMessage bubble must not be a live region (hints go through announcePlayFeedback)'
 );
 assert(
     html.includes('class="world-detail" aria-live="polite"'),

@@ -21,7 +21,7 @@
         document.documentElement.dataset.theme = 'cream';
     }
     </script>
-    <!-- APP_VERSION: v2-20261102-cute3 -->
+    <!-- APP_VERSION: v2-20261103-playlive -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@700;800;900&display=swap" media="print" onload="this.media='all'">
@@ -103,7 +103,7 @@
     <script src="./js/blipola-runtime.js"></script>
     <script>
     // ---------- App version ----------
-    const APP_VERSION = 'v2-20261102-cute3';
+    const APP_VERSION = 'v2-20261103-playlive';
 
     // ---------- Debug / Dev Mode ----------
     // Hidden diagnostic screen for parents and developers.
@@ -816,9 +816,7 @@
     window.blipolaHint = function () {
         if (!quiz || !quiz.blipolaContext) return;
         const message = blipola.hint(quiz.blipolaContext, quiz.wrongAttempts || 0);
-        const el = document.getElementById("blipolaMessage");
-        if (el) el.textContent = "💡 " + message;
-        speak(message);
+        announcePlayFeedback(document.getElementById("blipolaMessage"), "💡 " + message, "💡 Hint from Blipola.", message);
     };
 
     // ---------- Spaced repetition (research B) ----------
@@ -2213,9 +2211,10 @@
         `).join('');
         return `${topbar(true)}
         <div class="center-col">
-            <div id="blipolaBuddy" style="display:flex;align-items:center;gap:10px;margin:0 auto 10px;max-width:720px;padding:9px 12px;border:0;box-shadow:var(--sh-1);background:var(--kc-surface);color:var(--kc-ink);border-radius:var(--r-md);font-weight:800;">🤖 <span>Blipola</span><span id="blipolaMessage" aria-live="polite" style="font-weight:600;opacity:.78;">Think first. You can ask me for a clue.</span><button class="choice-btn" type="button" onclick="blipolaHint()" style="margin-left:auto;padding:7px 10px;">💡 Hint</button></div>
+            <div id="blipolaBuddy" style="display:flex;align-items:center;gap:10px;margin:0 auto 10px;max-width:720px;padding:9px 12px;border:0;box-shadow:var(--sh-1);background:var(--kc-surface);color:var(--kc-ink);border-radius:var(--r-md);font-weight:800;">🤖 <span>Blipola</span><span id="blipolaMessage" style="font-weight:600;opacity:.78;">Think first. You can ask me for a clue.</span><button class="choice-btn" type="button" onclick="blipolaHint()" style="margin-left:auto;padding:7px 10px;">💡 Hint</button></div>
             <div style="color:#999;margin-bottom:8px;">Question ${quiz.idx + 1} of ${ROUND_LENGTH}</div>
-            <div id="streakBadge" class="streak-badge" aria-live="polite"></div>
+            <div id="streakBadge" class="streak-badge"></div>
+            <div id="playFeedbackLive" class="sr-only" aria-live="polite"></div>
             <div class="prompt-box">${q.promptHTML}</div>
             <div class="choices">${choicesHTML}</div>
         </div>`;
@@ -2258,9 +2257,9 @@
             }
             // Streak tracking
             quiz.streak = (quiz.streak || 0) + 1;
-            if (quiz.streak >= 10) { progress.stars += 10; speak('🌟 LEGENDARY! Ten in a row!'); updateStreakBadge('legendary', '🌟 LEGENDARY! +10'); }
-            else if (quiz.streak >= 5) { progress.stars += 5; speak('⚡ Unstoppable! Five in a row!'); updateStreakBadge('unstoppable', '⚡ Unstoppable! +5'); }
-            else if (quiz.streak >= 3) { progress.stars += 2; speak('🔥 On Fire! Three in a row!'); updateStreakBadge('fire', '🔥 On Fire! +2'); }
+            if (quiz.streak >= 10) { progress.stars += 10; updateStreakBadge('legendary', '🌟 LEGENDARY! +10'); announcePlayFeedback(null, null, '🌟 10 in a row!', '🌟 LEGENDARY! Ten in a row!'); }
+            else if (quiz.streak >= 5) { progress.stars += 5; updateStreakBadge('unstoppable', '⚡ Unstoppable! +5'); announcePlayFeedback(null, null, '⚡ 5 in a row!', '⚡ Unstoppable! Five in a row!'); }
+            else if (quiz.streak >= 3) { progress.stars += 2; updateStreakBadge('fire', '🔥 On Fire! +2'); announcePlayFeedback(null, null, '🔥 3 in a row!', '🔥 On Fire! Three in a row!'); }
             saveProgress();
             confettiBurst();
             speak(descriptivePraise(q.sourceKey || quiz.key, q));
@@ -2295,12 +2294,27 @@
         }
         renderTopbarStarsOnly();
     }
+    // Play-screen announcements (kindergarten). Same split as the grade side:
+    // the visible bubble/badge keeps its text, the sr-only live node only
+    // gets a short status, and speak() keeps the full sentence. Screen
+    // readers announce live-region changes while the app TTS reads aloud, so
+    // putting the full text on both made both voices overlap every time.
+    function announcePlayFeedback(visibleEl, visibleText, liveText, spokenText){
+        if(visibleEl) visibleEl.textContent = visibleText || '';
+        const liveEl = document.getElementById('playFeedbackLive');
+        if(liveEl) liveEl.textContent = liveText || '';
+        if(spokenText) speak(spokenText);
+    }
     function updateStreakBadge(level, text) {
         // Streak badge is injected into renderPlay after rendering
         const badge = document.getElementById('streakBadge');
         if (!badge) return;
         badge.className = 'streak-badge' + (level ? ' active ' + level : '');
         badge.textContent = text;
+        if (!level) {
+            const liveEl = document.getElementById('playFeedbackLive');
+            if (liveEl) liveEl.textContent = '';
+        }
     }
     function renderTopbarStarsOnly() {
         const badge = document.getElementById('topbarStarBadge') || document.querySelector('.topbar .star-badge') || document.querySelector('.star-badge');
