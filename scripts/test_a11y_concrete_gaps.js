@@ -98,18 +98,24 @@ function extractFunction(source, fnName) {
 
 console.log('Testing N10 a11y concrete gaps (extracted from index.html)...');
 
-// 1. Feedback areas aria-live="polite" assertions
+// 1. Feedback areas: exactly one polite live region per lesson card.
+// The visible bubbles carry the full text for sighted users; the dedicated
 const renderGradeLessonSrc = extractFunction(html, 'renderGradeLesson');
+// sr-only node carries the short status for screen readers. Putting the full
+// text on a live region AND speaking it caused double announcements (§6.3).
+assert(
+    renderGradeLessonSrc.includes('id="gradeFeedbackLive" class="sr-only" aria-live="polite"'),
+    'renderGradeLesson must render one sr-only gradeFeedbackLive with aria-live="polite"'
+);
+assert(
+    !renderGradeLessonSrc.includes('id="gradeFeedback" class="grade-feedback" aria-live'),
+    'visible gradeFeedback bubble must not be a live region (announcements go to gradeFeedbackLive)'
+);
+assert(
+    !renderGradeLessonSrc.includes('id="gradeBlipolaMessage" aria-live'),
+    'visible gradeBlipolaMessage bubble must not be a live region (hints go through announceGradeFeedback)'
+);
 const renderPlaySrc = extractFunction(html, 'renderPlay');
-
-assert(
-    renderGradeLessonSrc.includes('id="gradeFeedback" class="grade-feedback" aria-live="polite"'),
-    'renderGradeLesson must render gradeFeedback with aria-live="polite"'
-);
-assert(
-    renderGradeLessonSrc.includes('id="gradeBlipolaMessage" aria-live="polite"'),
-    'renderGradeLesson must render gradeBlipolaMessage with aria-live="polite"'
-);
 assert(
     renderPlaySrc.includes('id="streakBadge" class="streak-badge" aria-live="polite"'),
     'renderPlay must render streakBadge with aria-live="polite"'
