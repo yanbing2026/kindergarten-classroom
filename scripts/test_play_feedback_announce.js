@@ -64,7 +64,17 @@ console.log('Testing play-screen feedback announcement split...');
     fn(null, null, '🔥 3 in a row!', '🔥 On Fire! Three in a row!');
     assert.strictEqual(live.textContent, '🔥 3 in a row!');
     assert.deepStrictEqual(spoken, ['🔥 On Fire! Three in a row!']);
-    console.log('✓ announcePlayFeedback splits visible / live / spoken channels');
+
+    // Math screen passes its own live node id; the play node stays untouched.
+    const mathLive = { textContent: '' };
+    const doc2 = { getElementById: (id) => (id === 'mathFeedbackLive' ? mathLive : null) };
+    const fn2 = new Function('document', 'speak', `${src}; return announcePlayFeedback;`)(doc2, speak);
+    spoken.length = 0;
+    fn2(null, null, '✓ Correct!', null, 'mathFeedbackLive');
+    assert.strictEqual(mathLive.textContent, '✓ Correct!');
+    assert.strictEqual(live.textContent, '🔥 3 in a row!', 'math announce must not touch the play live node');
+    assert.strictEqual(spoken.length, 0);
+    console.log('✓ announcePlayFeedback splits visible / live / spoken channels, mute-safe');
 }
 
 // 2. The play markup has exactly one live region, and it is not a visible
@@ -76,13 +86,15 @@ console.log('Testing play-screen feedback announcement split...');
     console.log('✓ play markup has one sr-only live region; visible bubble and badge are not live');
 }
 
-// 3. Hint and streak paths route through the helper; the old overlap is gone.
+// 3. Hint, streak, and answer-result paths route through the helper; the
+//    old overlap is gone. Muted screen-reader users now also get short
+//    result announcements where there used to be speak-only silence.
 {
     const hintSrc = extractFunction(html, 'blipolaHint');
     assert(hintSrc.includes('announcePlayFeedback('), 'blipolaHint must route through announcePlayFeedback');
 
     const updateSrc = extractFunction(html, 'updateStreakBadge');
-    assert(updateSrc.includes('playFeedbackLive'), 'clearing the badge must also clear the live node');
+    assert(updateSrc.includes("announcePlayFeedback(null, null, '', null)"), 'clearing the badge must also clear the live node');
 
     const handleSrc = extractFunction(html, 'handleChoice');
     for (const short of ['10 in a row!', '5 in a row!', '3 in a row!']) {
@@ -93,7 +105,17 @@ console.log('Testing play-screen feedback announcement split...');
     for (const badge of ['🌟 LEGENDARY! +10', '⚡ Unstoppable! +5', '🔥 On Fire! +2']) {
         assert(handleSrc.includes(badge), `visible badge text "${badge}" must stay unchanged`);
     }
-    console.log('✓ hint and streak paths use the helper; visible badge text unchanged');
+    // Answer results announce a short status (previously speak-only: silent
+    // for muted screen-reader users).
+    assert(handleSrc.includes("announcePlayFeedback(null, null, '✓ Correct!', null)"), 'correct answers must announce a short live status');
+    assert(handleSrc.includes("announcePlayFeedback(null, null, 'Try again.', null)"), 'wrong answers must announce a short live status');
+    console.log('✓ hint, streak, and answer-result paths use the helper; visible badge text unchanged');
+
+    const mathSrc = extractFunction(html, 'handleMathChoice');
+    assert(mathSrc.includes("announcePlayFeedback(null, null, '✓ Correct!', null, 'mathFeedbackLive')"), 'math correct must announce on the math live node');
+    assert(mathSrc.includes("announcePlayFeedback(null, null, 'Try again.', null, 'mathFeedbackLive')"), 'math wrong must announce on the math live node');
+    assert(html.includes('id="mathFeedbackLive" class="sr-only" aria-live="polite"'), 'math screen must render its own sr-only live node');
+    console.log('✓ math answer results announce on their own live node');
 }
 
 // 4. The .sr-only class actually hides visually.

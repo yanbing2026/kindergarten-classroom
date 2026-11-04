@@ -21,7 +21,7 @@
         document.documentElement.dataset.theme = 'cream';
     }
     </script>
-    <!-- APP_VERSION: v2-20261103-playlive -->
+    <!-- APP_VERSION: v2-20261104-results -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@700;800;900&display=swap" media="print" onload="this.media='all'">
@@ -103,7 +103,7 @@
     <script src="./js/blipola-runtime.js"></script>
     <script>
     // ---------- App version ----------
-    const APP_VERSION = 'v2-20261103-playlive';
+    const APP_VERSION = 'v2-20261104-results';
 
     // ---------- Debug / Dev Mode ----------
     // Hidden diagnostic screen for parents and developers.
@@ -2262,6 +2262,7 @@
             else if (quiz.streak >= 3) { progress.stars += 2; updateStreakBadge('fire', '🔥 On Fire! +2'); announcePlayFeedback(null, null, '🔥 3 in a row!', '🔥 On Fire! Three in a row!'); }
             saveProgress();
             confettiBurst();
+            announcePlayFeedback(null, null, '✓ Correct!', null);
             speak(descriptivePraise(q.sourceKey || quiz.key, q));
             scheduleNavigation(nextQuestion, 900);
         } else {
@@ -2290,6 +2291,7 @@
                 quiz.retryQueue.unshift(q.itemId);
             }
             updateStreakBadge(null, '');
+            announcePlayFeedback(null, null, 'Try again.', null);
             speak(descriptiveRetry(q.sourceKey || quiz.key, q));
         }
         renderTopbarStarsOnly();
@@ -2299,9 +2301,9 @@
     // gets a short status, and speak() keeps the full sentence. Screen
     // readers announce live-region changes while the app TTS reads aloud, so
     // putting the full text on both made both voices overlap every time.
-    function announcePlayFeedback(visibleEl, visibleText, liveText, spokenText){
+    function announcePlayFeedback(visibleEl, visibleText, liveText, spokenText, liveId){
         if(visibleEl) visibleEl.textContent = visibleText || '';
-        const liveEl = document.getElementById('playFeedbackLive');
+        const liveEl = document.getElementById(liveId || 'playFeedbackLive');
         if(liveEl) liveEl.textContent = liveText || '';
         if(spokenText) speak(spokenText);
     }
@@ -2311,10 +2313,7 @@
         if (!badge) return;
         badge.className = 'streak-badge' + (level ? ' active ' + level : '');
         badge.textContent = text;
-        if (!level) {
-            const liveEl = document.getElementById('playFeedbackLive');
-            if (liveEl) liveEl.textContent = '';
-        }
+        if (!level) announcePlayFeedback(null, null, '', null);
     }
     function renderTopbarStarsOnly() {
         const badge = document.getElementById('topbarStarBadge') || document.querySelector('.topbar .star-badge') || document.querySelector('.star-badge');
@@ -2800,6 +2799,7 @@
             <div style="color:#999;margin-bottom:8px;">Level ${lvNum} · Question ${mathState.idx + 1} of ${ROUND_LENGTH}</div>
             ${promptContent}
             <div class="choices">${choicesHTML}</div>
+            <div id="mathFeedbackLive" class="sr-only" aria-live="polite"></div>
         </div>`;
     }
     function afterMathPlayRender() {
@@ -2830,12 +2830,14 @@
             progress.mathStreak = adapt.streak;
             saveProgress();
             confettiBurst();
+            announcePlayFeedback(null, null, '✓ Correct!', null, 'mathFeedbackLive');
             speak(descriptivePraise('math', q));
             scheduleNavigation(nextMathQuestion, 900);
         } else {
             btnEl.classList.add('incorrect');
             btnEl.disabled = true;
             q.firstAttempt = false;
+            announcePlayFeedback(null, null, 'Try again.', null, 'mathFeedbackLive');
             speak(descriptiveRetry('math', q));
         }
         renderTopbarStarsOnly();

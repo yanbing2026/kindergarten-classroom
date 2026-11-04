@@ -1,6 +1,6 @@
 // App version — bump this whenever ANY precached resource changes (HTML,
-// JS, CSS, question banks). Keep identical to APP_VERSION in index.html (v2-20261103-playlive).
-const APP_VERSION = 'v2-20261103-playlive';
+// JS, CSS, question banks). Keep identical to APP_VERSION in index.html (v2-20261104-results).
+const APP_VERSION = 'v2-20261104-results';
 const CACHE_NAME = `kc-${APP_VERSION}`;
 
 // Images have their own version so a code/content release does not force
