@@ -21,7 +21,7 @@
         document.documentElement.dataset.theme = 'cream';
     }
     </script>
-    <!-- APP_VERSION: v2-20261102-cute3 -->
+    <!-- APP_VERSION: v2-20261121-nickname -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@700;800;900&display=swap" media="print" onload="this.media='all'">
@@ -103,7 +103,7 @@
     <script src="./js/blipola-runtime.js"></script>
     <script>
     // ---------- App version ----------
-    const APP_VERSION = 'v2-20261102-cute3';
+    const APP_VERSION = 'v2-20261121-nickname';
 
     // ---------- Debug / Dev Mode ----------
     // Hidden diagnostic screen for parents and developers.
@@ -604,6 +604,7 @@
                 if(key){
                     try{const accounts=getAccounts();delete accounts[key];localStorage.setItem('kc_accounts_v1',JSON.stringify(accounts));}catch(_){}
                     try{localStorage.removeItem(accountProgressKey(key));}catch(_){}
+                    try{localStorage.removeItem(nicknameStorageKey(key));}catch(_){}
                 }
                 localStorage.removeItem('kc_current_account');
                 setPinVerifier('');
@@ -1298,43 +1299,95 @@
         if (creamBtn) creamBtn.className = 'theme-card' + (theme === 'cream' ? ' active' : '');
         if (skyBtn) skyBtn.className = 'theme-card' + (theme === 'sky' ? ' active' : '');
     }
-    function getNickname() {
-        try {
-            return (localStorage.getItem('kc_nickname_v1') || '').trim();
-        } catch (_) {
-            return '';
-        }
+    // ---------- Nickname: per-account, Unicode-safe ----------
+    // The legacy `kc_nickname_v1` key was device-wide and had no account
+    // association. It must never be attributed to a named child. See
+    // OPENCODE-TEST-001-REPORT.md for the full migration policy.
+    const NICKNAME_LEGACY_KEY = 'kc_nickname_v1';
+    const NICKNAME_KEY_PREFIX = 'kc_nickname_v1_';
+    const NICKNAME_GUEST_NAMESPACE = 'guest';
+
+    function nicknameNamespace(accountKey) {
+        const key = typeof accountKey === 'string' ? accountKey : '';
+        return key ? 'acct_' + key.toLowerCase() : NICKNAME_GUEST_NAMESPACE;
     }
-    function setNickname(name) {
+    function nicknameStorageKey(accountKey) {
+        return NICKNAME_KEY_PREFIX + nicknameNamespace(accountKey);
+    }
+    function normalizeNickname(raw) {
+        if (typeof raw !== 'string') return '';
+        let value;
+        try { value = raw.normalize('NFC'); } catch (_) { value = raw; }
+        return value.trim().replace(/[ ]{2,}/g, ' ');
+    }
+    function isValidNickname(value) {
+        if (typeof value !== 'string') return false;
+        const s = normalizeNickname(value);
+        const len = Array.from(s).length; // code points, not UTF-16 units
+        if (len < 2 || len > 16) return false;
+        if (!/[\p{L}\p{N}]/u.test(s)) return false; // reject whitespace/punctuation-only
+        return /^[\p{L}\p{M}\p{N} \u0027\u2019\-]{2,16}$/u.test(s);
+    }
+    function getNickname() {
+        const accountKey = (typeof getCurrentAccount === 'function' ? getCurrentAccount() : '') || '';
+        const key = nicknameStorageKey(accountKey);
+        let stored = '';
+        try { stored = localStorage.getItem(key) || ''; } catch (_) { return ''; }
+        const normalized = normalizeNickname(stored);
+        if (isValidNickname(normalized)) return normalized;
+        try { localStorage.removeItem(key); } catch (_) {}
+        if (accountKey) return ''; // a named child never inherits legacy or guest data
+        // One-time migration: the legacy value has no owner, so it may only
+        // ever land in the guest namespace. Consume it either way.
+        let legacy = '';
+        try { legacy = localStorage.getItem(NICKNAME_LEGACY_KEY) || ''; } catch (_) {}
+        const safeLegacy = normalizeNickname(legacy);
+        const migrated = isValidNickname(safeLegacy) ? safeLegacy : '';
         try {
-            if (name) {
-                localStorage.setItem('kc_nickname_v1', name);
-            } else {
-                localStorage.removeItem('kc_nickname_v1');
-            }
+            if (migrated) localStorage.setItem(key, migrated);
+            localStorage.removeItem(NICKNAME_LEGACY_KEY);
         } catch (_) {}
+        return migrated;
+    }
+    function setNickname(name, accountKeyOpt) {
+        const accountKey = accountKeyOpt === undefined
+            ? ((typeof getCurrentAccount === 'function' ? getCurrentAccount() : '') || '')
+            : (accountKeyOpt || '');
+        const key = nicknameStorageKey(accountKey);
+        const normalized = normalizeNickname(name);
+        try {
+            if (isValidNickname(normalized)) {
+                localStorage.setItem(key, normalized);
+                // Consume the legacy key here too, so a stale device-wide value
+                // cannot surface later under a different account.
+                localStorage.removeItem(NICKNAME_LEGACY_KEY);
+                return true;
+            }
+            localStorage.removeItem(key);
+            localStorage.removeItem(NICKNAME_LEGACY_KEY);
+            return false;
+        } catch (_) { return false; }
     }
     function saveNickname() {
         const input = document.getElementById('nicknameInput');
         const errEl = document.getElementById('nicknameError');
         if (!input) return;
-        const raw = input.value.trim();
-        if (!raw) {
+        const normalized = normalizeNickname(input.value);
+        if (!normalized) {
             setNickname('');
             closeThemeModal();
             render();
             return;
         }
-        const valid = /^[a-zA-Z0-9 '-]{2,16}$/.test(raw);
-        if (!valid) {
+        if (!isValidNickname(normalized)) {
             if (errEl) {
-                errEl.textContent = "Use 2–16 letters, numbers, spaces, - or '.";
+                errEl.textContent = "Use 2–16 letters (Chinese and other scripts OK), numbers, spaces, - or '.";
                 errEl.style.display = 'block';
             }
             return;
         }
         if (errEl) errEl.style.display = 'none';
-        setNickname(raw);
+        setNickname(normalized);
         closeThemeModal();
         render();
     }
@@ -1370,11 +1423,11 @@
             <div class="settings-section" style="margin-bottom:20px;">
                 <div style="font-weight:700;font-size:0.95rem;margin-bottom:8px;color:var(--kc-ink-soft);">Name</div>
                 <div style="display:flex;gap:8px;">
-                    <input id="nicknameInput" type="text" maxlength="16" placeholder="e.g. Leo" value="${esc(curNick).replace(/"/g, '&quot;')}" onkeydown="if(event.key==='Enter')saveNickname()" style="flex:1;padding:8px 12px;border:2px solid var(--kc-line);border-radius:var(--r-md);font-size:1rem;background:var(--kc-surface);color:var(--kc-ink);box-sizing:border-box;">
+                    <input id="nicknameInput" type="text" maxlength="32" placeholder="e.g. Leo / 小明" value="${esc(curNick).replace(/"/g, '&quot;')}" onkeydown="if(event.key==='Enter')saveNickname()" style="flex:1;padding:8px 12px;border:2px solid var(--kc-line);border-radius:var(--r-md);font-size:1rem;background:var(--kc-surface);color:var(--kc-ink);box-sizing:border-box;">
                     <button type="button" class="theme-close-btn" onclick="saveNickname()" style="padding:8px 16px;background:var(--kc-primary);color:#fff;font-weight:700;cursor:pointer;">Save</button>
                 </div>
                 <div id="nicknameError" style="display:none;color:#d32f2f;font-size:0.85rem;margin-top:6px;"></div>
-                <div style="font-size:0.8rem;color:var(--kc-ink-soft);margin-top:6px;">Shown on the home screen. Stays on this device.</div>
+                <div style="font-size:0.8rem;color:var(--kc-ink-soft);margin-top:6px;">Shown on the home screen. Saved separately for each child on this device.</div>
             </div>
             <div class="theme-actions">
                 <button type="button" class="theme-close-btn" onclick="closeThemeModal()">Close</button>
