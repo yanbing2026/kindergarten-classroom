@@ -16,7 +16,7 @@ Issue: https://github.com/yanbing2026/kindergarten-classroom/issues/77
 | Test identities | disposable synthetic accounts **A**, **B**, and **Guest** only; no real child names, personal data, or credentials recorded |
 | Test data created | synthetic nicknames `小安` (A), `小贝` (B), `小客` (Guest); one quiz answer on A changed its diamonds from 0 to 1. No other production data touched. |
 
-Because no physical phone was available, all results below are **emulated-browser results** and must not be read as physical-device certification.
+Because no physical phone was available, all results below are **emulated mobile-browser acceptance-test results**, not physical-device acceptance, and must not be read as physical-device certification.
 
 ## 2. Result table
 
