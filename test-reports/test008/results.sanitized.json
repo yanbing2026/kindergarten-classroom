@@ -18,7 +18,7 @@
       "classification": "genuine production Worker behavior",
       "expected": "Worker accepts and persists one reward; re-login shows it.",
       "observed": "version=v2-20261122-progress-flush; TEST-A stars 0→1→re-login 1; mastery {}→{\"letters_L1\":{\"A\":1}}.",
-      "evidence": "test008-01-baseline.png"
+      "evidence": "test008-01-post-reward-relogin.png"
     },
     {
       "id": "B",
@@ -45,7 +45,7 @@
       "classification": "client-simulated — NOT Worker-side failure",
       "expected": "UI must not falsely claim cloud success; no lost/duplicated reward.",
       "observed": "{\"before\":1,\"earned\":2,\"uiStatus\":\"☁️ Syncing…\",\"falseSuccess\":false,\"afterRelogin\":2,\"lost\":false,\"duplicated\":false}. This is browser-offline only and does not satisfy B or C.",
-      "evidence": "test008-02-client-offline.png"
+      "evidence": "test008-02-post-client-relogin.png"
     },
     {
       "id": "E",
@@ -86,17 +86,26 @@
       "duplicated": false
     },
     "screenshot_context": {
-      "test008-01-baseline": {
+      "test008-01-post-reward-relogin.png": {
         "alias": "TEST-A",
-        "accountState": "signed-in"
+        "accountState": "signed-in",
+        "stage": "post-reward, post-logout/re-login (Scenario A end)",
+        "visibleDiamonds": 1,
+        "valueSource": "scenario A observed: 0 → 1 → re-login 1"
       },
-      "test008-02-client-offline": {
+      "test008-02-post-client-relogin.png": {
         "alias": "TEST-A",
-        "accountState": "signed-in"
+        "accountState": "signed-in",
+        "stage": "post client-simulated offline recovery, post re-login (Scenario D end)",
+        "visibleDiamonds": 2,
+        "valueSource": "scenario D observed: afterRelogin 2"
       },
-      "test008-03-final": {
+      "test008-03-final.png": {
         "alias": "TEST-A",
-        "accountState": "signed-in"
+        "accountState": "signed-in",
+        "stage": "final state (Scenario E)",
+        "visibleDiamonds": 2,
+        "valueSource": "scenario E observed: final TEST-A stars=2"
       }
     },
     "worker_requests": {
@@ -290,8 +299,8 @@
     }
   ],
   "screenshots": [
-    "test-reports/test008/test008-01-baseline.png",
-    "test-reports/test008/test008-02-client-offline.png",
+    "test-reports/test008/test008-01-post-reward-relogin.png",
+    "test-reports/test008/test008-02-post-client-relogin.png",
     "test-reports/test008/test008-03-final.png"
   ]
 }

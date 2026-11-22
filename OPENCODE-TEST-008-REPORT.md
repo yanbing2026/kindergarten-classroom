@@ -49,9 +49,17 @@ Authoritative machine-readable evidence: `test-reports/test008/results.sanitized
 
 ## 5. Screenshots
 
-Under `test-reports/test008/`: `test008-01-baseline.png`, `test008-02-client-offline.png`, `test008-03-final.png`. All three visibly show **“Hi, TEST-A!”**. The account chip/bar was hidden and the home greeting was replaced with the synthetic alias **at capture time only** (no application behavior changed); no credentials, account identifiers or learner data appear.
+Under `test-reports/test008/`, with the **actual capture stage** stated explicitly:
 
-Identity evidence for the annotation: the test harness asserted `getCurrentAccount()` was non-empty immediately before each screenshot (`accountState: "signed-in"`) and recorded this in `results.sanitized.json` → `evidence.screenshot_context` for all three files. `evidence.baseline` records alias `TEST-A`, the redacted account-key prefix `kcqafail…`, and the starting values, tying the displayed state to the synthetic account used in scenarios A/D/E. (An earlier draft used a stale prefix check in the screenshot helper and produced `Hi, Guest!` images; that was corrected and the run repeated — the committed screenshots are from the corrected run.)
+| File | Capture stage | Visible diamonds |
+| --- | --- | ---: |
+| `test008-01-post-reward-relogin.png` | Scenario A end — after the reward and after logout/re-login (initial name `test008-01-baseline.png` was misleading; corrected) | 1 |
+| `test008-02-post-client-relogin.png` | Scenario D end — after client-simulated offline recovery and re-login | 2 |
+| `test008-03-final.png` | Scenario E final state | 2 |
+
+All three visibly show **“Hi, TEST-A!”**. The account chip/bar was hidden and the greeting replaced with the synthetic alias **at capture time only** (no application behavior changed); no credentials, account identifiers or learner data appear. **No pre-reward screenshot was captured** — the true pre-action baseline (`0` diamonds) exists only as machine-readable values, not as an image.
+
+Identity/stage evidence: `results.sanitized.json` → `evidence.screenshot_context` records `{alias, accountState:"signed-in", stage, visibleDiamonds, valueSource}` for each file; the visible-diamond values come from the same run's scenario observations (A: `0 → 1 → re-login 1`; D: `afterRelogin 2`; E: `final stars=2`). `evidence.baseline` records alias `TEST-A`, redacted key prefix `kcqafail…`, `stars: 0`, and empty mastery, tying the starting state to the synthetic account. (Earlier drafts had a stale alias check producing `Hi, Guest!` images and misleading file names; both were corrected and the run repeated — the committed files are from the corrected run.)
 
 ## 6. Incidental observation (out of TEST-008 scope, not fixed)
 
