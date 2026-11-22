@@ -10,7 +10,7 @@ Issue: https://github.com/yanbing2026/kindergarten-classroom/issues/90
 | --- | --- |
 | Production URL | https://blockquest-classroom.pages.dev/ |
 | Observed app version | `v2-20261122-progress-flush` (read from deployed `APP_VERSION`) |
-| UTC test window | `2026-11-22T14:45:50.411Z` → `2026-11-22T14:45:54.499Z` (from attached `results.sanitized.json`) |
+| UTC test window | `2026-11-22T21:13:15.540Z` → `2026-11-22T21:13:19.866Z` (from attached `results.sanitized.json`) |
 | Timezone note | UTC timestamps from `Date().toISOString()`; runner local clock is US Eastern |
 | Browser | Google Chrome `157.0.8103.38`, headless, driven by `puppeteer-core` |
 | Device / viewport | `1280×900` headless desktop on Linux; **no mobile emulation, no physical hardware** |
@@ -42,14 +42,16 @@ Only method, host, path, HTTP status and duration were captured — **no headers
 
 - Total Worker responses: **21** = **14 application requests** (all HTTP 200) + **7 OPTIONS preflights** (HTTP 204).
 - Endpoints: `/salt` 3 POST, `/create` 1 POST, `/login` 2 POST, `/me` 3 GET, `/progress` 2 POST, `/events` 3 POST, plus the corresponding preflights.
-- Response duration range: **16–156 ms** (per-response values in `network.sanitized.json`).
+- Response duration range: **16–444 ms** (per-response values in `network.sanitized.json`).
 - No 4xx/5xx responses were observed during the final clean run.
 
 Authoritative machine-readable evidence: `test-reports/test008/results.sanitized.json` and `test-reports/test008/network.sanitized.json`. Their totals agree (21 = 14 + 7) and timestamps match.
 
 ## 5. Screenshots
 
-Under `test-reports/test008/`: `test008-01-baseline.png`, `test008-02-client-offline.png`, `test008-03-final.png`. Account chip/bar hidden and home greeting replaced with `TEST-A` at capture time only; no credentials or learner data appear.
+Under `test-reports/test008/`: `test008-01-baseline.png`, `test008-02-client-offline.png`, `test008-03-final.png`. All three visibly show **“Hi, TEST-A!”**. The account chip/bar was hidden and the home greeting was replaced with the synthetic alias **at capture time only** (no application behavior changed); no credentials, account identifiers or learner data appear.
+
+Identity evidence for the annotation: the test harness asserted `getCurrentAccount()` was non-empty immediately before each screenshot (`accountState: "signed-in"`) and recorded this in `results.sanitized.json` → `evidence.screenshot_context` for all three files. `evidence.baseline` records alias `TEST-A`, the redacted account-key prefix `kcqafail…`, and the starting values, tying the displayed state to the synthetic account used in scenarios A/D/E. (An earlier draft used a stale prefix check in the screenshot helper and produced `Hi, Guest!` images; that was corrected and the run repeated — the committed screenshots are from the corrected run.)
 
 ## 6. Incidental observation (out of TEST-008 scope, not fixed)
 

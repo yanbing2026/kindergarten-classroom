@@ -4,8 +4,8 @@
   "production_url": "https://blockquest-classroom.pages.dev/",
   "worker_host": "blockquest-api.yanbing2004.workers.dev",
   "utc_window": {
-    "start": "2026-11-22T14:45:50.411Z",
-    "end": "2026-11-22T14:45:54.499Z"
+    "start": "2026-11-22T21:13:15.540Z",
+    "end": "2026-11-22T21:13:19.866Z"
   },
   "totals": {
     "responses": 21,
@@ -17,7 +17,7 @@
     },
     "duration_ms": {
       "min": 16,
-      "max": 156
+      "max": 444
     }
   },
   "by_endpoint": {
@@ -76,28 +76,28 @@
       "host": "blockquest-api.yanbing2004.workers.dev",
       "path": "/salt",
       "status": 204,
-      "durationMs": 43
+      "durationMs": 147
     },
     {
       "method": "POST",
       "host": "blockquest-api.yanbing2004.workers.dev",
       "path": "/salt",
       "status": 200,
-      "durationMs": 156
+      "durationMs": 444
     },
     {
       "method": "OPTIONS",
       "host": "blockquest-api.yanbing2004.workers.dev",
       "path": "/create",
       "status": 204,
-      "durationMs": 33
+      "durationMs": 42
     },
     {
       "method": "POST",
       "host": "blockquest-api.yanbing2004.workers.dev",
       "path": "/create",
       "status": 200,
-      "durationMs": 126
+      "durationMs": 152
     },
     {
       "method": "OPTIONS",
@@ -111,28 +111,35 @@
       "host": "blockquest-api.yanbing2004.workers.dev",
       "path": "/me",
       "status": 200,
-      "durationMs": 81
+      "durationMs": 79
     },
     {
       "method": "OPTIONS",
       "host": "blockquest-api.yanbing2004.workers.dev",
       "path": "/events",
       "status": 204,
-      "durationMs": 28
+      "durationMs": 24
     },
     {
       "method": "OPTIONS",
       "host": "blockquest-api.yanbing2004.workers.dev",
       "path": "/events",
       "status": 204,
-      "durationMs": 33
+      "durationMs": 41
     },
     {
       "method": "OPTIONS",
       "host": "blockquest-api.yanbing2004.workers.dev",
       "path": "/progress",
       "status": 204,
-      "durationMs": 16
+      "durationMs": 33
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 200,
+      "durationMs": 110
     },
     {
       "method": "POST",
@@ -144,58 +151,30 @@
     {
       "method": "POST",
       "host": "blockquest-api.yanbing2004.workers.dev",
-      "path": "/events",
-      "status": 200,
-      "durationMs": 131
-    },
-    {
-      "method": "POST",
-      "host": "blockquest-api.yanbing2004.workers.dev",
       "path": "/progress",
       "status": 200,
-      "durationMs": 116
+      "durationMs": 106
     },
     {
       "method": "POST",
       "host": "blockquest-api.yanbing2004.workers.dev",
       "path": "/salt",
       "status": 200,
-      "durationMs": 56
+      "durationMs": 51
     },
     {
       "method": "OPTIONS",
       "host": "blockquest-api.yanbing2004.workers.dev",
       "path": "/login",
       "status": 204,
-      "durationMs": 23
+      "durationMs": 16
     },
     {
       "method": "POST",
       "host": "blockquest-api.yanbing2004.workers.dev",
       "path": "/login",
       "status": 200,
-      "durationMs": 106
-    },
-    {
-      "method": "GET",
-      "host": "blockquest-api.yanbing2004.workers.dev",
-      "path": "/me",
-      "status": 200,
-      "durationMs": 56
-    },
-    {
-      "method": "POST",
-      "host": "blockquest-api.yanbing2004.workers.dev",
-      "path": "/salt",
-      "status": 200,
-      "durationMs": 33
-    },
-    {
-      "method": "POST",
-      "host": "blockquest-api.yanbing2004.workers.dev",
-      "path": "/login",
-      "status": 200,
-      "durationMs": 126
+      "durationMs": 102
     },
     {
       "method": "GET",
@@ -207,16 +186,37 @@
     {
       "method": "POST",
       "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/salt",
+      "status": 200,
+      "durationMs": 45
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/login",
+      "status": 200,
+      "durationMs": 88
+    },
+    {
+      "method": "GET",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/me",
+      "status": 200,
+      "durationMs": 60
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
       "path": "/events",
       "status": 200,
-      "durationMs": 79
+      "durationMs": 74
     },
     {
       "method": "POST",
       "host": "blockquest-api.yanbing2004.workers.dev",
       "path": "/progress",
       "status": 200,
-      "durationMs": 76
+      "durationMs": 73
     }
   ],
   "failed_requests": [
