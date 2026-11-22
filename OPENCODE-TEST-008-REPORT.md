@@ -53,7 +53,7 @@ Under `test-reports/test008/`, with the **actual capture stage** stated explicit
 
 | File | Capture stage | Visible diamonds |
 | --- | --- | ---: |
-| `test008-01-post-reward-relogin.png` | Scenario A end — after the reward and after logout/re-login (initial name `test008-01-baseline.png` was misleading; corrected) | 1 |
+| `test008-01-post-reward-relogin.png` | Scenario A end — after the reward and after logout/re-login (an earlier draft used a misleading baseline label; corrected) | 1 |
 | `test008-02-post-client-relogin.png` | Scenario D end — after client-simulated offline recovery and re-login | 2 |
 | `test008-03-final.png` | Scenario E final state | 2 |
 
