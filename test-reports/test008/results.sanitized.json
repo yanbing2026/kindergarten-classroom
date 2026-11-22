@@ -60,10 +60,10 @@
   "evidence": {
     "version": "v2-20261122-progress-flush",
     "baseline": {
-      "alias": {},
-      "stars": {},
+      "alias": "TEST-A",
+      "stars": 0,
       "mastery": {},
-      "accountKeyPrefix": {}
+      "accountKeyPrefix": "kcqafail…"
     },
     "inspection": {
       "sources_reviewed": [
