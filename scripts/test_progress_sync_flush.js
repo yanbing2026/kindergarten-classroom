@@ -67,11 +67,18 @@ function makeEnv(opts = {}) {
     const statuses = [];
     const cloudCalls = [];
     const env = { timers, store, statuses, cloudCalls, account: opts.account || 'alice', progress: opts.progress || { stars: 20 } };
-    const doc = { getElementById() { return null; }, documentElement: { dataset: {} } };
+    const statusEl = {
+        set textContent(v) { statuses.push(v); },
+        get textContent() { return ''; }
+    };
+    const doc = {
+        getElementById(id) { return (id === 'accountSyncStatus' || id === 'accountPopoverStatusText') ? statusEl : null; },
+        documentElement: { dataset: {} }
+    };
     env.api = new Function(
         'localStorage', 'document', 'setTimeout', 'clearTimeout', 'window', 'console',
         'getCurrentAccount', 'getCurrentAccountName', 'setPinVerifier', 'cloudSaveProgress',
-        'progress', 'cloudApi', 'closeAccountPopover', 'renderAccountBar', 'render', 'blipola', 'loadProgress',
+        'progress', 'cloudApi', 'closeAccountPopover', 'renderAccountBar', 'render', 'blipola', 'loadProgress', 'setAccountEnv',
         `let cloudSyncTimer=null, cloudSyncRetryTimer=null, cloudSyncInFlight=false,
              cloudSyncPending=false, cloudSyncInFlightPromise=null, cloudSyncEpoch=0,
              currentPinVerifier='verifier';
@@ -80,7 +87,7 @@ function makeEnv(opts = {}) {
              scheduleCloudProgressSync, syncCloudProgress, drainCloudProgressSync, flushCloudProgressSync,
              bumpCloudSyncEpoch, mergeLoginProgress, progressHasData, mergeProgress,
              logoutAccount,
-             setAccount(k){ account=k; },
+             setAccount(k){ setAccountEnv(k); },
              setVerifier(v){ currentPinVerifier=v; },
              pending(){ return cloudSyncPending; },
              epoch(){ return cloudSyncEpoch; }
@@ -95,7 +102,8 @@ function makeEnv(opts = {}) {
         async (name, p) => { cloudCalls.push({ name, stars: p.stars, progress: p }); return opts.saveResult ? opts.saveResult(name, p) : { ok: true }; },
         env.progress,
         { clearToken() {} },
-        () => {}, () => {}, () => {}, {}, () => ({ stars: 0, mastery: {} })
+        () => {}, () => {}, () => {}, {}, () => ({ stars: 0, mastery: {} }),
+        (k) => { env.account = k; }
     );
     env.api.setCloudSyncStatusCapture = null;
     // setCloudSyncStatus writes into DOM nodes that are absent in this harness;
@@ -149,20 +157,27 @@ async function awaitFlush(env) { return env.api.flushCloudProgressSync(0); }
     console.log('✓ logout waits for pending write, then clears account');
 }
 
-// 4. Stale responses cannot affect a switched account.
+// 4. Stale responses cannot affect a switched account (real in-flight gate).
 {
     const gate = deferred();
-    const env = makeEnv();
+    let settled = false;
+    gate.promise.then(() => { settled = true; });
+    const env = makeEnv({ saveResult: () => gate.promise });
     env.api.scheduleCloudProgressSync(600);
     const saving = env.api.syncCloudProgress();
-    env.api.bumpCloudSyncEpoch(); // account switch
+    assert.strictEqual(settled, false, 'save must be in flight before epoch change');
+    const statusesBefore = env.statuses.length;
+    env.api.bumpCloudSyncEpoch(); // account switch while the request is genuinely pending
     env.api.setAccount('bob');
+    assert.strictEqual(settled, false, 'save must still be in flight after epoch change');
     gate.resolve({ ok: true });
-    await saving;
+    const result = await saving;
+    assert.strictEqual(result.ok, true);
     assert.strictEqual(env.cloudCalls.length, 1);
     assert.strictEqual(env.cloudCalls[0].name, 'alice', 'write uses the account captured at start');
-    assert.strictEqual(env.timers.size(), 0, 'stale result schedules no retry/status work');
-    console.log('✓ stale response cannot write to or update UI for a new account');
+    assert.strictEqual(env.statuses.length, statusesBefore, 'stale result must not update sync status');
+    assert.strictEqual(env.timers.size(), 0, 'stale result schedules no retry work');
+    console.log('✓ stale in-flight response cannot update UI or write to a new account');
 }
 
 // 5. Failed save is surfaced, keeps local progress and is recoverable on login.
@@ -258,14 +273,20 @@ async function awaitFlush(env) { return env.api.flushCloudProgressSync(0); }
     gates[0].resolve({ ok: true });
     await firstSave;
     await new Promise(r => setImmediate(r));
-    env.api.bumpCloudSyncEpoch(); // cacheAccount() equivalent
-    env.api.setAccount('bob');
+    // Second write is now pending; the account switch must still be blocked.
+    assert.strictEqual(env.cloudCalls.length, 2, 'second write started');
+    assert.strictEqual(env.cloudCalls[1].stars, 22, 'second write carries newest progress');
+    assert.strictEqual(env.account, 'alice', 'account must not switch while the second write is pending');
     gates[1].resolve({ ok: true });
-    await preflush;
-    assert.strictEqual(env.cloudCalls.length, 2);
+    const flushed = await preflush;
+    assert.strictEqual(flushed.ok, true, 'preflush succeeds only after both writes settle');
     assert.deepStrictEqual(env.cloudCalls.map(c => c.name), ['alice', 'alice'], 'both writes target the original account');
-    assert.strictEqual(env.cloudCalls[1].stars, 22, 'newest progress written before switch');
-    console.log('✓ account-switch preflush drains both writes without cross-account leakage');
+    // Only now does the real submitAccount() flow switch the account.
+    env.api.bumpCloudSyncEpoch();
+    env.api.setAccount('bob');
+    assert.strictEqual(env.account, 'bob');
+    assert.strictEqual(env.api.epoch(), 1);
+    console.log('✓ account-switch preflush blocks the switch until both writes complete');
 }
 
 console.log('\nAll progress-sync regression tests PASSED! ✅');
