@@ -1,0 +1,278 @@
+{
+  "meta": {
+    "url": "https://blockquest-classroom.pages.dev/",
+    "startedUtc": "2026-11-22T14:45:50.411Z",
+    "completedUtc": "2026-11-22T14:45:54.499Z",
+    "browser": "Chrome/157.0.8103.38",
+    "viewport": "1280x900 headless desktop (no mobile emulation, no physical device)",
+    "hostOS": "Linux (headless Chrome runtime)",
+    "account": "one newly created synthetic disposable account, aliased TEST-A; no credentials recorded",
+    "timezoneNote": "UTC timestamps via Date().toISOString(); local clock US Eastern",
+    "appVersion": "v2-20261122-progress-flush"
+  },
+  "scenarios": [
+    {
+      "id": "A",
+      "name": "Baseline healthy sync against real Worker",
+      "status": "PASS",
+      "classification": "genuine production Worker behavior",
+      "expected": "Worker accepts and persists one reward; re-login shows it.",
+      "observed": "version=v2-20261122-progress-flush; TEST-A stars 0→1→re-login 1; mastery {}→{\"letters_L1\":{\"A\":1}}.",
+      "evidence": "test008-01-baseline.png"
+    },
+    {
+      "id": "B",
+      "name": "Genuine Worker-side failure / timeout",
+      "status": "BLOCKED",
+      "classification": "not tested",
+      "expected": "Trigger a controlled documented Worker-side failure for the synthetic account only.",
+      "observed": "No existing safe documented failure-injection header, endpoint, parameter, or payload found in worker source or docs. Per issue rules, no mechanism was invented and no production outage was induced.",
+      "evidence": "read-only inspection summary in report"
+    },
+    {
+      "id": "C",
+      "name": "Recovery after genuine failure",
+      "status": "BLOCKED",
+      "classification": "not tested",
+      "expected": "Restore and verify exactly-once persistence after a genuine failure.",
+      "observed": "Conditional on B; B is BLOCKED, so C cannot be executed.",
+      "evidence": "n/a"
+    },
+    {
+      "id": "D",
+      "name": "Client-side simulated network interruption",
+      "status": "PASS",
+      "classification": "client-simulated — NOT Worker-side failure",
+      "expected": "UI must not falsely claim cloud success; no lost/duplicated reward.",
+      "observed": "{\"before\":1,\"earned\":2,\"uiStatus\":\"☁️ Syncing…\",\"falseSuccess\":false,\"afterRelogin\":2,\"lost\":false,\"duplicated\":false}. This is browser-offline only and does not satisfy B or C.",
+      "evidence": "test008-02-client-offline.png"
+    },
+    {
+      "id": "E",
+      "name": "No collateral impact / error summary",
+      "status": "PASS",
+      "classification": "genuine production observation",
+      "expected": "Only the synthetic account changed; no unexpected errors.",
+      "observed": "final TEST-A stars=2, errors=3 (unexpected=0), failed requests=3 (all client-offline). No other account accessed or modified.",
+      "evidence": "test008-03-final.png"
+    }
+  ],
+  "evidence": {
+    "version": "v2-20261122-progress-flush",
+    "baseline": {},
+    "inspection": {
+      "sources_reviewed": [
+        "worker/src/index.js",
+        "worker/README.md",
+        "docs/cloud-backend-d1.md",
+        "js/cloud-api.js"
+      ],
+      "documented_failure_injection": null,
+      "generic_handler": "worker/src/index.js catch-all returns {ok:false,error:\"server_error\"} HTTP 500 for unhandled errors; no safe public trigger documented",
+      "conclusion": "BLOCKED: no existing documented safe production failure-injection mechanism for synthetic accounts"
+    },
+    "client_simulation": {
+      "before": 1,
+      "earned": 2,
+      "uiStatus": "☁️ Syncing…",
+      "falseSuccess": false,
+      "afterRelogin": 2,
+      "lost": false,
+      "duplicated": false
+    },
+    "worker_requests": {
+      "definition": "All responses from the production Worker host; application = POST/GET, preflight = OPTIONS",
+      "total": 21,
+      "application_requests": 14,
+      "preflight_responses": 7,
+      "paths": [
+        "/create",
+        "/events",
+        "/login",
+        "/me",
+        "/progress",
+        "/salt"
+      ],
+      "statuses": [
+        200,
+        204
+      ]
+    }
+  },
+  "network": [
+    {
+      "method": "OPTIONS",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/salt",
+      "status": 204,
+      "durationMs": 43
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/salt",
+      "status": 200,
+      "durationMs": 156
+    },
+    {
+      "method": "OPTIONS",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/create",
+      "status": 204,
+      "durationMs": 33
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/create",
+      "status": 200,
+      "durationMs": 126
+    },
+    {
+      "method": "OPTIONS",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/me",
+      "status": 204,
+      "durationMs": 18
+    },
+    {
+      "method": "GET",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/me",
+      "status": 200,
+      "durationMs": 81
+    },
+    {
+      "method": "OPTIONS",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 204,
+      "durationMs": 28
+    },
+    {
+      "method": "OPTIONS",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 204,
+      "durationMs": 33
+    },
+    {
+      "method": "OPTIONS",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/progress",
+      "status": 204,
+      "durationMs": 16
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 200,
+      "durationMs": 121
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 200,
+      "durationMs": 131
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/progress",
+      "status": 200,
+      "durationMs": 116
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/salt",
+      "status": 200,
+      "durationMs": 56
+    },
+    {
+      "method": "OPTIONS",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/login",
+      "status": 204,
+      "durationMs": 23
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/login",
+      "status": 200,
+      "durationMs": 106
+    },
+    {
+      "method": "GET",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/me",
+      "status": 200,
+      "durationMs": 56
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/salt",
+      "status": 200,
+      "durationMs": 33
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/login",
+      "status": 200,
+      "durationMs": 126
+    },
+    {
+      "method": "GET",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/me",
+      "status": 200,
+      "durationMs": 40
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 200,
+      "durationMs": 79
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/progress",
+      "status": 200,
+      "durationMs": 76
+    }
+  ],
+  "errors": [
+    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED"
+  ],
+  "failed_requests": [
+    {
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "error": "net::ERR_INTERNET_DISCONNECTED"
+    },
+    {
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "error": "net::ERR_INTERNET_DISCONNECTED"
+    },
+    {
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/progress",
+      "error": "net::ERR_INTERNET_DISCONNECTED"
+    }
+  ],
+  "screenshots": [
+    "test-reports/test008/test008-01-baseline.png",
+    "test-reports/test008/test008-02-client-offline.png",
+    "test-reports/test008/test008-03-final.png"
+  ]
+}
