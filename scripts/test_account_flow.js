@@ -44,8 +44,9 @@ function extractFunction(source, fnName) {
 }
 
 const progressHasDataSrc = extractFunction(html, 'progressHasData');
+const mergeNumericTreeSrc = extractFunction(html, 'mergeNumericTree');
 const mergeProgressSrc = extractFunction(html, 'mergeProgress');
-const helpers = new Function(`${progressHasDataSrc}\n${mergeProgressSrc}\nreturn { progressHasData, mergeProgress };`)();
+const helpers = new Function(`${progressHasDataSrc}\n${mergeNumericTreeSrc}\n${mergeProgressSrc}\nreturn { progressHasData, mergeProgress };`)();
 const { progressHasData, mergeProgress } = helpers;
 
 console.log('Testing account progress merge policy...');
@@ -97,25 +98,26 @@ console.log('✓ progressHasData ignores empty shells and detects real work');
     console.log('✓ merge keeps max scores, earliest due date, and unique activity');
 }
 
-// 4. Login as a different account with real cloud data must not adopt
-//    anonymous local progress (the policy branch in submitAccount).
+// 4. Login merges the target account's OWN local copy with cloud data so a
+//    stale server response cannot roll back newer rewards. Anonymous device
+//    progress is only adopted by an empty cloud account.
 {
-    const sameAccount = false;
-    const localIsAnonymous = false;
-    const local = { stars: 99 };
+    const mergeLogin = (accountLocal, cloud, anonymous) => {
+        const accountData = progressHasData(accountLocal) ? accountLocal : null;
+        if (progressHasData(cloud)) return mergeProgress(accountData || {}, cloud);
+        const adopt = accountData || (progressHasData(anonymous) ? anonymous : null);
+        return mergeProgress(adopt || {}, cloud);
+    };
+    const accountLocal = { stars: 99 };
     const cloud = { stars: 1 };
-    const chosen = progressHasData(cloud)
-        ? (sameAccount ? mergeProgress(local, cloud) : cloud)
-        : ((localIsAnonymous || sameAccount) ? mergeProgress(local, cloud) : cloud);
-    assert.deepStrictEqual(chosen, cloud, "a different child's progress must never be merged");
-    console.log("✓ different-account login with cloud data keeps cloud progress only");
-
-    const anonymousDevice = true; // no account was selected before this login
-    const adopted = progressHasData({})
-        ? mergeProgress(local, {})
-        : ((anonymousDevice || sameAccount) ? mergeProgress(local, {}) : {});
-    assert.strictEqual(adopted.stars, 99, 'anonymous device work is adopted by an empty cloud account');
-    console.log('✓ first-time login into an empty cloud account adopts device progress');
+    const anonymous = { stars: 50 };
+    assert.strictEqual(mergeLogin(accountLocal, cloud, anonymous).stars, 99,
+        'newer local progress must not be rolled back by stale cloud data');
+    assert.strictEqual(mergeLogin(null, cloud, anonymous).stars, 1,
+        "a different child's anonymous progress must never be merged into a non-empty account");
+    assert.strictEqual(mergeLogin(null, {}, anonymous).stars, 50,
+        'anonymous device work is adopted by an empty cloud account');
+    console.log('✓ login merge keeps newer local data and isolates anonymous progress');
 }
 
 // 6. second login on the same tablet links the new player identity
