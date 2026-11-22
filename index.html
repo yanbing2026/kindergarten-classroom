@@ -460,19 +460,37 @@
         }
         return result;
     }
+    // Drain until there is neither an in-flight write nor a newer pending
+    // write for this account. A save can be in flight while another answer
+    // schedules a debounced follow-up: waiting only for the first request
+    // would lose that reward when logout clears the timer. Each pass sends
+    // the newest snapshot; the loop is bounded to avoid spinning forever if
+    // something keeps scheduling new saves.
+    async function drainCloudProgressSync(epochAtStart){
+        let lastResult={ok:true,reason:'nothing-pending'};
+        for(let i=0;i<100;i++){
+            if(epochAtStart!==undefined&&epochAtStart!==cloudSyncEpoch)return {ok:false,reason:'account-changed'};
+            clearTimeout(cloudSyncTimer); // pending work is handled below, not dropped
+            if(cloudSyncInFlight&&cloudSyncInFlightPromise){
+                lastResult=await cloudSyncInFlightPromise;
+                continue;
+            }
+            if(cloudSyncPending){
+                lastResult=await syncCloudProgress();
+                continue;
+            }
+            return lastResult;
+        }
+        return {ok:false,reason:'flush-incomplete'};
+    }
     // Flush the debounced write before anything that drops the account or
     // credentials. Local progress is already persisted synchronously by
     // saveProgress(); a failed/timeout save is reported instead of claimed
-    // as a success and will be retried by the normal sync path.
+    // as a success. On failure the local copy remains on disk and the normal
+    // retry/login merge path recovers it.
     async function flushCloudProgressSync(timeoutMs=4000){
-        clearTimeout(cloudSyncTimer);
         clearTimeout(cloudSyncRetryTimer);
-        let work=Promise.resolve({ok:true,reason:'nothing-pending'});
-        if(cloudSyncInFlight&&cloudSyncInFlightPromise){
-            work=cloudSyncInFlightPromise;
-        }else if(cloudSyncPending){
-            work=syncCloudProgress();
-        }
+        const work=drainCloudProgressSync(cloudSyncEpoch);
         if(!timeoutMs)return work;
         return Promise.race([
             work,

@@ -36,7 +36,7 @@ function extractFunction(source, fnName) {
 const FN_NAMES = [
     'progressHasData', 'mergeNumericTree', 'mergeProgress', 'mergeLoginProgress',
     'bumpCloudSyncEpoch', 'setCloudSyncStatus', 'scheduleCloudProgressSync',
-    'syncCloudProgress', 'flushCloudProgressSync', 'logoutAccount'
+    'syncCloudProgress', 'drainCloudProgressSync', 'flushCloudProgressSync', 'logoutAccount'
 ];
 const fnsSrc = FN_NAMES.map(n => extractFunction(html, n)).join('\n');
 
@@ -77,7 +77,7 @@ function makeEnv(opts = {}) {
              currentPinVerifier='verifier';
          ${fnsSrc}
          return {
-             scheduleCloudProgressSync, syncCloudProgress, flushCloudProgressSync,
+             scheduleCloudProgressSync, syncCloudProgress, drainCloudProgressSync, flushCloudProgressSync,
              bumpCloudSyncEpoch, mergeLoginProgress, progressHasData, mergeProgress,
              logoutAccount,
              setAccount(k){ account=k; },
@@ -209,7 +209,63 @@ async function awaitFlush(env) { return env.api.flushCloudProgressSync(0); }
         'account switch must invalidate stale async work');
     assert(extractFunction(html, 'submitAccount').includes('mergeLoginProgress('),
         'login must use the safe merge helper');
+    assert(extractFunction(html, 'flushCloudProgressSync').includes('drainCloudProgressSync('),
+        'flush must drain, not settle for one in-flight write');
+    assert(extractFunction(html, 'drainCloudProgressSync').includes('cloudSyncInFlightPromise'),
+        'drain must await in-flight writes and then newer pending writes');
     console.log('✓ duplicate-reward guards and account-change hooks present');
+}
+
+// 8. REVIEW BLOCKER: a reward scheduled while a save is in flight must also
+//    be flushed before logout clears the account.
+{
+    const gates = [deferred(), deferred()];
+    let call = 0;
+    const env = makeEnv({
+        storage: { kc_current_account: 'alice' },
+        saveResult: () => (++call === 1 ? gates[0].promise : gates[1].promise)
+    });
+    env.api.scheduleCloudProgressSync(600);
+    const firstSave = env.api.syncCloudProgress(); // snapshot: stars 20, in flight
+    env.progress.stars = 21;                       // new answer while in flight
+    env.api.scheduleCloudProgressSync(600);        // debounced follow-up pending
+    const loggingOut = env.api.logoutAccount();
+    await new Promise(r => setImmediate(r));
+    assert.strictEqual(env.store.kc_current_account, 'alice', 'logout must wait for both writes');
+    gates[0].resolve({ ok: true });
+    await firstSave;
+    await new Promise(r => setImmediate(r));
+    assert.strictEqual(env.cloudCalls.length, 2, 'follow-up save must be sent after the first settles');
+    assert.strictEqual(env.cloudCalls[1].stars, 21, 'follow-up save must carry the newest progress');
+    assert.strictEqual(env.store.kc_current_account, 'alice', 'account not cleared before second write resolves');
+    gates[1].resolve({ ok: true });
+    await loggingOut;
+    assert.strictEqual(env.store.kc_current_account, undefined, 'account cleared only after full drain');
+    console.log('✓ logout drains in-flight save plus newer pending save before clearing account');
+}
+
+// 9. Equivalent account-switch path: preflush drains both writes and both
+//    still target the account that earned them.
+{
+    const gates = [deferred(), deferred()];
+    let call = 0;
+    const env = makeEnv({ saveResult: () => (++call === 1 ? gates[0].promise : gates[1].promise) });
+    env.api.scheduleCloudProgressSync(600);
+    const firstSave = env.api.syncCloudProgress();
+    env.progress.stars = 22;
+    env.api.scheduleCloudProgressSync(600);
+    const preflush = env.api.flushCloudProgressSync(0);
+    gates[0].resolve({ ok: true });
+    await firstSave;
+    await new Promise(r => setImmediate(r));
+    env.api.bumpCloudSyncEpoch(); // cacheAccount() equivalent
+    env.api.setAccount('bob');
+    gates[1].resolve({ ok: true });
+    await preflush;
+    assert.strictEqual(env.cloudCalls.length, 2);
+    assert.deepStrictEqual(env.cloudCalls.map(c => c.name), ['alice', 'alice'], 'both writes target the original account');
+    assert.strictEqual(env.cloudCalls[1].stars, 22, 'newest progress written before switch');
+    console.log('✓ account-switch preflush drains both writes without cross-account leakage');
 }
 
 console.log('\nAll progress-sync regression tests PASSED! ✅');
