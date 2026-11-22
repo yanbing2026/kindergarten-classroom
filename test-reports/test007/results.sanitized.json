@@ -1,0 +1,506 @@
+{
+  "meta": {
+    "url": "https://blockquest-classroom.pages.dev/",
+    "startedUtc": "2026-11-22T04:21:57.316Z",
+    "completedUtc": "2026-11-22T04:22:08.909Z",
+    "browser": "Chrome/157.0.8103.38",
+    "viewport": "1280x900 headless desktop (no mobile emulation, no physical device)",
+    "accounts": "newly created synthetic TEST-A / TEST-B only (aliases in report; no credentials recorded)",
+    "backend": "real production Cloudflare Worker/D1 (no mocks)",
+    "appVersion": "v2-20261122-progress-flush"
+  },
+  "scenarios": [
+    {
+      "id": 1,
+      "name": "Immediate logout after one reward",
+      "status": "PASS",
+      "expected": "Reward remains after immediate logout and re-login.",
+      "observed": "A stars 0 → 1 → re-login 1; mastery {} → {\"letters_L1\":{\"A\":1}}.",
+      "evidence": "test007-02-one-reward.png"
+    },
+    {
+      "id": 2,
+      "name": "Multiple rapid rewards survive immediate logout",
+      "status": "PASS",
+      "expected": "All three rewards and mastery retained.",
+      "observed": "A stars 1 → 4 → re-login 4; mastery {\"letters_L1\":{\"A\":1}} → {\"letters_L1\":{\"A\":1,\"B\":1,\"C\":1,\"D\":1}}.",
+      "evidence": "test007-03-rapid-rewards.png"
+    },
+    {
+      "id": 3,
+      "name": "Refresh and re-login preserve progress",
+      "status": "PASS",
+      "expected": "Same stars/mastery after refresh and after logout/re-login.",
+      "observed": "A stars 4 → 5 → refresh 5 → re-login 5.",
+      "evidence": "test007-04-refresh.png"
+    },
+    {
+      "id": 4,
+      "name": "Account isolation A/B with distinct progress",
+      "status": "PASS",
+      "expected": "Neither account loses its own progress or receives the other's; A and B have different, identifiable deltas.",
+      "observed": "A 5→7→7→7 mastery={\"letters_L1\":{\"A\":1,\"B\":1,\"C\":1,\"D\":1,\"E\":1,\"F\":1,\"G\":1}}; B 0→1→1 mastery={\"letters_L1\":{\"A\":1}}; immediate switches used throughout.",
+      "evidence": "test007-05-isolation.png"
+    },
+    {
+      "id": 5,
+      "name": "Real production backend evidence",
+      "status": "PASS",
+      "expected": "Requests reach Cloudflare Worker endpoints with non-error statuses; save success is not falsely reported.",
+      "observed": "62 Worker responses = 55 application requests (44 POST + 11 GET, all 200) + 7 OPTIONS preflights (204); paths /create,/login,/me,/salt,/progress,/events; no 4xx/5xx. Offline probe: {\"before\":7,\"afterAnswer\":8,\"statusText\":\"☁️ Syncing…\",\"warningShown\":true,\"afterRelogin\":8,\"recovered\":true}. No auth headers/tokens captured.",
+      "evidence": "network log in report"
+    },
+    {
+      "id": "ERRORS",
+      "name": "Console / page / failed-request summary",
+      "status": "PASS",
+      "expected": "No unexpected errors.",
+      "observed": "page/console errors=3 (filtered=0); failed requests=3; details in report.",
+      "evidence": "n/a"
+    }
+  ],
+  "evidence": {
+    "version": "v2-20261122-progress-flush",
+    "baseline": {
+      "A": {
+        "stars": 0,
+        "badge": "💎 0v2-20261122-progress-flush",
+        "mastery": {},
+        "account": "TEST-A"
+      },
+      "B": {
+        "stars": 0,
+        "badge": "💎 0v2-20261122-progress-flush",
+        "mastery": {},
+        "account": "TEST-B"
+      }
+    },
+    "worker_requests": {
+      "total": 57,
+      "paths": [
+        "/create",
+        "/events",
+        "/login",
+        "/me",
+        "/progress",
+        "/salt"
+      ],
+      "statuses": [
+        200,
+        204
+      ]
+    },
+    "offline_probe": {
+      "before": 7,
+      "afterAnswer": 8,
+      "statusText": "☁️ Syncing…",
+      "warningShown": true,
+      "afterRelogin": 8,
+      "recovered": true
+    }
+  },
+  "network": [
+    {
+      "method": "OPTIONS",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/salt",
+      "status": 204
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/salt",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/create",
+      "status": 204
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/create",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/me",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/salt",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/create",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/salt",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/login",
+      "status": 204
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/me",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/progress",
+      "status": 204
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/progress",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/salt",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/progress",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/salt",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/salt",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/progress",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/progress",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/salt",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/progress",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/salt",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/salt",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/salt",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/salt",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/progress",
+      "status": 200
+    }
+  ],
+  "errors": [
+    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED"
+  ],
+  "failed": [
+    {
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "error": "net::ERR_INTERNET_DISCONNECTED"
+    },
+    {
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/events",
+      "error": "net::ERR_INTERNET_DISCONNECTED"
+    },
+    {
+      "host": "blockquest-api.yanbing2004.workers.dev",
+      "path": "/progress",
+      "error": "net::ERR_INTERNET_DISCONNECTED"
+    }
+  ],
+  "screenshots": [
+    "test-reports/test007/test007-00-before-create.png",
+    "test-reports/test007/test007-01-accounts-created.png",
+    "test-reports/test007/test007-02-one-reward.png",
+    "test-reports/test007/test007-03-rapid-rewards.png",
+    "test-reports/test007/test007-04-refresh.png",
+    "test-reports/test007/test007-05-isolation.png"
+  ]
+}
