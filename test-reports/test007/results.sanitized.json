@@ -64,19 +64,20 @@
     "baseline": {
       "A": {
         "stars": 0,
-        "badge": "💎 0v2-20261122-progress-flush",
         "mastery": {},
         "account": "TEST-A"
       },
       "B": {
         "stars": 0,
-        "badge": "💎 0v2-20261122-progress-flush",
         "mastery": {},
         "account": "TEST-B"
       }
     },
     "worker_requests": {
-      "total": 57,
+      "definition": "All responses from blockquest-api.yanbing2004.workers.dev captured in the final run; application = POST/GET, preflight = OPTIONS.",
+      "total": 62,
+      "application_requests": 55,
+      "preflight_responses": 7,
       "paths": [
         "/create",
         "/events",
