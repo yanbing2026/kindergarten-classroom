@@ -21,7 +21,7 @@
         document.documentElement.dataset.theme = 'cream';
     }
     </script>
-    <!-- APP_VERSION: v2-20261121-nickname -->
+    <!-- APP_VERSION: v2-20261122-progress-flush -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@700;800;900&display=swap" media="print" onload="this.media='all'">
@@ -103,7 +103,7 @@
     <script src="./js/blipola-runtime.js"></script>
     <script>
     // ---------- App version ----------
-    const APP_VERSION = 'v2-20261121-nickname';
+    const APP_VERSION = 'v2-20261122-progress-flush';
 
     // ---------- Debug / Dev Mode ----------
     // Hidden diagnostic screen for parents and developers.
@@ -283,6 +283,7 @@
         try{const accounts=getAccounts();return accounts[key]?.name || key;}catch(_){return key;}
     }
     function cacheAccount(name){
+        bumpCloudSyncEpoch();
         const key=name.toLowerCase();
         try{const accounts=getAccounts();accounts[key]={name:name};localStorage.setItem('kc_accounts_v1',JSON.stringify(accounts));}catch(_){}
         const previous=localStorage.getItem('kc_current_account')||'';
@@ -398,6 +399,16 @@
     let cloudSyncRetryTimer=null;
     let cloudSyncInFlight=false;
     let cloudSyncPending=false;
+    let cloudSyncInFlightPromise=null;
+    // Bumped whenever the active account changes. Async saves capture the
+    // epoch/account at start so a late response cannot affect a new account.
+    let cloudSyncEpoch=0;
+    function bumpCloudSyncEpoch(){
+        cloudSyncEpoch++;
+        clearTimeout(cloudSyncTimer);
+        clearTimeout(cloudSyncRetryTimer);
+        cloudSyncPending=false;
+    }
     function setCloudSyncStatus(state){
         const el=document.getElementById('accountSyncStatus');
         const popEl=document.getElementById('accountPopoverStatusText');
@@ -417,12 +428,27 @@
         setCloudSyncStatus('syncing');
     }
     async function syncCloudProgress(){
-        if(!cloudSyncPending||cloudSyncInFlight||!getCurrentAccount())return;
+        if(!cloudSyncPending||cloudSyncInFlight||!getCurrentAccount())return {ok:false,reason:'skipped'};
+        const epoch=cloudSyncEpoch;
+        const accountName=getCurrentAccountName();
+        const snapshot=progress;
         cloudSyncPending=false;
         cloudSyncInFlight=true;
         setCloudSyncStatus('syncing');
-        const result=await cloudSaveProgress(getCurrentAccountName(),progress);
-        cloudSyncInFlight=false;
+        const task=(async()=>{
+            let result;
+            try{result=await cloudSaveProgress(accountName,snapshot);}
+            catch(error){result={ok:false,reason:error?.message||String(error)};}
+            cloudSyncInFlight=false;
+            cloudSyncInFlightPromise=null;
+            return result;
+        })();
+        cloudSyncInFlightPromise=task;
+        const result=await task;
+        // The account was switched or logged out while the write was in
+        // flight. The write already used the account captured above; ignore
+        // its UI/status effects so it cannot affect the new account.
+        if(epoch!==cloudSyncEpoch)return result;
         clearTimeout(cloudSyncRetryTimer);
         if(result&&result.ok){
             setCloudSyncStatus('saved');
@@ -432,6 +458,44 @@
             setCloudSyncStatus('offline');
             cloudSyncRetryTimer=setTimeout(()=>scheduleCloudProgressSync(0),5000);
         }
+        return result;
+    }
+    // Drain until there is neither an in-flight write nor a newer pending
+    // write for this account. A save can be in flight while another answer
+    // schedules a debounced follow-up: waiting only for the first request
+    // would lose that reward when logout clears the timer. Each pass sends
+    // the newest snapshot; the loop is bounded to avoid spinning forever if
+    // something keeps scheduling new saves.
+    async function drainCloudProgressSync(epochAtStart){
+        let lastResult={ok:true,reason:'nothing-pending'};
+        for(let i=0;i<100;i++){
+            if(epochAtStart!==undefined&&epochAtStart!==cloudSyncEpoch)return {ok:false,reason:'account-changed'};
+            clearTimeout(cloudSyncTimer); // pending work is handled below, not dropped
+            if(cloudSyncInFlight&&cloudSyncInFlightPromise){
+                lastResult=await cloudSyncInFlightPromise;
+                continue;
+            }
+            if(cloudSyncPending){
+                lastResult=await syncCloudProgress();
+                continue;
+            }
+            return lastResult;
+        }
+        return {ok:false,reason:'flush-incomplete'};
+    }
+    // Flush the debounced write before anything that drops the account or
+    // credentials. Local progress is already persisted synchronously by
+    // saveProgress(); a failed/timeout save is reported instead of claimed
+    // as a success. On failure the local copy remains on disk and the normal
+    // retry/login merge path recovers it.
+    async function flushCloudProgressSync(timeoutMs=4000){
+        clearTimeout(cloudSyncRetryTimer);
+        const work=drainCloudProgressSync(cloudSyncEpoch);
+        if(!timeoutMs)return work;
+        return Promise.race([
+            work,
+            new Promise(resolve=>setTimeout(()=>resolve({ok:false,reason:'timeout'}),timeoutMs))
+        ]);
     }
     window.addEventListener('online',()=>{if(getCurrentAccount())scheduleCloudProgressSync(0);});
     document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&getCurrentAccount())syncCloudProgress();});
@@ -447,6 +511,20 @@
             || Object.keys(p.gradeMastery||{}).length>0
             || Object.keys(p.mathCorrect||{}).length>0;
     }
+    // Mastery-style stores are nested (cat_level -> item -> count); older
+    // saves were flat. Merge recursively with max at the leaves so a nested
+    // count is never coerced to 0 by Math.max on an object.
+    function mergeNumericTree(base,next){
+        const isObj=v=>v&&typeof v==='object'&&!Array.isArray(v);
+        if(!isObj(base)&&!isObj(next))return Math.max(Number(next)||0,Number(base)||0);
+        if(isObj(base)&&!isObj(next))return base;
+        if(!isObj(base)&&isObj(next))return next;
+        const out=Object.assign({},base);
+        for(const k of Object.keys(next)){
+            out[k]=Object.prototype.hasOwnProperty.call(out,k)?mergeNumericTree(out[k],next[k]):next[k];
+        }
+        return out;
+    }
     function mergeProgress(localP,cloudP){
         const isObj=v=>v&&typeof v==='object'&&!Array.isArray(v);
         if(!isObj(cloudP)||!Object.keys(cloudP).length)return localP;
@@ -454,11 +532,7 @@
         const merged=Object.assign({},cloudP,localP);
         merged.stars=Math.max(Number(localP.stars)||0,Number(cloudP.stars)||0);
         ['mastery','gradeMastery','mathCorrect'].forEach(field=>{
-            const out=Object.assign({},isObj(cloudP[field])?cloudP[field]:{});
-            Object.entries(isObj(localP[field])?localP[field]:{}).forEach(([k,v])=>{
-                out[k]=Math.max(Number(out[k])||0,Number(v)||0);
-            });
-            merged[field]=out;
+            merged[field]=mergeNumericTree(cloudP[field],localP[field]);
         });
         const due=Object.assign({},isObj(cloudP.due)?cloudP.due:{});
         Object.entries(isObj(localP.due)?localP.due:{}).forEach(([k,v])=>{
@@ -477,12 +551,30 @@
         }
         return merged;
     }
+    // Login must merge this account's own locally stored progress with the
+    // cloud copy: a stale server response must never roll back newer local
+    // rewards. Anonymous device progress may only be adopted by an empty
+    // cloud account, never merged into an account that already has data.
+    function mergeLoginProgress(accountLocal,cloudProgress,anonymousLocal){
+        const accountData=progressHasData(accountLocal)?accountLocal:null;
+        if(progressHasData(cloudProgress))return mergeProgress(accountData||{},cloudProgress);
+        const adopt=accountData||(progressHasData(anonymousLocal)?anonymousLocal:null);
+        return mergeProgress(adopt||{},cloudProgress);
+    }
     function closeAccountModal(){const m=document.getElementById('accountModal');if(m)m.style.display='none';}
     function openAccountModal(mode){const m=document.getElementById('accountModal');if(!m)return;const create=mode==='create';m.style.display='grid';m.innerHTML='<div class="account-box"><h2>⛏️ '+(create?'Create Your BlockQuest Account':'Welcome Back!')+'</h2><p>'+(create?'Create a child profile in the cloud.':'Log in to load this profile from the cloud.')+'</p><input id="accountName" maxlength="24" placeholder="Player name"><input id="accountPin" maxlength="6" inputmode="numeric" type="password" placeholder="4–6 digit PIN"><div class="account-actions"><button id="accountSubmit">'+(create?'Create':'Log In')+'</button><button id="accountCancel">Cancel</button></div><div id="accountStatus" class="account-status"></div><div class="account-switch"><button id="accountSwitch">'+(create?'Already have an account? Log in':'New player? Create an account')+'</button></div></div>';document.getElementById('accountSubmit').onclick=()=>submitAccount(mode);document.getElementById('accountCancel').onclick=closeAccountModal;document.getElementById('accountSwitch').onclick=()=>openAccountModal(create?'login':'create');}
     function submitAccount(mode){const name=(document.getElementById('accountName')?.value||'').trim(),pin=(document.getElementById('accountPin')?.value||'').trim(),status=document.getElementById('accountStatus'),btn=document.getElementById('accountSubmit');if(!/^[A-Za-z0-9 _-]{2,24}$/.test(name)){status.textContent='Use 2–24 letters, numbers, spaces, _ or -.';return;}if(!/^\d{4,6}$/.test(pin)){status.textContent='PIN must be 4–6 digits.';return;}if(!cloudApi){status.textContent='Cloud accounts need an internet connection. Your progress stays saved on this device.';return;}btn.disabled=true;status.textContent='Checking…';
     (async()=>{
         const key=name.toLowerCase();
         const hadAccount=getCurrentAccount();
+        // Settle any debounced write for the previous account before the
+        // account/credentials change. A failure is surfaced, not hidden: the
+        // local copy is still on disk and will be merged on the next login.
+        const preflush=await flushCloudProgressSync();
+        if(preflush&&preflush.ok===false&&preflush.reason!=='nothing-pending'&&preflush.reason!=='skipped'){
+            setCloudSyncStatus('offline');
+            console.warn('Pending cloud save did not complete before account change',preflush.reason);
+        }
         if(mode==='create'){
             // Upload whatever the child already earned on this device; sending
             // {} here used to erase local progress two lines later.
@@ -522,16 +614,13 @@
                 cacheAccount(acct.name||name);
                 const normalized=await ensureNormalizedAuth(acct.name||name);
                 const cloudProgress=acct.progress||{};
-                const sameAccount=String(hadAccount||'')===key;
-                const localIsAnonymous=!hadAccount;
-                let chosen;
-                if(progressHasData(cloudProgress)){
-                    // A different child's anonymous progress must never be
-                    // merged into an existing account.
-                    chosen=sameAccount?mergeProgress(progress,cloudProgress):cloudProgress;
-                }else{
-                    chosen=(localIsAnonymous||sameAccount)?mergeProgress(progress,cloudProgress):cloudProgress;
-                }
+                // Merge this account's OWN stored copy, not whatever happens
+                // to be in memory (which may be another child's guest data).
+                let accountLocal=null;
+                try{const raw=localStorage.getItem(accountProgressKey(key));if(raw)accountLocal=JSON.parse(raw);}catch(_){}
+                const localForLogin=String(hadAccount||'')===key?mergeProgress(accountLocal,progress):accountLocal;
+                const anonymousLocal=hadAccount?null:progress;
+                const chosen=mergeLoginProgress(localForLogin,cloudProgress,anonymousLocal);
                 try{localStorage.setItem(accountProgressKey(key),JSON.stringify(chosen));}catch(_){}
                 if(JSON.stringify(chosen)!==JSON.stringify(cloudProgress)){
                     const pushed=await cloudSaveProgress(acct.name||name,chosen);
@@ -549,6 +638,16 @@
     })();
     }
     async function logoutAccount(){
+        // Wait for the debounced save before dropping the account context,
+        // otherwise the timer fires with no account and the newest rewards
+        // never leave the device. The local copy is already saved; on failure
+        // we surface it and the next login merges it back from disk.
+        const flushed=await flushCloudProgressSync();
+        if(flushed&&flushed.ok===false&&flushed.reason!=='nothing-pending'&&flushed.reason!=='skipped'){
+            setCloudSyncStatus('offline');
+            console.warn('Cloud save did not complete before logout; progress stays on this device',flushed.reason);
+        }
+        bumpCloudSyncEpoch();
         if(cloudApi) cloudApi.clearToken();
         localStorage.removeItem('kc_current_account');
         setPinVerifier('');
